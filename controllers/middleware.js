@@ -2,6 +2,11 @@
  *          MIDDLEWARE FUNCTIONS          *
  ******************************************/
 
+/**
+ * Module dependencies.
+ */
+var db = require('../db');
+
 /*
  * ALL
  * Check authentication

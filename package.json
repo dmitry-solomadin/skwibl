@@ -1,15 +1,12 @@
 {
-  "name": "a-tease",
+  "name": "skwibl",
   "version": "0.0.1",
   "private": true,
-  "author": "a-tease <info@a-tease.com>",
+  "author": "skwibl <info@skwibl.com>",
   "description": "Realtime collaboration engine for WEB",
   "contributors": [{
     "name": "Yuri Karadzhov",
-    "email": "yuri@a-tease.com"
-  }, {
-    "name": "Alexander Baranovski",
-    "email": "alex@a-tease.com"
+    "email": "yuri@skwibl.com"
   }],
   "repository": {
     "type": "git",
