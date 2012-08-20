@@ -1,0 +1,174 @@
+<div style="position:relative;width:900px;height:230px;">
+<img style="height:230px;" src="/public/images/defaultpage.png">
+<img src="/public/images/avatar.png" style="width:230px;position:absolute;right:0px;top:0px;">
+</div>
+<script>
+
+var copt={
+  'connect timeout': 5000,
+  'max reconnection attempts': 5,
+  'force new connection': true
+};
+
+var activity = io.connect('/activity', copt);
+
+activity.on('connect', function() {
+  console.log('connection established');
+});
+
+</script>
+<div class="clear_medium"></div><div class="clear_medium"></div>
+
+<div style="width:673px;" class="fl mrt">
+
+	<ul id="myTab" class="mrl fl nav nav-tabs">
+		<li class="active"><a href="#addpost">Add post</a></li>
+		<li><a href="#friends">Friends</a></li>
+	</ul>
+	<a href="/users/12/edit" class="fr mrl_small btn btn-primary btn-large">Edit profile</a>
+	<div style="overflow:hidden;" class="fl mrl tab-content">
+		<div class="active tab-pane " id="addpost">
+			<div class="clear_medium"></div><div class="clear_medium"></div>
+			  <% for (var i in articles) { %>
+				<div class="mrl_big fl" style="width:650px;">
+					<a href="/user/<%= articles[i].id %>/">
+						<img class="fl mrt_big" width="60" src="<%= articles[i].avatar %>"></a>
+					</a>
+					<b class="fl">
+						<a href="/user/<%= articles[i].id %>/"><%= articles[i].name %></a>
+					</b>
+					<br>
+					<div class="fl" style="width:575px;">
+						<%= articles[i].content %>
+					</div>
+				</div>
+				<div class="clear_medium"></div>
+			  <% } %>
+		</div>
+
+		<div class="tab-pane " id="friends">
+			<div class="clear_medium"></div><div class="clear_medium"></div>
+				<div style="width:150px;" class="mrl fl">
+					<a href="/user/6/">
+						<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+					<b class="mrl fl">
+						<a href="/user/6/">Ivan</a>
+					</b>
+
+				</div>
+				<div style="width:150px;" class="mrl fl">
+					<a href="/user/6/">
+						<img width="60" src="/public/images/avatar.png" class="fl">
+					</a>
+
+					<b class="mrl fl">
+						<a href="/user/6/">Ivan</a>
+					</b>
+
+				</div>
+				<div style="width:150px;" class="mrl fl">
+					<a href="/user/6/">
+						<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+					<b class="mrl fl">
+						<a href="/user/6/">Ivan</a>
+					</b>
+
+				</div>
+				<div style="width:150px;" class="mrl fl">
+					<a href="/user/6/">
+						<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+					<b class="mrl fl">
+						<a href="/user/6/">Ivan</a>
+					</b>
+
+				</div>
+
+				<div class="clear_medium"></div><div class="clear_medium"></div>
+				<div style="width:150px;" class="mrl fl">
+					<a href="/user/6/">
+						<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+					<b class="mrl fl">
+						<a href="/user/6/">Ivan</a>
+					</b>
+				</div>
+				<div style="width:150px;" class="mrl fl">
+					<a href="/user/6/">
+						<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+					<b class="mrl fl">
+						<a href="/user/6/">Ivan</a>
+					</b>
+				</div>
+				<div style="width:150px;" class="mrl fl">
+					<a href="/user/6/">
+						<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+					<b class="mrl fl">
+						<a href="/user/6/">Ivan</a>
+					</b>
+				</div>
+				<div style="width:150px;" class="mrl fl">
+					<a href="/user/6/">
+						<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+					<b class="mrl fl">
+						<a href="/user/6/">Ivan</a>
+					</b>
+				</div>
+				<div class="clear_medium"></div>
+				<div style="width:150px;" class="mrl fl">
+					<a href="/user/6/">
+						<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+					<b class="mrl fl">
+						<a href="/user/6/">Ivan</a>
+					</b>
+
+				</div>
+				<div style="width:150px;" class="mrl fl">
+					<a href="/user/6/">
+						<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+					<b class="mrl fl">
+						<a href="/user/6/">Ivan</a>
+					</b>
+				</div>
+			</div>
+		</div>
+
+	</div>
+<div class="fl" style="width:200px;" >
+	<b>Name:</b> Alexandr Baranovsky
+	<div class="clear_small"></div>
+	<b>Gander:</b> male
+	<div class="clear_small"></div>
+	<b>Was born:</b> 03.10.1987
+	<div class="clear_small"></div>
+	<b>Email:</b> kisit@yandex.ru
+	<div class="clear_small"></div>
+	<b>Phone:</b> +380633437101
+	<div class="clear_small"></div>
+	<b>About:</b>
+	About me, About me, About me, About me, About me, About me, About me,
+	About me, About me, About me, About me, About me, About me, About me, About me, About me, About me,
+	About me, About me, About me, About me, About me, About me,
+	About me, About me, About me, About me
+	<div class="clear_small"></div>
+	<b>Occupation:</b> Team leader of web-developers.
+	<div class="clear_small"></div>
+	<b>Marital status:</b> Free
+	<div class="clear_small"></div>
+	<b>Interests:</b> Jazz, Boxing, Sex
+	<div class="clear_small"></div>
+</div>
+
+<script>
+	$('#myTab a').click(function (e) {
+		e.preventDefault();
+		$(this).tab('show');
+	})
+</script>

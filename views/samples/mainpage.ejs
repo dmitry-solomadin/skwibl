@@ -1,0 +1,124 @@
+<div class="container-fluid">
+<div class="fl mrt_big" style="width:670px;">
+	<div style="width:670px" class="carousel slide" id="myCarousel">
+		 <div class="carousel-inner">
+		  <div class="item">
+			<img alt="" src="/public/stylesheets/bootstrap/img/bootstrap-mdo-sfmoma-01.jpg">
+			<div class="carousel-caption">
+				<h4>First Thumbnail label</h4>
+				<p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+				</div>
+			  </div>
+			  <div class="item">
+				<img alt="" src="/public/stylesheets/bootstrap/img/bootstrap-mdo-sfmoma-02.jpg">
+				<div class="carousel-caption">
+				  <h4>Second Thumbnail label</h4>
+				  <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+				</div>
+			  </div>
+			  <div class="item active">
+				<img alt="" src="/public/stylesheets/bootstrap/img/bootstrap-mdo-sfmoma-03.jpg">
+				<div class="carousel-caption">
+				  <h4>Third Thumbnail label</h4>
+				  <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+				</div>
+			  </div>
+			</div>
+			<a data-slide="prev" href="#myCarousel" class="left carousel-control">‹</a>
+			<a data-slide="next" href="#myCarousel" class="right carousel-control">›</a>
+		  </div>
+	</div>
+	<div class="fl">
+		<!--<ul  style="margin-left:70px;" class="nav nav-tabs" id="myTab">
+			<li class="active"><a href="#login">Login</a></li>
+			<li><a href="#register">Register</a></li>
+		</ul>-->
+		<div class="clear_medium"></div>
+		<% if(message) { %>
+			<div style="color:red;"><%= message %></div>
+		<% } %>
+		<div class="clear_medium"></div>
+		<div class="tab-content">
+			<div class="tab-pane active" id="login">
+				<form action="/login" method="post" class="form-horizontal">
+					<fieldset>
+						<div class="control-group">
+							<label class="control-label" for="login">Login</label>
+							<div class="controls">
+								<input type="text" class="input-xlarge" name="email" >
+							</div>
+							<div class="clear_medium"></div>
+							<label class="control-label" for="password">Password</label>
+							<div class="controls">
+								<input type="password" class="input-xlarge" name="password" id="password">
+							</div>
+							<div class="clear_medium"></div>
+
+							<div class="fr" style="width:280px;" >
+								<a class="fl mrt_big" href="/forgotpassword">Forgot password?</a>
+
+								<label class="checkbox fl" >
+									<input type="checkbox"> Remember me
+								</label>
+							</div>
+							<div class="clear_medium"></div>
+							<div style="margin-left:160px;" class="fl mrt">
+								Login throw:
+							</div>
+							<a class="fl mrt">
+								<img src="/public/images/f.gif" >
+							</a>
+							<a class="fl mrt">
+								<img  src="/public/images/tt.gif">
+							</a>
+							<a class="fl">
+								<img  src="/public/images/tt.gif">
+							</a>
+							<div class="clear_medium"></div>
+							<div class="fr">
+								<button class="btn btn-primary" type="submit">Login</button>
+								<button class="btn" >Cancel</button>
+							</div>
+						</div>
+					</fieldset>
+				</form>
+			</div>
+
+		</div>
+
+		<div class="tab-pane" id="register">
+				<form action="/register" method="post" id="form_register" class="form-horizontal">
+					<fieldset>
+						<div class="control-group">
+							<label class="control-label" for="name">Name</label>
+							<div class="controls">
+							<input type="text" class="input-xlarge" name="name" id="name">
+							</div>
+							<div class="clear_medium"></div>
+							<label class="control-label" for="email">Email</label>
+							<div class="controls">
+							<input type="text" class="input-xlarge" name="email" id="email">
+							</div>
+							<div class="clear_medium"></div>
+							<label class="control-label" for="registerpassword">Password</label>
+							<div class="controls">
+							<input type="password" class="input-xlarge" name="password" id="registerpassword">
+							</div>
+							<div class="clear_medium"></div>
+							<div class="fr">
+								<button class="btn btn-primary" type="submit">Register</button>
+								<button class="btn" >Cancel</button>
+							</div>
+						</div>
+					</fieldset>
+				</form>
+			</div>
+
+	</div>
+</div>
+<script>
+	$('#myTab a').click(function (e) {
+		e.preventDefault();
+		$(this).tab('show');
+	})
+</script>

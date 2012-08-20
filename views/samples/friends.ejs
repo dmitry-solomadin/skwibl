@@ -1,0 +1,236 @@
+<h1 class="mrl">Friends</h1>
+<div class="clear_medium"></div>
+<div class="clear_medium"></div>
+<div class="controls">
+	<input type="text" id="search" name="search" class="fl mrl mrt input-xlarge">
+	<button type="submit" class="btn btn-primary fl">Search</button>
+</div>
+<div  style="width:730px;height:210px;overflow:auto;">
+	<% var a=0; for (var i in users) { %>
+			<div class="mrl fl" style="width:150px;">
+				<a href="/user/<%= users[i].id %>/" >
+					<img class="fl" width="60" src="<%= users[i].avatar %>"></a>
+				</a>
+				<b class="mrl fl">
+					<a href="/user/<%= users[i].id %>/"><%= users[i].name %></a><br>
+					<a style="color:orange;cursor:pointer;">Add to room</a>
+				</b>
+				<% var a=a+1 %>
+			</div>
+			<% if(a%4==0) { %>
+				<div class="clear_medium"></div>
+			<% } %>
+		  <% } %>
+	<div class="clear_medium"></div>
+</div>
+<div class="clear_medium" style="border-bottom:2px solid black;width:750px;"></div>
+
+<div style="background-color:#fff;padding:10px;margin:10px;margin-left:150px;margin-top:-50px;height:100px;width:390px;border:1px solid black;" class="fl">
+	<a class="fl" style="cursor:pointer;font-size:70px;margin-top:20px;">-</a>
+	<div class="mrl fl" style="width:70px;">
+		<a href="/user/8/">
+			<img width="60" class="fl" src="/public/images/avatar.png"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div class="mrl fl" style="width:70px;">
+		<a href="/user/8/">
+			<img width="60" class="fl" src="/public/images/avatar.png"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div class="mrl fl" style="width:70px;">
+		<a href="/user/8/">
+			<img width="60" class="fl" src="/public/images/avatar.png"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div class="mrl fl" style="width:70px;">
+		<a href="/user/8/">
+			<img width="60" class="fl" src="/public/images/avatar.png"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<a class="fr" style="cursor:pointer;font-size:70px;margin-top:20px;">+</a>
+</div>
+
+<div class="clear_medium"></div>
+
+<div class="fl" style="padding:10px;margin:10px;height:100px;width:330px;border:1px solid black;">
+	<div style="width:70px;" class="mrl fl">
+		<a href="/user/8/">
+			<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div style="width:70px;" class="mrl fl">
+		<a href="/user/8/">
+			<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div style="width:70px;" class="mrl fl">
+		<a href="/user/8/">
+			<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div style="width:70px;" class="mrl fl">
+		<a href="/user/8/">
+			<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div class="clear_small"></div>
+	<a href="/rooms/1"><h3>Go to this room</h3></a>
+</div>
+
+<div class="fl" style="padding:10px;margin:10px;height:100px;width:330px;border:1px solid black;">
+	<div style="width:70px;" class="mrl fl">
+		<a href="/user/8/">
+			<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div style="width:70px;" class="mrl fl">
+		<a href="/user/8/">
+			<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div style="width:70px;" class="mrl fl">
+		<a href="/user/8/">
+			<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div style="width:70px;" class="mrl fl">
+		<a href="/user/8/">
+			<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div class="clear_small"></div>
+	<a href="/rooms/1"><h3>Go to this room</h3></a>
+</div>
+
+<div class="clear_medium"></div>
+
+<div class="fl" style="padding:10px;margin:10px;height:100px;width:330px;border:1px solid black;">
+	<div style="width:70px;" class="mrl fl">
+		<a href="/user/8/">
+			<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div style="width:70px;" class="mrl fl">
+		<a href="/user/8/">
+			<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div style="width:70px;" class="mrl fl">
+		<a href="/user/8/">
+			<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div style="width:70px;" class="mrl fl">
+		<a href="/user/8/">
+			<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div class="clear_small"></div>
+	<a href="/rooms/1"><h3>Go to this room</h3></a>
+</div>
+
+<div class="fl" style="padding:10px;margin:10px;height:100px;width:330px;border:1px solid black;">
+	<div style="width:70px;" class="mrl fl">
+		<a href="/user/8/">
+			<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div style="width:70px;" class="mrl fl">
+		<a href="/user/8/">
+			<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div style="width:70px;" class="mrl fl">
+		<a href="/user/8/">
+			<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+
+	</div>
+	<div style="width:70px;" class="mrl fl">
+		<a href="/user/8/">
+			<img width="60" src="/public/images/avatar.png" class="fl"></a>
+
+		<b class="mrl fl">
+			<a href="/user/8/">Vika</a>
+		</b>
+	</div>
+	<div class="clear_small"></div>
+	<a href="/rooms/1"><h3>Go to this room</h3></a>
+</div>
+
+<div class="clear_medium"></div>

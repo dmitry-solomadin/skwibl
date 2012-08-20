@@ -1,0 +1,49 @@
+{
+  "name": "a-tease",
+  "version": "0.0.1",
+  "private": true,
+  "author": "a-tease <info@a-tease.com>",
+  "description": "Realtime collaboration engine for WEB",
+  "contributors": [{
+    "name": "Yuri Karadzhov",
+    "email": "yuri@a-tease.com"
+  }, {
+    "name": "Alexander Baranovski",
+    "email": "alex@a-tease.com"
+  }],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/a-tease/http-server.git"
+  },
+  "scripts": {
+    "start": "node --nouse-idle-notification app & node --nouse-idle-notification server.js",
+    "start_prod": "NODE_ENV=production node --nouse-idle-notification app.js & node --nouse-idle-notification server.js",
+    "debug": "node --debug app.js & node-inspector &"
+  },
+  "dependencies": {
+    "express": "3.0.x",
+    "connect-flash": "*",
+    "connect-redis": "1.x.x",
+    "cookie": "*",
+    "ejs": "*",
+    "ejs-locals": "*",
+    "socket.io": "*",
+    "passport": "*",
+    "passport-local": "*",
+    "passport-hash": "*",
+    "passport-google-oauth": "*",
+    "passport-facebook": "*",
+    "passport-vkontakte": "*",
+    "passport-twitter": "*",
+    "emailjs": "*",
+    "password-generator": "*",
+    "hiredis": "*",
+    "redis": "*"
+  },
+  "devDependencies": {
+    "node-inspector": "0.2.x"
+  },
+  "engine": {
+    "node": "0.8.x"
+  }
+}
