@@ -1,181 +1,535 @@
 <script type="text/javascript" src="/public/javascripts/paperjs/dist/paper.js"></script>
+<script type="text/javascript" src="/public/javascripts/fileuploader.js"></script>
+<link href="/public/stylesheets/fileuploader.css" rel="stylesheet">
 
 
-<script src="/public/javascripts/drawing.js"></script>
-<script src="/public/javascripts/colorpicker/colorpicker.js"></script>
-<link href="/public/javascripts/colorpicker/colorpicker.css" rel="stylesheet">
+<script type="text/paperscript">
+
+(function( $ ){
+	
+	var defaults = {
+		paper : false,
+		project : false,
+		tool : false,
+		historytools : [],
+		tooltype : 'line',
+
+		counter : 1,
+
+		curcounter : 1,
+
+		cureventx : 0,
+		cureventy : 0,
+
+		color: '#000',
+		strokeWidth : 5,
+		fillColor : false,
+		opacity : 1,
+		
+		width : 100,
+		height : 100,
+
+		strokeEnds : 6,
+
+		imgid : '',
+		backgroundimg : '',
+		backgroundcolor : 'white',
+		createimg : 0,
+	};
+	
+
+	var methods = {
+		
+		createTool : function(tool) {
+			defaults.tool = tool;
+			methods.setStrokeColor();
+			methods.setFillColor();
+			methods.setStrokeWidth();
+			methods.setOpacity();
+		},
+
+		setTooltype : function(tooltype) {
+			defaults.tooltype = tooltype;
+		},
+
+		setStrokeColor : function() {
+			defaults.tool.strokeColor = defaults.color;
+		},
+
+		setFillColor : function() {
+			if (defaults.fillColor){
+				defaults.tool.fillColor = defaults.fillColor;
+			}
+		},
+
+		setStrokeWidth : function(strokeWidth) {
+			if (typeof(strokeWidth) != 'undefined'){
+				defaults.strokeWidth = strokeWidth;
+			}
+			defaults.tool.strokeWidth = defaults.strokeWidth;
+		},
+
+		setOpacity : function(opacity) {
+			if (typeof(opacity) != 'undefined'){
+				defaults.opacity = opacity;
+			}
+			defaults.tool.opacity = defaults.opacity;
+		},
+
+		addToHistory : function(point, delta) {
+			
+		},
+
+		addStrokes : function (point, delta) {
+			var step = delta.rotate(90);
+			var strokePoints = defaults.strokeEnds * 2 + 1;
+			point -= step / 2;
+			step /= strokePoints - 1;
+			for(var i = 0; i < strokePoints; i++) {
+				var strokePoint = point + step * i;
+				var offset = delta * (Math.random() * 0.3 + 0.1);
+				if(i % 2) {
+					offset *= -1;
+				}
+				strokePoint += offset;
+				defaults.tool.insert(0, strokePoint);
+			}
+		},
+
+		onMouseDown : function(event) {
+			defaults.paper.tool.fixedDistance = 0;
+			if (defaults.tooltype == 'line'){
+				methods.createTool(new defaults.paper.Path());
+			}
+			else if (defaults.tooltype == 'circle'){
+				//methods.createTool(new defaults.paper.Path.Circle());
+			}
+			else if (defaults.tooltype == 'rectangle') {
+				
+			}
+			else if (defaults.tooltype == 'triangle') {
+			
+			}
+			else if (defaults.tooltype == 'brush') {
+				methods.createTool(new defaults.paper.Path());
+				methods.addPoint(event.point);
+				//tool.minDistance = 10;
+				//tool.maxDistance = 15;
+			}
+			else if (defaults.tooltype == 'straightline') {
+				methods.createTool(new defaults.paper.Path());
+				if (defaults.tool.segments.length == 0) {
+					defaults.tool.add(event.point);
+				}
+				defaults.tool.add(event.point);
+			}
+			else if (defaults.tooltype == 'brushshapes') {
+				defaults.strokeWidth = 0;
+				methods.createTool(new defaults.paper.Path());
+				defaults.paper.tool.fixedDistance = 30;
+				//context.drawImage(oldCanvas, 0, 0);
+				
+			}
+			else if (defaults.tooltype == 'img') {
+				if (defaults.createimg==0){
+					methods.createTool(new defaults.paper.Raster(defaults.imgid));
+					defaults.tool.position = event.point;
+					defaults.createimg = 1;
+				}else {
+					if (defaults.tool.hitTest(event.point)){
+						defaults.createimg = 0;
+					}
+				}
+				
+				
+				//defaults.tool.size = new defaults.paper.Size(290, 198);
+				//defaults.tool.position = defaults.paper.view.center;
+				/*if (defaults.tool.bounds.contains(event.point)) {
+					defaults.tool.position = event.point;
+				} */
+			}
+			else if (defaults.tooltype == 'brushcircles') {
+				var radius = (event.downPoint - event.point).length;
+				methods.createTool(new defaults.paper.Path.Circle(event.downPoint, 10));
+				defaults.tool.removeOnDrag();
+			}
+			else if (defaults.tooltype == 'eraser') {
+				methods.createTool(new defaults.paper.Path());
+			}
+			else if (defaults.tooltype == 'bimg') {
+				$(this).css('background-image', "url(" + defaults.backgroundimg + ")");
+			}
+			else if (defaults.tooltype == 'bcolor') {
+				$(this).css('background-color', defaults.backgroundcolor);
+				$(this).css('background-image', 'none');
+			}
+			
+		},
+
+		onMouseDrag : function(event) {
+			if (defaults.tooltype == 'line'){
+				methods.addPoint(event.point);
+			}
+			else if (defaults.tooltype == 'circle'){
+				var radius = (event.downPoint - event.point).length;
+				methods.createTool(new defaults.paper.Path.Circle(event.downPoint, radius));
+				defaults.tool.removeOnDrag();
+			}
+			else if (defaults.tooltype == 'rectangle') {
+				var sizes = event.downPoint - event.point;
+				var rectangle = new defaults.paper.Rectangle(event.point.x, event.point.y, sizes.x, sizes.y);
+				methods.createTool(new defaults.paper.Path.Rectangle(rectangle));
+				defaults.tool.removeOnDrag();
+				//methods.createTool(new defaults.paper.Rectangle(event.x, event.y));
+			}
+			else if (defaults.tooltype == 'triangle') {
+				var sides = 3;
+				var radius = (event.downPoint - event.point).length;
+				methods.createTool(new defaults.paper.Path.RegularPolygon(event.downPoint, sides, radius));
+				defaults.tool.removeOnDrag();
+				//var delta = event.point - event.downPoint;
+				//defaults.tool.rotate(delta.angle);
+			}
+			else if (defaults.tooltype == 'oval') {
+				var radius = (event.downPoint - event.point).length;
+				methods.createTool(new defaults.paper.Path.Oval(event.downPoint, radius));
+				defaults.tool.removeOnDrag();
+			}
+			else if (defaults.tooltype == 'star') {
+				var delta = event.point - event.downPoint;
+				var radius = delta.length;
+				var points = 5 + Math.round(radius / 50);
+				var position = event.downPoint;
+
+				methods.createTool(new defaults.paper.Path.Star(position, points, radius / 2, radius));
+				defaults.tool.rotate(delta.angle);
+				defaults.tool.removeOnDrag();
+			}
+			else if (defaults.tooltype == 'brush') {
+				var step = event.delta / 2;
+				step.angle += 90;
+				var top = event.middlePoint + step;
+				var bottom = event.middlePoint - step;
+				
+				defaults.tool.add(top);
+				defaults.tool.insert(0, bottom);
+				defaults.tool.smooth();
+			}
+			else if (defaults.tooltype == 'straightline') {
+				 defaults.tool.lastSegment.point = event.point;
+			}
+			else if (defaults.tooltype == 'brushshapes') {
+				// If this is the first drag event,
+				// add the strokes at the start:
+				if(event.count == 1) {
+					methods.addStrokes(event.middlePoint, event.delta*-1);
+				} else {
+					var step = event.delta / 2;
+					step.angle += 90;
+
+					var top = event.middlePoint + step;
+					var bottom = event.middlePoint - step;
+
+					defaults.tool.add(top);
+					defaults.tool.insert(0, bottom);
+				}
+				defaults.tool.smooth();
+				defaults.lastPoint = event.middlePoint;
+			}
+			else if (defaults.tooltype == 'img') {
+				/*methods.createTool(new defaults.paper.Raster(defaults.imgid));
+				defaults.tool.size = new defaults.paper.Size(290, 198);
+				defaults.tool.position = defaults.paper.view.center;*/
+				
+				if (defaults.tool.bounds.contains(event.point)) {
+					defaults.tool.position = event.point;
+				} 
+			}
+			else if (defaults.tooltype == 'eraser') {
+				methods.addPoint(event.point);
+			}
+			
+		},
+
+		onMouseUp : function(event) {
+			if (defaults.tooltype == 'line'){
+				methods.addPoint(event.point);
+			}
+			else if (defaults.tooltype == 'circle'){
+				/*defaults.tool.remove();
+				var radius = (event.downPoint - event.point).length;
+				methods.createTool(new defaults.paper.Path.Circle(event.downPoint, radius));*/
+			}
+			else if (defaults.tooltype == 'rectangle') {
+				/*defaults.tool.remove();
+				var sizes = event.downPoint - event.point;
+				var rectangle = new defaults.paper.Rectangle(event.point.x, event.point.y, sizes.x, sizes.y);
+				methods.createTool(new defaults.paper.Path.Rectangle(rectangle));*/
+			}
+			else if (defaults.tooltype == 'triangle') {
+				//methods.createTool(new defaults.paper.Path.RegularPolygon(event.x, event.y));
+			}
+			else if (defaults.tooltype == 'brush') {
+				methods.addPoint(event.point);
+				defaults.tool.closed = true;
+				defaults.tool.smooth();
+			}
+			else if (defaults.tooltype == 'brushshapes') {
+				var delta = event.point - defaults.lastPoint;
+				delta.length = defaults.paper.tool.maxDistance;
+				methods.addStrokes(event.point, delta);
+				defaults.tool.closed = true;
+				defaults.tool.smooth();
+			}
+			else if (defaults.tooltype == 'eraser') {
+				methods.addPoint(event.point);
+			}
 
 
+			defaults.historytools[defaults.counter] = defaults.tool;
+			defaults.counter++;
+			defaults.curcounter = defaults.counter;
+		},
+
+		addPoint : function(point) {
+			defaults.tool.add(point);
+		},
+
+		clearCanvas : function() {
+			//var tx = $(this).getContext('2d');
+			
+			var l = defaults.paper.project.activeLayer.children.length;
+			for(var i=0; i < l; i++){
+				defaults.paper.project.activeLayer.children[0].remove();
+			}
+
+			/*var canvas = document.getElementById("myCanvas");
+			var context = canvas.getContext("2d");
+			context.clearRect(0, 0, canvas.width, canvas.height);*/
+			/*var l = defaults.paper.project.activeLayer.children.length;
+			for(var i=0; i < l; i++){
+				defaults.paper.project.activeLayer.children[0].remove();
+			}*/
+			//project.activeLayer.remove();
+		},
+
+		copyContent : function() {
+			var canvas = document.getElementById("myCanvas");
+			var tx = canvas.getContext('2d');
+			var myImageData = tx.getImageData(0, 0, 100, 100);
+
+			var image = document.createElement('img');
+			//var raster = new defaults.paper.Raster(image);
+			//var point = new Point(10, 10);
+			//raster.drawImage(myImageData, point);
+			//tx.putImageData(myImageData, 0, 0);
+			//tx.drawImage(myImageData, 0, 0);
+			//new defaults.paper.Raster(myImageData)
+			//new Raster(myImageData);
+			//tx.putImageData(myImageData, 200, 30);
+			
+		},
+
+		prevhistory : function() {
+			defaults.curcounter = defaults.curcounter-1;
+			if (typeof(defaults.historytools[defaults.curcounter]) != 'undefined') {
+				//defaults.historytools[defaults.curcounter].opacity = 0;
+				defaults.historytools[defaults.curcounter].remove();
+			}
+		},
+
+		nexthistory : function() {
+			if (typeof(defaults.historytools[defaults.curcounter]) != 'undefined') {
+				defaults.historytools[defaults.curcounter].opacity = 1;
+				defaults.curcounter = defaults.curcounter+1;
+			}
+		},
+
+		init : function(opt){
+			var options = $.extend({}, defaults, opt);
+			defaults = options;
+			methods.createTool(new defaults.paper.Path());
+			
+			var self = this;
+
+			$('.color').click(function() {
+				$('.color').removeClass('activen');
+				defaults.color = $(this).attr('data-color');
+				$(this).addClass('activen');
+			});
+			$('.line').click(function() {
+				$('.line').removeClass('activen');
+				defaults.strokeWidth = $(this).attr('data-color');
+				$(this).addClass('activen');
+			});
+			$('.shape').click(function() {
+				$('.shape').removeClass('activen');
+				defaults.tooltype = $(this).attr('data-color');
+				$(this).addClass('activen');
+			});
+			$('.fillcolor').click(function() {
+				$('.fillcolor').removeClass('activen');
+				defaults.fillColor = $(this).attr('data-color');
+				$(this).addClass('activen');
+			});
+
+			$('.img').click(function() {
+				$('.img').removeClass('activen');
+				
+				/*defaults.tooltype = 'img';
+				methods.createTool(new defaults.paper.Raster($(this).attr('data-color')));
+				defaults.tool.size = new defaults.paper.Size(290, 198);
+				defaults.tool.position = defaults.paper.view.center;*/
+				
+				defaults.tooltype = 'img';
+				defaults.imgid = $(this).attr('data-color');
+				$(this).addClass('activen');
+			});
+
+			$('.backgr').click(function() {
+				$('.backgr').removeClass('activen');
+				defaults.tooltype = 'bcolor';
+				defaults.backgroundcolor = $(this).attr('data-color');
+				//$(self).css('background', $(this).attr('data-color')); 
+				$(this).addClass('activen');
+			});
+			
+			$('.backgrimg').click(function() {
+				$('.backgrimg').removeClass('activen');
+				defaults.tooltype = 'bimg';
+				defaults.backgroundimg = $('#' + $(this).attr('data-color')).attr('src');
+				$(this).addClass('activen');
+			});
+			
+			$('.erase').click(function() {
+				defaults.tooltype = 'eraser';
+				//self.opacity = 0;
+				$('.erase').removeClass('activen');
+				methods.createTool(new defaults.paper.Path());
+				//self.tool.strokeColor = 'white';
+				//self.color = false;
+				//self.fillColor = false;
+				$(this).addClass('erase');
+			});
+			return false;
+		}
+  };
+	
+  $.fn.drawing = function( method ) {
+    // немного магии
+    if ( methods[method] ) {
+        // если запрашиваемый метод существует, мы его вызываем
+        // все параметры, кроме имени метода прийдут в метод
+        // this так же перекочует в метод
+        return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+    } else if ( typeof method === 'object' || ! method ) {
+        // если первым параметром идет объект, либо совсем пусто
+        // выполняем метод init
+        return methods.init.apply( this, arguments );
+    } else {
+        // если ничего не получилось
+        $.error( 'Метод "' +  method + '" не найден в плагине jQuery.mySimplePlugin' );
+    }    
+  };
+
+})( jQuery );
+
+</script>
 
 <script type="text/paperscript" canvas="myCanvas">
-
+	$(document).ready(function() {
+		$("#myCanvas").drawing({paper : paper});
+	});
 	
-	/*var raster = new Raster('curimg');
-	raster.size = new Size(500, 300);
-	raster.position = view.center;
 
 	function onMouseDown(event) {
-		if (raster.bounds.contains(event.point)) {
-			raster.position = event.point;
-		} 
+		$("#myCanvas").drawing('onMouseDown', event);
 	}
 
 	function onMouseDrag(event) {
-		if (raster.bounds.contains(event.point)) {
-			raster.position = event.point;
-		} 
-		//raster.rotate(1);
-	}*/
-
-
-	function onMouseDown(event) {
-		if (window.Drawing.tooltype == 'line'){
-			window.Drawing.createTool(new Path());
-		}
-		else if (window.Drawing.tooltype == 'circle'){
-			//window.Drawing.createTool(new Path.Circle());
-		}
-		else if (window.Drawing.tooltype == 'rectangle') {
-			
-		}
-		else if (window.Drawing.tooltype == 'triangle') {
-		
-		}
-		else if (window.Drawing.tooltype == 'brush') {
-			window.Drawing.createTool(new Path());
-			window.Drawing.addPoint(event.point);
-			//tool.minDistance = 10;
-			//tool.maxDistance = 15;
-		}
-		else if (window.Drawing.tooltype == 'straightline') {
-			window.Drawing.createTool(new Path());
-			if (window.Drawing.tool.segments.length == 0) {
-				window.Drawing.tool.add(event.point);
-			}
-			 window.Drawing.tool.add(event.point);
-		}
-		
-	}
-
-	function onMouseDrag(event) {
-		if (window.Drawing.tooltype == 'line'){
-			window.Drawing.addPoint(event.point);
-		}
-		else if (window.Drawing.tooltype == 'circle'){
-			var radius = (event.downPoint - event.point).length;
-			window.Drawing.createTool(new Path.Circle(event.downPoint, radius));
-			window.Drawing.tool.removeOnDrag();
-		}
-		else if (window.Drawing.tooltype == 'rectangle') {
-			var sizes = event.downPoint - event.point;
-			var rectangle = new Rectangle(event.point.x, event.point.y, sizes.x, sizes.y);
-			window.Drawing.createTool(new Path.Rectangle(rectangle));
-			window.Drawing.tool.removeOnDrag();
-			//window.Drawing.createTool(new Rectangle(event.x, event.y));
-		}
-		else if (window.Drawing.tooltype == 'triangle') {
-			var sides = 3;
-			var radius = (event.downPoint - event.point).length;
-			window.Drawing.createTool(new Path.RegularPolygon(event.downPoint, sides, radius));
-			window.Drawing.tool.removeOnDrag();
-			//var delta = event.point - event.downPoint;
-			//window.Drawing.tool.rotate(delta.angle);
-		}
-		else if (window.Drawing.tooltype == 'oval') {
-			var radius = (event.downPoint - event.point).length;
-			window.Drawing.createTool(new Path.Oval(event.downPoint, radius));
-			window.Drawing.tool.removeOnDrag();
-		}
-		else if (window.Drawing.tooltype == 'star') {
-			var delta = event.point - event.downPoint;
-			var radius = delta.length;
-			var points = 5 + Math.round(radius / 50);
-			var position = event.downPoint;
-			window.Drawing.createTool(new Path.Star(position, points, radius / 2, radius));
-			window.Drawing.tool.rotate(delta.angle);
-			window.Drawing.tool.removeOnDrag();
-		}
-		else if (window.Drawing.tooltype == 'brush') {
-			var step = event.delta / 2;
-			step.angle += 90;
-			var top = event.middlePoint + step;
-			var bottom = event.middlePoint - step;
-			
-			window.Drawing.tool.add(top);
-			window.Drawing.tool.insert(0, bottom);
-			window.Drawing.tool.smooth();
-		}
-		else if (window.Drawing.tooltype == 'straightline') {
-			 window.Drawing.tool.lastSegment.point = event.point;
-		}
+		$("#myCanvas").drawing('onMouseDrag', event);
 	}
 
 	function onMouseUp(event) {
-		if (window.Drawing.tooltype == 'line'){
-			window.Drawing.addPoint(event.point);
-		}
-		else if (window.Drawing.tooltype == 'circle'){
-		}
-		else if (window.Drawing.tooltype == 'rectangle') {
-			
-		}
-		else if (window.Drawing.tooltype == 'triangle') {
-			window.Drawing.createTool(new Path.RegularPolygon(event.x, event.y));
-		}
-		else if (window.Drawing.tooltype == 'brush') {
-			window.Drawing.addPoint(event.point);
-			window.Drawing.tool.closed = true;
-			window.Drawing.tool.smooth();
-		}
+		$("#myCanvas").drawing('onMouseUp', event);
+	}
+</script>
+
+<script type="text/paperscript" canvas="myCanvas2">
+	function onMouseDown(event) {
+		$("#myCanvas2").drawing('onMouseDown', event);
 	}
 
+	function onMouseDrag(event) {
+		$("#myCanvas2").drawing('onMouseDrag', event);
+	}
+
+	function onMouseUp(event) {
+		$("#myCanvas2").drawing('onMouseUp', event);
+	}
 
 	$(document).ready(function() {
-		window.Drawing.createTool(new Path());
-
-		$('.color').click(function() {
-			$('.color').removeClass('activen');
-			window.Drawing.color = $(this).attr('data-color');
-			$(this).addClass('activen');
-		});
-		$('.line').click(function() {
-			$('.line').removeClass('activen');
-			window.Drawing.strokeWidth = $(this).attr('data-color');
-			$(this).addClass('activen');
-		});
-		$('.shape').click(function() {
-			$('.shape').removeClass('activen');
-			window.Drawing.tooltype = $(this).attr('data-color');;
-			$(this).addClass('activen');
-		});
-		$('.fillcolor').click(function() {
-			$('.fillcolor').removeClass('activen');
-			window.Drawing.fillColor = $(this).attr('data-color');;
-			$(this).addClass('activen');
-		});
-		/*$('.backgr').click(function() {
-			$('.backgr').removeClass('activen');
-			$(this).addClass('activen');
-		});*/
-		
+		$("#myCanvas2").drawing({paper : paper});
 	});
 
 	
-
 </script>
 
-<script>
+
+<script type="text/paperscript" >
 	$(document).ready(function() {
-		jQuery('#jquery-colour-picker-example select').colourPicker({
-			ico:    '/public/javascripts/colorpicker/jquery.colourPicker.gif', 
-			title:    false
+		$( "#slider" ).slider({
+			min: 1,
+			max:100,
+			value: 100,
+			change: function(event, ui) { 
+				var val = ui.value/100; 
+				$("#myCanvas").drawing('setOpacity', val);
+				$("#myCanvas2").drawing('setOpacity', val);
+			},
+			stop: function(event, ui) {
+				var val = ui.value/100; 
+				$("#myCanvas").drawing('setOpacity', val);
+				$("#myCanvas2").drawing('setOpacity', val);
+			}
+		});
+
+		$( "#slider2" ).slider({
+			min: 1,
+			max:100,
+			value: 1,
+			change: function(event, ui) { 
+				var val = ui.value; 
+				$("#myCanvas").drawing('setStrokeWidth', val);
+				$("#myCanvas2").drawing('setStrokeWidth', val);
+			},
+			stop: function(event, ui) {
+				var val = ui.value; 
+				$("#myCanvas").drawing('setStrokeWidth', val);
+				$("#myCanvas2").drawing('setStrokeWidth', val);
+			}
 		});
 	});
 </script>
+
 
 
 <h1 class="mrl">Rooms</h1>
 <div class="clear_medium"></div>
+
+
+<div class="clear_medium"></div>
+
+<canvas width="1000" height="300" style="border:1px solid black;" id="myCanvas" ></canvas>
+
+<div class="clear_medium"></div>
+
+
+<input type="button" value="Knopka" onclick="$('#myCanvas').drawing('copyContent');">
+
+<div class="clear_medium"></div>
+
+<input type="button" value="Clear" onclick="$('#myCanvas').drawing('clearCanvas');return false;" id="clear" >
 <div class="clear_medium"></div>
 <div class="fl mrt">
 	<h1>Line colors</h1>
@@ -187,6 +541,7 @@
 	<div class="color" style="background-color:blue;" data-color="blue"></div>
 	<div class="color" style="background-color:#9aff99;" data-color="#9aff99"></div>
 	<div class="clear_medium"></div>
+
 	<h1>Fill colors</h1>
 	<div class="fillcolor" style="background-color:white;" data-color="white"></div>
 	<div class="fillcolor" style="background-color:orange;" data-color="orange"></div>
@@ -195,65 +550,109 @@
 	<div class="fillcolor" style="background-color:#986536;" data-color="#986536"></div>
 	<div class="fillcolor" style="background-color:blue;" data-color="blue"></div>
 	<div class="fillcolor" style="background-color:#9aff99;" data-color="#9aff99"></div>
-	<!--<h1>Background color</h1>
+	<h1>Background color</h1>
 	<div class="backgr" style="background-color:white;" data-color="white"></div>
 	<div class="backgr" style="background-color:orange;" data-color="orange"></div>
 	<div class="backgr" style="background-color:yellow;" data-color="yellow"></div>
 	<div class="backgr" style="background-color:green;" data-color="green"></div>
 	<div class="backgr" style="background-color:#986536;" data-color="#986536"></div>
 	<div class="backgr" style="background-color:blue;" data-color="blue"></div>
-	<div class="backgr" style="background-color:#9aff99;" data-color="#9aff99"></div>-->
+	<div class="backgr" style="background-color:#9aff99;" data-color="#9aff99"></div>
+
+	<h1>Background image</h1>
+	<div class="fl mrt backgrimg" data-color="bimg1"><img id="bimg1" src="/public/images/28959.jpg" width="100"></div>
+	<div class="fl mrt backgrimg" data-color="bimg2"><img id="bimg2" src="/public/images/28974.jpg" width="100"></div>
+	<div class="fl mrt backgrimg" data-color="bimg3"><img id="bimg3" src="/public/images/28993.jpg" width="100"></div>
 </div>
+
+<div class="fl" style="padding:10px;width:100px;">
+	<a style="font-size:16px;cursor:pointer;" onclick="$('#myCanvas').drawing('prevhistory');return false;" class="fl mrt_big">prev</a>
+	<a style="font-size:16px;cursor:pointer;" class="fl" onclick="$('#myCanvas').drawing('nexthistory');return false;">next</a>
+	<div class="clear_medium"></div>
+
+</div>
+
+<div class="fl" style="padding:10px;width:100px;">
+	<h3>Width</h3>
+	<div class="clear_medium"></div>
+	<div id="slider2"></div>
+
+</div>
+
+<div class="fl lines mrt" style="padding:10px;">
+	<select id="shapes" onchange="$('#myCanvas2').drawing('setTooltype', this.value);">
+		<option value="line">Line</option>
+		<option value="circle">Cirlce</option>
+		<option value="rectangle">Rectangle</option>
+		<option value="triangle">Triangle</option>
+		<option value="oval">Oval</option>
+		<option value="star">Star</option>
+		<option value="brush">brush</option>
+		<option value="straightline">Straightline</option>
+		<option value="brushshapes">Кисточка</option>
+		
+	</select>
+</div>
+
+<div class="fl" style="padding:10px;">
+	<h3>Opacity</h3>
+	<div class="clear_medium"></div>
+	<div id="slider"  class="shape2" ></div>
+</div>
+
 <div class="fl lines" style="padding:10px;">
-	<div class="line" style="background-color:black;width:150px;height:3px;" data-color="3"></div>
-	<div class="clear_medium"></div>
-	<div class="line" style="background-color:black;width:150px;height:10px;" data-color="10"></div>
-	<div class="clear_medium"></div>
-	<div class="line" style="background-color:black;width:150px;height:20px;" data-color="20"></div>
-	<div class="clear_medium"></div>
-	<div class="line" style="background-color:black;width:150px;height:30px;" data-color="30"></div>
-</div>
-
-<div class="fl lines" style="padding:10px;">
-	<div class="shape"  data-color="circle">
-		Cirlce
+	<div class="img"  data-color="img1">
+		<img width="100" id="img1" src="/public/images/28959.jpg">
 	</div>
 	<div class="clear_medium"></div>
-	<div class="shape" data-color="rectangle">
-		Rectangle
+	<div class="img" data-color="img2">
+		<img width="100"  id="img2" src="/public/images/28974.jpg">
 	</div>
 	<div class="clear_medium"></div>
-	<div class="shape"  data-color="triangle">
-		Triangle
-	</div>
-	<div class="clear_medium"></div>
-	<div class="shape" data-color="line">
-		Line
-	</div>
-	<div class="clear_medium"></div>
-	<div class="shape" data-color="oval">
-		Oval
-	</div>
-	<div class="clear_medium"></div>
-	<div class="shape" data-color="star">
-		Star
-	</div>
-	<div class="clear_medium"></div>
-	<div class="shape" data-color="brush">
-		Brush
-	</div>
-	<div class="clear_medium"></div>
-	<div class="shape" data-color="straightline">
-		Straight line
+	<div class="img"  data-color="img3">
+		<img width="100" id="img3" src="/public/images/28993.jpg">
 	</div>
 </div>
-<div class="clear_medium"></div>
 
+<div class="clear_medium"></div><div class="clear_medium"></div>
 
-<canvas style="border:1px solid black;width:1000px;height:300px;" id="myCanvas" resize="true"></canvas>
+<div style="cursor:pointer;" id="hidefile-uploader">
+	<div id="file-uploader" style="width:130px;height:42px;">
+		<noscript>	
+			<p>Please enable JavaScript to use file uploader.</p>
+		</noscript>
+	</div>
+	<div class="clear_medium"></div>
+</div>
+<div id="curavatardiv">
+</div>
 
-<div class="clear_medium"></div>
-<img src="/public/images/1.11057.jpg" id="curimg">
+<script>
 
+var createUploader = function() {            
+	var uploader = new qq.FileUploader({
+		element: document.getElementById('file-uploader'),
+		action: '/file/upload',
+		title_uploader: 'Add image',
+		failed: 'Failed',
+		multiple: true,
+		cancel: 'Cancel',
+		debug: false,
+		params: {'entity': 3},
+		onSubmit: function(id, fileName) {
+			$(uploader._listElement).css('dispaly', '');
+		},
+		onComplete: function(id, fileName, responseJSON) {
+			$(uploader._listElement).css('dispaly', 'none');
+			if (responseJSON.fileName) {
+				var html = responseJSON.fileName + '<br>';
+				$('#curavatardiv').prepend(html);
+			}
+		}
+	});
+}
+$(document).ready(function() {
+	createUploader();
+});     
 
-
+</script>

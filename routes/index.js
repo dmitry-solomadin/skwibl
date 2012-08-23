@@ -9,6 +9,7 @@ var deps = [
 , 'rooms'
 , 'search'
 , 'support'
+, 'users'
 ];
 
 exports.configure = function(app, passport) {

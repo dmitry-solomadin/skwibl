@@ -13,12 +13,7 @@ exports.articles  = {
  * Module dependencies.
  */
 
-var redis = require('redis')
-  , connect_redis = require('connect-redis');
-
-var smtp = require('../smtp/smtp')
-  , cfg = require('../config')
-  , tools = require('../tools/tools');
+var redis = require('redis');
 
 var client = redis.createClient();
 

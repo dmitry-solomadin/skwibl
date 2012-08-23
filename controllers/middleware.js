@@ -12,7 +12,6 @@ var db = require('../db');
  * Check authentication
  */
 exports.isAuth = function(req, res, next) {
-  console.log(req.isAuthenticated());
   if(req.isAuthenticated()) {
     return next();
   }
@@ -21,7 +20,7 @@ exports.isAuth = function(req, res, next) {
   }
   return res.json({
     success: false
-    , message: 'not authenticated'
+  , message: 'not authenticated'
   });
 };
 

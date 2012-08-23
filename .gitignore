@@ -1,4 +1,5 @@
 *~
+npm-debug.log
 /static
 /node_modules
 app.js.orig

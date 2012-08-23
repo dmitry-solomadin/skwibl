@@ -18,7 +18,7 @@ exports.notFound = function(req, res) {
   }
   return res.json({
     success: false
-    , message: 'route not found'
+  , message: 'route not found'
   });
 };
 
@@ -32,6 +32,6 @@ exports.error = function(err, req, res, next){
   }
   return res.json({
     success: false
-    , message: err
+  , message: err
   });
 }; 

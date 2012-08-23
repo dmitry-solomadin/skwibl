@@ -28,3 +28,5 @@ exports.PASSWORD_EASYTOREMEMBER = false;
 exports.SESSION_DURATION = 7200;//two hours
 
 // exports.CONFIRM_EXPIRE = 604800;//one week
+
+exports.DIRECTORY_PERMISION = 0731;

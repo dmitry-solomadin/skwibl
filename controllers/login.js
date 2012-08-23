@@ -42,7 +42,7 @@ exports.regConfirm = function(req, res, next) {
 exports.local = function(passport) {
   return passport.authenticate('local', {
     failureRedirect: '/'
-    , failureFlash: true
+  , failureFlash: true
   });
 };
 
@@ -53,7 +53,7 @@ exports.local = function(passport) {
 exports.hash = function(passport) {
   return passport.authenticate('hash', {
     failureRedirect: '/'
-    , failureFlash: true
+  , failureFlash: true
   });
 };
 
