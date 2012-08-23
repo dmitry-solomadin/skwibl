@@ -14,7 +14,7 @@ exports.configure = function(app, passport) {
   /*
    * get user profile
    */
-  app.get('/users/:id', ctrls.isAuth, ctrls.users);
+  app.get('/users/:id', ctrls.isAuth, ctrls.profile);
 
   /*
    * edit user personal information

@@ -1,14 +1,9 @@
-<%-include('samples/header.ejs')%>
-<%-include('leftcoll.ejs')%>
-
-<div class="page tab-pane">
-	<%-include(template +  '.ejs')%>
-</div>
- 
-
+<%- layout('application') %>
+<%- includedTemplate = include("partials/" + template +  '.ejs') %>
 <% if (template=='room') { %>
-<%-include('rightcoll.ejs')%>
+<%- include('rightcoll.ejs') %>
 <% } %>
+<%- block('template', includedTemplate) %>
 
-<%-include('footer.ejs')%>
+
 

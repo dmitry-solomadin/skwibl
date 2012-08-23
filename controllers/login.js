@@ -20,6 +20,10 @@ exports.logOut = function(req, res) {
   res.redirect('/');
 };
 
+exports.login = function(req, res) {
+  res.redirect('/');
+}
+
 /*
  * GET
  * Registration confirm
@@ -161,9 +165,17 @@ exports.register = function(req, res, next) {
  * login page
  */
 exports.index = function(req, res) {
-  res.render('main', {
-    template: 'mainpage'
-  , user: req.user
-  , message: req.flash('error')
-  });
+	if (req.user){
+	  res.render('index', {
+	      template: 'user'
+	    , user: req.user
+		, articles: db.articles
+	    , message: req.flash('error')
+	  });	
+	} else {
+	  res.render('index', {
+	    template: 'mainpage'
+	  , message: req.flash('error')
+	  });		
+	}
 };

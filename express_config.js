@@ -52,6 +52,7 @@ exports.setUp = function() {
     app.use(passport.session());
     app.use(flash());
     app.use(app.router);
+	  app.use(express.static(__dirname + '/assets'));
     app.use(express.static(__dirname + '/static'));
     app.use(ctrls.notFound);
     //   app.use(ctrls.error);

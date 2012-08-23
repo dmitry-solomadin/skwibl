@@ -16,7 +16,7 @@ var cfg = require('../config');
  * User files
  */
 exports.files = function(req, res) {
-  res.render('index', { template: 'files' });
+  res.render('partials/files');
 };
 
 /*
@@ -24,7 +24,7 @@ exports.files = function(req, res) {
  * User videos
  */
 exports.videos = function(req, res) {
-  res.render('index', { template: 'videos' });
+  res.render('partials/videos');
 };
 
 /*
@@ -32,7 +32,7 @@ exports.videos = function(req, res) {
  * User photos
  */
 exports.photos = function(req, res) {
-  res.render('index', { template: 'photos' });
+  res.render('partials/photos');
 };
 
 /*
@@ -40,7 +40,7 @@ exports.photos = function(req, res) {
  * User documents
  */
 exports.documents = function(req, res) {
-  res.render('index', { template: 'documents' });
+  res.render('partials/documents');
 };
 
 /*

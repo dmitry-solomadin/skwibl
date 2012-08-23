@@ -4,3 +4,5 @@ npm-debug.log
 /node_modules
 app.js.orig
 .DS_STORE
+haproxy.cfg
+.idea/

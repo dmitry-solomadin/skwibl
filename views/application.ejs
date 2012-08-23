@@ -2,16 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Bootstrap, from Twitter</title>
+    <title>Skwibl</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-	
+
 	<script src="/socket.io/socket.io.js"></script>
-	
-	<script src="/public/javascripts/jquery/jquery-1.8.0.min.js"></script>
-	<script src="/public/javascripts/jquery/jquery-ui-1.8.21.custom.min.js"></script>	
-	
+
+	<script src="/javascripts/jquery.js"></script>
+	<script src="/javascripts/app.js"></script>
+	<script src="/public/javascripts/jquery/jquery-ui-1.8.21.custom.min.js"></script>
+
 	<script src="/public/javascripts/jquery/jquery.bgiframe-2.1.2.js"></script>
 	<script src="/public/javascripts/frontend.js"></script>
 	<link href="/public/javascripts/jquery/jquery-ui-1.8.21.custom.css" rel="stylesheet">
@@ -24,7 +25,6 @@
 
 	<script src="/public/javascripts/mediaplayer/build/mediaelement.js"></script>
 	<!-- mediaelement player-->
-
 
     <script src="/public/stylesheets/bootstrap/js/bootstrap-transition.js"></script>
     <script src="/public/stylesheets/bootstrap/js/bootstrap-alert.js"></script>
@@ -42,7 +42,6 @@
 	<link href="/public/stylesheets/bootstrap/css/bootstrap.css" rel="stylesheet">
     <link href="/public/stylesheets/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
   </head>
-
   <body>
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
@@ -54,16 +53,19 @@
           </a>
           <a class="brand" href="/">A-TEASE</a>
           <div class="btn-group pull-right">
-            
-			<!-- <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-              <i class="icon-user"></i> Username
-              <span class="caret"></span>
-            </a>
-           <ul class="dropdown-menu">
-              <li><a href="#">Profile</a></li>
-              <li class="divider"></li>
-              <li><a href="#">Sign Out</a></li>
-            </ul>-->
+
+		  <% if (typeof user != 'undefined') { %>
+		  <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-user"></i> <%= user.name %>
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="/users/<%= user.id %>" data-remote='true'>Profile</a></li>
+            <li class="divider"></li>
+            <li><a href="/logout">Sign Out</a></li>
+          </ul>
+		  <% } %>
+
           </div>
           <div class="nav-collapse">
             <ul class="nav">
@@ -72,15 +74,58 @@
               <li><a href="#contact">Contact</a></li>
             </ul>
 			<div class="fl">
-				<div class="fl  controls">
-					<input type="text" id="login" name="login" class="input-xlarge">
-				</div>
-				<a href="/search" class="fl btn btn-primary btn-large" >Search</a>
-			</div>
-			<div class="fr">
-				<a href="/logout"><h3>Logout</h3></a>
+				  <div class="fl  controls">
+				    <input type="text" id="login" name="login" class="input-xlarge">
+				  </div>
+                  <a href="/search" data-remote="true" class="fl btn btn-primary btn-large">Search</a>
 			</div>
           </div><!--/.nav-collapse -->
         </div>
       </div>
     </div>
+
+	<% if (typeof user != 'undefined') { %>
+	<div class="leftcol">
+		<div class="clear_medium"></div><div class="clear_medium"></div>
+		<a href="/users/<%= user.id %>" data-remote="true">
+			<img src="/public/images/profile.png" style="width:60px;" ><br>
+			Profile
+		</a>
+		<div class="clear_medium"></div><div class="clear_medium"></div>
+
+		<a href="/photos" data-remote="true">
+			<img src="/public/images/photo.png" style="width:80px;" ><br>
+			Photos
+		</a>
+		<div class="clear_medium"></div><div class="clear_medium"></div>
+
+		<a href="/videos" data-remote="true">
+			<img src="/public/images/video.jpg" style="width:80px;" ><br>
+			Videos
+		</a>
+		<div class="clear_medium"></div><div class="clear_medium"></div>
+
+		<a href="/documents" data-remote="true">
+			<img src="/public/images/documents.jpg" style="width:80px;" ><br>
+			Documents
+		</a>
+		<div class="clear_medium"></div><div class="clear_medium"></div>
+
+		<a href="/friends" data-remote="true">
+			<img src="/public/images/friends.jpg" style="width:60px;" ><br>
+			Friends
+		</a>
+		<div class="clear_medium"></div><div class="clear_medium"></div>
+	</div>
+	<% } %>
+
+	<div id="main-content" class="page tab-pane">
+		<% if (typeof user != "undefined") { %>
+			<%- blocks.template %>
+		<% } else { %>
+			<%- include('partials/mainpage.ejs') %>
+		<% } %>
+	</div>
+  </body>
+</html>
+

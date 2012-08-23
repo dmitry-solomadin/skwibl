@@ -24,7 +24,7 @@ exports.configure = function(app, passport) {
   /*
   * post local auth data
   */
-  app.post('/login', ctrls.local(passport), ctrls.profile);
+  app.post('/login', ctrls.local(passport), ctrls.login);
 
   /*
   * post local registration info
