@@ -3,3 +3,4 @@ npm-debug.log
 /static
 /node_modules
 app.js.orig
+.DS_STORE
