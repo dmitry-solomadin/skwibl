@@ -125,7 +125,7 @@ exports.register = function(req, res, next) {
   if(req.body != null) {
     var email = req.body.email;
     db.findUserByMail(email, function(err, user) {
-      if (err) {
+      if(err) {
         return next(err);
       }
       if (!user) {
@@ -140,10 +140,10 @@ exports.register = function(req, res, next) {
           value: email,
           type: 'main'
         }], function(err, user) {
-          if (err) {
+          if(err) {
             return next(err);
           }
-          if (!user) {
+          if(!user) {
             req.flash('error', 'Registration failed. Can not create user for email: ' + email);
             return res.redirect('/');
           }
@@ -162,20 +162,27 @@ exports.register = function(req, res, next) {
 
 /*
  * GET
- * login page
+ * dashboard - redirect to main page
+ */
+exports.dashboard = function(req, res) {
+  res.redirect('/');
+}
+
+/*
+ * GET
+ * main page
  */
 exports.index = function(req, res) {
-	if (req.user){
-	  res.render('index', {
-	      template: 'user'
-	    , user: req.user
-		, articles: db.articles
-	    , message: req.flash('error')
-	  });	
-	} else {
-	  res.render('index', {
-	    template: 'mainpage'
-	  , message: req.flash('error')
-	  });		
-	}
+  if(req.user){
+    return res.render('index', {
+      template: 'user'
+    , user: req.user
+    , articles: db.articles
+    , message: req.flash('error')
+    });
+  }
+  return res.render('index', {
+    template: 'mainpage'
+  , message: req.flash('error')
+  });
 };

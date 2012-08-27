@@ -66,5 +66,5 @@ exports.setUp = function() {
 exports.start = function(app){
   console.log("Express server listening on " +
   app.get('host') + ":" + app.get('port') +
-  " in " + process.env.NODE_ENV + " mode");
+  " in " + app.settings.env + " mode");
 };
