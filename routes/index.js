@@ -4,9 +4,9 @@
 
 var deps = [
   'files'
-, 'friends'
+, 'contacts'
 , 'login'
-, 'rooms'
+, 'projects'
 , 'search'
 , 'support'
 , 'users'

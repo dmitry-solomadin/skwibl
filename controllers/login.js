@@ -177,7 +177,6 @@ exports.index = function(req, res) {
     return res.render('index', {
       template: 'user'
     , user: req.user
-    , articles: db.articles
     , message: req.flash('error')
     });
   }

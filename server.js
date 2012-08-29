@@ -55,7 +55,6 @@ chat.on('connection', function(socket) {
   var hs = socket.handshake;
   console.log('A socket with sessionId '+hs.sessionId+' connected.');
 
-  friends.push(hs.session.name);
   socket.json.emit('list', users);
   socket.broadcast.json.emit('enter', hs.session.name);
 

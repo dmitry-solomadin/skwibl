@@ -13,7 +13,7 @@ var db = require('../db');
  * Redirect to user profile
  */
 exports.profile = function(req, res) {
-  res.render('partials/user', { articles: db.articles, menu: 1});
+  res.render('partials/user', { menu: 1 });
 };
 
 /*

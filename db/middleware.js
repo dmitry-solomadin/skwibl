@@ -7,8 +7,8 @@ exports.setUp = function(client) {
 
   var mod = {};
 
-  mod.isUserRoomMember = function(id, roomId, fn) {
-    client.sismember('rooms:' + roomId + ':friends', fn);
+  mod.isUserProjectMember = function(id, rid, fn) {
+    client.sismember('projects:' + rid + ':users', fn);
   };
 
   return mod;

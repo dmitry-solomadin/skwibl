@@ -1,5 +1,5 @@
 /******************************************
- *           FRIENDS MANAGEMENT           *
+ *           CONTACTS MANAGEMENT          *
  ******************************************/
 
 
@@ -14,7 +14,7 @@ exports.setUp = function(client) {
 
   var mod = {};
 
-  mod.getFriendInfo = function(id, confirmed, fn) {
+  mod.getContactInfo = function(id, confirmed, fn) {
     client.hmget('users:' + id, 'provider', 'providerId', 'displayName', 'avatar', function(err,array) {
       if(err) {
         return process.nextTick(function() {
@@ -28,26 +28,26 @@ exports.setUp = function(client) {
     });
   };
 
-  mod.getUserFriendsField = function(id, field, fn) {
+  mod.getUserContactField = function(id, field, fn) {
     var me = this;
     client.smembers('users:' + id + field, function(err, array) {
       if(!err && array) {
         var leftToProcess = array.length - 1
-        , confirmed = field === ':friends'
-        , friends = [];
+        , confirmed = field === ':contacts'
+        , contacts = [];
         for(var i = 0, len = array.length; i < len; i++) {
-          (function(friendId) {
+          (function(cid) {
             process.nextTick(function() {
-              me.getFriendInfo(friendId, confirmed, function(err, friend) {
+              me.getContactInfo(cid, confirmed, function(err, contact) {
                 if(err) {
                   return process.nextTick(function() {
                     fn(err, []);
                   });
                 }
-                friends.push(friend);
+                contacts.push(contact);
                 if(leftToProcess-- === 0) {
                   return process.nextTick(function() {
-                    fn(null, friends);
+                    fn(null, contacts);
                   });
                 }
               });
@@ -61,74 +61,74 @@ exports.setUp = function(client) {
     });
   };
 
-  mod.getUserFriends = function(id, fn) {
+  mod.getUserContacts = function(id, fn) {
     var me = this;
-    this.getUserFriendsField(id, ':friends', function(err, friends) {
+    this.getUserContactField(id, ':contacts', function(err, contacts) {
       if(err) {
         return process.nextTick(function() {
           fn(err, []);
         });
       }
-      return me.getUserFriendsField(id, ':friendsunconfirmed', function(err, unconfirmed) {
+      return me.getUserContactField(id, ':unconfirmed', function(err, unconfirmed) {
         if(err) {
           return process.nextTick(function() {
-            fn(err, friends);
+            fn(err, contacts);
           });
         }
         return process.nextTick(function() {
           //TODO change to async loop
-          fn(err, friends.concat(unconfirmed));
+          fn(err, contacts.concat(unconfirmed));
         });
       });
     });
   };
 
-  mod.addUserFriend = function(id, friendId, fn) {
-    // Check if friend exists
-    return client.exists('users:' + friendId, function(err, val) {
+  mod.addUserContact = function(id, cid, fn) {
+    // Check if contact exists
+    return client.exists('users:' + cid, function(err, val) {
       if(!err && val) {
-        // Add friend to unconfirmed
-        return client.sadd('users:' + id + ':friendsunconfirmed', friendId, function(err, val) {
+        // Add contact to unconfirmed
+        return client.sadd('users:' + id + ':unconfirmed', cid, function(err, val) {
           if(!err) {
-            // Add friendrequest for the friend
-            return client.sadd('users:' + friendId + ':friendrequests', id, fn);
+            // Add request for the contact
+            return client.sadd('users:' + cid + ':requests', id, fn);
           }
           return process.nextTick(function () {
-            fn(new Error('Can not add user' + friendId + 'as a fiend'));
+            fn(new Error('Can not add user' + cid + 'as a contact'));
           });
         });
       }
       return process.nextTick(function () {
-        fn(new Error('User ' + friendId + ' does not exist'));
+        fn(new Error('User ' + cid + ' does not exist'));
       });
     });
   };
 
-  mod.deleteUserFriend = function(id, friendId, fn) {
-    // Delete User from friend list
-    client.srem('users:' + friendId + ':friends', id);
-    // Delete User from friendrequests
-    client.srem('users:' + friendId + ':friendrequests', id);
-    // Delete Friend from user list
-    client.srem('users:' + id + ':friends', friendId);
-    // Delete Friend from unconfirmed
-    client.srem('users:' + id + ':friendsunconfirmed', friendId, fn);
+  mod.deleteUserContact = function(id, cid, fn) {
+    // Delete User from contact list
+    client.srem('users:' + cid + ':contacts', id);
+    // Delete User from requests
+    client.srem('users:' + cid + ':requests', id);
+    // Delete Contact from user list
+    client.srem('users:' + id + ':contacts', cid);
+    // Delete Contact from unconfirmed
+    client.srem('users:' + id + ':unconfirmed', cid, fn);
   };
 
-  mod.inviteUserFriend = function(id, providerId, provider, fn) {
+  mod.inviteUserContact = function(id, providerId, provider, fn) {
     // TODO Invite new Fiend from Social networks
   };
 
-  mod.inviteEmailUserFriend = function(id, email, fn) {
+  mod.inviteEmailUserContact = function(id, email, fn) {
     var me = this;
-    this.findUserByMail(email, function(err, friend) {
+    this.findUserByMail(email, function(err, contact) {
       if(err) {
         return process.nextTick(function () {
           fn(err);
         });
       }
-      if(friend) {
-        return me.addUserFriend(id, friend.id, fn);
+      if(contact) {
+        return me.addUserContact(id, contact.id, fn);
       }
       var hash = tools.hash(email)
       , password = tools.genPass();
@@ -140,41 +140,41 @@ exports.setUp = function(client) {
       }, null, [{
         value: email,
         type: 'main'
-      }], function(err, friend) {
+      }], function(err, contact) {
         if (err) {
           return process.nextTick(function () {
             fn(err);
           });
         }
-        if (!friend) {
+        if (!contact) {
           return process.nextTick(function () {
             fn(new Error('Can not create user.'));
           });
         }
-        client.sadd('users:' + id + ':friendsunconfirmed', friend.id);
-        client.sadd('users:' + friend.id + ':friendrequests', id);
+        client.sadd('users:' + id + ':unconfirmed', contact.id);
+        client.sadd('users:' + contact.id + ':requests', id);
         return me.findUserById(id, function(err, user) {
-          return smtp.regPropose(user, friend, hash, fn);
+          return smtp.regPropose(user, contact, hash, fn);
         });
-        //       return me.expireUser(friend, me.findUserById(id, function(err, user) {
-        //         return smtp.regPropose(user, friend, hash, fn);
+        //       return me.expireUser(contact, me.findUserById(id, function(err, user) {
+        //         return smtp.regPropose(user, contact, hash, fn);
         //       }));
       });
     });
   };
 
-  mod.inviteLinkUserFriend = function(id, fn) {
+  mod.inviteLinkUserContact = function(id, fn) {
     //TODO generate link for a user
   };
 
-  mod.confirmUserFriend = function(id, friendId, accept, fn) {
-    client.srem('users:' + id + ':friendrequests', friendId);
+  mod.confirmUserContact = function(id, cid, accept, fn) {
     if(accept) {
-      client.smove('users:' + friendId + ':friendsunconfirmed', 'users:' + fiendId + 'friends', id, fn);
+      client.smove('users:' + id + ':requests', 'users:' + id + ':contacts', cid);
+      return client.smove('users:' + cid + ':unconfirmed', 'users:' + cid + ':contacts', id, fn);
       // TODO send notification to a new fried
-    } else {
-      client.srem('users:' + friendId + 'friendsunconfirmed', id, fn);
     }
+    client.srem('users:' + id + ':requests', cid);
+    return client.srem('users:' + cid + 'unconfirmed', id, fn);
   };
 
   return mod;

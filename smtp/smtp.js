@@ -21,7 +21,6 @@ exports.sendRegMail = function(user, fn) {
   user.provider +'.<br><br>Registration info<br>login: ' +
   email +'<br>password: ' +
   user.password + '</html>';
-  console.log(user);
   return smtp.send({
     text: "enable html to see registration details",
     from: cfg.DOMAIN + " <" + cfg.SMTP_NOREPLY + ">",
@@ -67,14 +66,14 @@ exports.regNotify = function(req, res, next, user, link) {
   });
 };
 
-exports.regPropose = function(user, friend, link, fn) {
-  var email = friend.email
+exports.regPropose = function(user, contact, link, fn) {
+  var email = contact.email
     , name = tools.getName(user)
     , msg = '<html>' + name + ' invites you to <a href="' + cfg.DOMAIN + '">' + cfg.DOMAIN + '</a><br>Follow the link below to continue<br><a href="' +
   cfg.DOMAIN + '/confirm/' + link + '">' +
   cfg.DOMAIN + '/confirm/' + link + '</a><br><br>Registration info<br>login: ' +
   email +'<br>password: ' +
-  friend.password + '</html>';
+  contact.password + '</html>';
   return smtp.send({
     text: "enable html to accept invitation",
     from: cfg.DOMAIN + " <" + cfg.SMTP_NOREPLY + ">",

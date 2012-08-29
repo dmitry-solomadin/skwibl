@@ -2,13 +2,6 @@
  *                  DB                    *
  ******************************************/
 
-
-//TODO Delete
-exports.articles  = {
-  '1':{'name':'alex', 'avatar' : '/public/images/avatar.png', 'id' : '15', 'content':'The day started to the upside, after big names like Goldman Sachs, Coca-Cola and Johnson & Johnson beat the Street’s consensus earnings view, but the market pulled back after Federal Reserve Chairman Ben Bernanke played it straight during his semiannual monetary policy report to the Senate Banking Committee.'},
-  '2':{'name':'Boris', 'avatar' : '/public/images/avatar.png', 'id' : '15', 'content':'The day started to the upside, after big names like Goldman Sachs, Coca-Cola and Johnson & Johnson beat the Street’s consensus earnings view, but the market pulled back after Federal Reserve Chairman Ben Bernanke played it straight during his semiannual monetary policy report to the Senate Banking Committee.'}
-};
-
 /**
  * Module dependencies.
  */
@@ -24,10 +17,10 @@ client.on("error", function (err) {
 var deps = [
   'auxiliary'
 // , 'files'
-, 'friends'
+, 'contacts'
 , 'login'
 , 'middleware'
-, 'rooms'
+, 'projects'
 // , 'search'
 // , 'support'
 , 'users'
