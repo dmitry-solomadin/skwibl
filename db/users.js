@@ -20,7 +20,7 @@ exports.setUp = function(client) {
           fn(err, null);
         });
       }
-      client.lrange('users:' + id + ':emails', 0, -1,  function(err, emails) {
+      client.smembers('users:' + id + ':emails',  function(err, emails) {
         if(err) {
           return process.nextTick(function () {
             fn(new Error('User ' + id + ' have no emails'));
@@ -35,7 +35,7 @@ exports.setUp = function(client) {
             for(var i = 0, len = emails.length; i < len; i++) {
               umails.push({
                 value: emails[i]
-                , type: types[i]
+              , type: types[i]
               });
             }
             user.emails = umails;
@@ -109,10 +109,8 @@ exports.setUp = function(client) {
     client.exists('users:' + id, function(err, val) {
       var value = email.value;
       if(!err && val) {
-        return client.multi()
-        .rpush('users:' + id + ':emails' , value)
-        .mset('emails:' + value + ':uid', id, 'emails:' + value + ':type', email.type)
-        .exec(fn);
+        client.sadd('users:' + id + ':emails' , value);
+        return client.mset('emails:' + value + ':uid', id, 'emails:' + value + ':type', email.type, fn);
       }
       return process.nextTick(function () {
         fn(new Error('User ' + id + ' does not exist'));

@@ -16,11 +16,12 @@ var smtp  = email.server.connect({
 });
 
 exports.sendRegMail = function(user, fn) {
-  var email = user.emails[0].value
+  var email = user.email
     , msg = '<html>You are successfuly registred at <a href="' + cfg.DOMAIN + '">' + cfg.DOMAIN +'</a> with ' +
   user.provider +'.<br><br>Registration info<br>login: ' +
   email +'<br>password: ' +
   user.password + '</html>';
+  console.log(user);
   return smtp.send({
     text: "enable html to see registration details",
     from: cfg.DOMAIN + " <" + cfg.SMTP_NOREPLY + ">",
@@ -38,7 +39,7 @@ exports.sendRegMail = function(user, fn) {
 };
 
 exports.regNotify = function(req, res, next, user, link) {
-  var email = user.emails[0].value
+  var email = user.email
     , msg = '<html>You are about to register at <a href="' + cfg.DOMAIN + '">' + cfg.DOMAIN + '</a><br>Follow the link below to continue<br><a href="' +
   cfg.DOMAIN + '/confirm/' + link + '">' +
   cfg.DOMAIN + '/confirm/' + link + '</a><br> or just ignore this mail to cancel registration.<br><br>Registration info<br>login: ' +
@@ -67,7 +68,7 @@ exports.regNotify = function(req, res, next, user, link) {
 };
 
 exports.regPropose = function(user, friend, link, fn) {
-  var email = friend.emails[0].value
+  var email = friend.email
     , name = tools.getName(user)
     , msg = '<html>' + name + ' invites you to <a href="' + cfg.DOMAIN + '">' + cfg.DOMAIN + '</a><br>Follow the link below to continue<br><a href="' +
   cfg.DOMAIN + '/confirm/' + link + '">' +
@@ -96,7 +97,7 @@ exports.regPropose = function(user, friend, link, fn) {
 };
 
 exports.passwordSend = function(req, res, next, user) {
-  var email = user.emails[0].value
+  var email = user.email
     , msg = '<html>Your registration info for <a href="' + cfg.DOMAIN + '">' + cfg.DOMAIN + '</a> is<br>login: ' +
   email +'<br>password: ' +
   user.password + '</html>';

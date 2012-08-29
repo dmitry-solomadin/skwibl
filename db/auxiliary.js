@@ -15,15 +15,12 @@ exports.setUp = function(client) {
 
   var mod = {};
 
-  mod.sessions = null;
-
   mod.sessionStore = function(express) {
     var sessionStore = connect_redis(express);
-    var sessions = new sessionStore({
+    return new sessionStore({
       client: client
     , ttl: cfg.SESSION_DURATION
     });
-    return sessions;
   };
 
   mod.getSessionData = function(sessionId, fn) {

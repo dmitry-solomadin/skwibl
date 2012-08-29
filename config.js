@@ -15,7 +15,7 @@ exports.TWITTER_CONSUMER_SECRET = "111";
 
 exports.SITE_SECRET = 'T&murj1n';
 
-exports.SMTP_USER = "yuri.karadzhov@gmail.com";
+exports.SMTP_USER = "skwibl.noreply@gmail.com";
 exports.SMTP_PASSWORD = "dfylthdfhlty";
 exports.SMTP_HOST = "smtp.gmail.com";
 exports.SMTP_SSL = true;
@@ -29,4 +29,4 @@ exports.SESSION_DURATION = 7200;//two hours
 
 // exports.CONFIRM_EXPIRE = 604800;//one week
 
-exports.DIRECTORY_PERMISION = 0731;
+exports.DIRECTORY_PERMISION = 0751;//rwxr-x--x

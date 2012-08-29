@@ -55,6 +55,7 @@ exports.setUp = function(client) {
     client.incr('global:nextUserId', function(err, val) {
       if(!err) {
         user.id = val;
+        user.email = emails[0].value;
         if(user.provider === 'local') {
           user.providerId = val;
         }
@@ -69,16 +70,13 @@ exports.setUp = function(client) {
           emailuid.push('emails:' + email + ':uid');
           emailuid.push(val);
         }
-        //TODO remove multi
-        var multi = client.multi();
         if(user.hash) {
-          multi.set('hashes:' + user.hash + ':uid', val);
+          client.set('hashes:' + user.hash + ':uid', val);
         }
-        multi.hmset('users:' + val, user);
-        multi.lpush('users:' + val + ':emails', umails);
-        multi.mset(emailtypes);
-        multi.mset(emailuid);
-        return multi.exec(function(err, results) {
+        client.hmset('users:' + val, user);
+        client.sadd('users:' + val + ':emails', umails);
+        client.mset(emailtypes);
+        return client.mset(emailuid, function(err, results) {
           if(err) {
             return process.nextTick(function () {
               fn(err, null);
@@ -161,17 +159,17 @@ exports.setUp = function(client) {
 
   mod.findUserByMailsOrCreate = function(profile, fn) {
     var emails = profile.emails
-    , me = this;
+      , me = this;
     return this.findUserByMails(emails, function (err, user) {
       if(!user) {
         var email = emails[0].value
-        , password = tools.genPass();
+          , password = tools.genPass();
         return me.addUser({
-          displayName: profile.displayName,
-          providerId: profile.id,
-          password: password,
-          status: 'registred',
-          provider: profile.provider
+          displayName: profile.displayName
+        , providerId: profile.id
+        , password: password
+        , status: 'registred'
+        , provider: profile.provider
         }, profile.name, emails, function(err, user){
           if(user) {
             return smtp.sendRegMail(user, fn);
