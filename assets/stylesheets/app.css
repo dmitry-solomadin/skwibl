@@ -1,0 +1,14 @@
+.jp-play-bar {
+    overflow: visible !important;
+}
+
+.jp-bookmark {
+    position: absolute;
+    width: 10px;
+    height: 14px;
+    background: #87ceeb;
+}
+
+.hide {
+    display: none;
+}

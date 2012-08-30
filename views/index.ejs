@@ -1,9 +1,3 @@
 <%- layout('application') %>
 <%- includedTemplate = include("partials/" + template +  '.ejs') %>
-<% if (template=='room') { %>
-<%- include('rightcoll.ejs') %>
-<% } %>
 <%- block('template', includedTemplate) %>
-
-
-

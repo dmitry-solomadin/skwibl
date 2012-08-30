@@ -12,6 +12,7 @@ var deps = [
 , 'search'
 , 'support'
 , 'users'
+, 'dev'
 ];
 
 for(var i = 0, len = deps.length; i < len; i++) {
