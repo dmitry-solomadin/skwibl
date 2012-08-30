@@ -10,6 +10,7 @@ var deps = [
 , 'search'
 , 'support'
 , 'users'
+, 'dev'
 ];
 
 exports.configure = function(app, passport) {

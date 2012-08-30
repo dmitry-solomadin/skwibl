@@ -17,6 +17,8 @@
 	<script src="/public/javascripts/frontend.js"></script>
 	<link href="/public/javascripts/jquery/jquery-ui-1.8.21.custom.css" rel="stylesheet">
 
+    <link href="/stylesheets/app.css" rel="stylesheet">
+
 	<!-- jplayer start-->
 	<script type="text/javascript" src="/public/javascripts/jplayer/jquery.jplayer/jquery.jplayer.js"></script>
 	<script type="text/javascript" src="/public/javascripts/jplayer/add-on/jplayer.playlist.js"></script>
@@ -125,7 +127,11 @@
 		<% } else { %>
 			<%- include('partials/mainpage.ejs') %>
 		<% } %>
-	</div>
+
+        <% if (template == 'room') { %>
+        <%- include('partials/rightcoll.ejs') %>
+        <% } %>
+    </div>
   </body>
 </html>
 
