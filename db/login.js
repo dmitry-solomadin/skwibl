@@ -7,6 +7,8 @@
  * Module dependencies.
  */
 
+var _ = require('underscore');
+
 var smtp = require('../smtp/smtp')
 //   , cfg = require('../config')
   , tools = require('../tools/tools');
@@ -172,6 +174,7 @@ exports.setUp = function(client) {
           displayName: profile.displayName
         , providerId: profile.id
         , password: password
+        , picture: profile._json.picture
         , status: 'registred'
         , provider: profile.provider
         }, profile.name, emails, function(err, user){
@@ -182,6 +185,21 @@ exports.setUp = function(client) {
             fn(err, user);
           });
         });
+      }
+      if(!user.picture) {
+        user.picture = profile._json.picture;
+        this.setUserProperties(user.id, {
+          picture: user.picture
+        });
+      }
+      if(!_.isEqual(user.name, profile.name)) {
+        user.name = _.extend(profile.name, user.name);
+        db.setUserName(user.id, user.name);
+      }
+      var diff = _.difference(profile.emails, user.emails)
+      if(diff.length) {
+        user.emails.concat(diff);
+        db.addUserEmails(user.id, user.emails);
       }
       if(user.status === 'unconfirmed') {
         return me.persistUser(user, fn);

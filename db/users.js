@@ -7,6 +7,8 @@
  * Module dependencies.
  */
 
+var _ = require('underscore');
+
 var tools = require('../tools/tools');
 
 exports.setUp = function(client) {
@@ -63,7 +65,7 @@ exports.setUp = function(client) {
 
   mod.findUserByMails = function(emails, fn) {
     var me = this;
-    client.mget(emails.map(tools.getValue).map(tools.emailUid), function(err, array) {
+    client.mget(_.pluck(emails, 'value').map(tools.emailUid), function(err, array) {
       if(!err && array) {
         for(var i = 0, len = array.length; i < len; i++) {
           var id = array[i];
@@ -93,7 +95,8 @@ exports.setUp = function(client) {
   mod.setUserProperties = function(id, properties, fn) {
     client.exists('users:' + id, function(err, val) {
       if(!err && val) {
-        return client.hmset('users:' + id ,properties, function(err, val) {
+        var purifiedProp = tools.purify(properties);
+        return client.hmset('users:' + id ,purifiedProp, function(err, val) {
           return process.nextTick(function () {
             fn(null);
           });
@@ -105,11 +108,27 @@ exports.setUp = function(client) {
     });
   };
 
-  mod.addUserMail = function(id, email, fn) {
+  mod.setUserName = function(id, name, fn) {
     client.exists('users:' + id, function(err, val) {
-      var value = email.value;
       if(!err && val) {
-        client.sadd('users:' + id + ':emails' , value);
+        var purifiedName = tools.purify(name);
+        return client.hmset('users:' + id + ':name' ,purifiedName, function(err, val) {
+          return process.nextTick(function () {
+            fn(null);
+          });
+        });
+      }
+      return process.nextTick(function() {
+        fn(new Error('User ' + id + ' does not exist'));
+      });
+    });
+  };
+
+  mod.addUserEmails = function(id, emails, fn) {
+    client.exists('users:' + id, function(err, val) {
+      var values = _.pluck(emails, 'value');
+      if(!err && val) {
+        client.sadd('users:' + id + ':emails' , values);
         return client.mset('emails:' + value + ':uid', id, 'emails:' + value + ':type', email.type, fn);
       }
       return process.nextTick(function () {

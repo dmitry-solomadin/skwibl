@@ -7,9 +7,9 @@ exports.setUp = function(client) {
 
   var mod = {};
 
-  mod.addUserToProject = function(id, rid, fn) {
+  mod.addUserToProject = function(id, pid, fn) {
     //Add user as a contact to all project members
-    client.smembers('projects:' + rid + ':users', function(err, array) {
+    client.smembers('projects:' + pid + ':users', function(err, array) {
       if(!err && array) {
         var leftToProcess = array.length - 1;
         for(var i = 0, len = array.length; i < len; i++) {
@@ -33,9 +33,9 @@ exports.setUp = function(client) {
   mod.createProject = function(id, name, cids, fn) {
     client.incr('global:nextProjectId', function(err, val) {
       if(!err) {
-        rid = val;
-        client.set('projects:' + rid + ':name', name);
-        client.set('projects:' + rid + ':users', cids);
+        pid = val;
+        client.set('projects:' + pid + ':name', name);
+        client.set('projects:' + pid + ':users', cids);
         //TODO send notification to all users except creator
       }
       return process.nextTick(function () {
@@ -44,11 +44,11 @@ exports.setUp = function(client) {
     });
   };
 
-  mod.deleteProject = function(id, rid, fn) {
-    client.srem('projects:' + rid + ':users', id);
-    client.scard('projects:' + rid + ':users', function(err, val) {
+  mod.deleteProject = function(id, pid, fn) {
+    client.srem('projects:' + pid + ':users', id);
+    client.scard('projects:' + pid + ':users', function(err, val) {
       if(!err && !val) {
-        return client.del('projects:' + rid, fn(err, value));
+        return client.del('projects:' + pid, fn(err, value));
       }
       //TODO send notification to all contacts except id
       return process.nextTick(function() {
@@ -57,14 +57,14 @@ exports.setUp = function(client) {
     });
   };
 
-  mod.addUserToProject = function(id, rid, fn) {
+  mod.addUserToProject = function(id, pid, fn) {
     var me = this;
     //Check if user exists
     return client.exists('users:' + id, function(err, val) {
       if(!err && val) {
-        return me.addUserToProject(id, rid, function(err) {
-          return me.addUserToProject(id, rid, function() {
-            return client.sadd('projects:' + rid + ':users', id, fn);
+        return me.addUserToProject(id, pid, function(err) {
+          return me.addUserToProject(id, pid, function() {
+            return client.sadd('projects:' + pid + ':users', id, fn);
           });
         });
         //TODO send notification to all contacts except id
@@ -75,11 +75,11 @@ exports.setUp = function(client) {
     });
   };
 
-  mod.inviteUserToProject = function(id, rid, providerId, provider, fn) {};
+  mod.inviteUserToProject = function(id, pid, providerId, provider, fn) {};
 
-  mod.inviteEmailUserToProject = function(id, rid, email, fn) {};
+  mod.inviteEmailUserToProject = function(id, pid, email, fn) {};
 
-  mod.inviteLinkUserToProject = function(id, rid, fn) {};
+  mod.inviteLinkUserToProject = function(id, pid, fn) {};
 
   return mod;
 

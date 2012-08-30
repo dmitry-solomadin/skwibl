@@ -65,6 +65,19 @@ exports.hash = function(passport) {
  * GET
  * Google authenticate
  */
+exports.google = function(passport) {
+  return passport.authenticate('google', {
+    scope: [
+      'https://www.googleapis.com/auth/userinfo.profile'
+    , 'https://www.googleapis.com/auth/userinfo.email'
+    ]
+  });
+};
+
+/*
+ * GET
+ * Google authentication callback
+ */
 exports.googleCb = function(passport) {
   return passport.authenticate('google', {
     failureRedirect: '/'
@@ -78,11 +91,11 @@ exports.googleCb = function(passport) {
 exports.facebook = function(passport) {
   return passport.authenticate('facebook', {
     scope: [
-    'email'
-  , 'user_status'
-  , 'user_checkins'
-  , 'user_photos'
-  , 'user_videos'
+      'email'
+    , 'user_status'
+    , 'user_checkins'
+    , 'user_photos'
+    , 'user_videos'
     ]
   })
 };

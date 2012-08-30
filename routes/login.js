@@ -39,7 +39,7 @@ exports.configure = function(app, passport) {
  /*
   * auth or register with google
   */
-  app.get('/auth/google', passport.authenticate('google'), ctrls.empty);
+  app.get('/auth/google', ctrls.google(passport), ctrls.empty);
 
  /*
   * google callback

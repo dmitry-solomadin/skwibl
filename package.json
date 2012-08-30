@@ -35,7 +35,8 @@
     "emailjs": "*",
     "password-generator": "*",
     "hiredis": "*",
-    "redis": "*"
+    "redis": "*",
+    "underscore": "*"
   },
   "devDependencies": {
     "node-inspector": "0.2.x"
