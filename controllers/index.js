@@ -5,10 +5,10 @@
 var deps = [
   'auxiliary'
 , 'files'
-, 'friends'
+, 'contacts'
 , 'login'
 , 'middleware'
-, 'rooms'
+, 'projects'
 , 'search'
 , 'support'
 , 'users'

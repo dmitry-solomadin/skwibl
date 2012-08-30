@@ -29,21 +29,6 @@ activity.on('connect', function() {
 	<div style="overflow:hidden;" class="fl mrl tab-content">
 		<div class="active tab-pane " id="addpost">
 			<div class="clear_medium"></div><div class="clear_medium"></div>
-			  <% for (var i in articles) { %>
-				<div class="mrl_big fl" style="width:650px;">
-					<a href="/user/<%= articles[i].id %>/">
-						<img class="fl mrt_big" width="60" src="<%= articles[i].avatar %>"></a>
-					</a>
-					<b class="fl">
-						<a href="/user/<%= articles[i].id %>/"><%= articles[i].name %></a>
-					</b>
-					<br>
-					<div class="fl" style="width:575px;">
-						<%= articles[i].content %>
-					</div>
-				</div>
-				<div class="clear_medium"></div>
-			  <% } %>
 		</div>
 
 		<div class="tab-pane " id="friends">

@@ -33,6 +33,27 @@ exports.genPass = function() {
   return generatePassword.call(null, cfg.PASSWORD_LENGTH, cfg.PASSWORD_EASYTOREMEMBER);
 };
 
+exports.isEmpty = function(obj) {
+  return Object.keys(obj).length === 0;
+};
+
+
+
+exports.purify = function(obj) {
+  if(!obj) {
+    return null;
+  }
+  for(var prop in obj) {
+    if(!obj[prop]) {
+      delete obj[prop];
+    }
+  }
+  if(this.isEmpty(obj)) {
+    return null;
+  }
+  return obj;
+};
+
 exports.getName = function(user) {
   if(user.name) {
     var name = user.name;

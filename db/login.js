@@ -25,8 +25,8 @@ exports.setUp = function(client) {
 //       client.expire('emails:' + email + ':type', cfg.CONFIRM_EXPIRE);
 //       client.expire('emails:' + email + ':uid', cfg.CONFIRM_EXPIRE);
 //     }
-//     client.expire('users:' + id + ':friendrequests', cfg.CONFIRM_EXPIRE);
-//     //TODO delete unconfirmed friends if user expire
+//     client.expire('users:' + id + ':requests', cfg.CONFIRM_EXPIRE);
+//     //TODO delete unconfirmed contacts if user expire
 //     client.expire('hashes:' + user.hash + ':uid', cfg.CONFIRM_EXPIRE, fn);
 //   };
 
@@ -74,6 +74,10 @@ exports.setUp = function(client) {
           client.set('hashes:' + user.hash + ':uid', val);
         }
         client.hmset('users:' + val, user);
+        var purifiedName = tools.purify(name);
+        if(purifiedName) {
+          client.hmset('users:' + val + ':name', purifiedName);
+        }
         client.sadd('users:' + val + ':emails', umails);
         client.mset(emailtypes);
         return client.mset(emailuid, function(err, results) {
@@ -82,7 +86,7 @@ exports.setUp = function(client) {
               fn(err, null);
             });
           }
-          user.name = name;
+          user.name = purifiedName;
           user.emails = emails;
           return process.nextTick(function () {
             fn(null, user);
@@ -99,21 +103,21 @@ exports.setUp = function(client) {
     // If user exists
     client.exists('users:' + id, function(err, val) {
       if(!err && val) {
-        // Get friends list
-        client.smembers('users:' + id + 'friends', function(err, array) {
+        // Get contacts list
+        client.smembers('users:' + id + ':contacts', function(err, array) {
           if(!err) {
-            val.forEach(function(friendId) {
-              // Add user from friends' lists
-              client.sadd('users:' + friendId + ':friends');
+            val.forEach(function(cid) {
+              // Add user from contacts' lists
+              client.sadd('users:' + cid + ':contacts');
             });
           }
         });
-        // Get unconfirmed friends list
-        client.smembers('users:' + id + 'friendsunconfirmed', function(err, array) {
+        // Get unconfirmed contacts list
+        client.smembers('users:' + id + 'unconfirmed', function(err, array) {
           if(!err) {
-            val.forEach(function(friendId) {
-              // Add user from friends' requests
-              client.sadd('users:' + friendId + ':friendrequests');
+            val.forEach(function(cid) {
+              // Add user from contacts' requests
+              client.sadd('users:' + cid + ':requests');
             });
           }
         });
@@ -130,21 +134,21 @@ exports.setUp = function(client) {
     // If user exists
     client.exists('users:' + id, function(err, val) {
       if(!err && val) {
-        // Get friends list
-        client.smembers('users:' + id + 'friends', function(err, array) {
+        // Get contacts list
+        client.smembers('users:' + id + ':contacts', function(err, array) {
           if(!err) {
-            val.forEach(function(friendId) {
-              // Delete user from friends' lists
-              client.srem('users:' + friendId + ':friends');
+            val.forEach(function(cid) {
+              // Delete user from contacts' lists
+              client.srem('users:' + cid + ':contacts');
             });
           }
         });
-        // Get unconfirmed friends list
-        client.smembers('users:' + id + 'friendsunconfirmed', function(err, array) {
+        // Get unconfirmed contacts list
+        client.smembers('users:' + id + 'unconfirmed', function(err, array) {
           if(!err) {
-            val.forEach(function(friendId) {
-              // Delete user from friends' requests
-              client.srem('users:' + friendId + ':friendrequests');
+            val.forEach(function(cid) {
+              // Delete user from contacts' requests
+              client.srem('users:' + cid + ':requests');
             });
           }
         });

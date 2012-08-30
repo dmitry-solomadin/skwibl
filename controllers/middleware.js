@@ -26,10 +26,10 @@ exports.isAuth = function(req, res, next) {
 
 /*
  * GET
- * Check if the user is the room member
+ * Check if the user is the project member
  */
 exports.isMember = function(req, res, next) {
-  db.isUserRoomMember(req.user.id, req.params.id, function(err, val) {
+  db.isUserProjectMember(req.user.id, req.params.id, function(err, val) {
     if(val) {
       return next();
     }
