@@ -17,31 +17,9 @@ exports.setUp = function(client) {
 
   var mod = {};
 
-//   mod.expireUser = function(user, fn) {
-//     var emails = user.emails
-//       , id = user.id;
-//     client.expire('users:' + id, cfg.CONFIRM_EXPIRE);
-//     client.expire('users:' + id + ':emails', cfg.CONFIRM_EXPIRE);
-//     for(var i = 0, len = emails.length; i < len; i++) {
-//       var email = emails[i].value;
-//       client.expire('emails:' + email + ':type', cfg.CONFIRM_EXPIRE);
-//       client.expire('emails:' + email + ':uid', cfg.CONFIRM_EXPIRE);
-//     }
-//     client.expire('users:' + id + ':requests', cfg.CONFIRM_EXPIRE);
-//     //TODO delete unconfirmed contacts if user expire
-//     client.expire('hashes:' + user.hash + ':uid', cfg.CONFIRM_EXPIRE, fn);
-//   };
-
   mod.persistUser = function(user, fn) {
     var emails = user.emails
       , id = user.id;
-    //   client.persist('users:' + id);
-    //   client.persist('users:' + id + ':emails');
-    //   for(var i = 0, len = emails.length; i < len; i++) {
-      //     var email = emails[i].value;
-    //     client.persist('emails:' + email + ':type');
-    //     client.persist('emails:' + email + ':uid');
-    //   }
     client.hdel('users:' + id, 'hash');
     client.del('hashes:' + user.hash + ':uid');
     this.setUserProperties(user.id, {
@@ -54,7 +32,7 @@ exports.setUp = function(client) {
   }
 
   mod.addUser = function(user, name, emails, fn) {
-    client.incr('global:nextUserId', function(err, val) {
+    client.incr('users:next', function(err, val) {
       if(!err) {
         user.id = val;
         user.email = emails[0].value;
@@ -62,8 +40,8 @@ exports.setUp = function(client) {
           user.providerId = val;
         }
         var umails = []
-        , emailtypes = []
-        , emailuid = [];
+          , emailtypes = []
+          , emailuid = [];
         for(var i = 0, len = emails.length; i < len; i++) {
           var email = emails[i].value;
           umails.push(email);
@@ -102,65 +80,49 @@ exports.setUp = function(client) {
   };
 
   mod.restoreUser = function(id, fn) {
-    // If user exists
-    client.exists('users:' + id, function(err, val) {
-      if(!err && val) {
-        // Get contacts list
-        client.smembers('users:' + id + ':contacts', function(err, array) {
-          if(!err) {
-            val.forEach(function(cid) {
-              // Add user from contacts' lists
-              client.sadd('users:' + cid + ':contacts');
-            });
-          }
+    // Get contacts list
+    client.smembers('users:' + id + ':contacts', function(err, array) {
+      if(!err) {
+        val.forEach(function(cid) {
+          // Add user from contacts' lists
+          client.sadd('users:' + cid + ':contacts');
         });
-        // Get unconfirmed contacts list
-        client.smembers('users:' + id + 'unconfirmed', function(err, array) {
-          if(!err) {
-            val.forEach(function(cid) {
-              // Add user from contacts' requests
-              client.sadd('users:' + cid + ':requests');
-            });
-          }
-        });
-        // Set status to registred
-        return client.hset('users:' + id + ':emails' , 'status', 'registred', fn);
       }
-      return process.nextTick(function () {
-        fn(new Error('User ' + id + ' does not exist'));
-      });
     });
+    // Get unconfirmed contacts list
+    client.smembers('users:' + id + 'unconfirmed', function(err, array) {
+      if(!err) {
+        val.forEach(function(cid) {
+          // Add user from contacts' requests
+          client.sadd('users:' + cid + ':requests');
+        });
+      }
+    });
+    // Set status to registred
+    return client.hset('users:' + id + ':emails' , 'status', 'registred', fn);
   };
 
   mod.delUser = function(id, fn) {
-    // If user exists
-    client.exists('users:' + id, function(err, val) {
-      if(!err && val) {
-        // Get contacts list
-        client.smembers('users:' + id + ':contacts', function(err, array) {
-          if(!err) {
-            val.forEach(function(cid) {
-              // Delete user from contacts' lists
-              client.srem('users:' + cid + ':contacts');
-            });
-          }
+    // Get contacts list
+    client.smembers('users:' + id + ':contacts', function(err, array) {
+      if(!err) {
+        array.forEach(function(cid) {
+          // Delete user from contacts' lists
+          client.srem('users:' + cid + ':contacts');
         });
-        // Get unconfirmed contacts list
-        client.smembers('users:' + id + 'unconfirmed', function(err, array) {
-          if(!err) {
-            val.forEach(function(cid) {
-              // Delete user from contacts' requests
-              client.srem('users:' + cid + ':requests');
-            });
-          }
-        });
-        // Set status to deleted
-        return client.hset('users:' + id + ':emails' , 'status', 'deleted', fn);
       }
-      return process.nextTick(function () {
-        fn(new Error('User ' + id + ' does not exist'));
-      });
     });
+    // Get unconfirmed contacts list
+    client.smembers('users:' + id + 'unconfirmed', function(err, array) {
+      if(!err) {
+        array.forEach(function(cid) {
+          // Delete user from contacts' requests
+          client.srem('users:' + cid + ':requests');
+        });
+      }
+    });
+    // Set status to deleted
+    return client.hset('users:' + id + ':emails' , 'status', 'deleted', fn);
   };
 
   mod.findUserByMailsOrCreate = function(profile, fn) {
@@ -194,15 +156,18 @@ exports.setUp = function(client) {
       }
       if(!_.isEqual(user.name, profile.name)) {
         user.name = _.extend(profile.name, user.name);
-        db.setUserName(user.id, user.name);
+        me.setUserName(user.id, user.name);
       }
       var diff = _.difference(profile.emails, user.emails)
       if(diff.length) {
         user.emails.concat(diff);
-        db.addUserEmails(user.id, user.emails);
+        me.addUserEmails(user.id, user.emails);
       }
       if(user.status === 'unconfirmed') {
         return me.persistUser(user, fn);
+      }
+      if(user.status === 'deleted') {
+        return me.restoreUser(user, fn);
       }
       return process.nextTick(function () {
         fn(err, user);

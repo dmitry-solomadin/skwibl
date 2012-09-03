@@ -87,53 +87,37 @@ exports.setUp = function(client) {
         return me.findUserById(val, fn);
       }
       return process.nextTick(function () {
-        fn(null, null);
+        fn(err, null);
       });
     });
   };
 
   mod.setUserProperties = function(id, properties, fn) {
-    client.exists('users:' + id, function(err, val) {
-      if(!err && val) {
-        var purifiedProp = tools.purify(properties);
-        return client.hmset('users:' + id ,purifiedProp, function(err, val) {
-          return process.nextTick(function () {
-            fn(null);
-          });
-        });
-      }
+    var purifiedProp = tools.purify(properties);
+    return client.hmset('users:' + id ,purifiedProp, function(err, val) {
       return process.nextTick(function () {
-        fn(new Error('User ' + id + ' does not exist'));
+        fn(null);
       });
     });
   };
 
   mod.setUserName = function(id, name, fn) {
-    client.exists('users:' + id, function(err, val) {
-      if(!err && val) {
-        var purifiedName = tools.purify(name);
-        return client.hmset('users:' + id + ':name' ,purifiedName, function(err, val) {
-          return process.nextTick(function () {
-            fn(null);
-          });
-        });
-      }
-      return process.nextTick(function() {
-        fn(new Error('User ' + id + ' does not exist'));
+    var purifiedName = tools.purify(name);
+    return client.hmset('users:' + id + ':name', purifiedName, function(err, val) {
+      return process.nextTick(function () {
+        fn(null);
       });
     });
   };
 
   mod.addUserEmails = function(id, emails, fn) {
-    client.exists('users:' + id, function(err, val) {
-      var values = _.pluck(emails, 'value');
-      if(!err && val) {
-        client.sadd('users:' + id + ':emails' , values);
-        return client.mset('emails:' + value + ':uid', id, 'emails:' + value + ':type', email.type, fn);
-      }
-      return process.nextTick(function () {
-        fn(new Error('User ' + id + ' does not exist'));
-      });
+    var values = _.pluck(emails, 'value');
+    client.sadd('users:' + id + ':emails' , values);
+    values.forEach(function(value) {
+      client.mset('emails:' + value + ':uid', id, 'emails:' + value + ':type', email.type);
+    });
+    return process.nextTick(function() {
+      fn(null, values);
     });
   };
 

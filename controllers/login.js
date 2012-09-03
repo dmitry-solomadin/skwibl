@@ -20,6 +20,10 @@ exports.logOut = function(req, res) {
   res.redirect('/');
 };
 
+/*
+ * GET
+ * Redirect to main page
+ */
 exports.login = function(req, res) {
   res.redirect('/');
 }
@@ -160,8 +164,15 @@ exports.register = function(req, res, next) {
             req.flash('error', 'Registration failed. Can not create user for email: ' + email);
             return res.redirect('/');
           }
-          return smtp.regNotify(req, res, next, user, hash)
-          //           return db.expireUser(user, smtp.regNotify(req, res, next, user, hash));
+          return smtp.regNotify(req, res, next, user, hash);
+        });
+      }
+      if(user.status === 'deleted') {
+        return db.restoreUser(user, function(err) {
+          if(!err) {
+            return smtp.passwordSend(req, res, next, user);
+          }
+          return next(err);
         });
       }
       req.flash('error', 'This mail is already in use: ' + email);
@@ -172,14 +183,6 @@ exports.register = function(req, res, next) {
     return res.redirect('/');
   }
 };
-
-/*
- * GET
- * dashboard - redirect to main page
- */
-exports.dashboard = function(req, res) {
-  res.redirect('/');
-}
 
 /*
  * GET

@@ -50,6 +50,9 @@ exports.setUp = function() {
         if(user.status === 'unconfirmed') {
           return db.persistUser(user, done);
         }
+        if(user.status === 'deleted') {
+          return db.restoreUser(user, done);
+        }
         return done(null, user);
       })
     });

@@ -17,14 +17,14 @@ exports.configure = function(app, passport) {
   app.get('/', ctrls.index);
 
  /*
-  * logout
-  */
-  app.get('/logout', ctrls.isAuth, ctrls.logOut);
-
- /*
   * post local auth data
   */
   app.post('/login', ctrls.local(passport), ctrls.login);
+
+ /*
+  * get registration page
+  */
+  app.get('/register', ctrls.regPage);
 
  /*
   * post local registration info
@@ -34,7 +34,7 @@ exports.configure = function(app, passport) {
  /*
   * confirm local registration
   */
-  app.get('/confirm/:hash', ctrls.hash(passport), ctrls.regConfirm, ctrls.dashboard);
+  app.get('/confirm/:hash', ctrls.hash(passport), ctrls.regConfirm, ctrls.login);
 
  /*
   * auth or register with google
@@ -44,7 +44,7 @@ exports.configure = function(app, passport) {
  /*
   * google callback
   */
-  app.get('/auth/google/callback', ctrls.googleCb(passport), ctrls.dashboard);
+  app.get('/auth/google/callback', ctrls.googleCb(passport), ctrls.login);
 
  /*
   * auth or register with facebook
@@ -54,7 +54,7 @@ exports.configure = function(app, passport) {
  /*
   * facebook callback
   */
-  app.get('/auth/facebook/callback', ctrls.facebookCb(passport), ctrls.dashboard);
+  app.get('/auth/facebook/callback', ctrls.facebookCb(passport), ctrls.login);
 
  /*
   * auth or register with vkontakte
@@ -64,7 +64,7 @@ exports.configure = function(app, passport) {
  /*
   * vkontakte callback
   */
-  app.get('/auth/vkontakte/callback', ctrls.vkontakteCb(passport), ctrls.dashboard);
+  app.get('/auth/vkontakte/callback', ctrls.vkontakteCb(passport), ctrls.login);
 
  /*
   * auth or register with twitter
@@ -74,6 +74,11 @@ exports.configure = function(app, passport) {
  /*
   * twitter callback
   */
-  app.get('/auth/twitter/callback', ctrls.twitterCb(passport), ctrls.dashboard);
+  app.get('/auth/twitter/callback', ctrls.twitterCb(passport), ctrls.login);
+
+  /*
+   * logout
+   */
+  app.get('/logout', ctrls.isAuth, ctrls.logOut);
 
 }
