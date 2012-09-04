@@ -3,11 +3,11 @@
  ******************************************/
 
 var deps = [
-  'auxiliary'
+  'auth'
+, 'aux'
 , 'files'
 , 'contacts'
-, 'login'
-, 'middleware'
+, 'mid'
 , 'projects'
 , 'search'
 , 'support'
@@ -16,10 +16,9 @@ var deps = [
 ];
 
 for(var i = 0, len = deps.length; i < len; i++) {
-  var mod = require('./' + deps[i]);
-  for(var p in mod) {
-    this[p] = mod[p];
-  }
+  var dep = deps[i]
+    , mod = require('./' + dep);
+  this[dep] = mod;
 }
 
 module.exports = this;

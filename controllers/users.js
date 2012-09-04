@@ -20,7 +20,7 @@ exports.profile = function(req, res) {
  * GET
  * Edit personal profile
  */
-exports.editUser = function(req, res) {
+exports.edit = function(req, res) {
   res.render('partials/edituser', { menu: 1});
 };
 
@@ -28,8 +28,8 @@ exports.editUser = function(req, res) {
  * POST
  * Update user profile info
  */
-exports.updateUser = function(req, res) {
-  db.setUserProperties(req.user.id, req.body.properties, function(err) {
+exports.update = function(req, res) {
+  db.users.setProperties(req.user.id, req.body.properties, function(err) {
     if(err) {
       return res.send(false);
     }
@@ -41,8 +41,8 @@ exports.updateUser = function(req, res) {
  * POST
  * Delete user profile
  */
-exports.deleteUser = function(req, res) {
-  db.delUser(req.user.id, function(err) {
+exports.delete = function(req, res) {
+  db.users.delete(req.user.id, function(err) {
     if(err) {
       req.flash('error', err);
       return res.redirect('/');

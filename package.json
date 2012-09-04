@@ -30,7 +30,6 @@
     "passport-hash": "*",
     "passport-google-oauth": "*",
     "passport-facebook": "*",
-    "passport-vkontakte": "*",
     "passport-twitter": "*",
     "emailjs": "*",
     "password-generator": "*",

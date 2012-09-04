@@ -29,7 +29,7 @@ exports.isAuth = function(req, res, next) {
  * Check if the user is the project member
  */
 exports.isMember = function(req, res, next) {
-  db.isUserProjectMember(req.user.id, req.params.pid, function(err, val) {
+  db.mid.isMember(req.user.id, req.params.pid, function(err, val) {
     if(val) {
       return next();
     }
@@ -48,7 +48,7 @@ exports.isMember = function(req, res, next) {
  * Check if the user is project owner
  */
 exports.isOwner = function(req, res, next) {
-  db.isUserProjectOwner(req.user.id, req.body.pid, function(err, val) {
+  db.mid.isOwner(req.user.id, req.body.pid, function(err, val) {
     if(val) {
       return next();
     }
@@ -64,7 +64,7 @@ exports.isOwner = function(req, res, next) {
  * Check if the user is invited to a project
  */
 exports.isInvited = function(req, res, next) {
-  db.isUserInvited(req.user.id, req.body.pid, function(err, val) {
+  db.mid.isInvited(req.user.id, req.body.pid, function(err, val) {
     if(val) {
       return next();
     }

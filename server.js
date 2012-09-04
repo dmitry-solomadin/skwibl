@@ -20,7 +20,7 @@ sio.set('authorization', function(data, accept){
   console.log(data.cookie);
   data.sessionId = data.cookie['express.sid'].substring(2, 26);
   console.log(data.sessionId);
-  db.getSessionData(data.sessionId, function(err, session){
+  db.sessions.get(data.sessionId, function(err, session){
     if(err) {
       return accept('Error in session store.', false);
     } else if(!session) {

@@ -3,9 +3,9 @@
  ******************************************/
 
 var deps = [
-  'files'
+  'auth'
+, 'files'
 , 'contacts'
-, 'login'
 , 'projects'
 , 'search'
 , 'support'

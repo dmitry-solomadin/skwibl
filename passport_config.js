@@ -26,7 +26,7 @@ exports.setUp = function() {
   passport.deserializeUser(function(user, done) {
     console.log('deserialize');
     done(null, user);
-//     db.findUserById(id, function (err, user) {
+//     db.users.findById(id, function (err, user) {
 //       done(err, user);
 //     });
   });
@@ -37,7 +37,7 @@ exports.setUp = function() {
   },
   function(username, password, done) {
     process.nextTick(function () {
-      db.findUserByMail(username, function(err, user) {
+      db.users.findByEmail(username, function(err, user) {
         if(err) {
           return done(err);
         }
@@ -48,10 +48,10 @@ exports.setUp = function() {
           return done(null, false, { message: 'Invalid password' });
         }
         if(user.status === 'unconfirmed') {
-          return db.persistUser(user, done);
+          return db.users.persist(user, done);
         }
         if(user.status === 'deleted') {
-          return db.restoreUser(user, done);
+          return db.users.restore(user, done);
         }
         return done(null, user);
       })
@@ -60,7 +60,7 @@ exports.setUp = function() {
 
   passport.use(new HashStrategy(function(hash, done) {
     process.nextTick(function () {
-      db.findUserByHash(hash, function(err, user) {
+      db.users.findByHash(hash, function(err, user) {
         if (err) {
           return done(err);
         }
@@ -81,7 +81,7 @@ exports.setUp = function() {
     callbackURL: cfg.DOMAIN + '/auth/google/callback'
   }, function(accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
-      db.findUserByMailsOrCreate(profile, done);
+      db.auth.findOrCreate(profile, done);
     });
   }));
 
@@ -91,7 +91,7 @@ exports.setUp = function() {
     callbackURL: cfg.DOMAIN + '/auth/facebook/callback'
   }, function(accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
-      db.findUserByMailsOrCreate(profile, done);
+      db.auth.findOrCreate(profile, done);
     });
   }));
 
@@ -101,7 +101,7 @@ exports.setUp = function() {
     callbackURL: cfg.DOMAIN + '/auth/facebook/callback'
   }, function(accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
-      db.findUserByMailsOrCreate(profile, done);
+      db.auth.findOrCreate(profile, done);
     });
   }));
 
@@ -112,7 +112,7 @@ exports.setUp = function() {
   },
   function(token, tokenSecret, profile, done) {
     process.nextTick(function () {
-      db.findUserByMailsOrCreate(profile, done);
+      db.auth.findOrCreate(profile, done);
     });
   }));
 

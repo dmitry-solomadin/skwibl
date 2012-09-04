@@ -15,23 +15,22 @@ client.on("error", function (err) {
 });
 
 var deps = [
-  'auxiliary'
+  'auth'
 // , 'files'
 , 'contacts'
-, 'login'
-, 'middleware'
+, 'mid'
 , 'projects'
 // , 'search'
+, 'sessions'
 // , 'support'
 , 'users'
 ];
 
 for(var i = 0, len = deps.length; i < len; i++) {
-  var mod = require('./' + deps[i]);
-  var obj = mod.setUp(client);
-  for(var p in obj) {
-    this[p] = obj[p];
-  }
+  var dep = deps[i]
+    , mod = require('./' + dep)
+    , obj = mod.setUp(client, this);
+  this[dep] = obj;
 }
 
 module.exports = this;

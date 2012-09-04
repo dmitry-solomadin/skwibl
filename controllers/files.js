@@ -15,39 +15,39 @@ var cfg = require('../config');
  * GET
  * User files
  */
-exports.files = function(req, res) {
+exports.get = function(req, res) {
   res.render('partials/files');
 };
 
 /*
- * GET
- * User videos
+ * POST
+ * Add file from cloud source
  */
-exports.videos = function(req, res) {
-  res.render('partials/videos');
+exports.add = function(req, res) {
+  //TODO
 };
 
 /*
- * GET
- * User photos
+ * POST
+ * delete file
  */
-exports.photos = function(req, res) {
-  res.render('partials/photos');
+exports.delete = function(req, res) {
+  //TODO
 };
 
 /*
- * GET
- * User documents
+ * POST
+ * Update file
  */
-exports.documents = function(req, res) {
-  res.render('partials/documents');
+exports.update = function(req, res) {
+  //TODO
 };
 
 /*
  * POST
  * Upload file
  */
-exports.uploadFile = function(req, res, next) {
+exports.upload = function(req, res, next) {
   if(req.xhr){
     var dirName = './static/private/' +  req.user.id
       , dir = fs.mkdir(dirName, cfg.DIRECTORY_PERMISION);

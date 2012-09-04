@@ -3,15 +3,15 @@
  ******************************************/
 
 
-exports.setUp = function(client) {
+exports.setUp = function(client, db) {
 
   var mod = {};
 
-  mod.isUserProjectMember = function(id, pid, fn) {
+  mod.isMember = function(id, pid, fn) {
     client.sismember('projects:' + pid + ':users', fn);
   };
 
-  mod.isUserProjectOwner = function(id, pid, fn) {
+  mod.isOwner = function(id, pid, fn) {
     client.hget('projects:' + pid, 'owner', function(err, val) {
       if(!err && val === id) {
         return process.nextTick(function() {
@@ -24,7 +24,7 @@ exports.setUp = function(client) {
     })
   };
 
-  mod.isUserInvited = function(id, pid, fn) {
+  mod.isInvited = function(id, pid, fn) {
     client.sismember('projects:' + pid + ':unconfirmed', id, fn);
   };
 

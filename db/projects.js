@@ -11,15 +11,15 @@ var _ = require('underscore');
 
 var tools = require('../tools/tools');
 
-exports.setUp = function(client) {
+exports.setUp = function(client, db) {
 
   var mod = {};
 
-  mod.getUserProjects = function(id, fn) {};
+  mod.get = function(id, fn) {};
 
-  mod.getProjectData = function(pid, id, fn) {}
+  mod.getData = function(pid, id, fn) {}
 
-  mod.addProject = function(uid, name, fn) {
+  mod.add = function(uid, name, fn) {
     client.incr('projects:next', function(err, val) {
       if(!err) {
         var project = {};
@@ -39,7 +39,7 @@ exports.setUp = function(client) {
     });
   };
 
-  mod.setProjectProperties = function(pid, properties, fn) {
+  mod.setProperties = function(pid, properties, fn) {
     var purifiedProp = tools.purify(properties);
     return client.hmset('projects:' + pid, purifiedProp, function(err, val) {
       return process.nextTick(function() {
@@ -48,7 +48,7 @@ exports.setUp = function(client) {
     });
   };
 
-  mod.inviteUserToProject = function(pid, id, fn) {
+  mod.invite = function(pid, id, fn) {
     //Check if user exists
     return client.exists('users:' + id, function(err, val) {
       if(!err && val) {
@@ -61,13 +61,19 @@ exports.setUp = function(client) {
     });
   };
 
-  mod.inviteSocialUserToProject = function(pid, provider, providerId, fn) {};
+  mod.inviteSocial = function(pid, provider, providerId, fn) {
+    //TODO
+  };
 
-  mod.inviteEmailUserToProject = function(pid, email, fn) {};
+  mod.inviteEmail = function(pid, email, fn) {
+    //TODO
+  };
 
-  mod.inviteLinkUserToProject = function(pid, fn) {};
+  mod.inviteLink = function(pid, fn) {
+    //TODO
+  };
 
-  mod.confirmUserToProject = function(pid, id, fn) {
+  mod.confirm = function(pid, id, fn) {
     //Get project members
     client.smembers('projects:' + pid + ':users', function(err, array) {
       if(!err && array) {
@@ -96,9 +102,8 @@ exports.setUp = function(client) {
     });
   };
 
-  mod.removeUserFromProject = function(pid, id, fn) {
-    var me = this;
-    this.isUserProjectMember(id, pid, function(err, val) {
+  mod.remove = function(pid, id, fn) {
+    db.mid.isMember(id, pid, function(err, val) {
       if(!err && val) {
         //Remove project from user projects
         client.srem('users:' + id + ':projects', pid);
@@ -107,13 +112,13 @@ exports.setUp = function(client) {
           //Get project members
           client.smembers('projects:' + pid + ':users', function(err, array) {
             if(!err && array) {
-              me.recalculateUserContacts(id, array, pid);
+              db.contacts.recalculate(id, array, pid);
               var leftToProcess = array.length - 1;
               for(var i = 0, len = array.length; i < len; i++) {
                 (function(cid) {
                   process.nextTick(function() {
                     //Recalculate member contacts
-                    me.recalculateUserContacts(cid, [id], pid);
+                    db.contacts.recalculate(cid, [id], pid);
                     if(leftToProcess-- === 0) {
                       return process.nextTick(function() {
                         fn(null);
