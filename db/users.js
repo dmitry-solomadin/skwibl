@@ -7,13 +7,123 @@
  * Module dependencies.
  */
 
+var _ = require('underscore');
+
 var tools = require('../tools/tools');
 
-exports.setUp = function(client) {
+exports.setUp = function(client, db) {
 
   var mod = {};
 
-  mod.findUserById = function(id, fn) {
+  mod.persist = function(user, fn) {
+    var emails = user.emails
+    , id = user.id;
+    client.hdel('users:' + id, 'hash');
+    client.del('hashes:' + user.hash + ':uid');
+    db.users.setProperties(user.id, {
+      status: 'registred'
+    } ,function(err, val) {
+      return process.nextTick(function () {
+        fn(err, user);
+      });
+    });
+  }
+
+  mod.add = function(user, name, emails, fn) {
+    client.incr('users:next', function(err, val) {
+      if(!err) {
+        user.id = val;
+        user.email = emails[0].value;
+        if(user.provider === 'local') {
+          user.providerId = val;
+        }
+        var umails = []
+        , emailtypes = []
+        , emailuid = [];
+        for(var i = 0, len = emails.length; i < len; i++) {
+          var email = emails[i].value;
+          umails.push(email);
+          emailtypes.push('emails:' + email + ':type');
+          emailtypes.push(emails[i].type);
+          emailuid.push('emails:' + email + ':uid');
+          emailuid.push(val);
+        }
+        if(user.hash) {
+          client.set('hashes:' + user.hash + ':uid', val);
+        }
+        client.hmset('users:' + val, user);
+        var purifiedName = tools.purify(name);
+        if(purifiedName) {
+          client.hmset('users:' + val + ':name', purifiedName);
+        }
+        client.sadd('users:' + val + ':emails', umails);
+        client.mset(emailtypes);
+        return client.mset(emailuid, function(err, results) {
+          if(err) {
+            return process.nextTick(function () {
+              fn(err, null);
+            });
+          }
+          user.name = purifiedName;
+          user.emails = emails;
+          return process.nextTick(function () {
+            fn(null, user);
+          });
+        });
+      }
+      return process.nextTick(function () {
+        fn(err, null);
+      });
+    });
+  };
+
+  mod.restore = function(id, fn) {
+    // Get contacts list
+    client.smembers('users:' + id + ':contacts', function(err, array) {
+      if(!err) {
+        val.forEach(function(cid) {
+          // Add user from contacts' lists
+          client.sadd('users:' + cid + ':contacts');
+        });
+      }
+    });
+    // Get unconfirmed contacts list
+    client.smembers('users:' + id + 'unconfirmed', function(err, array) {
+      if(!err) {
+        val.forEach(function(cid) {
+          // Add user from contacts' requests
+          client.sadd('users:' + cid + ':requests');
+        });
+      }
+    });
+    // Set status to registred
+    return client.hset('users:' + id + ':emails' , 'status', 'registred', fn);
+  };
+
+  mod.delete = function(id, fn) {
+    // Get contacts list
+    client.smembers('users:' + id + ':contacts', function(err, array) {
+      if(!err) {
+        array.forEach(function(cid) {
+          // Delete user from contacts' lists
+          client.srem('users:' + cid + ':contacts');
+        });
+      }
+    });
+    // Get unconfirmed contacts list
+    client.smembers('users:' + id + 'unconfirmed', function(err, array) {
+      if(!err) {
+        array.forEach(function(cid) {
+          // Delete user from contacts' requests
+          client.srem('users:' + cid + ':requests');
+        });
+      }
+    });
+    // Set status to deleted
+    return client.hset('users:' + id + ':emails' , 'status', 'deleted', fn);
+  };
+
+  mod.findById = function(id, fn) {
     client.hgetall('users:' + id, function (err, user) {
       if(err || !user) {
         return process.nextTick(function () {
@@ -49,26 +159,24 @@ exports.setUp = function(client) {
     });
   };
 
-  mod.findUserByMail = function(email, fn) {
-    var me = this;
+  mod.findByEmail = function(email, fn) {
     client.get('emails:' + email + ':uid', function(err, val) {
       if(err) {
         return process.nextTick(function () {
           fn(null, null);
         });
       }
-      return me.findUserById(val, fn);
+      return db.users.findById(val, fn);
     });
   };
 
-  mod.findUserByMails = function(emails, fn) {
-    var me = this;
-    client.mget(emails.map(tools.getValue).map(tools.emailUid), function(err, array) {
+  mod.findByEmails = function(emails, fn) {
+    client.mget(_.pluck(emails, 'value').map(tools.emailUid), function(err, array) {
       if(!err && array) {
         for(var i = 0, len = array.length; i < len; i++) {
           var id = array[i];
           if(id) {
-            return me.findUserById(id, fn)
+            return db.users.findById(id, fn)
           }
         }
       }
@@ -78,44 +186,48 @@ exports.setUp = function(client) {
     });
   };
 
-  mod.findUserByHash = function(hash, fn) {
-    var me = this;
+  mod.findByHash = function(hash, fn) {
     client.get('hashes:' + hash + ':uid', function(err, val) {
       if(!err && val) {
-        return me.findUserById(val, fn);
+        return db.users.findById(val, fn);
       }
       return process.nextTick(function () {
-        fn(null, null);
+        fn(err, null);
       });
     });
   };
 
-  mod.setUserProperties = function(id, properties, fn) {
-    client.exists('users:' + id, function(err, val) {
-      if(!err && val) {
-        return client.hmset('users:' + id ,properties, function(err, val) {
-          return process.nextTick(function () {
-            fn(null);
-          });
+  mod.setProperties = function(id, properties, fn) {
+    var purifiedProp = tools.purify(properties);
+    return client.hmset('users:' + id ,purifiedProp, function(err, val) {
+      return process.nextTick(function () {
+        fn(null);
+      });
+    });
+  };
+
+  mod.setName = function(id, name, fn) {
+    var purifiedName = tools.purify(name);
+    return client.hmset('users:' + id + ':name', purifiedName, function(err, val) {
+      if(fn) {
+        return process.nextTick(function () {
+          fn(null);
         });
       }
-      return process.nextTick(function () {
-        fn(new Error('User ' + id + ' does not exist'));
-      });
     });
   };
 
-  mod.addUserMail = function(id, email, fn) {
-    client.exists('users:' + id, function(err, val) {
-      var value = email.value;
-      if(!err && val) {
-        client.sadd('users:' + id + ':emails' , value);
-        return client.mset('emails:' + value + ':uid', id, 'emails:' + value + ':type', email.type, fn);
-      }
-      return process.nextTick(function () {
-        fn(new Error('User ' + id + ' does not exist'));
-      });
+  mod.addEmails = function(id, emails, fn) {
+    var values = _.pluck(emails, 'value');
+    client.sadd('users:' + id + ':emails' , values);
+    values.forEach(function(value, index) {
+      client.mset('emails:' + value + ':uid', id, 'emails:' + value + ':type', emails[index].type);
     });
+    if(fn) {
+      return process.nextTick(function() {
+        fn(null, values);
+      });
+    }
   };
 
   return mod;

@@ -1,8 +1,8 @@
 
 exports.DOMAIN = process.env.DOMAIN || 'http://localhost';
 
-exports.GOOGLE_CLIENT_ID = "111";
-exports.GOOGLE_CLIENT_SECRET = "111";
+exports.GOOGLE_CLIENT_ID = "435757431999.apps.googleusercontent.com";
+exports.GOOGLE_CLIENT_SECRET = "IoZpFsfeyBuRvs2Djbut1wSZ";
 
 exports.FACEBOOK_APP_ID = "152821258188092";
 exports.FACEBOOK_APP_SECRET = "3f7244cfb86f62ed14d90626936cb3f1";

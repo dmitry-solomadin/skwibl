@@ -2,24 +2,24 @@
  *              CONTROLLERS               *
  ******************************************/
 
-var deps = [
-  'auxiliary'
-, 'files'
-, 'contacts'
-, 'login'
-, 'middleware'
-, 'projects'
-, 'search'
-, 'support'
-, 'users'
-, 'dev'
-];
 
-for(var i = 0, len = deps.length; i < len; i++) {
-  var mod = require('./' + deps[i]);
-  for(var p in mod) {
-    this[p] = mod[p];
+/**
+ * Module dependencies.
+ */
+
+var fs = require('fs');
+
+var module;
+
+fs.readdirSync(__dirname).forEach(function(name){
+  var len = name.length
+    , ext = name.substring(len - 3, len)
+    , isModule = name !== 'index.js' && ext === '.js';
+  if(isModule) {
+    var mod = require('./' + name)
+      , dep = name.substring(0, len - 3);
+    module[dep] = mod;
   }
-}
+});
 
-module.exports = this;
+module.exports = module;

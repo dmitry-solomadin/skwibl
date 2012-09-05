@@ -5,7 +5,9 @@
 
 var crypto = require('crypto')
   , generatePassword = require('password-generator')
-  , cfg = require('../config');
+  , _ = require('underscore');
+
+var cfg = require('../config');
 
 exports.emailType = function(x) {
   return 'emails:' + x + ':type';
@@ -33,12 +35,6 @@ exports.genPass = function() {
   return generatePassword.call(null, cfg.PASSWORD_LENGTH, cfg.PASSWORD_EASYTOREMEMBER);
 };
 
-exports.isEmpty = function(obj) {
-  return Object.keys(obj).length === 0;
-};
-
-
-
 exports.purify = function(obj) {
   if(!obj) {
     return null;
@@ -48,7 +44,7 @@ exports.purify = function(obj) {
       delete obj[prop];
     }
   }
-  if(this.isEmpty(obj)) {
+  if(_.isEmpty(obj)) {
     return null;
   }
   return obj;

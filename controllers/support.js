@@ -26,7 +26,7 @@ exports.forgotPassword = function(req, res) {
  */
 exports.passwordRecovery = function(req, res, next) {
   var email = req.body.email;
-  db.findUserByMail(email, function(err, user) {
+  db.users.findByEmail(email, function(err, user) {
     if (err) {
       return next(err);
     }

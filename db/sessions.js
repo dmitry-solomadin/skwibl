@@ -1,5 +1,5 @@
 /******************************************
- *          AUXILIARY FUNCTIONS           *
+ *           SESSION MANAGEMENT           *
  ******************************************/
 
 
@@ -11,11 +11,11 @@ var connect_redis = require('connect-redis');
 
 var cfg = require('../config');
 
-exports.setUp = function(client) {
+exports.setUp = function(client, db) {
 
   var mod = {};
 
-  mod.sessionStore = function(express) {
+  mod.createStore = function(express) {
     var sessionStore = connect_redis(express);
     return new sessionStore({
       client: client
@@ -23,11 +23,11 @@ exports.setUp = function(client) {
     });
   };
 
-  mod.getSessionData = function(sessionId, fn) {
+  mod.get = function(sessionId, fn) {
     return client.get('sess:' + sessionId, fn);
   };
 
-  mod.touchSession = function(sessionId, fn) {
+  mod.touch = function(sessionId, fn) {
     client.expire('sess:' + sessionId, cfg.SESSION_DURATION, fn);
   };
 

@@ -46,7 +46,7 @@ exports.setUp = function() {
     app.use(express.session({
       key: 'express.sid'
     , secret: cfg.SITE_SECRET
-    , store: db.sessionStore(express)
+    , store: db.sessions.createStore(express)
     }));
     app.use(passport.initialize());
     app.use(passport.session());
@@ -54,7 +54,7 @@ exports.setUp = function() {
     app.use(app.router);
 	  app.use(express.static(__dirname + '/assets'));
     app.use(express.static(__dirname + '/static'));
-    app.use(ctrls.notFound);
+    app.use(ctrls.aux.notFound);
     //   app.use(ctrls.error);
   });
 

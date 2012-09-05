@@ -11,24 +11,24 @@ var ctrls = require('../controllers');
 
 exports.configure = function(app, passport) {
 
-  /*
-   * get user profile
-   */
-  app.get('/users/:id', ctrls.isAuth, ctrls.profile);
+ /*
+  * get user profile
+  */
+  app.get('/users/:id', ctrls.users.profile);
 
-  /*
-   * edit user personal information
-   */
-  app.get('/users/:id/edit', ctrls.isAuth, ctrls.editUser);
+ /*
+  * edit user personal information
+  */
+  app.get('/users/:id/edit', ctrls.mid.isAuth, ctrls.users.edit);
 
-  /*
-   * update user personal information
-   */
-  app.post('/users/update', ctrls.isAuth, ctrls.updateUser);
+ /*
+  * update user personal information
+  */
+  app.post('/users/update', ctrls.mid.isAuth, ctrls.users.update);
 
-  /*
-   * delete user
-   */
-  app.post('/users/delete', ctrls.isAuth, ctrls.deleteUser);
-  
+ /*
+  * delete user
+  */
+  app.post('/users/delete', ctrls.mid.isAuth, ctrls.users.delete);
+
 }

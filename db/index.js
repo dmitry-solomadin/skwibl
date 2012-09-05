@@ -6,32 +6,26 @@
  * Module dependencies.
  */
 
-var redis = require('redis');
+var fs = require('fs')
+  , redis = require('redis');
 
-var client = redis.createClient();
+var module
+  , client = redis.createClient();
 
 client.on("error", function (err) {
   console.log("Error " + err);
 });
 
-var deps = [
-  'auxiliary'
-// , 'files'
-, 'contacts'
-, 'login'
-, 'middleware'
-, 'projects'
-// , 'search'
-// , 'support'
-, 'users'
-];
-
-for(var i = 0, len = deps.length; i < len; i++) {
-  var mod = require('./' + deps[i]);
-  var obj = mod.setUp(client);
-  for(var p in obj) {
-    this[p] = obj[p];
+fs.readdirSync(__dirname).forEach(function(name){
+  var len = name.length
+    , ext = name.substring(len - 3, len)
+    , isModule = name !== 'index.js' && ext === '.js';
+  if(isModule) {
+    var mod = require('./' + name)
+      , dep = name.substring(0, len - 3)
+      , obj = mod.setUp(client, module);
+    module[dep] = obj;
   }
-}
+});
 
-module.exports = this;
+module.exports = module;
