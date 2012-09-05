@@ -12,21 +12,6 @@ var ctrls = require('../controllers');
 exports.configure = function(app, passport) {
 
  /*
-  * all user photos
-  */
-  app.get('/photos', ctrls.isAuth, ctrls.photos);
-
- /*
-  * all user videos
-  */
-  app.get('/videos', ctrls.isAuth, ctrls.videos);
-
- /*
-  * all user documents
-  */
-  app.get('/documents', ctrls.isAuth, ctrls.documents);
-
- /*
   * all user files
   */
   app.get('/files', ctrls.isAuth, ctrls.files);

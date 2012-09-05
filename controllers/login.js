@@ -15,12 +15,12 @@ var db = require('../db')
  * GET
  * Logout
  */
-exports.logOut = function(req, res) {
+exports.logOut = function (req, res) {
   req.logOut();
   res.redirect('/');
 };
 
-exports.login = function(req, res) {
+exports.login = function (req, res) {
   res.redirect('/');
 }
 
@@ -28,10 +28,10 @@ exports.login = function(req, res) {
  * GET
  * Registration confirm
  */
-exports.regConfirm = function(req, res, next) {
+exports.regConfirm = function (req, res, next) {
   var id = req.user.id;
-  return db.findUserById(id, function(err, user) {
-    if(err) {
+  return db.findUserById(id, function (err, user) {
+    if (err) {
       req.flash('error', 'Problem while registring user');
       return res.redirect('/');
     }
@@ -43,10 +43,9 @@ exports.regConfirm = function(req, res, next) {
  * POST
  * Local authenticate
  */
-exports.local = function(passport) {
+exports.local = function (passport) {
   return passport.authenticate('local', {
-    failureRedirect: '/'
-  , failureFlash: true
+    failureRedirect:'/', failureFlash:true
   });
 };
 
@@ -54,10 +53,9 @@ exports.local = function(passport) {
  * GET
  * Link authenticate
  */
-exports.hash = function(passport) {
+exports.hash = function (passport) {
   return passport.authenticate('hash', {
-    failureRedirect: '/'
-  , failureFlash: true
+    failureRedirect:'/', failureFlash:true
   });
 };
 
@@ -65,9 +63,9 @@ exports.hash = function(passport) {
  * GET
  * Google authenticate
  */
-exports.googleCb = function(passport) {
+exports.googleCb = function (passport) {
   return passport.authenticate('google', {
-    failureRedirect: '/'
+    failureRedirect:'/'
   });
 };
 
@@ -75,14 +73,14 @@ exports.googleCb = function(passport) {
  * GET
  * Facebook authenticate
  */
-exports.facebook = function(passport) {
+exports.facebook = function (passport) {
   return passport.authenticate('facebook', {
-    scope: [
-    'email'
-  , 'user_status'
-  , 'user_checkins'
-  , 'user_photos'
-  , 'user_videos'
+    scope:[
+      'email'
+      , 'user_status'
+      , 'user_checkins'
+      , 'user_photos'
+      , 'user_videos'
     ]
   })
 };
@@ -91,9 +89,9 @@ exports.facebook = function(passport) {
  * GET
  * Facebook authentication callback
  */
-exports.facebookCb = function(passport) {
+exports.facebookCb = function (passport) {
   return passport.authenticate('facebook', {
-    failureRedirect: '/'
+    failureRedirect:'/'
   });
 };
 
@@ -101,9 +99,9 @@ exports.facebookCb = function(passport) {
  * GET
  * Vkontakte authentication callback
  */
-exports.vkontakteCb = function(passport) {
+exports.vkontakteCb = function (passport) {
   return passport.authenticate('vkontakte', {
-    failureRedirect: '/'
+    failureRedirect:'/'
   });
 };
 
@@ -111,39 +109,49 @@ exports.vkontakteCb = function(passport) {
  * GET
  * Twitter authentication callback
  */
-exports.twitterCb = function(passport) {
+exports.twitterCb = function (passport) {
   return passport.authenticate('twitter', {
-    failureRedirect: '/'
+    failureRedirect:'/'
   });
+};
+
+/*
+ * GET
+ * Local registration
+ */
+exports.registration = function (req, res, next) {
+  return res.render('index', {template:'registration'});
 };
 
 /*
  * POST
  * Local registration
  */
-exports.register = function(req, res, next) {
-  if(req.body != null) {
+exports.register = function (req, res, next) {
+  if (req.body != null) {
     var email = req.body.email;
-    db.findUserByMail(email, function(err, user) {
-      if(err) {
+    db.findUserByMail(email, function (err, user) {
+      if (err) {
         return next(err);
       }
       if (!user) {
         var hash = tools.hash(email);
         return db.addUser({
-          hash: hash,
-          displayName: req.body.name,
-          password: req.body.password,
-          status: 'unconfirmed',
-          provider: 'local'
-        }, null, [{
-          value: email,
-          type: 'main'
-        }], function(err, user) {
-          if(err) {
+          hash:hash,
+          displayName:req.body.name,
+          password:req.body.password,
+          status:'unconfirmed',
+          provider:'local'
+        }, null, [
+          {
+            value:email,
+            type:'main'
+          }
+        ], function (err, user) {
+          if (err) {
             return next(err);
           }
-          if(!user) {
+          if (!user) {
             req.flash('error', 'Registration failed. Can not create user for email: ' + email);
             return res.redirect('/');
           }
@@ -164,7 +172,7 @@ exports.register = function(req, res, next) {
  * GET
  * dashboard - redirect to main page
  */
-exports.dashboard = function(req, res) {
+exports.dashboard = function (req, res) {
   res.redirect('/');
 }
 
@@ -172,16 +180,10 @@ exports.dashboard = function(req, res) {
  * GET
  * main page
  */
-exports.index = function(req, res) {
-  if(req.user){
-    return res.render('index', {
-      template: 'user'
-    , user: req.user
-    , message: req.flash('error')
-    });
+exports.index = function (req, res) {
+  if (req.user) {
+    return res.render('index', {template:'user', user:req.user});
   }
-  return res.render('index', {
-    template: 'mainpage'
-  , message: req.flash('error')
-  });
+
+  return res.render('index', {template:'mainpage'});
 };

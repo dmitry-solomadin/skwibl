@@ -31,6 +31,11 @@ exports.configure = function(app, passport) {
   */
   app.post('/register', ctrls.register);
 
+  /*
+   * get registration page
+   */
+  app.get('/registration', ctrls.registration);
+
  /*
   * confirm local registration
   */

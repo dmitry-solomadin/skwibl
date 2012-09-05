@@ -20,30 +20,6 @@ exports.files = function(req, res) {
 };
 
 /*
- * GET
- * User videos
- */
-exports.videos = function(req, res) {
-  res.render('partials/videos');
-};
-
-/*
- * GET
- * User photos
- */
-exports.photos = function(req, res) {
-  res.render('partials/photos');
-};
-
-/*
- * GET
- * User documents
- */
-exports.documents = function(req, res) {
-  res.render('partials/documents');
-};
-
-/*
  * POST
  * Upload file
  */
