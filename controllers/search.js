@@ -7,5 +7,5 @@
  * Search
  */
 exports.search = function(req, res) {
-  res.render('partials/search');
+  res.render('index', {template: 'search'});
 };
