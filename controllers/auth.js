@@ -16,16 +16,16 @@ var db = require('../db')
  * main page
  */
 exports.mainPage = function(req, res) {
-  if(req.user){
+  if (req.user) {
     return res.render('index', {
-      template: 'user'
-    , user: req.user
-    , message: req.flash('error')
-    });
+      template:'user'
+    , user:req.user
+    , error:req.flash('error')});
   }
+
   return res.render('index', {
-    template: 'mainpage'
-  , message: req.flash('error')
+    template:'mainpage'
+  , error:req.flash('error')
   });
 };
 
@@ -38,12 +38,12 @@ exports.regPage = function(req, res) {
     return res.render('index', {
       template: 'user'
     , user: req.user
-    , message: req.flash('error')
+    , error: req.flash('error')
     });
   }
   return res.render('index', {
     template: 'mainpage'
-  , message: req.flash('error')
+  , error: req.flash('error')
   });
 };
 

@@ -12,3 +12,22 @@
 .hide {
     display: none;
 }
+
+.loginBlock {
+    background: white;
+    z-index: 9999;
+    padding: 25px 10px 10px 10px;
+    border-radius: 4px;
+    box-shadow: #404040 0 0 20px;
+}
+
+.loginFields {
+    margin-top: 10px;
+}
+
+.loginFields input {
+    margin-bottom: 5px;
+    border: 1px solid gray;
+    box-shadow: none;
+    border-radius: 0;
+}

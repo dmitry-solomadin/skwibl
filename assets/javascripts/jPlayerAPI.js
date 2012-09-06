@@ -13,7 +13,6 @@ $(function () {
 
       var popoverContent = $("<div class='jp-bookmark-content' onmouseover=''><div class='add-comment'></div></div>");
 
-
       $(bookmark).popover({
         title:timePlayed,
         trigger:'manual',
@@ -24,7 +23,7 @@ $(function () {
 
       $(bookmark).combinedHover({
         additionalTriggers:".popover",
-        live: true,
+        live:true,
         onTrigger:function () {
           $(bookmark).popover('show');
         },
@@ -32,12 +31,28 @@ $(function () {
           $(bookmark).popover('hide');
         }
       });
+    },
 
-//      $(bookmark).mouseenter(function () {
-//        $(this).popover('show');
-//      }).mouseleave(function () {
-//          $(this).popover('hide');
-//        })
+    snapshot:function (jplayerSelector) {
+      var video = $(jplayerSelector)[0];
+      var canvas = $('<canvas></canvas>')[0];
+
+      var ratio = 54 / video.videoHeight;
+
+      canvas.width = ratio * video.videoWidth;
+      canvas.height = 54;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, canvas.width, canvas.height);
+
+      return canvas.toDataURL('image/jpeg');
+    },
+
+    initAdditionalToolbar:function (jplayerSelector) {
+      var jplayer = $(jplayerSelector);
+      var jplayerContainer = jplayer.closest(".jp-container");
+
+      var additionalSeekBar = jplayerContainer.find(".jp-additional-seek-bar");
+
     }
   };
 

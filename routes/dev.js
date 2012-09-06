@@ -1,5 +1,5 @@
 /******************************************
- *             FILE MANAGEMENT            *
+ *            DEVELOPMENT PAGES            *
  ******************************************/
 
 
@@ -11,6 +11,8 @@ var ctrls = require('../controllers');
 
 exports.configure = function(app, passport) {
 
-  app.get('/dev/player', ctrls.isAuth, ctrls.devPlayer);
+  app.get('/dev/player', ctrls.mid.isAuth, ctrls.dev.player);
 
-}
+  app.get('/dev/room', ctrls.mid.isAuth, ctrls.dev.room);
+
+};

@@ -46,7 +46,7 @@ exports.delete = function(req, res) {
       req.flash('error', err);
       return res.redirect('/');
     }
-    req.flash('warning', 'Your profile has been successfuly deleted.');
+    req.flash('error', 'Your profile has been successfuly deleted.');
     return res.redirect('/');
   });
 };
