@@ -7,7 +7,8 @@ var http = require('http')
   , cookie = require('cookie')
   , io = require('socket.io');
 
-var db = require('./db');
+var db = require('./db')
+  , cfg = require('./config');
 
 var server = http.createServer()
   , sio = io.listen(server);
@@ -18,7 +19,7 @@ sio.set('authorization', function(data, accept){
   }
   data.cookie = cookie.parse(data.headers.cookie);
   console.log(data.cookie);
-  data.sessionId = data.cookie['express.sid'].substring(2, 26);
+  data.sessionId = data.cookie[cfg.SESSION_KEY].substring(2, 26);
   console.log(data.sessionId);
   db.sessions.get(data.sessionId, function(err, session){
     if(err) {
@@ -72,6 +73,6 @@ chat.on('connection', function(socket) {
 
 });
 
-server.listen(9000, '127.0.0.1', function() {
-  console.log('socket.io serer is started on 127.0.0.1:9000');
+server.listen(cfg.SOCKET_PORT, cfg.HOST, function() {
+  console.log('socket.io serer is started on ' + cfg.HOST + ':' + cfg.SOCKET_PORT + ' in ' + process.env.NODE_ENV + ' mode');
 });
