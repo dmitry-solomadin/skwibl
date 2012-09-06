@@ -8,8 +8,8 @@
  */
 
 var db = require('../db')
-  , smtp = require('../smtp/smtp')
-  , tools = require('../tools/tools');
+  , smtp = require('../smtp')
+  , tools = require('../tools');
 
 /*
  * GET
@@ -19,13 +19,13 @@ exports.mainPage = function(req, res) {
   if(req.user){
     return res.render('index', {
       template: 'user'
-      , user: req.user
-      , message: req.flash('error')
+    , user: req.user
+    , message: req.flash('error')
     });
   }
   return res.render('index', {
     template: 'mainpage'
-    , message: req.flash('error')
+  , message: req.flash('error')
   });
 };
 
@@ -37,13 +37,13 @@ exports.regPage = function(req, res) {
   if(req.user){
     return res.render('index', {
       template: 'user'
-      , user: req.user
-      , message: req.flash('error')
+    , user: req.user
+    , message: req.flash('error')
     });
   }
   return res.render('index', {
     template: 'mainpage'
-    , message: req.flash('error')
+  , message: req.flash('error')
   });
 };
 

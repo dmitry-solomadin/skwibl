@@ -9,8 +9,8 @@
 
 var _ = require('underscore');
 
-var smtp = require('../smtp/smtp')
-  , tools = require('../tools/tools');
+var smtp = require('../smtp')
+  , tools = require('../tools');
 
 exports.setUp = function(client, db) {
 
@@ -33,9 +33,7 @@ exports.setUp = function(client, db) {
           if(user) {
             return smtp.sendRegMail(user, fn);
           }
-          return process.nextTick(function () {
-            fn(err, user);
-          });
+          return tools.asyncOpt(fn, err, user);
         });
       }
       if(!user.picture) {
@@ -59,9 +57,7 @@ exports.setUp = function(client, db) {
       if(user.status === 'deleted') {
         return db.users.restore(user, fn);
       }
-      return process.nextTick(function () {
-        fn(err, user);
-      });
+      return tools.asyncOpt(fn, err, user);
     });
   };
 

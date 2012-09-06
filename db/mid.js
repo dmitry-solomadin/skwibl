@@ -14,13 +14,9 @@ exports.setUp = function(client, db) {
   mod.isOwner = function(id, pid, fn) {
     client.hget('projects:' + pid, 'owner', function(err, val) {
       if(!err && val === id) {
-        return process.nextTick(function() {
-          fn(null, true);
-        });
+        return tools.asyncOpt(fn, null, true);
       }
-      return process.nextTick(function() {
-        fn(err, false);
-      });
+      return tools.asyncOpt(fn, err, false);
     })
   };
 

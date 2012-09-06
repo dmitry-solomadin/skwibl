@@ -3,7 +3,8 @@
  * Module dependencies.
  */
 
-var crypto = require('crypto')
+var fs = require('fs')
+  , crypto = require('crypto')
   , generatePassword = require('password-generator')
   , _ = require('underscore');
 
@@ -15,14 +16,6 @@ exports.emailType = function(x) {
 
 exports.emailUid = function(x) {
   return 'emails:' + x + ':uid';
-};
-
-exports.getValue = function(x) {
-  return x.value;
-};
-
-exports.getType = function(x) {
-  return x.type;
 };
 
 exports.hash = function(email) {
@@ -67,4 +60,66 @@ exports.getName = function(user) {
     return user.displayName;
   }
   return user.emails[0].value;
+};
+
+exports.returnStatus = function(err, res) {
+  if(!err) {
+    return res.send(true);
+  }
+  res.send(false);
+};
+
+exports.include = function(dir, fn) {
+  fs.readdirSync(dir).forEach(function(name){
+    var len = name.length
+      , ext = name.substring(len - 3, len)
+      , isModule = name !== 'index.js' && ext === '.js';
+    if(isModule) {
+      var mod = require(dir + '/' + name)
+        , shortName = name.substring(0, len - 3);
+      fn(mod, shortName);
+    }
+  });
+};
+
+exports.async = function(fn) {
+  return process.nextTick(function() {
+    fn(err, val);
+  });
+};
+
+exports.asyncOpt = function(fn, err, val) {
+  if(fn) {
+    return process.nextTick(function() {
+      fn(err, val);
+    });
+  }
+};
+
+exports.asyncOrdered = function(array, index, fn, done) {
+  index = index || 0;
+  if(index === array.length) {
+    return done();
+  }
+  fn();
+  process.nextTick(function() {
+    tools.asyncOrdered(array, index++, fn, done);
+  });
+};
+
+exports.asyncParallel = function(array, fn) {
+  var left = array.length - 1;
+  for(var i = 0, len = array.length; i < len; i++) {
+    (function(val) {
+      process.nextTick(function() {
+        fn(left, val);
+      });
+    })(array[i]);
+  }
+};
+
+exports.asyncDone = function(left, fn) {
+  if(--left === 0) {
+    return process.nextTick(fn);
+  }
 };
