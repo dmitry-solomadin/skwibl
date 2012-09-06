@@ -7,7 +7,7 @@
  */
 
 var db = require('../db')
-  , smtp = require('../smtp/smtp');
+  , smtp = require('../smtp');
 
 /*
  * GET

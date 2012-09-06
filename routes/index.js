@@ -7,16 +7,10 @@
  * Module dependencies.
  */
 
-var fs = require('fs');
+var tools = require('../tools');
 
 exports.configure = function(app, passport) {
-  fs.readdirSync(__dirname).forEach(function(name){
-    var len = name.length
-      , ext = name.substring(len - 3, len)
-      , isModule = name !== 'index.js' && ext === '.js';
-    if(isModule) {
-      var mod = require('./' + name);
-      mod.configure(app, passport);
-    }
+  tools.include(__dirname, function(mod, name) {
+    mod.configure(app, passport);
   });
 };

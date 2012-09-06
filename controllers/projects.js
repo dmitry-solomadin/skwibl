@@ -9,6 +9,8 @@
 
 var db = require('../db');
 
+var tools = require('../tools');
+
 /*
  * GET
  * Get all projects
@@ -41,10 +43,7 @@ exports.show = function(req, res, next) {
  */
 exports.create = function(req, res) {
   db.projects.add(req.user.id, req.body.name, function(err, project) {
-    if(!err) {
-      return res.send(true);
-    }
-    res.send(false);
+    tools.returnStatus(err, res);
   });
 };
 
@@ -57,10 +56,7 @@ exports.close = function(req, res) {
     status: 'closed'
   , end: new Date
   }, function(err) {
-    if(!err) {
-      return res.send(true);
-    }
-    res.send(false);
+    tools.returnStatus(err, res);
   });
 };
 
@@ -72,10 +68,7 @@ exports.reopen = function(req, res) {
   db.projects.setProperties(req.body.pid, {
     status: 'reopened'
   }, function(err) {
-    if(!err) {
-      return res.send(true);
-    }
-    res.send(false);
+    tools.returnStatus(err, res);
   });
 };
 
@@ -87,10 +80,7 @@ exports.delete = function(req, res) {
   db.projects.setProperties(req.body.pid, {
     status: 'deleted'
   }, function(err) {
-    if(!err) {
-      return res.send(true);
-    }
-    res.send(false);
+    tools.returnStatus(err, res);
   });
 };
 
@@ -101,10 +91,7 @@ exports.delete = function(req, res) {
 exports.invite = function(req, res) {
   var data = req.body;
   db.projects.invite(data.pid, data.id, function(err) {
-    if(!err) {
-      return res.send(true);
-    }
-    res.send(false);
+    tools.returnStatus(err, res);
   });
 };
 
@@ -115,10 +102,7 @@ exports.invite = function(req, res) {
 exports.inviteSocial = function(req, res) {
   var data = req.body;
   db.projects.inviteSocial(data.pid, data.provider, data.providerId, function(err) {
-    if(!err) {
-      return res.send(true);
-    }
-    res.send(false);
+    tools.returnStatus(err, res);
   });
 };
 
@@ -129,10 +113,7 @@ exports.inviteSocial = function(req, res) {
 exports.inviteEmail = function(req, res) {
   var data = req.body;
   db.projects.inviteEmail(data.pid, data.email, function(err) {
-    if(!err) {
-      return res.send(true);
-    }
-    res.send(false);
+    tools.returnStatus(err, res);
   });
 }
 
@@ -142,10 +123,7 @@ exports.inviteEmail = function(req, res) {
  */
 exports.inviteLink = function(req, res) {
   db.projects.inviteLink(req.body.pid, function(err) {
-    if(!err) {
-      return res.send(true);
-    }
-    res.send(false);
+    tools.returnStatus(err, res);
   });
 };
 
@@ -155,10 +133,7 @@ exports.inviteLink = function(req, res) {
  */
 exports.confirm = function(req, res) {
   db.projects.confirm(req.user.id, req.body.pid, function(err) {
-    if(!err) {
-      return res.send(true);
-    }
-    res.send(false);
+    tools.returnStatus(err, res);
   });
 };
 
@@ -169,9 +144,6 @@ exports.confirm = function(req, res) {
 exports.remove = function(req, res) {
   var data = req.body;
   db.projects.remove(data.pid, data.id, function(err) {
-    if(!err) {
-      return res.send(true);
-    }
-    res.send(false);
+    tools.returnStatus(err, res);
   });
 };

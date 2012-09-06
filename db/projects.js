@@ -9,7 +9,7 @@
 
 var _ = require('underscore');
 
-var tools = require('../tools/tools');
+var tools = require('../tools');
 
 exports.setUp = function(client, db) {
 
@@ -29,23 +29,15 @@ exports.setUp = function(client, db) {
         project.status = 'new';
         client.hmset('projects:' + val, project);
         client.sadd('projects:' + val + ':users', uid);
-        return process.nextTick(function() {
-          fn(null, project);
-        });
+        return tools.asyncOpt(fn, null, project);
       }
-      return process.nextTick(function() {
-        fn(err, null);
-      });
+      return tools.asyncOpt(fn, err, null);
     });
   };
 
   mod.setProperties = function(pid, properties, fn) {
     var purifiedProp = tools.purify(properties);
-    return client.hmset('projects:' + pid, purifiedProp, function(err, val) {
-      return process.nextTick(function() {
-        fn(null);
-      });
-    });
+    return client.hmset('projects:' + pid, purifiedProp, fn);
   };
 
   mod.invite = function(pid, id, fn) {
@@ -55,9 +47,7 @@ exports.setUp = function(client, db) {
         client.sadd('projects:' + pid + ':unconfirmed', id);
         //TODO Send invitation to user
       }
-      return process.nextTick(function() {
-        fn(err);
-      });
+      return tools.asyncOpt(fn, err);
     });
   };
 
@@ -77,26 +67,19 @@ exports.setUp = function(client, db) {
     //Get project members
     client.smembers('projects:' + pid + ':users', function(err, array) {
       if(!err && array) {
-        var leftToProcess = array.length - 1;
-        for(var i = 0, len = array.length; i < len; i++) {
-          (function(cid) {
-            process.nextTick(function() {
-              //Add the user as a contact to all project members
-              client.sadd('users:' + cid + ':contacts', id);
-              //And vise-versa
-              client.sadd('users:' + id + ':contacts', cid);
-              if(leftToProcess-- === 0) {
-                return process.nextTick(function() {
-                  //Add the user to the project
-                  client.smove('projects:' + pid + ':unconfirmed', 'projects:' + pid + ':users', id);
-                  //Add the project to the user
-                  client.sadd('users:' + id + ':projects', pid);
-                  fn(null);
-                });
-              }
-            });
-          })(array[i])
-        }
+        tools.asyncParallel(array, function(left, cid) {
+          //Add the user as a contact to all project members
+          client.sadd('users:' + cid + ':contacts', id);
+          //And vise-versa
+          client.sadd('users:' + id + ':contacts', cid);
+          tools.asyncDone(left, function() {
+            //Add the user to the project
+            client.smove('projects:' + pid + ':unconfirmed', 'projects:' + pid + ':users', id);
+            //Add the project to the user
+            client.sadd('users:' + id + ':projects', pid);
+            fn(null);
+          });
+        });
       }
       fn(err);
     });
@@ -113,20 +96,13 @@ exports.setUp = function(client, db) {
           client.smembers('projects:' + pid + ':users', function(err, array) {
             if(!err && array) {
               db.contacts.recalculate(id, array, pid);
-              var leftToProcess = array.length - 1;
-              for(var i = 0, len = array.length; i < len; i++) {
-                (function(cid) {
-                  process.nextTick(function() {
-                    //Recalculate member contacts
-                    db.contacts.recalculate(cid, [id], pid);
-                    if(leftToProcess-- === 0) {
-                      return process.nextTick(function() {
-                        fn(null);
-                      });
-                    }
-                  });
-                })(array[i])
-              }
+              tools.asyncParallel(array, function(left, cid) {
+                //Recalculate member contacts
+                db.contacts.recalculate(cid, [id], pid);
+                tools.asyncDone(left, function() {
+                  fn(null);
+                });
+              });
             }
             fn(err);
           });

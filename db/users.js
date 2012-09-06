@@ -9,7 +9,7 @@
 
 var _ = require('underscore');
 
-var tools = require('../tools/tools');
+var tools = require('../tools');
 
 exports.setUp = function(client, db) {
 
@@ -23,9 +23,7 @@ exports.setUp = function(client, db) {
     db.users.setProperties(user.id, {
       status: 'registred'
     } ,function(err, val) {
-      return process.nextTick(function () {
-        fn(err, user);
-      });
+      return tools.asyncOpt(fn, err, user);
     });
   }
 
@@ -60,20 +58,14 @@ exports.setUp = function(client, db) {
         client.mset(emailtypes);
         return client.mset(emailuid, function(err, results) {
           if(err) {
-            return process.nextTick(function () {
-              fn(err, null);
-            });
+            return tools.asyncOpt(fn, err, null);
           }
           user.name = purifiedName;
           user.emails = emails;
-          return process.nextTick(function () {
-            fn(null, user);
-          });
+          return tools.asyncOpt(fn, null, user);
         });
       }
-      return process.nextTick(function () {
-        fn(err, null);
-      });
+      return tools.asyncOpt(fn, err, null);
     });
   };
 
@@ -126,15 +118,11 @@ exports.setUp = function(client, db) {
   mod.findById = function(id, fn) {
     client.hgetall('users:' + id, function (err, user) {
       if(err || !user) {
-        return process.nextTick(function () {
-          fn(err, null);
-        });
+        return tools.asyncOpt(fn, err, null);
       }
       client.smembers('users:' + id + ':emails',  function(err, emails) {
         if(err) {
-          return process.nextTick(function () {
-            fn(new Error('User ' + id + ' have no emails'));
-          });
+          return tools.asyncOpt(fn, new Error('User ' + id + ' have no emails'));
         }
         client.mget(emails.map(tools.emailType), function(err, array) {
           if(array && array.length) {
@@ -150,9 +138,7 @@ exports.setUp = function(client, db) {
             }
             user.emails = umails;
             user.name = name;
-            return process.nextTick(function () {
-              return fn(null, user);
-            });
+            return tools.asyncOpt(fn, null, user);
           });
         });
       });
@@ -162,9 +148,7 @@ exports.setUp = function(client, db) {
   mod.findByEmail = function(email, fn) {
     client.get('emails:' + email + ':uid', function(err, val) {
       if(err) {
-        return process.nextTick(function () {
-          fn(null, null);
-        });
+        return tools.asyncOpt(fn, null, null);
       }
       return db.users.findById(val, fn);
     });
@@ -180,9 +164,7 @@ exports.setUp = function(client, db) {
           }
         }
       }
-      return process.nextTick(function () {
-        fn(null, null);
-      });
+      return tools.asyncOpt(fn, null, null);
     });
   };
 
@@ -191,30 +173,18 @@ exports.setUp = function(client, db) {
       if(!err && val) {
         return db.users.findById(val, fn);
       }
-      return process.nextTick(function () {
-        fn(err, null);
-      });
+      return tools.asyncOpt(fn, err, null);
     });
   };
 
   mod.setProperties = function(id, properties, fn) {
     var purifiedProp = tools.purify(properties);
-    return client.hmset('users:' + id ,purifiedProp, function(err, val) {
-      return process.nextTick(function () {
-        fn(null);
-      });
-    });
+    return client.hmset('users:' + id ,purifiedProp, fn);
   };
 
   mod.setName = function(id, name, fn) {
     var purifiedName = tools.purify(name);
-    return client.hmset('users:' + id + ':name', purifiedName, function(err, val) {
-      if(fn) {
-        return process.nextTick(function () {
-          fn(null);
-        });
-      }
-    });
+    return client.hmset('users:' + id + ':name', purifiedName, fn);
   };
 
   mod.addEmails = function(id, emails, fn) {
@@ -223,11 +193,7 @@ exports.setUp = function(client, db) {
     values.forEach(function(value, index) {
       client.mset('emails:' + value + ':uid', id, 'emails:' + value + ':type', emails[index].type);
     });
-    if(fn) {
-      return process.nextTick(function() {
-        fn(null, values);
-      });
-    }
+    return tools.asyncOpt(fn, null, values);
   };
 
   return mod;

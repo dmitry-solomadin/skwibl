@@ -6,7 +6,7 @@
 var email = require('emailjs');
 
 var cfg = require('../config')
-  , tools = require('../tools/tools');
+  , tools = require('../tools');
 
 var smtp  = email.server.connect({
   user: cfg.SMTP_USER
@@ -31,9 +31,7 @@ exports.sendRegMail = function(user, fn) {
       alternative:true
     }]
   }, function(err, message) {
-    return process.nextTick(function () {
-      fn(err, user);
-    });
+    return tools.asyncOpt(fn, err, user);
   });
 };
 
@@ -54,15 +52,13 @@ exports.regNotify = function(req, res, next, user, link) {
       alternative:true
     }]
   }, function(err, message) {
-    return process.nextTick(function () {
-      if(err) {
-        req.flash('error', 'Can not send confirmation to  ' + email);
-        return res.redirect('/');
-      } else {
-        req.flash('message', 'User with email: ' + email + ' successfuly registred.');
-        return res.redirect('/checkmail');
-      }
-    });
+    if(err) {
+      req.flash('error', 'Can not send confirmation to  ' + email);
+      return res.redirect('/');
+    } else {
+      req.flash('message', 'User with email: ' + email + ' successfuly registred.');
+      return res.redirect('/checkmail');
+    }
   });
 };
 
@@ -85,13 +81,9 @@ exports.regPropose = function(user, contact, link, fn) {
     }]
   }, function(err, message) {
     if(err) {
-      return process.nextTick(function () {
-        fn(new Error('Can not send confirmation to  ' + email));
-      });
+      return tools.asyncOpt(fn, new Error('Can not send confirmation to  ' + email));
     }
-    return process.nextTick(function () {
-      fn(err);
-    });
+    return tools.asyncOpt(fn, err);
   });
 };
 
@@ -110,14 +102,12 @@ exports.passwordSend = function(req, res, next, user) {
       alternative:true
     }]
   }, function(err, message) {
-    return process.nextTick(function () {
-      if(err) {
-        req.flash('error', 'Can not send confirmation to ' + email);
-        return res.redirect('/forgotpassword');
-      } else {
-        req.flash('message', 'Password successfuly sent to email: ' + email);
-        return res.redirect('/checkmail');
-      }
-    });
+    if(err) {
+      req.flash('error', 'Can not send confirmation to ' + email);
+      return res.redirect('/forgotpassword');
+    } else {
+      req.flash('message', 'Password successfuly sent to email: ' + email);
+      return res.redirect('/checkmail');
+    }
   });
 };

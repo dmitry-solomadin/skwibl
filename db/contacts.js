@@ -7,77 +7,45 @@
  * Module dependencies.
  */
 
-var smtp = require('../smtp/smtp')
-  , tools = require('../tools/tools');
+var smtp = require('../smtp')
+  , tools = require('../tools');
 
 exports.setUp = function(client, db) {
 
   var mod = {};
 
-  mod.getInfo = function(id, confirmed, fn) {
+  mod.getInfo = function(id, fn) {
     client.hmget('users:' + id, 'provider', 'providerId', 'displayName', 'picture', function(err,array) {
       if(err) {
-        return process.nextTick(function() {
-          fn(err, array);
-        });
+        return tools.asyncOpt(fn, err, array);
       }
-      array.push(confirmed);
-      return process.nextTick(function() {
-        fn(err, array);
-      });
+      return tools.asyncOpt(fn, err, array);
     });
   };
 
   mod.getField = function(id, field, fn) {
     client.smembers('users:' + id + field, function(err, array) {
       if(!err && array) {
-        var leftToProcess = array.length - 1
-          , confirmed = field === ':contacts'
-          , contacts = [];
-        for(var i = 0, len = array.length; i < len; i++) {
-          (function(cid) {
-            process.nextTick(function() {
-              db.contacts.getInfo(cid, confirmed, function(err, contact) {
-                if(err) {
-                  return process.nextTick(function() {
-                    fn(err, []);
-                  });
-                }
-                contacts.push(contact);
-                if(leftToProcess-- === 0) {
-                  return process.nextTick(function() {
-                    fn(null, contacts);
-                  });
-                }
-              });
+        var contacts = [];
+        tools.asyncParallel(array, function(left, cid) {
+          db.contacts.getInfo(cid, function(err, contact) {
+            if(err) {
+              return tools.asyncOpt(fn, err, []);
+            }
+            contacts.push(contact);
+            tools.asyncDone(left, function() {
+              fn(null, contacts);
             });
-          })(array[i]);
-        }
+          });
+        });
       }
-      return process.nextTick(function() {
-        fn(err, []);
-      });
+      return tools.asyncOpt(fn, err, []);
     });
   };
 
   mod.get = function(id, fn) {
     db.contacts.getField(id, ':contacts', function(err, contacts) {
-      if(err) {
-        return process.nextTick(function() {
-          fn(err, []);
-        });
-      }
-      return db.contacts.getField(id, ':unconfirmed', function(err, unconfirmed) {
-        if(err) {
-          return process.nextTick(function() {
-            fn(err, contacts);
-          });
-        }
-        return process.nextTick(function() {
-          //TODO change to async loop
-          fn(err, contacts.concat(unconfirmed));
-        });
-      });
+      return tools.asyncOpt(fn, err, contacts);
     });
   };
 
@@ -85,26 +53,19 @@ exports.setUp = function(client, db) {
     //Get user projects
     client.smembers('users:' + id + ':projects', function(err, array) {
       if(!err && array) {
-        var leftToProcess = array.length;
-        for(var i = 0, len = array.length; i < len; i++) {
-          (function(project) {
-            if(array[i] !== pid) {
-              //Check if client belongs to another project
-              client.sismember('projects:' + project + ':users', function(err, val) {
-                if(!err && val) {
-                  return process.nextTick(function() {
-                    fn(null, true);
-                  });
-                }
-                if(--leftToProcess === 0) {
-                  return process.nextTick(function() {
-                    fn(null, false);
-                  });
-                }
+        tools.asyncParallel(array, function(left, project) {
+          if(array[i] !== pid) {
+            //Check if client belongs to another project
+            client.sismember('projects:' + project + ':users', function(err, val) {
+              if(!err && val) {
+                return tools.asyncOpt(fn, null, true);
+              }
+              tools.asyncDone(left, function() {
+                fn(null, false);
               });
-            }
-          })(array[i]);
-        }
+            });
+          }
+        });
       }
     });
   };
@@ -118,9 +79,7 @@ exports.setUp = function(client, db) {
         }
       });
     });
-    return process.nextTick(function() {
-      fn(err, val);
-    });
+    return tools.asyncOpt(fn, err, val);
   };
 
 //   mod.inviteEmailUserContact = function(id, email, fn) {

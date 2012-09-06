@@ -8,6 +8,8 @@
 
 var db = require('../db');
 
+var tools = require('../tools');
+
 /*
  * GET
  * Redirect to user profile
@@ -30,10 +32,7 @@ exports.edit = function(req, res) {
  */
 exports.update = function(req, res) {
   db.users.setProperties(req.user.id, req.body.properties, function(err) {
-    if(err) {
-      return res.send(false);
-    }
-    return res.send(true);
+    tools.returnStatus(err, res);
   });
 };
 
@@ -47,7 +46,7 @@ exports.delete = function(req, res) {
       req.flash('error', err);
       return res.redirect('/');
     }
-    req.flash('warning', 'Your profile has been successfuly deleted.');
+    req.flash('error', 'Your profile has been successfuly deleted.');
     return res.redirect('/');
   });
 };

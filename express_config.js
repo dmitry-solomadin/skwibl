@@ -32,8 +32,8 @@ exports.setUp = function() {
   });
 
   app.configure(function(){
-    app.set('port', process.env.PORT || 3000);
-    app.set('host', process.env.HOST || 'localhost');
+    app.set('port', cfg.PORT);
+    app.set('host', cfg.HOST);
     app.set('views', __dirname + '/views');
     app.engine('ejs', ejs_locals);
     app.set('view engine', 'ejs');
@@ -44,7 +44,7 @@ exports.setUp = function() {
     app.use(express.methodOverride());
     app.use(express.cookieParser());
     app.use(express.session({
-      key: 'express.sid'
+      key: cfg.SESSION_KEY
     , secret: cfg.SITE_SECRET
     , store: db.sessions.createStore(express)
     }));

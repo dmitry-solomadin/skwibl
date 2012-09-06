@@ -1,6 +1,10 @@
 
 exports.DOMAIN = process.env.DOMAIN || 'http://localhost';
 
+exports.HOST = process.env.HOST || 'localhost';
+exports.PORT = process.env.PORT || 3000;
+exports.SOCKET_PORT = 9000;
+
 exports.GOOGLE_CLIENT_ID = "435757431999.apps.googleusercontent.com";
 exports.GOOGLE_CLIENT_SECRET = "IoZpFsfeyBuRvs2Djbut1wSZ";
 
@@ -14,6 +18,7 @@ exports.TWITTER_CONSUMER_KEY = "111";
 exports.TWITTER_CONSUMER_SECRET = "111";
 
 exports.SITE_SECRET = 'T&murj1n';
+exports.SESSION_KEY = 'express.sid';
 
 exports.SMTP_USER = "skwibl.noreply@gmail.com";
 exports.SMTP_PASSWORD = "dfylthdfhlty";
