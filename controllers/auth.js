@@ -98,17 +98,6 @@ exports.register = function(req, res, next) {
 };
 
 /*
- * POST
- * Local authenticate
- */
-exports.local = function(passport) {
-  return passport.authenticate('local', {
-    failureRedirect: '/'
-  , failureFlash: true
-  });
-};
-
-/*
  * GET
  * Link authenticate
  */
@@ -205,8 +194,16 @@ exports.confirm = function(req, res, next) {
  * GET
  * Redirect to main page
  */
-exports.logIn = function(req, res) {
-  res.redirect('/');
+exports.logIn = function(req, res, passport) {
+  passport.authenticate('local', function (err, user, info) {
+    if (!user) {
+      return res.send(info)
+    }
+
+    req.logIn(user, function () {
+      return res.send("OK");
+    });
+  })(req, res);
 }
 
 /*

@@ -8,7 +8,6 @@ $(function () {
       }).fadeIn();
 
       $(document).on("click.login", function(event){
-        console.log(event);
         if (event.target.id ==  "loginBlock" || event.target.id ==  "signInButton" ||
           $(event.target).closest("#loginBlock")[0]){
           return;
@@ -18,8 +17,24 @@ $(function () {
       });
 
       return false;
+    },
+
+    initLogin: function(){
+      $("#loginForm").data("process-submit", function(data){
+        home.processLogin(data);
+      })
+    },
+
+    processLogin: function(data) {
+      if (data == "OK"){
+        window.location = "/"
+      } else {
+        $("#loginError").show().html(data.message);
+      }
     }
   };
+
+  home.initLogin();
 
   window.App.Home = home;
 });
