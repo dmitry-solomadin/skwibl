@@ -26,7 +26,7 @@ $(function () {
     },
 
     processLogin: function(data) {
-      if (data == "OK"){
+      if (data == "OK") {
         window.location = "/"
       } else {
         $("#loginError").show().html(data.message);

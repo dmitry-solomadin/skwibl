@@ -29,7 +29,7 @@ exports.configure = function(app, passport) {
   /*
    * post local auth data
    */
-  app.post('/login', function (req, res) { ctrls.auth.logIn(req, res, passport) });
+  app.post('/login', ctrls.auth.local(passport));
 
   /*
    * confirm local registration
