@@ -37,7 +37,8 @@
 </div>
 
 <div id="loginBlock" class="loginBlock" style="display: none;">
-  <form action="/login" method="post" class="form-horizontal">
+  <form id="loginForm" action="/login" method="post" class="form-horizontal" data-remote="true">
+    <div id="loginError" class="alert alert-error hide"></div>
     <div>
       Sign in with your social account:
       <div style="clear: both;"></div>

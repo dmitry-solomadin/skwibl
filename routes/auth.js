@@ -11,59 +11,59 @@ var ctrls = require('../controllers');
 
 exports.configure = function(app, passport) {
 
- /*
-  * get login page
-  */
+  /*
+   * get login page
+   */
   app.get('/', ctrls.auth.mainPage);
 
- /*
-  * get registration page
-  */
+  /*
+   * get registration page
+   */
   app.get('/register', ctrls.auth.regPage);
 
- /*
-  * post local registration info
-  */
+  /*
+   * post local registration info
+   */
   app.post('/register', ctrls.auth.register);
 
- /*
-  * post local auth data
-  */
-  app.post('/login', ctrls.auth.local(passport), ctrls.auth.logIn);
+  /*
+   * post local auth data
+   */
+  app.post('/login', ctrls.auth.local(passport));
 
- /*
-  * confirm local registration
-  */
+  /*
+   * confirm local registration
+   */
   app.get('/confirm/:hash', ctrls.auth.hash(passport), ctrls.auth.confirm, ctrls.auth.logIn);
 
- /*
-  * auth or register with google
-  */
+  /*
+   * auth or register with google
+   */
   app.get('/auth/google', ctrls.auth.google(passport), ctrls.aux.empty);
 
- /*
-  * google callback
-  */
+  /*
+   * google callback
+   */
   app.get('/auth/google/callback', ctrls.auth.googleCb(passport), ctrls.auth.logIn);
 
- /*
-  * auth or register with facebook
-  */
+  /*
+   * auth or register with facebook
+   */
   app.get('/auth/facebook', ctrls.auth.facebook(passport), ctrls.aux.empty);
 
- /*
-  * facebook callback
-  */
+  /*
+   * facebook callback
+   */
   app.get('/auth/facebook/callback', ctrls.auth.facebookCb(passport), ctrls.auth.logIn);
 
- /*
-  * auth or register with twitter
-  */
+  /*
+   * auth or register with twitter
+   */
   app.get('/auth/twitter', ctrls.auth.twitter(passport));
 
- /*
-  * twitter callback
-  */
+  /*
+   * twitter callback
+   */
   app.get('/auth/twitter/callback', ctrls.auth.twitterCb(passport), ctrls.auth.logIn);
 
   /*

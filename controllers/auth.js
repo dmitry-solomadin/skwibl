@@ -101,11 +101,18 @@ exports.register = function(req, res, next) {
  * POST
  * Local authenticate
  */
-exports.local = function(passport) {
-  return passport.authenticate('local', {
-    failureRedirect: '/'
-  , failureFlash: true
-  });
+exports.local = function (passport) {
+  return function (req, res, next) {
+    passport.authenticate('local', function (err, user, info) {
+      if (!user) {
+        return res.send(info)
+      }
+
+      req.logIn(user, function () {
+        return res.send("OK");
+      })
+    })(req, res);
+  }
 };
 
 /*
