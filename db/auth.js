@@ -42,8 +42,9 @@ exports.setUp = function(client, db) {
           picture: user.picture
         });
       }
-      if(!_.isEqual(user.name, profile.name)) {
-        user.name = _.extend(profile.name, user.name);
+      var purifiedName = tools.purify(profile.name);
+      if(!_.isEqual(user.name, purifiedName)) {
+        user.name = _.extend(purifiedName, user.name);
         db.users.setName(user.id, user.name);
       }
       var diff = _.difference(profile.emails, user.emails)
