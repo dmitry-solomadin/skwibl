@@ -31,3 +31,51 @@
     box-shadow: none;
     border-radius: 0;
 }
+
+/* ROOM STYLES START */
+
+.color {
+    cursor: pointer;
+    display: inline-block;
+    height: 20px;
+    margin: 10px 2px 0 0;
+    width: 20px;
+    border: 1px solid #b2b2b2;
+}
+
+.activen {
+    border: 1px solid orange;
+    box-shadow: orange 0 0 5px;
+}
+
+.activeMenu li {
+    font-size: 16px;
+    padding: 7px;
+    color: #404040;
+    cursor: pointer;
+}
+
+.activeMenu li.disabled {
+    color: #b2b2b2;
+    text-shadow: #808080 0 0 1px;
+}
+
+.activeMenu li:hover {
+    background-color: #87ceeb;
+}
+
+.activeMenu li.disabled:hover {
+    background-color: transparent;
+}
+
+.skwibl-btn-group {
+    float: left;
+    position: relative;
+}
+
+#colorSelect {
+    width: 250px;
+    text-align: center;
+}
+
+/* ROOM STYLES END */
