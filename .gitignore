@@ -4,5 +4,5 @@ npm-debug.log
 /node_modules
 *.orig
 .DS_STORE
-haproxy.cfg
+.directory
 .idea/

@@ -1,0 +1,86 @@
+#!/bin/sh
+
+####################################
+#       /etc/init.d/haproxy        #
+####################################
+
+### BEGIN INIT INFO
+# Provides:	  haproxy
+# Required-Start:    $local_fs $remote_fs $network $syslog $named
+# Required-Stop:     $local_fs $remote_fs $network $syslog $named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts the haproxy web server
+# Description:       starts haproxy using start-stop-daemon
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/local/sbin/haproxy
+DAEMON_CONFIG='/etc/haproxy/haproxy.cfg'
+NAME=haproxy
+DESC=haproxy
+
+test -x $DAEMON || exit 0
+
+set -e
+
+. /lib/lsb/init-functions
+
+test_haproxy_config() {
+	$DAEMON -c -f $DAEMON_CONFIG
+	return $?
+}
+
+getHaproxyPID() {
+	PID=`ps aux | grep 'haproxy -f' | grep -v 'grep' | awk '{print $2}'`
+}
+
+start() {
+		test_haproxy_config
+		$DAEMON -f $DAEMON_CONFIG
+}
+
+stop() {
+		getHaproxyPID
+		kill -9 $PID
+}
+
+restart() {
+		getHaproxyPID
+		$DAEMON -f $DAEMON_CONFIG -sf $PID
+}
+
+case "$1" in
+	start)
+		echo -n "Starting $DESC: "
+		start
+		echo "$NAME."
+		;;
+
+	stop)
+		echo -n "Stopping $DESC: "
+		stop
+		echo "$NAME."
+		;;
+
+	restart|force-reload)
+		echo -n "Restarting $DESC: "
+		restart
+		;;
+
+	configtest|testconfig)
+		echo -n "Testing $DESC configuration: "
+		if test_haproxy_config; then
+			echo "$NAME."
+		else
+			exit $?
+		fi
+		;;
+
+	*)
+		echo "Usage: $NAME {start|stop|restart|force-reload|testconfig|configtest}" >&2
+		exit 1
+		;;
+esac
+
+exit 0
