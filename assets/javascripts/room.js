@@ -13,9 +13,8 @@ $(function () {
 
   var room = {
     init:function (canvas, opt) {
-      var options = $.extend({}, opts, opt);
-      opts = options;
-      this.createTool(new opts.paper.Path());
+      opts = $.extend({}, opts, opt);
+      this.createTool(new Path());
 
       $("#toolSelect > li, #panTool, #selectTool").on("click", function () {
         window.room.setTooltype($(this).data("tooltype"));
@@ -27,26 +26,12 @@ $(function () {
         $(this).addClass('activen');
       });
 
-      this.initUploader();
+      window.room.helper.initUploader();
 
       return false;
     },
 
-    createTool:function (tool, settings) {
-      if (!settings) {
-        settings = {};
-      }
-
-      opts.tool = tool;
-      opts.tool.strokeColor = settings.color ? settings.color : opts.color;
-      opts.tool.strokeWidth = settings.width ? settings.width : opts.strokeWidth;
-      opts.tool.opacity = settings.opacity ? settings.opacity : opts.opacity;
-      opts.tool.dashArray = settings.dashArray ? settings.dashArray : undefined;
-    },
-
-    setTooltype:function (tooltype) {
-      opts.tooltype = tooltype;
-    },
+    // *** Mouse events handling ***
 
     onMouseMove:function (canvas, event) {
       $(canvas).css({cursor:"default"});
@@ -112,7 +97,7 @@ $(function () {
         }
       }
 
-      /* this should be*/
+      /* this should be */
       if (opts.tooltype == 'line' || opts.tooltype == 'straightline' || opts.tooltype == 'highligher') {
         this.addHistoryTool();
       }
@@ -120,10 +105,10 @@ $(function () {
 
     onMouseDrag:function (canvas, event) {
       if (opts.tooltype == 'line') {
-        this.addPoint(event.point);
+        opts.tool.add(event.point);
         opts.tool.smooth();
       } else if (opts.tooltype == 'highligher') {
-        this.addPoint(event.point);
+        opts.tool.add(event.point);
         opts.tool.smooth();
       } else if (opts.tooltype == 'circle') {
         var radius = (event.downPoint - event.point).length;
@@ -176,10 +161,10 @@ $(function () {
 
     onMouseUp:function (canvas, event) {
       if (opts.tooltype == 'line') {
-        this.addPoint(event.point);
+        opts.tool.add(event.point);
         opts.tool.simplify(10);
       } else if (opts.tooltype == 'highligher') {
-        this.addPoint(event.point);
+        opts.tool.add(event.point);
         opts.tool.simplify(10);
       }
 
@@ -188,15 +173,29 @@ $(function () {
       }
     },
 
+    // *** Item manipulation ***
+
+    createTool:function (tool, settings) {
+      if (!settings) {
+        settings = {};
+      }
+
+      opts.tool = tool;
+      opts.tool.strokeColor = settings.color ? settings.color : opts.color;
+      opts.tool.strokeWidth = settings.width ? settings.width : opts.strokeWidth;
+      opts.tool.opacity = settings.opacity ? settings.opacity : opts.opacity;
+      opts.tool.dashArray = settings.dashArray ? settings.dashArray : undefined;
+    },
+
+    setTooltype:function (tooltype) {
+      opts.tooltype = tooltype;
+    },
+
     addImg:function (img) {
       window.room.createTool(new opts.paper.Raster(img));
       opts.tool.position = opts.paper.view.center;
 
       this.addHistoryTool();
-    },
-
-    addPoint:function (point) {
-      opts.tool.add(point);
     },
 
     clearCanvas:function () {
@@ -225,6 +224,8 @@ $(function () {
         opts.selectedTool = null;
       }
     },
+
+    // *** History, undo & redo ***
 
     prevhistory:function () {
       if (opts.historyCounter == 0) {
@@ -302,34 +303,12 @@ $(function () {
       $("#redoLink").addClass("disabled");
     },
 
+    // *** Misc methods ***
+
     redraw:function () {
       opts.paper.view.draw()
-    },
-
-    initUploader:function () {
-      var uploader = new qq.FileUploader({
-        element:$('#file-uploader')[0],
-        action:'/file/upload',
-        title_uploader:'Upload',
-        failed:'Failed',
-        multiple:true,
-        cancel:'Cancel',
-        debug:false,
-        params:{'entity':3},
-        onSubmit:function (id, fileName) {
-          $(uploader._listElement).css('dispaly', '');
-        },
-        onComplete:function (id, fileName, responseJSON) {
-          $(uploader._listElement).css('dispaly', 'none');
-          if (responseJSON.fileName) {
-            var img = $("<img src=\"/public/images/avatar.png\" width='100' height='100'>");
-            $('#curavatardiv').prepend(img);
-
-            window.room.addImg(img[0]);
-          }
-        }
-      });
     }
+
   };
 
   var helper = {
@@ -372,6 +351,31 @@ $(function () {
       } else {
         elem.opacity = 0;
       }
+    },
+
+    initUploader:function () {
+      var uploader = new qq.FileUploader({
+        element:$('#file-uploader')[0],
+        action:'/file/upload',
+        title_uploader:'Upload',
+        failed:'Failed',
+        multiple:true,
+        cancel:'Cancel',
+        debug:false,
+        params:{'entity':3},
+        onSubmit:function (id, fileName) {
+          $(uploader._listElement).css('dispaly', '');
+        },
+        onComplete:function (id, fileName, responseJSON) {
+          $(uploader._listElement).css('dispaly', 'none');
+          if (responseJSON.fileName) {
+            var img = $("<img src=\"/public/images/avatar.png\" width='100' height='100'>");
+            $('#curavatardiv').prepend(img);
+
+            window.room.addImg(img[0]);
+          }
+        }
+      });
     }
 
   };
