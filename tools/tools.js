@@ -3,12 +3,16 @@
  * Module dependencies.
  */
 
-var fs = require('fs')
+var cluster = require('cluster')
+  , os = require('os')
+  , fs = require('fs')
   , crypto = require('crypto')
   , generatePassword = require('password-generator')
   , _ = require('underscore');
 
 var cfg = require('../config');
+
+var numCPUs = os.cpus().length;
 
 exports.emailType = function(x) {
   return 'emails:' + x + ':type';
@@ -121,5 +125,20 @@ exports.asyncParallel = function(array, fn) {
 exports.asyncDone = function(left, fn) {
   if(--left === 0) {
     return process.nextTick(fn);
+  }
+};
+
+exports.exitNotify = function(worker, code, signal) {
+  console.log('Worker ' + worker.id + ' died: ' + worker.process.pid);
+};
+
+exports.startCluster = function(stop, start) {
+  if(cluster.isMaster) {
+    for(var i = 0; i < numCPUs; i++) {
+      cluster.fork();
+    }
+    cluster.on('exit', stop);
+  } else {
+    start(cluster);
   }
 };
