@@ -136,6 +136,13 @@ $(function () {
         opts.tool.removeOnDrag();
       } else if (opts.tooltype == 'straightline') {
         opts.tool.lastSegment.point = event.point;
+      } else if (opts.tooltype == 'pan') {
+        console.log(opts.paper.project.activeLayer.children);
+        $(opts.paper.project.activeLayer.children).each(function () {
+          if (this.translate) {
+            this.translate(event.delta);
+          }
+        })
       } else if (opts.tooltype == 'select') {
         if (opts.selectedTool) {
           if (opts.selectedTool.scalersSelected) {
@@ -346,10 +353,12 @@ $(function () {
       var selectionRect = new Path.Rectangle(bounds.x - additionalBound, bounds.y - additionalBound,
         bounds.width + (additionalBound * 2), bounds.height + (additionalBound * 2));
 
-      var topLeftRect = new Path.Rectangle(bounds.x - additionalBound - 2,
-        bounds.y - additionalBound - 2, 5, 5);
-      var bottomRightRect = new Path.Rectangle(bounds.x + bounds.width + additionalBound - 2,
-        bounds.y + bounds.height + additionalBound - 2, 5, 5);
+      var selectRectWidth = 8;
+      var selectRectHalfWidth = selectRectWidth / 2;
+      var topLeftRect = new Path.Rectangle(bounds.x - additionalBound - selectRectHalfWidth,
+        bounds.y - additionalBound - selectRectHalfWidth, selectRectWidth, selectRectWidth);
+      var bottomRightRect = new Path.Rectangle(bounds.x + bounds.width + additionalBound - selectRectHalfWidth,
+        bounds.y + bounds.height + additionalBound - selectRectHalfWidth, selectRectWidth, selectRectWidth);
 
       var removeButton = new Raster("removeButton");
       removeButton.position = new Point(selectionRect.bounds.x + selectionRect.bounds.width, selectionRect.bounds.y);
