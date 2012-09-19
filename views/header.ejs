@@ -49,6 +49,7 @@
             <ul class="dropdown-menu activeMenu" id="actionSelect">
               <li id="undoLink" onclick="window.room.prevhistory();return false;" class="disabled">Undo</li>
               <li id="redoLink" onclick="window.room.nexthistory();return false;" class="disabled">Redo</li>
+              <li id="removeSelected" class="disabled" onclick="window.room.removeSelected(); return false;">Remove</li>
               <li onclick="window.room.clearCanvas(); return false;">Clear</li>
             </ul>
           </span>

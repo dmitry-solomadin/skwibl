@@ -1,3 +1,2 @@
 <%- layout('dev') %>
-<%- includedTemplate = include(template +  '.ejs') %>
-<%- block('template', includedTemplate) %>
+<%- block('template', include(template +  '.ejs')) %>

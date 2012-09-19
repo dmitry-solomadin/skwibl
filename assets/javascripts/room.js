@@ -1,7 +1,6 @@
 $(function () {
   var opts = {
     paper:undefined,
-    project:undefined,
     tool:undefined,
     selectedTool:undefined,
     historytools:[],
@@ -9,9 +8,7 @@ $(function () {
     historyCounter:undefined,
     color:'#000',
     strokeWidth:5,
-    opacity:1,
-    imgid:'',
-    createimg:0
+    opacity:1
   };
 
   var room = {
@@ -19,7 +16,6 @@ $(function () {
       var options = $.extend({}, opts, opt);
       opts = options;
       this.createTool(new opts.paper.Path());
-      opts.canvas = canvas;
 
       $("#toolSelect > li, #panTool, #selectTool").on("click", function () {
         window.room.setTooltype($(this).data("tooltype"));
@@ -31,95 +27,93 @@ $(function () {
         $(this).addClass('activen');
       });
 
-      $("#slider2").slider({
-        min:1,
-        max:100,
-        value:1,
-        change:function (event, ui) {
-          opts.strokeWidth = ui.value;
-        },
-        stop:function (event, ui) {
-          opts.strokeWidth = ui.value;
-        }
-      });
-
       this.initUploader();
 
       return false;
     },
 
-    createTool:function (tool) {
+    createTool:function (tool, settings) {
+      if (!settings) {
+        settings = {};
+      }
+
       opts.tool = tool;
-      this.setStrokeColor();
-      this.setStrokeWidth();
-      this.setOpacity();
+      opts.tool.strokeColor = settings.color ? settings.color : opts.color;
+      opts.tool.strokeWidth = settings.width ? settings.width : opts.strokeWidth;
+      opts.tool.opacity = settings.opacity ? settings.opacity : opts.opacity;
+      opts.tool.dashArray = settings.dashArray ? settings.dashArray : undefined;
     },
 
     setTooltype:function (tooltype) {
       opts.tooltype = tooltype;
     },
 
-    setStrokeColor:function () {
-      opts.tool.strokeColor = opts.color;
-    },
+    onMouseMove:function (canvas, event) {
+      $(canvas).css({cursor:"default"});
 
-    setStrokeWidth:function (strokeWidth) {
-      if (typeof(strokeWidth) != 'undefined') {
-        opts.strokeWidth = strokeWidth;
+      if (opts.selectedTool && opts.selectedTool.selectionRect) {
+        if (opts.selectedTool.selectionRect.bottomRightRect.bounds.contains(event.point)) {
+          $(canvas).css({cursor:"se-resize"});
+        } else if (opts.selectedTool.selectionRect.topLeftRect.bounds.contains(event.point)) {
+          $(canvas).css({cursor:"nw-resize"});
+        }
       }
-      opts.tool.strokeWidth = opts.strokeWidth;
-    },
-
-    setOpacity:function (opacity) {
-      if (typeof(opacity) != 'undefined') {
-        opts.opacity = opacity;
-      }
-      opts.tool.opacity = opts.opacity;
     },
 
     onMouseDown:function (canvas, event) {
-      opts.strokeWidth = 5;
-      opts.opacity = 1;
+      $("#removeSelected").addClass("disabled");
+      if (opts.selectedTool && opts.selectedTool.selectionRect) {
+        opts.selectedTool.selectionRect.remove();
+      }
+
       if (opts.tooltype == 'line') {
         this.createTool(new opts.paper.Path());
       } else if (opts.tooltype == 'highligher') {
-        opts.strokeWidth = 15;
-        opts.opacity = 0.7;
-        this.createTool(new opts.paper.Path());
+        this.createTool(new opts.paper.Path(), {color:opts.color, width:15, opacity:0.7});
       } else if (opts.tooltype == 'straightline') {
         this.createTool(new opts.paper.Path());
         if (opts.tool.segments.length == 0) {
           opts.tool.add(event.point);
         }
         opts.tool.add(event.point);
-      } else if (opts.tooltype == 'img') {
-        if (opts.createimg == 0) {
-          this.createTool(new opts.paper.Raster(opts.imgid));
-          opts.tool.position = event.point;
-          opts.createimg = 1;
-        } else {
-          if (opts.tool.hitTest(event.point)) {
-            opts.createimg = 0;
-          }
-        }
-      } else if (opts.tooltype == 'pan') {
+      } else if (opts.tooltype == "select") {
         var selectedSomething = false;
-        $(opts.historytools).each(function () {
+        $(window.room.getHistoryTools()).each(function () {
           if (this.bounds.contains(event.point)) {
             opts.selectedTool = this;
-            opts.selectedTool.selectedPoint = event.point
             selectedSomething = true;
           }
-        })
+        });
+
+        if (opts.selectedTool && opts.selectedTool.selectionRect &&
+          opts.selectedTool.selectionRect.bounds.contains(event.point)) {
+          selectedSomething = true;
+        }
 
         if (!selectedSomething) {
           opts.selectedTool = null;
         }
+
+        if (opts.selectedTool) {
+          opts.selectedTool.selectionRect = window.room.helper.createSelectionRectangle(opts.selectedTool);
+          $("#removeSelected").removeClass("disabled");
+
+          if (opts.selectedTool.selectionRect.topLeftRect.bounds.contains(event.point)) {
+            opts.selectedTool.scalersSelected = "topLeft"
+          } else if (opts.selectedTool.selectionRect.bottomRightRect.bounds.contains(event.point)) {
+            opts.selectedTool.scalersSelected = "bottomRight"
+          } else {
+            opts.selectedTool.scalersSelected = false;
+          }
+
+          if (opts.selectedTool.selectionRect.removeButton.bounds.contains(event.point)) {
+            window.room.removeSelected();
+          }
+        }
       }
 
-      if (opts.tooltype == 'line' || opts.tooltype == 'circle' ||
-        opts.tooltype == 'rectangle' || opts.tooltype == 'straightline' ||
-        opts.tooltype == 'highligher') {
+      /* this should be*/
+      if (opts.tooltype == 'line' || opts.tooltype == 'straightline' || opts.tooltype == 'highligher') {
         this.addHistoryTool();
       }
     },
@@ -127,8 +121,10 @@ $(function () {
     onMouseDrag:function (canvas, event) {
       if (opts.tooltype == 'line') {
         this.addPoint(event.point);
+        opts.tool.smooth();
       } else if (opts.tooltype == 'highligher') {
         this.addPoint(event.point);
+        opts.tool.smooth();
       } else if (opts.tooltype == 'circle') {
         var radius = (event.downPoint - event.point).length;
         this.createTool(new opts.paper.Path.Circle(event.downPoint, radius));
@@ -140,10 +136,33 @@ $(function () {
         opts.tool.removeOnDrag();
       } else if (opts.tooltype == 'straightline') {
         opts.tool.lastSegment.point = event.point;
-      } else if (opts.tooltype == 'pan') {
+      } else if (opts.tooltype == 'select') {
         if (opts.selectedTool) {
-          opts.selectedTool.translate(event.point - opts.selectedTool.selectedPoint);
-          opts.selectedTool.selectedPoint = event.point
+          if (opts.selectedTool.scalersSelected) {
+            var deltaPart = (event.delta.x + event.delta.y) / 200;
+            if (opts.selectedTool.scalersSelected == 'topLeft') {
+              deltaPart = -deltaPart;
+            }
+            var delta = 1 + deltaPart;
+
+            opts.selectedTool.scale(delta);
+
+            var previousPoint = new Point(opts.selectedTool.selectionRect.theRect.bounds.x, opts.selectedTool.selectionRect.theRect.bounds.y);
+            opts.selectedTool.selectionRect.theRect.scale(delta);
+            var nextPoint = new Point(opts.selectedTool.selectionRect.theRect.bounds.x, opts.selectedTool.selectionRect.theRect.bounds.y);
+
+            opts.selectedTool.selectionRect.topLeftRect.translate(nextPoint - previousPoint);
+            opts.selectedTool.selectionRect.bottomRightRect.translate(previousPoint - nextPoint);
+            opts.selectedTool.selectionRect.removeButton.position = new Point(
+              opts.selectedTool.selectionRect.theRect.bounds.x + opts.selectedTool.selectionRect.theRect.bounds.width,
+              opts.selectedTool.selectionRect.theRect.bounds.y);
+          } else {
+            opts.selectedTool.translate(event.delta);
+
+            if (opts.selectedTool.selectionRect) {
+              opts.selectedTool.selectionRect.translate(event.delta);
+            }
+          }
         }
       }
     },
@@ -151,15 +170,20 @@ $(function () {
     onMouseUp:function (canvas, event) {
       if (opts.tooltype == 'line') {
         this.addPoint(event.point);
+        opts.tool.simplify(10);
       } else if (opts.tooltype == 'highligher') {
         this.addPoint(event.point);
+        opts.tool.simplify(10);
+      }
+
+      if (opts.tooltype == 'circle' || opts.tooltype == 'rectangle') {
+        this.addHistoryTool();
       }
     },
 
     addImg:function (img) {
       window.room.createTool(new opts.paper.Raster(img));
       opts.tool.position = opts.paper.view.center;
-      console.log(opts.tool.width);
 
       this.addHistoryTool();
     },
@@ -176,6 +200,21 @@ $(function () {
       this.redraw();
     },
 
+    removeSelected:function () {
+      if (opts.selectedTool) {
+        // add new 'remove' item into history and link it to removed item.
+        window.room.addHistoryTool(opts.selectedTool, "remove");
+
+        opts.selectedTool.opacity = 0;
+
+        if (opts.selectedTool.selectionRect) {
+          opts.selectedTool.selectionRect.remove();
+        }
+
+        opts.selectedTool = null;
+      }
+    },
+
     prevhistory:function () {
       if (opts.historyCounter == 0) {
         return;
@@ -184,8 +223,14 @@ $(function () {
       $("#redoLink").removeClass("disabled");
 
       opts.historyCounter = opts.historyCounter - 1;
-      if (typeof(opts.historytools[opts.historyCounter]) != 'undefined') {
-        opts.historytools[opts.historyCounter].opacity = 0;
+      var item = opts.historytools[opts.historyCounter];
+      if (typeof(item) != 'undefined') {
+        if (item.type == "remove") {
+          window.room.helper.reverseOpacity(item.tool);
+        } else {
+          window.room.helper.reverseOpacity(item);
+        }
+
         this.redraw();
       }
 
@@ -201,8 +246,14 @@ $(function () {
 
       $("#undoLink").removeClass("disabled");
 
-      if (typeof(opts.historytools[opts.historyCounter]) != 'undefined') {
-        opts.historytools[opts.historyCounter].opacity = 1;
+      var item = opts.historytools[opts.historyCounter];
+      if (typeof(item) != 'undefined') {
+        if (item.type == "remove") {
+          window.room.helper.reverseOpacity(item.tool);
+        } else {
+          window.room.helper.reverseOpacity(item);
+        }
+
         opts.historyCounter = opts.historyCounter + 1;
         this.redraw();
       }
@@ -212,16 +263,48 @@ $(function () {
       }
     },
 
-    addHistoryTool:function () {
+    getHistoryTools:function () {
+      var visibleHistoryTools = new Array();
+      $(opts.historytools).each(function () {
+        if (!this.type && this.opacity != 0) {
+          visibleHistoryTools.push(this);
+        }
+      });
+      return visibleHistoryTools;
+    },
+
+    addHistoryTool:function (tool, type) {
+      var tool = tool ? tool : opts.tool;
       if (opts.historyCounter != opts.historytools.length) { // rewrite history
         opts.historytools = opts.historytools.slice(0, opts.historyCounter)
       }
 
-      opts.historytools.push(opts.tool);
+      if (type) {
+        opts.historytools.push({tool:tool, type:type});
+      } else {
+        opts.historytools.push(tool);
+      }
+
       opts.historyCounter = opts.historytools.length;
 
       $("#undoLink").removeClass("disabled");
       $("#redoLink").addClass("disabled");
+    },
+
+    findById:function (array, id) {
+      var elem, elemIndex;
+      $(array).each(function (index) {
+        if (this.id == id) {
+          elem = this;
+          elemIndex = index;
+        }
+      });
+
+      if (elem) {
+        return {elem:elem, index:elemIndex};
+      } else {
+        return null;
+      }
     },
 
     redraw:function () {
@@ -254,11 +337,64 @@ $(function () {
     }
   };
 
-  window.room = room
+  var helper = {
+
+    createSelectionRectangle:function (selectedTool) {
+      var bounds = selectedTool.bounds;
+      var additionalBound = parseInt(selectedTool.strokeWidth / 2);
+
+      var selectionRect = new Path.Rectangle(bounds.x - additionalBound, bounds.y - additionalBound,
+        bounds.width + (additionalBound * 2), bounds.height + (additionalBound * 2));
+
+      var topLeftRect = new Path.Rectangle(bounds.x - additionalBound - 2,
+        bounds.y - additionalBound - 2, 5, 5);
+      var bottomRightRect = new Path.Rectangle(bounds.x + bounds.width + additionalBound - 2,
+        bounds.y + bounds.height + additionalBound - 2, 5, 5);
+
+      var removeButton = new Raster("removeButton");
+      removeButton.position = new Point(selectionRect.bounds.x + selectionRect.bounds.width, selectionRect.bounds.y);
+
+      var selectionRectGroup = new Group([selectionRect, topLeftRect, bottomRightRect, removeButton]);
+
+      selectionRectGroup.theRect = selectionRect;
+      selectionRectGroup.topLeftRect = topLeftRect;
+      selectionRectGroup.bottomRightRect = bottomRightRect;
+      selectionRectGroup.removeButton = removeButton;
+
+      window.room.createTool(selectionRect, {color:"skyblue", width:1, opacity:1, dashArray:[3, 3]});
+      window.room.createTool(topLeftRect, {color:"blue", width:1, opacity:1});
+      window.room.createTool(bottomRightRect, {color:"blue", width:1, opacity:1});
+      window.room.createTool(removeButton);
+
+      return selectionRectGroup;
+    },
+
+    reverseOpacity:function (elem) {
+      if (elem.opacity == 0) {
+        elem.opacity = 1;
+      } else {
+        elem.opacity = 0;
+      }
+    }
+
+  };
+
+  window.room = room;
+  window.room.helper = helper;
 });
 
 $(document).ready(function () {
   window.room.init($("#myCanvas"), {paper:paper});
+
+  // disable canvas text selection for cursor change
+  var canvas = $("#myCanvas")[0];
+  canvas.onselectstart = function () {
+    return false;
+  };
+
+  canvas.onmousedown = function () {
+    return false;
+  };
 });
 
 function onMouseDown(event) {
@@ -271,4 +407,8 @@ function onMouseDrag(event) {
 
 function onMouseUp(event) {
   window.room.onMouseUp($("#myCanvas"), event);
+}
+
+function onMouseMove(event) {
+  window.room.onMouseMove($("#myCanvas"), event);
 }
