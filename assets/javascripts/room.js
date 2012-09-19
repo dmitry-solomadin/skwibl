@@ -204,6 +204,10 @@ $(function () {
         this.remove()
       });
 
+      opts.historytool = []
+      opts.selectedTool = null;
+      opts.historyCounter = undefined;
+
       this.redraw();
     },
 
@@ -296,22 +300,6 @@ $(function () {
 
       $("#undoLink").removeClass("disabled");
       $("#redoLink").addClass("disabled");
-    },
-
-    findById:function (array, id) {
-      var elem, elemIndex;
-      $(array).each(function (index) {
-        if (this.id == id) {
-          elem = this;
-          elemIndex = index;
-        }
-      });
-
-      if (elem) {
-        return {elem:elem, index:elemIndex};
-      } else {
-        return null;
-      }
     },
 
     redraw:function () {
