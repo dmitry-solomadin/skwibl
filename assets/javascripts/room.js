@@ -111,8 +111,9 @@ $(function () {
         opts.tool.add(event.point);
         opts.tool.smooth();
       } else if (opts.tooltype == 'circle') {
-        var radius = (event.downPoint - event.point).length;
-        this.createTool(new opts.paper.Path.Circle(event.downPoint, radius));
+        var sizes = event.downPoint - event.point;
+        var rectangle = new opts.paper.Rectangle(event.point.x, event.point.y, sizes.x, sizes.y);
+        this.createTool(new Path.Oval(rectangle));
         opts.tool.removeOnDrag();
       } else if (opts.tooltype == 'rectangle') {
         var sizes = event.downPoint - event.point;
