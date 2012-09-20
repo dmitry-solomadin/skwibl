@@ -131,23 +131,28 @@ $(function () {
       } else if (opts.tooltype == 'select') {
         if (opts.selectedTool) {
           if (opts.selectedTool.scalersSelected) {
-            var deltaPart = (event.delta.x + event.delta.y) / 200;
-            if (opts.selectedTool.scalersSelected == 'topLeft') {
-              deltaPart = -deltaPart;
-            }
-            var delta = 1 + deltaPart;
+            var tool = opts.selectedTool;
+            var boundingBox = opts.selectedTool.selectionRect;
 
-            opts.selectedTool.scale(delta);
+            // get scale percentages
+            var h = tool.bounds.height;
+            var w = opts.selectedTool.bounds.width;
+            var sx = (w + 2 * event.delta.x) / w;
+            var sy = (h + 2 * event.delta.y) / h;
 
-            var previousPoint = new Point(opts.selectedTool.selectionRect.theRect.bounds.x, opts.selectedTool.selectionRect.theRect.bounds.y);
-            opts.selectedTool.selectionRect.theRect.scale(delta);
-            var nextPoint = new Point(opts.selectedTool.selectionRect.theRect.bounds.x, opts.selectedTool.selectionRect.theRect.bounds.y);
+            // scale tool & bounding box
+            tool.scale(sx, sy);
+            boundingBox.theRect.scale(sx, sy);
 
-            opts.selectedTool.selectionRect.topLeftRect.translate(nextPoint - previousPoint);
-            opts.selectedTool.selectionRect.bottomRightRect.translate(previousPoint - nextPoint);
-            opts.selectedTool.selectionRect.removeButton.position = new Point(
-              opts.selectedTool.selectionRect.theRect.bounds.x + opts.selectedTool.selectionRect.theRect.bounds.width,
-              opts.selectedTool.selectionRect.theRect.bounds.y);
+            var bx = boundingBox.theRect.bounds.x;
+            var by = boundingBox.theRect.bounds.y;
+            var bw = boundingBox.theRect.bounds.width;
+            var bh = boundingBox.theRect.bounds.height;
+
+            // move bounding box controls
+            boundingBox.topLeftRect.position = new Point(bx + bw, by + bh);
+            boundingBox.bottomRightRect.position = new Point(bx, by);
+            boundingBox.removeButton.position = new Point(bx + bw, by);
           } else {
             opts.selectedTool.translate(event.delta);
 
