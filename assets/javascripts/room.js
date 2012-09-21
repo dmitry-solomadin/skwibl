@@ -7,7 +7,7 @@ $(function () {
     tooltype:'line',
     historyCounter:undefined,
     color:'#000',
-    strokeWidth:5,
+    defaultWidth:3,
     opacity:1
   };
 
@@ -61,6 +61,13 @@ $(function () {
           opts.tool.add(event.point);
         }
         opts.tool.add(event.point);
+      } else if (opts.tooltype == 'arrow') {
+        this.createTool(new opts.paper.Path());
+        if (opts.tool.segments.length == 0) {
+          opts.tool.add(event.point);
+        }
+        opts.tool.add(event.point);
+        opts.tool.lineStart = event.point
       } else if (opts.tooltype == "select") {
         var selectedSomething = false;
         $(window.room.getHistoryTools()).each(function () {
@@ -122,6 +129,22 @@ $(function () {
         opts.tool.removeOnDrag();
       } else if (opts.tooltype == 'straightline') {
         opts.tool.lastSegment.point = event.point;
+      } else if (opts.tooltype == 'arrow') {
+        var arrow = opts.tool;
+        arrow.lastSegment.point = event.point;
+
+        var vector = event.point - arrow.lineStart;
+        vector = vector.normalize(10);
+        var triangle = new opts.paper.Path([
+          event.point + vector.rotate(135),
+          event.point,
+          event.point + vector.rotate(-135)
+        ]);
+        this.createTool(triangle);
+
+        opts.tool = arrow;
+
+        triangle.removeOnDrag();
       } else if (opts.tooltype == 'pan') {
         console.log(opts.paper.project.activeLayer.children);
         $(opts.paper.project.activeLayer.children).each(function () {
@@ -188,7 +211,7 @@ $(function () {
 
       opts.tool = tool;
       opts.tool.strokeColor = settings.color ? settings.color : opts.color;
-      opts.tool.strokeWidth = settings.width ? settings.width : opts.strokeWidth;
+      opts.tool.strokeWidth = settings.width ? settings.width : opts.defaultWidth;
       opts.tool.opacity = settings.opacity ? settings.opacity : opts.opacity;
       opts.tool.dashArray = settings.dashArray ? settings.dashArray : undefined;
     },
