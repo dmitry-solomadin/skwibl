@@ -8,13 +8,13 @@ $(function () {
     historyCounter:undefined,
     color:'#000',
     defaultWidth:3,
+    currentScale:1,
     opacity:1
   };
 
   var room = {
     init:function (canvas, opt) {
       opts = $.extend({}, opts, opt);
-      this.createTool(new Path());
 
       $("#toolSelect > li, #panTool, #selectTool").on("click", function () {
         window.room.setTooltype($(this).data("tooltype"));
@@ -34,6 +34,8 @@ $(function () {
     // *** Mouse events handling ***
 
     onMouseMove:function (canvas, event) {
+      event.point = event.point.transform(new Matrix(1 / opts.currentScale, 0, 0, 1 / opts.currentScale, 0, 0));
+
       $(canvas).css({cursor:"default"});
 
       if (opts.selectedTool && opts.selectedTool.selectionRect) {
@@ -46,6 +48,8 @@ $(function () {
     },
 
     onMouseDown:function (canvas, event) {
+      event.point = event.point.transform(new Matrix(1 / opts.currentScale, 0, 0, 1 / opts.currentScale, 0, 0));
+
       $("#removeSelected").addClass("disabled");
       if (opts.selectedTool && opts.selectedTool.selectionRect) {
         opts.selectedTool.selectionRect.remove();
@@ -62,7 +66,9 @@ $(function () {
         }
         opts.tool.add(event.point);
       } else if (opts.tooltype == 'arrow') {
-        this.createTool(new opts.paper.Path());
+        var arrow = new opts.paper.Path();
+        arrow.arrow = arrow;
+        this.createTool(arrow);
         if (opts.tool.segments.length == 0) {
           opts.tool.add(event.point);
         }
@@ -105,12 +111,14 @@ $(function () {
       }
 
       /* this should be */
-      if (opts.tooltype == 'line' || opts.tooltype == 'straightline' || opts.tooltype == 'highligher') {
+      if (opts.tooltype == 'line' || opts.tooltype == 'highligher') {
         this.addHistoryTool();
       }
     },
 
     onMouseDrag:function (canvas, event) {
+      event.point = event.point.transform(new Matrix(1 / opts.currentScale, 0, 0, 1 / opts.currentScale, 0, 0));
+
       if (opts.tooltype == 'line') {
         opts.tool.add(event.point);
         opts.tool.smooth();
@@ -130,7 +138,7 @@ $(function () {
       } else if (opts.tooltype == 'straightline') {
         opts.tool.lastSegment.point = event.point;
       } else if (opts.tooltype == 'arrow') {
-        var arrow = opts.tool;
+        var arrow = opts.tool.arrow;
         arrow.lastSegment.point = event.point;
 
         var vector = event.point - arrow.lineStart;
@@ -142,11 +150,12 @@ $(function () {
         ]);
         this.createTool(triangle);
 
-        opts.tool = arrow;
+        var arrowGroup = new Group([triangle, arrow]);
+        arrowGroup.arrow = arrow;
+        opts.tool = arrowGroup;
 
         triangle.removeOnDrag();
       } else if (opts.tooltype == 'pan') {
-        console.log(opts.paper.project.activeLayer.children);
         $(opts.paper.project.activeLayer.children).each(function () {
           if (this.translate) {
             this.translate(event.delta);
@@ -189,6 +198,8 @@ $(function () {
     },
 
     onMouseUp:function (canvas, event) {
+      event.point = event.point.transform(new Matrix(1 / opts.currentScale, 0, 0, 1 / opts.currentScale, 0, 0));
+
       if (opts.tooltype == 'line') {
         opts.tool.add(event.point);
         opts.tool.simplify(10);
@@ -197,7 +208,8 @@ $(function () {
         opts.tool.simplify(10);
       }
 
-      if (opts.tooltype == 'circle' || opts.tooltype == 'rectangle') {
+      if (opts.tooltype == 'straightline' || opts.tooltype == 'arrow' ||
+        opts.tooltype == 'circle' || opts.tooltype == 'rectangle') {
         this.addHistoryTool();
       }
     },
@@ -252,6 +264,26 @@ $(function () {
 
         opts.selectedTool = null;
       }
+    },
+
+    setCanvasScale:function (scale) {
+      var finalScale = scale / opts.currentScale;
+      opts.currentScale = scale;
+
+      var transformMatrix = new Matrix(finalScale, 0, 0, finalScale, 0, 0);
+      opts.paper.project.activeLayer.transform(transformMatrix);
+
+      this.redraw();
+    },
+
+    addCanvasScale:function () {
+      var scale = opts.currentScale + 0.1;
+      this.setCanvasScale(scale);
+    },
+
+    subtractCanvasScale:function () {
+      var scale = opts.currentScale - 0.1;
+      this.setCanvasScale(scale);
     },
 
     // *** History, undo & redo ***

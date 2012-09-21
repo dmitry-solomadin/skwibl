@@ -42,6 +42,18 @@
         <span class="skwibl-btn-group">
           <a href="#" id="panTool" class="btn" data-tooltype="pan">Pan</a>
         </span>
+      <span class="skwibl-btn-group">
+          <select class="btn" style="width:75px;" onchange="window.room.setCanvasScale($(this).find(':selected').val())">
+            <option value="0.5">50%</option>
+            <option value="0.75">75%</option>
+            <option value="1" selected="selected">100%</option>
+            <option value="1.25">125%</option>
+            <option value="1.5">150%</option>
+            <option value="2">200%</option>
+          </select>
+          <a class="btn" href="#" onclick="window.room.addCanvasScale(); return false;">+</a>
+          <a class="btn" href="#" onclick="window.room.subtractCanvasScale(); return false;">-</a>
+        </span>
         <span class="skwibl-btn-group">
             <a href="#" class="btn" data-toggle="dropdown">
               Actions
