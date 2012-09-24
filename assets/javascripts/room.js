@@ -1,8 +1,12 @@
 $(function () {
-  var opts = {
+  var opts = {};
+  var savedOpts = new Array();
+
+  var defaultOpts = {
     paper:undefined,
     tool:undefined,
     selectedTool:undefined,
+    image:undefined,
     historytools:[],
     tooltype:'line',
     historyCounter:undefined,
@@ -14,7 +18,10 @@ $(function () {
 
   var room = {
     init:function (canvas, opt) {
-      opts = $.extend({}, opts, opt);
+      $.extend(opts, opt);
+      $.extend(opts, defaultOpts);
+
+      savedOpts.push(opts);
 
       $("#toolSelect > li, #panTool, #selectTool").on("click", function () {
         window.room.setTooltype($(this).data("tooltype"));
@@ -24,6 +31,12 @@ $(function () {
         $('.color').removeClass('activen');
         opts.color = $(this).attr('data-color');
         $(this).addClass('activen');
+      });
+
+      $(document).on("click", "#canvasSelectDiv a", function () {
+        window.room.selectCanvas(this);
+
+        return false;
       });
 
       window.room.helper.initUploader();
@@ -214,33 +227,72 @@ $(function () {
       }
     },
 
-    // *** Item manipulation ***
+    // *** Image upload & canvas manipulation ***
 
-    createTool:function (tool, settings) {
-      if (!settings) {
-        settings = {};
+    handleUpload:function (image) {
+      if (opts.image) {
+        this.addNewCanvas();
       }
 
-      opts.tool = tool;
-      opts.tool.strokeColor = settings.color ? settings.color : opts.color;
-      opts.tool.strokeWidth = settings.width ? settings.width : opts.defaultWidth;
-      opts.tool.opacity = settings.opacity ? settings.opacity : opts.opacity;
-      opts.tool.dashArray = settings.dashArray ? settings.dashArray : undefined;
+      this.addImage(image);
     },
 
-    setTooltype:function (tooltype) {
-      opts.tooltype = tooltype;
+    addImage:function (image) {
+      var img = new opts.paper.Raster(image);
+      opts.paper.project.activeLayer.insertChild(0, img)
+
+      img.size.width = image.width;
+      img.size.height = image.height;
+      img.position = opts.paper.view.center;
+
+      opts.image = image;
     },
 
-    addImg:function (image) {
-      window.room.createTool(new opts.paper.Raster(image));
-      console.log($(image).width());
+    addNewCanvas:function () {
+      this.eraseCanvas();
 
-      opts.tool.size.width = image.width;
-      opts.tool.size.height = image.height;
-      opts.tool.position = opts.paper.view.center;
+      var oldOpts = opts;
+      opts = {};
+      $.extend(opts, defaultOpts);
 
-      this.addHistoryTool();
+      opts.paper = oldOpts.paper;
+      savedOpts.push(opts);
+
+      $("#canvasSelectDiv a").removeClass("canvasSelected");
+      var canvasCount = $("#canvasSelectDiv a").length + 1;
+      $("#canvasSelectDiv").append("<a href='#' class='canvasSelected'>Canvas " + canvasCount + "</a>")
+    },
+
+    selectCanvas:function (anchor) {
+      if ($(anchor).hasClass("canvasSelected")) {
+        return;
+      }
+
+      $("#canvasSelectDiv a").removeClass("canvasSelected");
+
+      var index = $(anchor).index();
+      var canvasOpts = this.findCanvasOptsByIndex(index);
+      if (!canvasOpts) {
+        alert("No canvas opts by given index=" + index);
+      }
+
+      this.eraseCanvas();
+      opts = canvasOpts;
+
+      window.room.addImage(opts.image);
+      this.restoreFromHistory(opts.historytools);
+
+      $(anchor).addClass("canvasSelected");
+    },
+
+    findCanvasOptsByIndex:function (index) {
+      var canvasOpts;
+      $(savedOpts).each(function (indexInternal) {
+        if (indexInternal == index) {
+          canvasOpts = this;
+        }
+      });
+      return canvasOpts;
     },
 
     clearCanvas:function () {
@@ -251,23 +303,10 @@ $(function () {
       this.redraw();
     },
 
-    removeSelected:function () {
-      if (opts.selectedTool) {
-        // add new 'remove' item into history and link it to removed item.
-        window.room.addHistoryTool(opts.selectedTool, "remove");
-        opts.selectedTool.opacity = 0;
-
-        this.unselect();
-
-        this.redraw();
-      }
-    },
-
-    unselect:function () {
-      if (opts.selectedTool.selectionRect) {
-        opts.selectedTool.selectionRect.remove();
-      }
-      opts.selectedTool = null;
+    eraseCanvas:function () {
+      $(opts.paper.project.activeLayer.children).each(function () {
+        this.remove();
+      });
     },
 
     setCanvasScale:function (scale) {
@@ -288,6 +327,43 @@ $(function () {
     subtractCanvasScale:function () {
       var scale = opts.currentScale - 0.1;
       this.setCanvasScale(scale);
+    },
+
+    // *** Item manipulation ***
+
+    createTool:function (tool, settings) {
+      if (!settings) {
+        settings = {};
+      }
+
+      opts.tool = tool;
+      opts.tool.strokeColor = settings.color ? settings.color : opts.color;
+      opts.tool.strokeWidth = settings.width ? settings.width : opts.defaultWidth;
+      opts.tool.opacity = settings.opacity ? settings.opacity : opts.opacity;
+      opts.tool.dashArray = settings.dashArray ? settings.dashArray : undefined;
+    },
+
+    setTooltype:function (tooltype) {
+      opts.tooltype = tooltype;
+    },
+
+    removeSelected:function () {
+      if (opts.selectedTool) {
+        // add new 'remove' item into history and link it to removed item.
+        window.room.addHistoryTool(opts.selectedTool, "remove");
+        opts.selectedTool.opacity = 0;
+
+        this.unselect();
+
+        this.redraw();
+      }
+    },
+
+    unselect:function () {
+      if (opts.selectedTool.selectionRect) {
+        opts.selectedTool.selectionRect.remove();
+      }
+      opts.selectedTool = null;
     },
 
     // *** History, undo & redo ***
@@ -351,6 +427,14 @@ $(function () {
       }
     },
 
+    restoreFromHistory:function (history) {
+      $(history).each(function () {
+        if (!this.type) {
+          opts.paper.project.activeLayer.addChild(this);
+        }
+      });
+    },
+
     getHistoryTools:function () {
       var visibleHistoryTools = new Array();
       $(opts.historytools).each(function () {
@@ -405,7 +489,7 @@ $(function () {
       var bottomRightRect = new Path.Rectangle(bounds.x + bounds.width + additionalBound - selectRectHalfWidth,
         bounds.y + bounds.height + additionalBound - selectRectHalfWidth, selectRectWidth, selectRectWidth);
 
-      var removeButton = new Raster("removeButton");
+      var removeButton = new Raster(removeImg);
       removeButton.position = new Point(selectionRect.bounds.x + selectionRect.bounds.width, selectionRect.bounds.y);
 
       var selectionRectGroup = new Group([selectionRect, topLeftRect, bottomRightRect, removeButton]);
@@ -459,11 +543,9 @@ $(function () {
           if (responseJSON.fileName) {
             var image = new Image();
             image.src = "/public/images/avatar.png";
-            $(image).on("load", function(){
-              window.room.addImg(image);
+            $(image).on("load", function () {
+              window.room.handleUpload(image);
             })
-
-
           }
         }
       });
@@ -473,6 +555,9 @@ $(function () {
 
   window.room = room;
   window.room.helper = helper;
+
+  var removeImg = new Image();
+  removeImg.src = "/images/remove.png";
 });
 
 $(document).ready(function () {

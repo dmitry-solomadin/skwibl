@@ -78,4 +78,14 @@
     text-align: center;
 }
 
+.canvasSelected {
+    color: black;
+}
+
+.canvasSelected:hover {
+    cursor: default;
+    color: black;
+    text-decoration: none;
+}
+
 /* ROOM STYLES END */
