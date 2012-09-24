@@ -240,13 +240,9 @@ $(function () {
     },
 
     clearCanvas:function () {
-      $(opts.paper.project.activeLayer.children).each(function () {
-        this.remove()
-      });
-
-      opts.historytool = []
-      opts.selectedTool = null;
-      opts.historyCounter = undefined;
+      window.room.helper.setOpacityElems(opts.historytools, 0);
+      window.room.addHistoryTool(null, "clear");
+      this.unselect();
 
       this.redraw();
     },
@@ -255,15 +251,19 @@ $(function () {
       if (opts.selectedTool) {
         // add new 'remove' item into history and link it to removed item.
         window.room.addHistoryTool(opts.selectedTool, "remove");
-
         opts.selectedTool.opacity = 0;
 
-        if (opts.selectedTool.selectionRect) {
-          opts.selectedTool.selectionRect.remove();
-        }
+        this.unselect();
 
-        opts.selectedTool = null;
+        this.redraw();
       }
+    },
+
+    unselect:function () {
+      if (opts.selectedTool.selectionRect) {
+        opts.selectedTool.selectionRect.remove();
+      }
+      opts.selectedTool = null;
     },
 
     setCanvasScale:function (scale) {
@@ -298,17 +298,22 @@ $(function () {
       opts.historyCounter = opts.historyCounter - 1;
       var item = opts.historytools[opts.historyCounter];
       if (typeof(item) != 'undefined') {
-        if (item.type == "remove") {
-          window.room.helper.reverseOpacity(item.tool);
-        } else {
-          window.room.helper.reverseOpacity(item);
-        }
-
+        executePrevHistory(item);
         this.redraw();
       }
 
       if (opts.historyCounter == 0) {
         $("#undoLink").addClass("disabled");
+      }
+
+      function executePrevHistory(item) {
+        if (item.type == "remove") {
+          window.room.helper.reverseOpacity(item.tool);
+        } else if (item.type == "clear") {
+          window.room.helper.setOpacityElems(opts.historytools, 1);
+        } else {
+          window.room.helper.reverseOpacity(item);
+        }
       }
     },
 
@@ -321,11 +326,7 @@ $(function () {
 
       var item = opts.historytools[opts.historyCounter];
       if (typeof(item) != 'undefined') {
-        if (item.type == "remove") {
-          window.room.helper.reverseOpacity(item.tool);
-        } else {
-          window.room.helper.reverseOpacity(item);
-        }
+        executeNextHistory(item);
 
         opts.historyCounter = opts.historyCounter + 1;
         this.redraw();
@@ -333,6 +334,16 @@ $(function () {
 
       if (opts.historyCounter == opts.historytools.length) {
         $("#redoLink").addClass("disabled");
+      }
+
+      function executeNextHistory(item) {
+        if (item.type == "remove") {
+          window.room.helper.reverseOpacity(item.tool);
+        } else if (item.type == "clear") {
+          window.room.helper.setOpacityElems(opts.historytools, 0);
+        } else {
+          window.room.helper.reverseOpacity(item);
+        }
       }
     },
 
@@ -352,8 +363,10 @@ $(function () {
         opts.historytools = opts.historytools.slice(0, opts.historyCounter)
       }
 
-      if (type) {
+      if (type == "remove") {
         opts.historytools.push({tool:tool, type:type});
+      } else if (type == "clear") {
+        opts.historytools.push({type:type});
       } else {
         opts.historytools.push(tool);
       }
@@ -412,6 +425,16 @@ $(function () {
       } else {
         elem.opacity = 0;
       }
+    },
+
+    setOpacityElems:function (elems, opacity) {
+      $(elems).each(function () {
+        if (this.type == "remove") {
+          this.tool.opacity = 0;
+        } else if (!this.type) {
+          this.opacity = opacity;
+        }
+      });
     },
 
     initUploader:function () {
