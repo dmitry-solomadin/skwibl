@@ -232,8 +232,12 @@ $(function () {
       opts.tooltype = tooltype;
     },
 
-    addImg:function (img) {
-      window.room.createTool(new opts.paper.Raster(img));
+    addImg:function (image) {
+      window.room.createTool(new opts.paper.Raster(image));
+      console.log($(image).width());
+
+      opts.tool.size.width = image.width;
+      opts.tool.size.height = image.height;
       opts.tool.position = opts.paper.view.center;
 
       this.addHistoryTool();
@@ -448,15 +452,18 @@ $(function () {
         debug:false,
         params:{'entity':3},
         onSubmit:function (id, fileName) {
-          $(uploader._listElement).css('dispaly', '');
+          $(uploader._listElement).css('dispaly', 'none');
         },
         onComplete:function (id, fileName, responseJSON) {
           $(uploader._listElement).css('dispaly', 'none');
           if (responseJSON.fileName) {
-            var img = $("<img src=\"/public/images/avatar.png\" width='100' height='100'>");
-            $('#curavatardiv').prepend(img);
+            var image = new Image();
+            image.src = "/public/images/avatar.png";
+            $(image).on("load", function(){
+              window.room.addImg(image);
+            })
 
-            window.room.addImg(img[0]);
+
           }
         }
       });
