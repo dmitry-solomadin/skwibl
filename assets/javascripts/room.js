@@ -88,39 +88,8 @@ $(function () {
         opts.tool.add(event.point);
         opts.tool.lineStart = event.point
       } else if (opts.tooltype == "select") {
-        var selectedSomething = false;
-        $(window.room.getHistoryTools()).each(function () {
-          if (this.bounds.contains(event.point)) {
-            opts.selectedTool = this;
-            selectedSomething = true;
-          }
-        });
-
-        if (opts.selectedTool && opts.selectedTool.selectionRect &&
-          opts.selectedTool.selectionRect.bounds.contains(event.point)) {
-          selectedSomething = true;
-        }
-
-        if (!selectedSomething) {
-          opts.selectedTool = null;
-        }
-
-        if (opts.selectedTool) {
-          opts.selectedTool.selectionRect = window.room.helper.createSelectionRectangle(opts.selectedTool);
-          $("#removeSelected").removeClass("disabled");
-
-          if (opts.selectedTool.selectionRect.topLeftRect.bounds.contains(event.point)) {
-            opts.selectedTool.scalersSelected = "topLeft"
-          } else if (opts.selectedTool.selectionRect.bottomRightRect.bounds.contains(event.point)) {
-            opts.selectedTool.scalersSelected = "bottomRight"
-          } else {
-            opts.selectedTool.scalersSelected = false;
-          }
-
-          if (opts.selectedTool.selectionRect.removeButton.bounds.contains(event.point)) {
-            window.room.removeSelected();
-          }
-        }
+        window.room.testSelect(event.point);
+        window.room.drawSelectRect(event.point);
       }
 
       /* this should be */
@@ -130,6 +99,8 @@ $(function () {
     },
 
     onMouseDrag:function (canvas, event) {
+      opts.dragPerformed = true;
+
       event.point = event.point.transform(new Matrix(1 / opts.currentScale, 0, 0, 1 / opts.currentScale, 0, 0));
 
       if (opts.tooltype == 'line') {
@@ -225,6 +196,8 @@ $(function () {
         opts.tooltype == 'circle' || opts.tooltype == 'rectangle') {
         this.addHistoryTool();
       }
+
+      opts.dragPerformed = false;
     },
 
     // *** Image upload & canvas manipulation ***
@@ -410,6 +383,66 @@ $(function () {
         opts.selectedTool.selectionRect.remove();
       }
       opts.selectedTool = null;
+    },
+
+    testSelect:function (point) {
+      var selectTimeDelta = opts.selectTime ? new Date().getTime() - opts.selectTime : undefined;
+      opts.selectTime = new Date().getTime();
+
+      var selected = false;
+
+      // Select scalers or remove buttton has highest priority.
+      if (opts.selectedTool && opts.selectedTool.selectionRect &&
+        (opts.selectedTool.selectionRect.topLeftRect.bounds.contains(point) ||
+          opts.selectedTool.selectionRect.bottomRightRect.bounds.contains(point) ||
+          opts.selectedTool.selectionRect.removeButton.bounds.contains(point))) {
+        selected = true;
+      }
+
+      // Already selected item has next highest priority if time between selectes was big.
+      if (selectTimeDelta > 750 && opts.selectedTool && opts.selectedTool.selectionRect &&
+        opts.selectedTool.selectionRect.bounds.contains(point)) {
+        selected = true;
+      }
+
+      if (!selected) {
+        var previousSelectedTool = opts.selectedTool;
+        $(window.room.getHistoryTools()).each(function () {
+          if (this.bounds.contains(point)) {
+            opts.selectedTool = this;
+            selected = true;
+          }
+
+          if (selectTimeDelta < 750) {
+            if (opts.selectedTool && previousSelectedTool) {
+              return opts.selectedTool.id == previousSelectedTool.id;
+            }
+          }
+        });
+      }
+
+      if (!selected) {
+        opts.selectedTool = null;
+      }
+    },
+
+    drawSelectRect:function (point) {
+      if (opts.selectedTool) {
+        opts.selectedTool.selectionRect = window.room.helper.createSelectionRectangle(opts.selectedTool);
+        $("#removeSelected").removeClass("disabled");
+
+        if (opts.selectedTool.selectionRect.topLeftRect.bounds.contains(point)) {
+          opts.selectedTool.scalersSelected = "topLeft"
+        } else if (opts.selectedTool.selectionRect.bottomRightRect.bounds.contains(point)) {
+          opts.selectedTool.scalersSelected = "bottomRight"
+        } else {
+          opts.selectedTool.scalersSelected = false;
+        }
+
+        if (opts.selectedTool.selectionRect.removeButton.bounds.contains(point)) {
+          window.room.removeSelected();
+        }
+      }
     },
 
     // *** History, undo & redo ***
