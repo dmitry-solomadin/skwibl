@@ -239,7 +239,7 @@ $(function () {
 
     addImage:function (image) {
       var img = new opts.paper.Raster(image);
-      opts.paper.project.activeLayer.insertChild(0, img)
+      opts.paper.project.activeLayer.insertChild(0, img);
 
       img.size.width = image.width;
       img.size.height = image.height;
@@ -327,6 +327,52 @@ $(function () {
     subtractCanvasScale:function () {
       var scale = opts.currentScale - 0.1;
       this.setCanvasScale(scale);
+    },
+
+    // *** Save & restore state ***
+
+    restoreState:function (state) {
+      this.eraseCanvas();
+
+      $(state).each(function () {
+        var path = new opts.paper.Path();
+        $(this.segments).each(function () {
+          path.addSegment(createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
+        });
+        path.closed = this.closed;
+
+        window.room.createTool(path);
+      });
+
+      function createSegment(x, y, ix, iy, ox, oy) {
+        var handleIn = new Point(ix, iy);
+        var handleOut = new Point(ox, oy);
+        var firstPoint = new Point(x, y);
+
+        return new opts.paper.Segment(firstPoint, handleIn, handleOut);
+      }
+    },
+
+    saveState:function () {
+      var elements = [];
+      $(paper.project.activeLayer.children).each(function () {
+        var element = {};
+        element.segments = [];
+        element.closed = this.closed;
+        $(this.segments).each(function () {
+          element.segments.push({
+            x:this.point.x,
+            y:this.point.y,
+            ix:this.handleIn.x,
+            iy:this.handleIn.y,
+            ox:this.handleOut.x,
+            oy:this.handleOut.y
+          });
+        });
+        elements.push(element);
+      });
+
+      return elements;
     },
 
     // *** Item manipulation ***
