@@ -21,6 +21,8 @@ $(function () {
       $.extend(opts, opt);
       $.extend(opts, defaultOpts);
 
+      opts.canvas = canvas;
+
       savedOpts.push(opts);
 
       $("#toolSelect > li, #panTool, #selectTool").on("click", function () {
@@ -90,6 +92,8 @@ $(function () {
       } else if (opts.tooltype == "select") {
         window.room.testSelect(event.point);
         window.room.drawSelectRect(event.point);
+      } else if (opts.tooltype == "comment") {
+        window.room.createComment();
       }
 
       /* this should be */
@@ -232,8 +236,7 @@ $(function () {
       savedOpts.push(opts);
 
       $("#canvasSelectDiv a").removeClass("canvasSelected");
-      var canvasCount = $("#canvasSelectDiv a").length + 1;
-      $("#canvasSelectDiv").append("<a href='#' class='canvasSelected'>Canvas " + canvasCount + "</a>")
+      $("#canvasSelectDiv").append("<a href='#' class='canvasSelected'></a>")
     },
 
     selectCanvas:function (anchor) {
@@ -364,6 +367,11 @@ $(function () {
 
     setTooltype:function (tooltype) {
       opts.tooltype = tooltype;
+    },
+
+    createComment:function () {
+      console.log(opts.canvas);
+      $(opts.canvas).append("<div>The div</div>");
     },
 
     removeSelected:function () {

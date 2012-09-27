@@ -12,6 +12,7 @@
           <ul class="dropdown-menu activeMenu" id="toolSelect">
             <li data-tooltype="line">Pencil</li>
             <li data-tooltype="highligher">Highligher</li>
+            <li data-tooltype="comment">Comment</li>
             <li data-tooltype="circle">Cirlce</li>
             <li data-tooltype="rectangle">Rectangle</li>
             <li data-tooltype="straightline">Line</li>
@@ -63,6 +64,7 @@
               <li id="undoLink" onclick="window.room.prevhistory();return false;" class="disabled">Undo</li>
               <li id="redoLink" onclick="window.room.nexthistory();return false;" class="disabled">Redo</li>
               <li id="removeSelected" class="disabled" onclick="window.room.removeSelected(); return false;">Remove</li>
+              <li onclick="window.room.restoreState(window.room.saveState())">Save&Restore state</li>
               <li onclick="window.room.clearCanvas(); return false;">Clear</li>
             </ul>
           </span>
