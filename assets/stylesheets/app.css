@@ -1,3 +1,15 @@
+/* MISC START */
+
+.fr {
+    float: right;
+}
+
+.fl {
+    float: left;
+}
+
+/* MISC END */
+
 .jp-play-bar {
     overflow: visible !important;
 }
@@ -126,6 +138,57 @@
 
 body.room {
     overflow: hidden;
+}
+
+.room-content {
+    position: relative;
+}
+
+.comment-maximized {
+    position: absolute;
+    width: 150px;
+    height: 200px;
+    box-shadow: #e3e3e3 0 0 3px;
+}
+
+.comment-maximized {
+    background: #fcfcfc;
+    border: 1px solid #c2e1f5;
+    border-radius: 3px;
+}
+
+.comment-remove {
+    background: url("/images/remove.png");
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    cursor: pointer !important;
+}
+
+.comment-minimize {
+    background: url("/images/minimize.png");
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    cursor: pointer !important;
+}
+
+.comment-minimized {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    background: url("/images/comment-small.png");
+}
+
+.comment-header {
+    height: 20px;
+    border-bottom: 2px solid #e3e3e3;
+}
+
+.comment-content {
+    height: 100px;
 }
 
 /* ROOM STYLES END */

@@ -93,7 +93,7 @@ $(function () {
         window.room.testSelect(event.point);
         window.room.drawSelectRect(event.point);
       } else if (opts.tooltype == "comment") {
-        window.room.createComment();
+        window.room.createComment(event.point.x, event.point.y);
       }
 
       /* this should be */
@@ -369,11 +369,6 @@ $(function () {
       opts.tooltype = tooltype;
     },
 
-    createComment:function () {
-      console.log(opts.canvas);
-      $(opts.canvas).append("<div>The div</div>");
-    },
-
     removeSelected:function () {
       if (opts.selectedTool) {
         // add new 'remove' item into history and link it to removed item.
@@ -552,6 +547,129 @@ $(function () {
       $("#redoLink").addClass("disabled");
     },
 
+    // *** Comments ***
+
+    createComment:function (x, y) {
+      var commentMin = $("<div class='comment-minimized'>&nbsp;</div>");
+      commentMin.css({left:x, top:y});
+
+      var commentMax = $("<div class='comment-maximized'></div>");
+      commentMax.css({left:x - 200, top:y - 85});
+      var commentHeader = $("<div class='comment-header'>" +
+        "<div class='fr'><span class='comment-minimize'></span><span class='comment-remove'></span></div>" +
+        "</div>");
+
+      commentHeader.find(".comment-minimize").on("click", function () {
+        window.room.hideComment(commentMin);
+      });
+
+      commentHeader.find(".comment-remove").on("click", function () {
+        window.room.removeComment(commentMin);
+      });
+
+      commentMin.on("mousedown", function () {
+        window.room.showComment(commentMin);
+      });
+
+      commentMax.append(commentHeader);
+      var commentContent = $("<div class='comment-content'></div>");
+      commentMax.append(commentContent);
+
+      commentHeader.drags({onDrag:function (dx, dy) {
+        commentMax.css({left:(commentMax.position().left + dx) + "px", top:(commentMax.position().top + dy) + "px"});
+
+        redrawArrow();
+      }});
+
+      commentMin.drags({onDrag:function (dx, dy) {
+        commentMin.css({left:(commentMin.position().left + dx) + "px", top:(commentMin.position().top + dy) + "px"});
+
+        redrawArrow();
+      }});
+
+      commentMin[0].$maximized = commentMax;
+
+      $("#room-content").prepend(commentMin);
+      $("#room-content").prepend(commentMax);
+
+      var coords = getArrowCoords("default");
+      var path = new opts.paper.Path();
+      path.strokeColor = '#C2E1F5';
+      path.strokeWidth = "2";
+      path.fillColor = "#FCFCFC";
+      path.add(new Point(coords.x0, coords.y0));
+      path.add(new Point(coords.x1, coords.y1));
+      path.add(new Point(coords.x2, coords.y2));
+      path.closed = true;
+      opts.paper.project.activeLayer.addChild(path);
+
+      commentMin[0].arrow = path;
+
+      window.room.setTooltype("select");
+
+      function getArrowCoords(zone) {
+        if (!zone || zone == 5) {
+          return null;
+        } else if (zone == "default") {
+          zone = 6;
+        }
+
+        var x0 = commentMin.position().left + (commentMin.width() / 2);
+        var y0 = commentMin.position().top + (commentMin.height() / 2);
+
+        var w = commentMax.width(), h = commentMax.height();
+        var c = commentsHelper.getCommentCoords(commentMax.position().left, commentMax.position().top, w, h);
+
+        var pos = commentsHelper.getArrowPos(zone, c, w, h);
+
+        return {
+          x0:x0, y0:y0, x1:pos.x1, y1:pos.y1, x2:pos.x2, y2:pos.y2
+        };
+      }
+
+      function redrawArrow() {
+        var zone = commentsHelper.getZone(commentMax.position().left, commentMax.position().top,
+          commentMin.position().left + (commentMin.width() / 2), commentMin.position().top + (commentMin.height() / 2),
+          commentMax.width(), commentMax.height());
+
+        var coords = getArrowCoords(zone);
+
+        if (coords == null) {
+          path.opacity = 0;
+        } else {
+          path.opacity = 1;
+        }
+
+        path.segments[0].point.x = coords.x0;
+        path.segments[0].point.y = coords.y0;
+        path.segments[1].point.x = coords.x1;
+        path.segments[1].point.y = coords.y1;
+        path.segments[2].point.x = coords.x2;
+        path.segments[2].point.y = coords.y2;
+      }
+    },
+
+    hideComment:function ($comment) {
+      $comment[0].$maximized.hide();
+      $comment[0].arrow.opacity = 0;
+      window.room.redraw();
+    },
+
+    showComment:function ($comment) {
+      $comment[0].$maximized.show();
+      $comment[0].arrow.opacity = 1;
+      window.room.redraw();
+    },
+
+    removeComment:function ($comment) {
+      if (confirm("Are you sure?")) {
+        $comment[0].$maximized.remove();
+        $comment[0].arrow.remove();
+        $comment.remove();
+        window.room.redraw();
+      }
+    },
+
     // *** Misc methods ***
 
     redraw:function () {
@@ -636,6 +754,105 @@ $(function () {
           }
         }
       });
+    }
+
+  };
+
+  var commentsHelper = {
+
+    SIDE_OFFSET:15,
+    CORNER_OFFSET:35,
+
+    getZone:function (left, top, x0, y0, w, h) {
+      var c = this.getCommentCoords(left, top, w, h);
+
+      var zone = null;
+
+      if (x0 <= c.xtl && y0 <= c.ytl) {
+        zone = 1;
+      } else if (x0 > c.xtl && x0 < c.xtr && y0 < c.ytl) {
+        zone = 2;
+      } else if (x0 >= c.xtr && y0 <= c.ytr) {
+        zone = 3;
+      } else if (x0 < c.xtl && y0 < c.ybl && y0 > c.ytl) {
+        zone = 4;
+      } else if (x0 >= c.xtl && x0 <= c.xtr && y0 <= c.ybl && y0 >= c.ytl) {
+        zone = 5;
+      } else if (x0 > c.xtr && y0 < c.ybr && y0 > c.ytr) {
+        zone = 6;
+      } else if (x0 <= c.xbl && y0 >= c.ybl) {
+        zone = 7;
+      } else if (x0 > c.xbl && x0 < c.xbr && y0 > c.ybl) {
+        zone = 8;
+      } else if (x0 >= c.xbr && y0 >= c.ybr) {
+        zone = 9;
+      }
+
+      return zone;
+    },
+
+    getCommentCoords:function (left, top, width, height) {
+      return {xtl:left, ytl:top,
+        xtr:left + width, ytr:top,
+        xbl:left, ybl:top + height,
+        xbr:left + width, ybr:top + height};
+    },
+
+    getArrowPos:function (zone, c, w, h) {
+      var x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+      var w2 = w / 2, h2 = h / 2;
+
+      if (zone == 1) {
+        x1 = c.xtl;
+        y1 = c.ytl + this.CORNER_OFFSET;
+
+        x2 = c.xtl + this.CORNER_OFFSET;
+        y2 = c.ytl;
+      } else if (zone == 2) {
+        x2 = c.xtl + w2 + this.SIDE_OFFSET;
+        y2 = c.ytl;
+
+        x1 = c.xtl + w2 - this.SIDE_OFFSET;
+        y1 = c.ytl;
+      } else if (zone == 3) {
+        x1 = c.xtr - this.CORNER_OFFSET;
+        y1 = c.ytr;
+
+        x2 = c.xtr;
+        y2 = c.ytr + this.CORNER_OFFSET;
+      } else if (zone == 4) {
+        x1 = c.xtl;
+        y1 = c.ytl + h2 + this.SIDE_OFFSET;
+
+        x2 = c.xtl;
+        y2 = c.ytl + h2 - this.SIDE_OFFSET;
+      } else if (zone == 6) {
+        x1 = c.xtr;
+        y1 = c.ytr + h2 - this.SIDE_OFFSET;
+
+        x2 = c.xtr;
+        y2 = c.ytr + h2 + this.SIDE_OFFSET;
+      } else if (zone == 7) {
+        x1 = c.xbl + this.CORNER_OFFSET;
+        y1 = c.ybl;
+
+        x2 = c.xbl;
+        y2 = c.ybl - this.CORNER_OFFSET;
+      } else if (zone == 8) {
+        x1 = c.xbl + w2 + this.SIDE_OFFSET;
+        y1 = c.ybl;
+
+        x2 = c.xbl + w2 - this.SIDE_OFFSET;
+        y2 = c.ybl;
+      } else if (zone == 9) {
+        x1 = c.xbr;
+        y1 = c.ybr - this.CORNER_OFFSET;
+
+        x2 = c.xbr - this.CORNER_OFFSET;
+        y2 = c.ybr;
+      }
+
+      return {x1:x1, y1:y1, x2:x2, y2:y2};
     }
 
   };
