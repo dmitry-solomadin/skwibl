@@ -9,11 +9,17 @@
 
     <%- include('/shared/application_scripts') %>
 </head>
-<body>
+<body <% if (template == 'room') { %>class="room"<% } %>>
 <%- include('/header.ejs') %>
 
-<div id="main-content" class="page tab-pane">
+<% if (template == 'room') { %>
+<div id="room-content" class="room-content">
     <%- blocks.template %>
 </div>
+<% } else { %>
+<div id="main-content" class="page tab-pane">
+  <%- blocks.template %>
+</div>
+<% } %>
 </body>
 </html>

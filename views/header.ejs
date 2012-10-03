@@ -12,9 +12,11 @@
           <ul class="dropdown-menu activeMenu" id="toolSelect">
             <li data-tooltype="line">Pencil</li>
             <li data-tooltype="highligher">Highligher</li>
+            <li data-tooltype="comment">Comment</li>
             <li data-tooltype="circle">Cirlce</li>
             <li data-tooltype="rectangle">Rectangle</li>
             <li data-tooltype="straightline">Line</li>
+            <li data-tooltype="arrow">Arrow</li>
           </ul>
         </span>
         <span class="skwibl-btn-group">
@@ -41,6 +43,18 @@
         <span class="skwibl-btn-group">
           <a href="#" id="panTool" class="btn" data-tooltype="pan">Pan</a>
         </span>
+      <span class="skwibl-btn-group">
+          <select class="btn" style="width:75px;" onchange="window.room.setCanvasScale($(this).find(':selected').val())">
+            <option value="0.5">50%</option>
+            <option value="0.75">75%</option>
+            <option value="1" selected="selected">100%</option>
+            <option value="1.25">125%</option>
+            <option value="1.5">150%</option>
+            <option value="2">200%</option>
+          </select>
+          <a class="btn" href="#" onclick="window.room.addCanvasScale(); return false;">+</a>
+          <a class="btn" href="#" onclick="window.room.subtractCanvasScale(); return false;">-</a>
+        </span>
         <span class="skwibl-btn-group">
             <a href="#" class="btn" data-toggle="dropdown">
               Actions
@@ -49,6 +63,8 @@
             <ul class="dropdown-menu activeMenu" id="actionSelect">
               <li id="undoLink" onclick="window.room.prevhistory();return false;" class="disabled">Undo</li>
               <li id="redoLink" onclick="window.room.nexthistory();return false;" class="disabled">Redo</li>
+              <li id="removeSelected" class="disabled" onclick="window.room.removeSelected(); return false;">Remove</li>
+              <li onclick="window.room.restoreState(window.room.saveState())">Save&Restore state</li>
               <li onclick="window.room.clearCanvas(); return false;">Clear</li>
             </ul>
           </span>

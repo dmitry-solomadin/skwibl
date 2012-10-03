@@ -48,4 +48,36 @@
       trigger[0].hovercount = trigger[0].hovercount + toAdd
     }
   };
+
+  $.fn.drags = function (opt) {
+    opt = $.extend({cursor:"move"}, opt);
+    var $el = this;
+
+    $(document).on("mouseup", function () {
+      $('.draggable').removeClass('draggable');
+    });
+
+    return $el.css('cursor', opt.cursor).on("mousedown", function (e) {
+      var $drag = $(this).addClass('draggable');
+
+      $drag.css('z-index', 1000).parents().on("mousemove", function (e) {
+        if (!$drag.data("pdx")) {
+          $drag.data("pdx", e.clientX);
+          $drag.data("pdy", e.clientY);
+        } else {
+          var dx = e.clientX - parseInt($drag.data("pdx")),
+            dy = e.clientY - parseInt($drag.data("pdy"));
+
+          $drag.data("pdx", e.clientX);
+          $drag.data("pdy", e.clientY);
+
+          if ($drag.hasClass("draggable")) {
+            opt.onDrag(dx, dy);
+          }
+        }
+      });
+
+      e.preventDefault(); // disable selection
+    });
+  }
 })(jQuery);
