@@ -15,26 +15,32 @@ exports.setUp = function(client, db) {
   var mod = {};
 
   mod.getInfo = function(id, fn) {
-    client.hmget('users:' + id, 'provider', 'providerId', 'displayName', 'picture', function(err,array) {
-      if(err) {
-        return tools.asyncOpt(fn, err, array);
+    client.hmget('users:' + id, 'id', 'provider', 'providerId', 'displayName', 'picture', function(err, array) {
+      if(!err && array) {
+        var user = {};
+        user.id = array[0];
+        user.provider = array[1];
+        user.providerId = array[2];
+        user.displayName = array[3];
+        user.picture = array[4];
+        return client.hgetall('users:' + id + ':name', function(err, name) {
+          user.name = name;
+          return tools.asyncOpt(fn, err, user);
+        });
       }
-      return tools.asyncOpt(fn, err, array);
+      return tools.asyncOpt(fn, err, null);
     });
   };
 
   mod.getField = function(id, field, fn) {
     client.smembers('users:' + id + field, function(err, array) {
-      if(!err && array) {
+      if(!err && array && array.length) {
         var contacts = [];
-        tools.asyncParallel(array, function(left, cid) {
+        return tools.asyncParallel(array, function(left, cid) {
           db.contacts.getInfo(cid, function(err, contact) {
-            if(err) {
-              return tools.asyncOpt(fn, err, []);
-            }
             contacts.push(contact);
-            tools.asyncDone(left, function() {
-              fn(null, contacts);
+            return tools.asyncDone(left, function() {
+              return tools.asyncOpt(fn, null, contacts);
             });
           });
         });
@@ -50,23 +56,26 @@ exports.setUp = function(client, db) {
   };
 
   mod.isContact = function(id, cid, pid, fn) {
+    console.log('iscontact');
     //Get user projects
     client.smembers('users:' + id + ':projects', function(err, array) {
-      if(!err && array) {
-        tools.asyncParallel(array, function(left, project) {
-          if(array[i] !== pid) {
+      if(!err && array && array.length) {
+        return tools.asyncParallel(array, function(left, project) {
+          if(project !== pid) {
+            console.log(left);
             //Check if client belongs to another project
             client.sismember('projects:' + project + ':users', function(err, val) {
               if(!err && val) {
                 return tools.asyncOpt(fn, null, true);
               }
-              tools.asyncDone(left, function() {
-                fn(null, false);
+              return tools.asyncDone(left, function() {
+                return tools.asyncOpt(fn, null, false);
               });
             });
           }
         });
       }
+      return tools.asyncOpt(fn, null, false);
     });
   };
 
@@ -79,7 +88,19 @@ exports.setUp = function(client, db) {
         }
       });
     });
-    return tools.asyncOpt(fn, err, val);
+    return tools.asyncOpt(fn, null);
+  };
+
+  mod.deleteContacts = function(pid, array, index, fn) {
+    if(index === array.length) {
+      client.del('projects:' + pid + ':users');
+      return tools.asyncOpt(fn, null, pid);
+    }
+    return db.projects.remove(pid, array[index], function(err) {
+      return process.nextTick(function() {
+        db.contacts.deleteContacts(pid, array, ++index, fn);
+      });
+    });
   };
 
 //   mod.inviteEmailUserContact = function(id, email, fn) {

@@ -34,7 +34,7 @@
     "emailjs": "*",
     "password-generator": "*",
     "hiredis": "*",
-    "redis": "*",
+    "redis": "0.7.2",
     "underscore": "*"
   },
   "devDependencies": {

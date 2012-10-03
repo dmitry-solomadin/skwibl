@@ -14,6 +14,19 @@ var cfg = require('../config');
 
 var numCPUs = os.cpus().length;
 
+exports.getUsers = function(clients) {
+  var hsn = clients[0].manager.handshaken
+    , ids = []
+    , users = [];
+  for(el in hsn) {
+    var id = hsn[el].user.id;
+    if(ids.indexOf(id) === -1) {
+      ids.push(id);
+    }
+  };
+  return ids;
+};
+
 exports.emailType = function(x) {
   return 'emails:' + x + ':type';
 };
@@ -117,13 +130,14 @@ exports.asyncParallel = function(array, fn) {
     (function(val) {
       process.nextTick(function() {
         fn(left, val);
+        --left;
       });
     })(array[i]);
   }
 };
 
 exports.asyncDone = function(left, fn) {
-  if(--left === 0) {
+  if(left === 0) {
     return process.nextTick(fn);
   }
 };

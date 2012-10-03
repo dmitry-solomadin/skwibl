@@ -49,10 +49,12 @@ exports.setUp = function(server) {
         } else if(!session) {
           return accept('Session not found.', false);
         }
-        var sessionData = JSON.parse(session);
-        if(!sessionData.passport.user) {
+        var sessionData = JSON.parse(session)
+          , user = sessionData.passport.user;
+        if(!user) {
           return accept('User not logged in', false);
         }
+        data.user = user;
         data.session = sessionData;
         return accept(null, true);
       });

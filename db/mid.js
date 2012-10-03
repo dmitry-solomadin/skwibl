@@ -3,12 +3,18 @@
  ******************************************/
 
 
+/**
+ * Module dependencies.
+ */
+
+var tools = require('../tools');
+
 exports.setUp = function(client, db) {
 
   var mod = {};
 
   mod.isMember = function(id, pid, fn) {
-    client.sismember('projects:' + pid + ':users', fn);
+    client.sismember('projects:' + pid + ':users', id, fn);
   };
 
   mod.isOwner = function(id, pid, fn) {
@@ -17,11 +23,16 @@ exports.setUp = function(client, db) {
         return tools.asyncOpt(fn, null, true);
       }
       return tools.asyncOpt(fn, err, false);
-    })
+    });
   };
 
-  mod.isInvited = function(id, pid, fn) {
-    client.sismember('projects:' + pid + ':unconfirmed', id, fn);
+  mod.isInvited = function(id, aid, fn) {
+    client.hget('activities:' + aid, 'owner', function(err, val) {
+      if(!err && val === id) {
+        return tools.asyncOpt(fn, null, true);
+      }
+      return tools.asyncOpt(fn, err, false);
+    });
   };
 
   return mod;

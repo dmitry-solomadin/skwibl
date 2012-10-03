@@ -24,7 +24,7 @@ exports.configure = function(app, passport) {
  /*
   * add new project
   */
-  app.post('/projects/create', ctrls.mid.isAuth, ctrls.projects.create);
+  app.post('/projects/add', ctrls.mid.isAuth, ctrls.projects.add);
 
  /*
   * close project
@@ -61,14 +61,14 @@ exports.configure = function(app, passport) {
 //   */
 //   app.post('/projects/invitelink', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.projects.inviteLink);
 
-  /*
-   * confirm user invitation
-   */
+ /*
+  * confirm user invitation
+  */
   app.post('/projects/confirm', ctrls.mid.isAuth, ctrls.mid.isInvited, ctrls.projects.confirm);
 
-  /*
-   * remove user from a project
-   */
-  app.post('/project/remove', ctrls.mid.isAuth, ctrls.mid.isOwner, ctrls.projects.remove);
+ /*
+  * remove user from a project
+  */
+  app.post('/projects/remove', ctrls.mid.isAuth, ctrls.mid.isOwner, ctrls.projects.remove);
 
 }

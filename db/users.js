@@ -17,7 +17,7 @@ exports.setUp = function(client, db) {
 
   mod.persist = function(user, fn) {
     var emails = user.emails
-    , id = user.id;
+      , id = user.id;
     client.hdel('users:' + id, 'hash');
     client.del('hashes:' + user.hash + ':uid');
     db.users.setProperties(user.id, {
@@ -30,14 +30,14 @@ exports.setUp = function(client, db) {
   mod.add = function(user, name, emails, fn) {
     client.incr('users:next', function(err, val) {
       if(!err) {
-        user.id = val;
+        user.id = val + '';
         user.email = emails[0].value;
         if(user.provider === 'local') {
           user.providerId = val;
         }
         var umails = []
-        , emailtypes = []
-        , emailuid = [];
+          , emailtypes = []
+          , emailuid = [];
         for(var i = 0, len = emails.length; i < len; i++) {
           var email = emails[i].value;
           umails.push(email);

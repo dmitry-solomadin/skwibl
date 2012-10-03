@@ -18,12 +18,10 @@ var LocalStrategy = require('passport-local').Strategy
 exports.setUp = function() {
 
   passport.serializeUser(function(user, done) {
-    console.log('serialize');
     done(null, user);
   });
 
   passport.deserializeUser(function(user, done) {
-    console.log('deserialize');
     done(null, user);
 //     db.users.findById(id, function (err, user) {
 //       done(err, user);

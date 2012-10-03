@@ -41,9 +41,15 @@ exports.show = function(req, res, next) {
  * POST
  * Add new project
  */
-exports.create = function(req, res) {
+exports.add = function(req, res) {
+  if(!req.body.name || req.body.name === '') {
+    return res.send(false);
+  }
   db.projects.add(req.user.id, req.body.name, function(err, project) {
-    tools.returnStatus(err, res);
+    if(!err) {
+      return res.send(project);
+    }
+    return res.send(false);
   });
 };
 
@@ -77,9 +83,7 @@ exports.reopen = function(req, res) {
  * Delete project
  */
 exports.delete = function(req, res) {
-  db.projects.setProperties(req.body.pid, {
-    status: 'deleted'
-  }, function(err) {
+  db.projects.delete(req.body.pid, function(err) {
     tools.returnStatus(err, res);
   });
 };
@@ -90,7 +94,7 @@ exports.delete = function(req, res) {
  */
 exports.invite = function(req, res) {
   var data = req.body;
-  db.projects.invite(data.pid, data.id, function(err) {
+  db.projects.invite(data.pid, req.user.id, data.uid, function(err) {
     tools.returnStatus(err, res);
   });
 };
@@ -132,18 +136,22 @@ exports.inviteLink = function(req, res) {
  * Confirm user invitation to a project
  */
 exports.confirm = function(req, res) {
-  db.projects.confirm(req.user.id, req.body.pid, function(err) {
+  var data = req.body;
+  db.projects.confirm(data.aid, req.user.id, data.answer, function(err) {
     tools.returnStatus(err, res);
   });
 };
 
 /*
  * POST
- * Remove user to a project
+ * Remove user from a project
  */
 exports.remove = function(req, res) {
   var data = req.body;
-  db.projects.remove(data.pid, data.id, function(err) {
-    tools.returnStatus(err, res);
-  });
+  if(req.user.id !== data.id) {
+    return db.projects.remove(data.pid, data.id, function(err) {
+      tools.returnStatus(err, res);
+    });
+  }
+  return res.send(false);
 };
