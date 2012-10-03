@@ -554,7 +554,7 @@ $(function () {
       commentMin.css({left:x, top:y});
 
       var commentMax = $("<div class='comment-maximized'></div>");
-      commentMax.css({left:x - 200, top:y - 85});
+      commentMax.css({left:x - 250, top:y - 85});
       var commentHeader = $("<div class='comment-header'>" +
         "<div class='fr'><span class='comment-minimize'></span><span class='comment-remove'></span></div>" +
         "</div>");
@@ -572,7 +572,10 @@ $(function () {
       });
 
       commentMax.append(commentHeader);
-      var commentContent = $("<div class='comment-content'></div>");
+      var commentContent = $("<div class='comment-content'>" +
+        "<textarea class='comment-reply' placeholder='Type a comment...'></textarea>" +
+        "<input type='button' class='btn fr comment-send hide' value='Send'>" +
+        "</div>");
       commentMax.append(commentContent);
 
       commentHeader.drags({onDrag:function (dx, dy) {
@@ -586,6 +589,28 @@ $(function () {
 
         redrawArrow();
       }});
+
+
+      $(document).on("click", function (evt) {
+        $(".comment-send:visible").each(function(){
+          $(this).hide();
+
+          redrawArrow();
+        });
+
+        if (evt.target){
+          $(evt.target).parent(".comment-content").find(".comment-send").show();
+        }
+      });
+
+      $(commentMax).find(".comment-send").on("click", function(){
+        var commentContent = $(this).parent(".comment-content");
+        var commentTextarea = commentContent.find(".comment-reply");
+        var commentText = commentTextarea.val();
+        commentTextarea.val("");
+
+        commentContent.prepend("<div class='comment-text'>" + commentText + "</div>");
+      });
 
       commentMin[0].$maximized = commentMax;
 
