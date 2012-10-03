@@ -181,6 +181,11 @@ body.room {
     background: url("/images/comment-small.png");
 }
 
+.comment-min-rect {
+    width: 0;
+    height: 0;
+}
+
 .comment-header {
     height: 20px;
     border-bottom: 2px solid #e3e3e3;

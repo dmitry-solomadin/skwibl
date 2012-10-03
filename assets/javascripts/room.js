@@ -70,6 +70,8 @@ $(function () {
         opts.selectedTool.selectionRect.remove();
       }
 
+      opts.commentRect = null;
+
       if (opts.tooltype == 'line') {
         this.createTool(new opts.paper.Path());
       } else if (opts.tooltype == 'highligher') {
@@ -92,8 +94,6 @@ $(function () {
       } else if (opts.tooltype == "select") {
         window.room.testSelect(event.point);
         window.room.drawSelectRect(event.point);
-      } else if (opts.tooltype == "comment") {
-        window.room.createComment(event.point.x, event.point.y);
       }
 
       /* this should be */
@@ -123,7 +123,22 @@ $(function () {
         var rectangle = new opts.paper.Rectangle(event.point.x, event.point.y, sizes.x, sizes.y);
         this.createTool(new opts.paper.Path.Rectangle(rectangle));
         opts.tool.removeOnDrag();
-      } else if (opts.tooltype == 'straightline') {
+      } else if (opts.tooltype == 'comment') {
+        var sizes = event.downPoint - event.point;
+
+        if (sizes.x < 0 && sizes.y < 0) {
+          var x = event.downPoint.x, y = event.downPoint.y, w = Math.abs(sizes.x), h = Math.abs(sizes.y);
+        } else {
+          x = event.point.x, y = event.point.y, w = sizes.x, h = sizes.y;
+        }
+
+        var rectangle = new Path.RoundRectangle(x, y, w, h, 8, 8);
+        opts.commentRect = rectangle;
+
+        this.createTool(rectangle, {width:"2", color:"#C2E1F5"});
+        opts.tool.removeOnDrag();
+      }
+      if (opts.tooltype == 'straightline') {
         opts.tool.lastSegment.point = event.point;
       } else if (opts.tooltype == 'arrow') {
         var arrow = opts.tool.arrow;
@@ -181,6 +196,11 @@ $(function () {
               opts.selectedTool.selectionRect.translate(event.delta);
             }
           }
+
+          // redraw comment arrow if there is one.
+          if (opts.selectedTool.commentMin) {
+            commentsHelper.redrawArrow(opts.selectedTool.commentMin);
+          }
         }
       }
     },
@@ -194,11 +214,18 @@ $(function () {
       } else if (opts.tooltype == 'highligher') {
         opts.tool.add(event.point);
         opts.tool.simplify(10);
+      } else if (opts.tooltype == "comment") {
+        opts.commentRect.commentMin = window.room.createComment(event.point.x, event.point.y, opts.commentRect);
       }
 
       if (opts.tooltype == 'straightline' || opts.tooltype == 'arrow' ||
-        opts.tooltype == 'circle' || opts.tooltype == 'rectangle') {
-        this.addHistoryTool();
+        opts.tooltype == 'circle' || opts.tooltype == 'rectangle' || opts.tooltype == 'select') {
+
+        if (opts.tooltype == 'select' && opts.commentRect) {
+          this.addHistoryTool();
+        } else {
+          this.addHistoryTool();
+        }
       }
 
       opts.dragPerformed = false;
@@ -398,7 +425,8 @@ $(function () {
       if (opts.selectedTool && opts.selectedTool.selectionRect &&
         (opts.selectedTool.selectionRect.topLeftRect.bounds.contains(point) ||
           opts.selectedTool.selectionRect.bottomRightRect.bounds.contains(point) ||
-          opts.selectedTool.selectionRect.removeButton.bounds.contains(point))) {
+          (opts.selectedTool.selectionRect.removeButton &&
+            opts.selectedTool.selectionRect.removeButton.bounds.contains(point)))) {
         selected = true;
       }
 
@@ -442,7 +470,8 @@ $(function () {
           opts.selectedTool.scalersSelected = false;
         }
 
-        if (opts.selectedTool.selectionRect.removeButton.bounds.contains(point)) {
+        if (opts.selectedTool.selectionRect.removeButton &&
+          opts.selectedTool.selectionRect.removeButton.bounds.contains(point)) {
           window.room.removeSelected();
         }
       }
@@ -549,12 +578,20 @@ $(function () {
 
     // *** Comments ***
 
-    createComment:function (x, y) {
-      var commentMin = $("<div class='comment-minimized'>&nbsp;</div>");
+    createComment:function (x, y, rect) {
+      var COMMENT_SHIFT_X = 75;
+      var COMMENT_SHIFT_Y = -135;
+
+      if (x < 100) {
+        COMMENT_SHIFT_X = 75;
+        COMMENT_SHIFT_Y = 55;
+      }
+
+      var commentMin = $("<div class='comment-minimized" + (rect ? " hide" : "") + "'>&nbsp;</div>");
       commentMin.css({left:x, top:y});
 
       var commentMax = $("<div class='comment-maximized'></div>");
-      commentMax.css({left:x - 250, top:y - 85});
+      commentMax.css({left:x + COMMENT_SHIFT_X, top:y + COMMENT_SHIFT_Y});
       var commentHeader = $("<div class='comment-header'>" +
         "<div class='fr'><span class='comment-minimize'></span><span class='comment-remove'></span></div>" +
         "</div>");
@@ -581,29 +618,29 @@ $(function () {
       commentHeader.drags({onDrag:function (dx, dy) {
         commentMax.css({left:(commentMax.position().left + dx) + "px", top:(commentMax.position().top + dy) + "px"});
 
-        redrawArrow();
+        commentsHelper.redrawArrow(commentMin);
       }});
 
       commentMin.drags({onDrag:function (dx, dy) {
         commentMin.css({left:(commentMin.position().left + dx) + "px", top:(commentMin.position().top + dy) + "px"});
 
-        redrawArrow();
+        commentsHelper.redrawArrow(commentMin);
       }});
 
 
       $(document).on("click", function (evt) {
-        $(".comment-send:visible").each(function(){
+        $(".comment-send:visible").each(function () {
           $(this).hide();
 
-          redrawArrow();
+          commentsHelper.redrawArrow(commentMin);
         });
 
-        if (evt.target){
+        if (evt.target) {
           $(evt.target).parent(".comment-content").find(".comment-send").show();
         }
       });
 
-      $(commentMax).find(".comment-send").on("click", function(){
+      $(commentMax).find(".comment-send").on("click", function () {
         var commentContent = $(this).parent(".comment-content");
         var commentTextarea = commentContent.find(".comment-reply");
         var commentText = commentTextarea.val();
@@ -613,11 +650,17 @@ $(function () {
       });
 
       commentMin[0].$maximized = commentMax;
+      commentMin[0].rect = rect;
 
       $("#room-content").prepend(commentMin);
       $("#room-content").prepend(commentMax);
 
-      var coords = getArrowCoords("default");
+      var bp = commentsHelper.getArrowBindPoint(commentMin, commentMax.position().left + (commentMax.width() / 2),
+        commentMax.position().top + (commentMax.height() / 2));
+      var zone = commentsHelper.getZone(commentMax.position().left, commentMax.position().top,
+        bp.x, bp.y, commentMax.width(), commentMax.height());
+
+      var coords = commentsHelper.getArrowCoords(commentMin, zone);
       var path = new opts.paper.Path();
       path.strokeColor = '#C2E1F5';
       path.strokeWidth = "2";
@@ -632,57 +675,25 @@ $(function () {
 
       window.room.setTooltype("select");
 
-      function getArrowCoords(zone) {
-        if (!zone || zone == 5) {
-          return null;
-        } else if (zone == "default") {
-          zone = 6;
-        }
-
-        var x0 = commentMin.position().left + (commentMin.width() / 2);
-        var y0 = commentMin.position().top + (commentMin.height() / 2);
-
-        var w = commentMax.width(), h = commentMax.height();
-        var c = commentsHelper.getCommentCoords(commentMax.position().left, commentMax.position().top, w, h);
-
-        var pos = commentsHelper.getArrowPos(zone, c, w, h);
-
-        return {
-          x0:x0, y0:y0, x1:pos.x1, y1:pos.y1, x2:pos.x2, y2:pos.y2
-        };
-      }
-
-      function redrawArrow() {
-        var zone = commentsHelper.getZone(commentMax.position().left, commentMax.position().top,
-          commentMin.position().left + (commentMin.width() / 2), commentMin.position().top + (commentMin.height() / 2),
-          commentMax.width(), commentMax.height());
-
-        var coords = getArrowCoords(zone);
-
-        if (coords == null) {
-          path.opacity = 0;
-        } else {
-          path.opacity = 1;
-        }
-
-        path.segments[0].point.x = coords.x0;
-        path.segments[0].point.y = coords.y0;
-        path.segments[1].point.x = coords.x1;
-        path.segments[1].point.y = coords.y1;
-        path.segments[2].point.x = coords.x2;
-        path.segments[2].point.y = coords.y2;
-      }
+      return commentMin;
     },
 
-    hideComment:function ($comment) {
-      $comment[0].$maximized.hide();
-      $comment[0].arrow.opacity = 0;
+    hideComment:function ($commentmin) {
+      $commentmin[0].$maximized.hide();
+      $commentmin[0].arrow.opacity = 0;
+      $commentmin.show();
+
       window.room.redraw();
     },
 
-    showComment:function ($comment) {
-      $comment[0].$maximized.show();
-      $comment[0].arrow.opacity = 1;
+    showComment:function ($commentmin) {
+      $commentmin[0].$maximized.show();
+      $commentmin[0].arrow.opacity = 1;
+
+      if ($commentmin[0].rect) {
+        $commentmin.hide();
+      }
+
       window.room.redraw();
     },
 
@@ -719,20 +730,29 @@ $(function () {
       var bottomRightRect = new Path.Rectangle(bounds.x + bounds.width + additionalBound - selectRectHalfWidth,
         bounds.y + bounds.height + additionalBound - selectRectHalfWidth, selectRectWidth, selectRectWidth);
 
-      var removeButton = new Raster(removeImg);
-      removeButton.position = new Point(selectionRect.bounds.x + selectionRect.bounds.width, selectionRect.bounds.y);
+      if (!selectedTool.commentMin) {
+        var removeButton = new Raster(removeImg);
+        removeButton.position = new Point(selectionRect.bounds.x + selectionRect.bounds.width, selectionRect.bounds.y);
+      }
 
-      var selectionRectGroup = new Group([selectionRect, topLeftRect, bottomRightRect, removeButton]);
+      var selectionRectGroup = new Group([selectionRect, topLeftRect, bottomRightRect]);
 
       selectionRectGroup.theRect = selectionRect;
       selectionRectGroup.topLeftRect = topLeftRect;
       selectionRectGroup.bottomRightRect = bottomRightRect;
-      selectionRectGroup.removeButton = removeButton;
+
+      if (!selectedTool.commentMin) {
+        selectionRectGroup.removeButton = removeButton;
+        selectionRectGroup.addChild(removeButton);
+      }
 
       window.room.createTool(selectionRect, {color:"skyblue", width:1, opacity:1, dashArray:[3, 3]});
       window.room.createTool(topLeftRect, {color:"blue", width:1, opacity:1});
       window.room.createTool(bottomRightRect, {color:"blue", width:1, opacity:1});
-      window.room.createTool(removeButton);
+
+      if (!selectedTool.commentMin) {
+        window.room.createTool(removeButton);
+      }
 
       return selectionRectGroup;
     },
@@ -786,7 +806,7 @@ $(function () {
   var commentsHelper = {
 
     SIDE_OFFSET:15,
-    CORNER_OFFSET:35,
+    CORNER_OFFSET:18,
 
     getZone:function (left, top, x0, y0, w, h) {
       var c = this.getCommentCoords(left, top, w, h);
@@ -878,6 +898,89 @@ $(function () {
       }
 
       return {x1:x1, y1:y1, x2:x2, y2:y2};
+    },
+
+    getArrowCoords:function ($commentMin, zone) {
+      var commentMax = $commentMin[0].$maximized;
+
+      if (zone == 5) {
+        return null;
+      }
+
+      var w = commentMax.width(), h = commentMax.height();
+      var c = commentsHelper.getCommentCoords(commentMax.position().left, commentMax.position().top, w, h);
+
+      var bp = this.getArrowBindPoint($commentMin, c.xtl + (w / 2), c.ytl + (h / 2));
+
+      var pos = commentsHelper.getArrowPos(zone, c, w, h);
+
+      return {
+        x0:bp.x, y0:bp.y, x1:pos.x1, y1:pos.y1, x2:pos.x2, y2:pos.y2
+      };
+    },
+
+    getArrowBindPoint:function ($commentMin, cmX, cmY) {
+      var rect = $commentMin[0].rect;
+
+      if (!rect) {
+        return {x:$commentMin.position().left + ($commentMin.width() / 2),
+          y:$commentMin.position().top + ($commentMin.height() / 2)}
+      } else {
+        rect.xtl = rect.bounds.x;
+        rect.ytl = rect.bounds.y;
+        rect.xtr = rect.bounds.x + rect.bounds.width;
+        rect.ytr = rect.bounds.y;
+        rect.xbl = rect.bounds.x;
+        rect.ybl = rect.bounds.y + rect.bounds.height;
+        rect.xbr = rect.bounds.x + rect.bounds.width;
+        rect.ybr = rect.bounds.y + rect.bounds.height;
+        rect.center = new Point(rect.bounds.x + (rect.bounds.width / 2), rect.bounds.y + (rect.bounds.height / 2));
+
+        if (cmX <= rect.center.x && cmY <= rect.center.y) {
+          return {x:rect.xtl, y:rect.ytl};
+        } else if (cmX >= rect.center.x && cmY <= rect.center.y) {
+          return {x:rect.xtr, y:rect.ytr};
+        } else if (cmX <= rect.center.x && cmY >= rect.center.y) {
+          return {x:rect.xbl, y:rect.ybr};
+        } else if (cmX >= rect.center.x && cmY >= rect.center.y) {
+          return {x:rect.xbr, y:rect.ybr};
+        }
+
+        return null;
+      }
+    },
+
+    redrawArrow:function ($commentMin) {
+      var commentMax = $commentMin[0].$maximized;
+      var rect = $commentMin[0].rect;
+      var arrow = $commentMin[0].arrow;
+
+      var bp = this.getArrowBindPoint($commentMin, commentMax.position().left + (commentMax.width() / 2),
+        commentMax.position().top + (commentMax.height() / 2));
+
+      var zone = commentsHelper.getZone(commentMax.position().left, commentMax.position().top,
+        bp.x, bp.y, commentMax.width(), commentMax.height());
+
+      if (rect) {
+        // rebind comment-minimized
+        $commentMin.css({left:bp.x - ($commentMin.width() / 2), top:bp.y - ($commentMin.height() / 2)});
+      }
+
+      var coords = this.getArrowCoords($commentMin, zone);
+
+      if (coords == null) {
+        arrow.opacity = 0;
+        return;
+      } else {
+        arrow.opacity = 1;
+      }
+
+      arrow.segments[0].point.x = coords.x0;
+      arrow.segments[0].point.y = coords.y0;
+      arrow.segments[1].point.x = coords.x1;
+      arrow.segments[1].point.y = coords.y1;
+      arrow.segments[2].point.x = coords.x2;
+      arrow.segments[2].point.y = coords.y2;
     }
 
   };
