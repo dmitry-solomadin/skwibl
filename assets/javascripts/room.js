@@ -188,7 +188,10 @@ $(function () {
             // move bounding box controls
             boundingBox.topLeftRect.position = new Point(bx + bw, by + bh);
             boundingBox.bottomRightRect.position = new Point(bx, by);
-            boundingBox.removeButton.position = new Point(bx + bw, by);
+
+            if (boundingBox.removeButton) {
+              boundingBox.removeButton.position = new Point(bx + bw, by);
+            }
           } else {
             opts.selectedTool.translate(event.delta);
 
