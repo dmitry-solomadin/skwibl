@@ -146,8 +146,7 @@ body.room {
 
 .comment-maximized {
     position: absolute;
-    width: 150px;
-    height: 200px;
+    width: 190px;
     box-shadow: #e3e3e3 0 0 3px;
 }
 
@@ -188,7 +187,21 @@ body.room {
 }
 
 .comment-content {
-    height: 100px;
+    padding: 10px;
 }
+
+.comment-content .comment-text:last-child {
+    margin-bottom: 5px;
+}
+
+.comment-reply {
+    width: 160px;
+    height: 40px;
+}
+
+.comment-send {
+    margin-bottom: 10px;
+}
+
 
 /* ROOM STYLES END */
