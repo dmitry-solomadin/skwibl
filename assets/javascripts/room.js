@@ -143,17 +143,31 @@ $(function () {
         var arrow = opts.tool.arrow;
         arrow.lastSegment.point = event.point;
 
-        var vector = event.point - arrow.lineStart;
-        vector = vector.normalize(10);
-        var triangle = new opts.paper.Path([
-          event.point + vector.rotate(135),
-          event.point,
-          event.point + vector.rotate(-135)
-        ]);
+        var arrowGroup = new Group([arrow]);
+        arrowGroup.arrow = arrow;
+        arrowGroup.drawTriangle = function(){
+          var vector = this.arrow.lastSegment.point - this.arrow.segments[0].point;
+          vector = vector.normalize(10);
+          if (this.triangle){
+            this.triangle.segments[0].point = this.arrow.lastSegment.point + vector.rotate(135);
+            this.triangle.segments[1].point = this.arrow.lastSegment.point;
+            this.triangle.segments[2].point = this.arrow.lastSegment.point + vector.rotate(-135);
+          } else {
+            var triangle = new opts.paper.Path([
+              this.arrow.lastSegment.point + vector.rotate(135),
+              this.arrow.lastSegment.point,
+              this.arrow.lastSegment.point + vector.rotate(-135)
+            ]);
+            this.triangle = triangle;
+            this.addChild(triangle);
+          }
+
+          return this.triangle;
+        };
+
+        var triangle = arrowGroup.drawTriangle();
         this.createTool(triangle);
 
-        var arrowGroup = new Group([triangle, arrow]);
-        arrowGroup.arrow = arrow;
         opts.tool = arrowGroup;
 
         triangle.removeOnDrag();
@@ -190,7 +204,12 @@ $(function () {
             var sy = (h + 2 * event.delta.y) / h;
 
             // scale tool & bounding box
-            tool.scale(sx, sy);
+            if (tool.arrow) { // scale arrow
+              tool.arrow.scale(sx, sy);
+              tool.drawTriangle();
+            } else {
+              tool.scale(sx, sy);
+            }
             boundingBox.theRect.scale(sx, sy);
 
             var bx = boundingBox.theRect.bounds.x;
@@ -427,7 +446,10 @@ $(function () {
         settings = {};
       }
 
-      opts.tool = tool;
+      if (!settings.justCreate){
+        opts.tool = tool;
+      }
+
       opts.tool.strokeColor = settings.color ? settings.color : opts.color;
       opts.tool.strokeWidth = settings.width ? settings.width : opts.defaultWidth;
       opts.tool.opacity = settings.opacity ? settings.opacity : opts.opacity;
