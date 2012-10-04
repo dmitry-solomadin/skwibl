@@ -229,8 +229,14 @@ $(function () {
         this.addHistoryTool();
       }
 
-      if (opts.tooltype == 'select' && opts.commentRect) {
-        this.addHistoryTool();
+      if (opts.tooltype == 'comment') {
+        if (opts.commentRect) {
+          this.addHistoryTool();
+        } else {
+          this.addHistoryTool({type:"comment", commentMin:commentMin});
+        }
+
+        window.room.setTooltype("select");
       }
 
       opts.dragPerformed = false;
@@ -304,8 +310,11 @@ $(function () {
     },
 
     clearCanvas:function () {
+      window.room.addHistoryTool({
+        type:"clear", tools:this.getHistoryTools()
+      });
       window.room.helper.setOpacityElems(opts.historytools, 0);
-      window.room.addHistoryTool(null, "clear");
+
       this.unselect();
 
       this.redraw();
@@ -404,7 +413,7 @@ $(function () {
     removeSelected:function () {
       if (opts.selectedTool) {
         // add new 'remove' item into history and link it to removed item.
-        window.room.addHistoryTool(opts.selectedTool, "remove");
+        window.room.addHistoryTool({type:"remove", tool:opts.selectedTool});
         opts.selectedTool.opacity = 0;
 
         this.unselect();
@@ -414,7 +423,7 @@ $(function () {
     },
 
     unselect:function () {
-      if (opts.selectedTool.selectionRect) {
+      if (opts.selectedTool && opts.selectedTool.selectionRect) {
         opts.selectedTool.selectionRect.remove();
       }
       opts.selectedTool = null;
@@ -506,7 +515,18 @@ $(function () {
         if (item.type == "remove") {
           window.room.helper.reverseOpacity(item.tool);
         } else if (item.type == "clear") {
-          window.room.helper.setOpacityElems(opts.historytools, 1);
+          window.room.helper.setOpacityElems(item.tools, 1);
+        } else if (item.commentMin) {
+          var commentRect = item.type != "comment";
+
+          if (!commentRect) {
+            item.commentMin.hide()
+          }
+          item.commentMin[0].$maximized.hide();
+          item.commentMin[0].arrow.opacity = 0;
+          if (commentRect) {
+            item.opacity = 0;
+          }
         } else {
           window.room.helper.reverseOpacity(item);
         }
@@ -536,7 +556,18 @@ $(function () {
         if (item.type == "remove") {
           window.room.helper.reverseOpacity(item.tool);
         } else if (item.type == "clear") {
-          window.room.helper.setOpacityElems(opts.historytools, 0);
+          window.room.helper.setOpacityElems(item.tools, 0);
+        } else if (item.commentMin) {
+          var commentRect = item.type != "comment";
+
+          if (!commentRect) {
+            item.commentMin.show()
+          }
+          item.commentMin[0].$maximized.show();
+          item.commentMin[0].arrow.opacity = 1;
+          if (commentRect) {
+            item.opacity = 1;
+          }
         } else {
           window.room.helper.reverseOpacity(item);
         }
@@ -561,19 +592,13 @@ $(function () {
       return visibleHistoryTools;
     },
 
-    addHistoryTool:function (tool, type) {
+    addHistoryTool:function (tool) {
       var tool = tool ? tool : opts.tool;
       if (opts.historyCounter != opts.historytools.length) { // rewrite history
         opts.historytools = opts.historytools.slice(0, opts.historyCounter)
       }
 
-      if (type == "remove") {
-        opts.historytools.push({tool:tool, type:type});
-      } else if (type == "clear") {
-        opts.historytools.push({type:type});
-      } else {
-        opts.historytools.push(tool);
-      }
+      opts.historytools.push(tool);
 
       opts.historyCounter = opts.historytools.length;
 
@@ -677,8 +702,6 @@ $(function () {
       opts.paper.project.activeLayer.addChild(path);
 
       commentMin[0].arrow = path;
-
-      window.room.setTooltype("select");
 
       return commentMin;
     },
