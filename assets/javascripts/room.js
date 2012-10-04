@@ -158,8 +158,19 @@ $(function () {
 
         triangle.removeOnDrag();
       } else if (opts.tooltype == 'pan') {
-        $(opts.paper.project.activeLayer.children).each(function () {
-          if (this.translate) {
+        $(this.getAllHistoryTools()).each(function () {
+          if (this.commentMin) {
+            var commentRect = this.type != "comment";
+
+            this.commentMin.css({top:this.commentMin.position().top + event.delta.y,
+              left:this.commentMin.position().left + event.delta.x});
+            this.commentMin[0].arrow.translate(event.delta);
+            this.commentMin[0].$maximized.css({top:this.commentMin[0].$maximized.position().top + event.delta.y,
+              left:this.commentMin[0].$maximized.position().left + event.delta.x});
+            if (commentRect) {
+              this.translate(event.delta);
+            }
+          } else if (!this.type && this.translate) {
             this.translate(event.delta);
           }
         })
@@ -590,6 +601,10 @@ $(function () {
         }
       });
       return visibleHistoryTools;
+    },
+
+    getAllHistoryTools:function () {
+      return opts.historytools;
     },
 
     addHistoryTool:function (tool) {
