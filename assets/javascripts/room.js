@@ -162,11 +162,14 @@ $(function () {
           if (this.commentMin) {
             var commentRect = this.type != "comment";
 
-            this.commentMin.css({top:this.commentMin.position().top + event.delta.y,
-              left:this.commentMin.position().left + event.delta.x});
+            var dx = opts.currentScale * event.delta.x;
+            var dy = opts.currentScale * event.delta.y;
+
+            this.commentMin.css({top:this.commentMin.position().top + dy,
+              left:this.commentMin.position().left + dx});
             this.commentMin[0].arrow.translate(event.delta);
-            this.commentMin[0].$maximized.css({top:this.commentMin[0].$maximized.position().top + event.delta.y,
-              left:this.commentMin[0].$maximized.position().left + event.delta.x});
+            this.commentMin[0].$maximized.css({top:this.commentMin[0].$maximized.position().top + dy,
+              left:this.commentMin[0].$maximized.position().left + dx});
             if (commentRect) {
               this.translate(event.delta);
             }
@@ -342,7 +345,21 @@ $(function () {
       opts.currentScale = scale;
 
       var transformMatrix = new Matrix(finalScale, 0, 0, finalScale, 0, 0);
+
+
       opts.paper.project.activeLayer.transform(transformMatrix);
+
+      $(this.getAllHistoryTools()).each(function () {
+        if (this.commentMin) {
+          this.commentMin.css({top:this.commentMin.position().top * finalScale,
+            left:this.commentMin.position().left * finalScale});
+
+          var commentMax = this.commentMin[0].$maximized;
+          commentMax.css({top:commentMax.position().top * finalScale, left:commentMax.position().left * finalScale});
+
+          commentsHelper.redrawArrow(this.commentMin);
+        }
+      });
 
       this.redraw();
     },
@@ -854,6 +871,15 @@ $(function () {
     getZone:function (left, top, x0, y0, w, h) {
       var c = this.getCommentCoords(left, top, w, h);
 
+      c.xtl = c.xtl / opts.currentScale;
+      c.ytl = c.ytl / opts.currentScale;
+      c.xtr = c.xtr / opts.currentScale;
+      c.ytr = c.ytr / opts.currentScale;
+      c.xbl = c.xbl / opts.currentScale;
+      c.ybl = c.ybl / opts.currentScale;
+      c.xbr = c.xbr / opts.currentScale;
+      c.ybr = c.ybr / opts.currentScale;
+
       var zone = null;
 
       if (x0 <= c.xtl && y0 <= c.ytl) {
@@ -977,7 +1003,8 @@ $(function () {
         rect.ybl = rect.bounds.y + rect.bounds.height;
         rect.xbr = rect.bounds.x + rect.bounds.width;
         rect.ybr = rect.bounds.y + rect.bounds.height;
-        rect.center = new Point(rect.bounds.x + (rect.bounds.width / 2), rect.bounds.y + (rect.bounds.height / 2));
+        rect.center = new Point((rect.bounds.x + (rect.bounds.width / 2)) * opts.currentScale,
+          (rect.bounds.y + (rect.bounds.height / 2)) * opts.currentScale);
 
         if (cmX <= rect.center.x && cmY <= rect.center.y) {
           return {x:rect.xtl, y:rect.ytl};
@@ -998,15 +1025,17 @@ $(function () {
       var rect = $commentMin[0].rect;
       var arrow = $commentMin[0].arrow;
 
-      var bp = this.getArrowBindPoint($commentMin, commentMax.position().left + (commentMax.width() / 2),
-        commentMax.position().top + (commentMax.height() / 2));
+      var cmx = commentMax.position().left + (commentMax.width() / 2);
+      var cmy = commentMax.position().top + (commentMax.height() / 2);
+      var bp = this.getArrowBindPoint($commentMin, cmx, cmy);
 
       var zone = commentsHelper.getZone(commentMax.position().left, commentMax.position().top,
-        bp.x, bp.y, commentMax.width(), commentMax.height());
+        rect ? bp.x : (bp.x / opts.currentScale), rect ? bp.y : (bp.y / opts.currentScale), commentMax.width(), commentMax.height());
 
       if (rect) {
         // rebind comment-minimized
-        $commentMin.css({left:bp.x - ($commentMin.width() / 2), top:bp.y - ($commentMin.height() / 2)});
+        $commentMin.css({left:(bp.x * opts.currentScale) - ($commentMin.width() / 2),
+          top:(bp.y * opts.currentScale) - ($commentMin.height() / 2)});
       }
 
       var coords = this.getArrowCoords($commentMin, zone);
@@ -1018,12 +1047,12 @@ $(function () {
         arrow.opacity = 1;
       }
 
-      arrow.segments[0].point.x = coords.x0;
-      arrow.segments[0].point.y = coords.y0;
-      arrow.segments[1].point.x = coords.x1;
-      arrow.segments[1].point.y = coords.y1;
-      arrow.segments[2].point.x = coords.x2;
-      arrow.segments[2].point.y = coords.y2;
+      arrow.segments[0].point.x = rect ? coords.x0 : coords.x0 / opts.currentScale;
+      arrow.segments[0].point.y = rect ? coords.y0 : coords.y0 / opts.currentScale;
+      arrow.segments[1].point.x = coords.x1 / opts.currentScale;
+      arrow.segments[1].point.y = coords.y1 / opts.currentScale;
+      arrow.segments[2].point.x = coords.x2 / opts.currentScale;
+      arrow.segments[2].point.y = coords.y2 / opts.currentScale;
     }
 
   };
