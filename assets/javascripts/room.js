@@ -137,8 +137,7 @@ $(function () {
 
         this.createTool(rectangle, {width:"2", color:"#C2E1F5"});
         opts.tool.removeOnDrag();
-      }
-      if (opts.tooltype == 'straightline') {
+      } else if (opts.tooltype == 'straightline') {
         opts.tool.lastSegment.point = event.point;
       } else if (opts.tooltype == 'arrow') {
         var arrow = opts.tool.arrow;
@@ -218,17 +217,20 @@ $(function () {
         opts.tool.add(event.point);
         opts.tool.simplify(10);
       } else if (opts.tooltype == "comment") {
-        opts.commentRect.commentMin = window.room.createComment(event.point.x, event.point.y, opts.commentRect);
+        var commentMin = window.room.createComment(event.point.x, event.point.y, opts.commentRect);
+
+        if (opts.commentRect) {
+          opts.commentRect.commentMin = commentMin;
+        }
       }
 
       if (opts.tooltype == 'straightline' || opts.tooltype == 'arrow' ||
-        opts.tooltype == 'circle' || opts.tooltype == 'rectangle' || opts.tooltype == 'select') {
+        opts.tooltype == 'circle' || opts.tooltype == 'rectangle') {
+        this.addHistoryTool();
+      }
 
-        if (opts.tooltype == 'select' && opts.commentRect) {
-          this.addHistoryTool();
-        } else {
-          this.addHistoryTool();
-        }
+      if (opts.tooltype == 'select' && opts.commentRect) {
+        this.addHistoryTool();
       }
 
       opts.dragPerformed = false;
@@ -585,7 +587,7 @@ $(function () {
       var COMMENT_SHIFT_X = 75;
       var COMMENT_SHIFT_Y = -135;
 
-      if (x < 100) {
+      if (y < 100) {
         COMMENT_SHIFT_X = 75;
         COMMENT_SHIFT_Y = 55;
       }
