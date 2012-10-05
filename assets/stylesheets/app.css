@@ -101,8 +101,8 @@ body {
 }
 
 .canvasSelectDiv a {
-    width: 45px;
-    height: 45px;
+    width: 80px;
+    height: 60px;
     display: inline-block;
     border: 1px solid gray;
 }
@@ -139,7 +139,7 @@ body {
 
 .canvasFooterBottom {
     padding: 5px 10px;
-    height: 50px;
+    height: 63px;
 }
 
 body.room {

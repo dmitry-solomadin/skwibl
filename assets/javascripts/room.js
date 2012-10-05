@@ -10,18 +10,16 @@ $(function () {
     historytools:[],
     tooltype:'line',
     historyCounter:undefined,
-    color:'#000',
-    defaultWidth:3,
+    color:'#404040',
+    defaultWidth:2,
     currentScale:1,
     opacity:1
   };
 
   var room = {
-    init:function (canvas, opt) {
+    init:function (opt) {
       $.extend(opts, opt);
       $.extend(opts, defaultOpts);
-
-      opts.canvas = canvas;
 
       savedOpts.push(opts);
 
@@ -145,10 +143,10 @@ $(function () {
 
         var arrowGroup = new Group([arrow]);
         arrowGroup.arrow = arrow;
-        arrowGroup.drawTriangle = function(){
+        arrowGroup.drawTriangle = function () {
           var vector = this.arrow.lastSegment.point - this.arrow.segments[0].point;
           vector = vector.normalize(10);
-          if (this.triangle){
+          if (this.triangle) {
             this.triangle.segments[0].point = this.arrow.lastSegment.point + vector.rotate(135);
             this.triangle.segments[1].point = this.arrow.lastSegment.point;
             this.triangle.segments[2].point = this.arrow.lastSegment.point + vector.rotate(-135);
@@ -203,13 +201,16 @@ $(function () {
             var sx = (w + 2 * event.delta.x) / w;
             var sy = (h + 2 * event.delta.y) / h;
 
-            // scale tool & bounding box
-            if (tool.arrow) { // scale arrow
+            // scale tool
+            if (tool.arrow) {
+              // scale arrow
               tool.arrow.scale(sx, sy);
               tool.drawTriangle();
             } else {
               tool.scale(sx, sy);
             }
+
+            // scale bounding box
             boundingBox.theRect.scale(sx, sy);
 
             var bx = boundingBox.theRect.bounds.x;
@@ -273,6 +274,8 @@ $(function () {
       }
 
       opts.dragPerformed = false;
+
+      this.updateSelectedCanvasThumb();
     },
 
     // *** Image upload & canvas manipulation ***
@@ -283,10 +286,13 @@ $(function () {
       }
 
       this.addImage(image);
+
+      this.updateSelectedCanvasThumb();
     },
 
     addImage:function (image) {
       var img = new opts.paper.Raster(image);
+      img.isImage = true;
       opts.paper.project.activeLayer.insertChild(0, img);
 
       img.size.width = image.width;
@@ -294,52 +300,8 @@ $(function () {
       img.position = opts.paper.view.center;
 
       opts.image = image;
-    },
 
-    addNewCanvas:function () {
-      this.eraseCanvas();
-
-      var oldOpts = opts;
-      opts = {};
-      $.extend(opts, defaultOpts);
-
-      opts.paper = oldOpts.paper;
-      savedOpts.push(opts);
-
-      $("#canvasSelectDiv a").removeClass("canvasSelected");
-      $("#canvasSelectDiv").append("<a href='#' class='canvasSelected'></a>")
-    },
-
-    selectCanvas:function (anchor) {
-      if ($(anchor).hasClass("canvasSelected")) {
-        return;
-      }
-
-      $("#canvasSelectDiv a").removeClass("canvasSelected");
-
-      var index = $(anchor).index();
-      var canvasOpts = this.findCanvasOptsByIndex(index);
-      if (!canvasOpts) {
-        alert("No canvas opts by given index=" + index);
-      }
-
-      this.eraseCanvas();
-      opts = canvasOpts;
-
-      window.room.addImage(opts.image);
-      this.restoreFromHistory(opts.historytools);
-
-      $(anchor).addClass("canvasSelected");
-    },
-
-    findCanvasOptsByIndex:function (index) {
-      var canvasOpts;
-      $(savedOpts).each(function (indexInternal) {
-        if (indexInternal == index) {
-          canvasOpts = this;
-        }
-      });
-      return canvasOpts;
+      this.addHistoryTool(img);
     },
 
     clearCanvas:function () {
@@ -364,7 +326,6 @@ $(function () {
       opts.currentScale = scale;
 
       var transformMatrix = new Matrix(finalScale, 0, 0, finalScale, 0, 0);
-
 
       opts.paper.project.activeLayer.transform(transformMatrix);
 
@@ -391,6 +352,77 @@ $(function () {
     subtractCanvasScale:function () {
       var scale = opts.currentScale - 0.1;
       this.setCanvasScale(scale);
+    },
+
+    // *** Canvas thumbnails ***
+
+    addNewCanvas:function () {
+      this.eraseCanvas();
+
+      var oldOpts = opts;
+      opts = {};
+      $.extend(opts, defaultOpts);
+
+      opts.paper = oldOpts.paper;
+      savedOpts.push(opts);
+
+      $("#canvasSelectDiv a").removeClass("canvasSelected");
+      $("#canvasSelectDiv").append("<a href='#' class='canvasSelected'><canvas width='80' height='60'></canvas></a>")
+    },
+
+    updateSelectedCanvasThumb:function () {
+      var selectedCanvas = $(".canvasSelected canvas");
+      var selectedContext = selectedCanvas[0].getContext('2d');
+      var canvas = opts.paper.project.view.element;
+      var cvw = $(canvas).width(), cvh = $(canvas).height();
+      var scw = $(selectedCanvas).width(), sch = $(selectedCanvas).height();
+      var sy = sch / cvh;
+
+      var transformMatrix = new Matrix(sy, 0, 0, sy, 0, 0);
+      opts.paper.project.activeLayer.transform(transformMatrix);
+      this.redraw();
+
+      var shift = -((sy * cvw) - scw) / 2;
+
+      selectedContext.clearRect(0, 0, scw, sch);
+      for (var i = 0; i < 5; i++) {
+        selectedContext.drawImage(canvas, shift, 0);
+      }
+
+      transformMatrix = new Matrix(opts.currentScale / sy, 0, 0, opts.currentScale / sy, 0, 0);
+      opts.paper.project.activeLayer.transform(transformMatrix);
+      this.redraw();
+    },
+
+    selectCanvas:function (anchor) {
+      if ($(anchor).hasClass("canvasSelected")) {
+        return;
+      }
+
+      $("#canvasSelectDiv a").removeClass("canvasSelected");
+
+      var index = $(anchor).index();
+      var canvasOpts = this.findCanvasOptsByIndex(index);
+      if (!canvasOpts) {
+        alert("No canvas opts by given index=" + index);
+      }
+
+      this.eraseCanvas();
+      opts = canvasOpts;
+
+      this.restoreFromHistory(opts.historytools);
+
+      $(anchor).addClass("canvasSelected");
+    },
+
+    findCanvasOptsByIndex:function (index) {
+      var canvasOpts;
+      $(savedOpts).each(function (indexInternal) {
+        if (indexInternal == index) {
+          canvasOpts = this;
+        }
+      });
+      return canvasOpts;
     },
 
     // *** Save & restore state ***
@@ -446,12 +478,15 @@ $(function () {
         settings = {};
       }
 
-      if (!settings.justCreate){
+      if (!settings.justCreate) {
         opts.tool = tool;
       }
 
       opts.tool.strokeColor = settings.color ? settings.color : opts.color;
       opts.tool.strokeWidth = settings.width ? settings.width : opts.defaultWidth;
+      if (settings.fillColor) {
+        opts.tool.fillColor = settings.fillColor;
+      }
       opts.tool.opacity = settings.opacity ? settings.opacity : opts.opacity;
       opts.tool.dashArray = settings.dashArray ? settings.dashArray : undefined;
     },
@@ -503,6 +538,10 @@ $(function () {
       if (!selected) {
         var previousSelectedTool = opts.selectedTool;
         $(window.room.getHistoryTools()).each(function () {
+          if (this.isImage) {
+            return true; // uploaded image is not selectable.
+          }
+
           if (this.bounds.contains(point)) {
             opts.selectedTool = this;
             selected = true;
@@ -809,8 +848,17 @@ $(function () {
       var selectRectHalfWidth = selectRectWidth / 2;
       var topLeftRect = new Path.Rectangle(bounds.x - additionalBound - selectRectHalfWidth,
         bounds.y - additionalBound - selectRectHalfWidth, selectRectWidth, selectRectWidth);
+      // segemnts swap for fillColor to work.
+      var s = topLeftRect.segments[2];
+      topLeftRect.segments[2] = topLeftRect.segments[0];
+      topLeftRect.segments[0] = s;
+
       var bottomRightRect = new Path.Rectangle(bounds.x + bounds.width + additionalBound - selectRectHalfWidth,
         bounds.y + bounds.height + additionalBound - selectRectHalfWidth, selectRectWidth, selectRectWidth);
+      // segemnts swap for fillColor to work.
+      var s = bottomRightRect.segments[2];
+      bottomRightRect.segments[2] = bottomRightRect.segments[0];
+      bottomRightRect.segments[0] = s;
 
       if (!selectedTool.commentMin) {
         var removeButton = new Raster(removeImg);
@@ -828,9 +876,9 @@ $(function () {
         selectionRectGroup.addChild(removeButton);
       }
 
-      window.room.createTool(selectionRect, {color:"skyblue", width:1, opacity:1, dashArray:[3, 3]});
-      window.room.createTool(topLeftRect, {color:"blue", width:1, opacity:1});
-      window.room.createTool(bottomRightRect, {color:"blue", width:1, opacity:1});
+      window.room.createTool(selectionRect, {color:"#a0a0aa", width:.5, opacity:1, dashArray:[3, 3]});
+      window.room.createTool(topLeftRect, {color:"#202020", width:1, opacity:1, fillColor:"white"});
+      window.room.createTool(bottomRightRect, {color:"#202020", width:1, opacity:1, fillColor:"white"});
 
       if (!selectedTool.commentMin) {
         window.room.createTool(removeButton);
@@ -1087,7 +1135,7 @@ $(function () {
 });
 
 $(document).ready(function () {
-  window.room.init($("#myCanvas"), {paper:paper});
+  window.room.init({paper:paper});
 
   // disable canvas text selection for cursor change
   var canvas = $("#myCanvas")[0];
