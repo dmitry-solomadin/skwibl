@@ -742,14 +742,12 @@ $(function () {
         commentMax.css({left:(commentMax.position().left + dx) + "px", top:(commentMax.position().top + dy) + "px"});
 
         commentsHelper.redrawArrow(commentMin);
-        window.room.redraw();
       }});
 
       commentMin.drags({onDrag:function (dx, dy) {
         commentMin.css({left:(commentMin.position().left + dx) + "px", top:(commentMin.position().top + dy) + "px"});
 
         commentsHelper.redrawArrow(commentMin);
-        window.room.redraw();
       }});
 
       $(document).on("click", function (evt) {
@@ -803,6 +801,7 @@ $(function () {
     hideComment:function ($commentmin) {
       $commentmin[0].$maximized.hide();
       $commentmin[0].arrow.opacity = 0;
+      $commentmin[0].arrow.isHidden = true;
       $commentmin.show();
 
       window.room.redraw();
@@ -811,6 +810,9 @@ $(function () {
     showComment:function ($commentmin) {
       $commentmin[0].$maximized.show();
       $commentmin[0].arrow.opacity = 1;
+      $commentmin[0].arrow.isHidden = false;
+
+      commentsHelper.redrawArrow($commentmin); // the comment position might have been changed.
 
       if ($commentmin[0].rect) {
         $commentmin.hide();
@@ -1100,14 +1102,18 @@ $(function () {
       var cmy = commentMax.position().top + (commentMax.height() / 2);
       var bp = this.getArrowBindPoint($commentMin, cmx, cmy);
 
-      var zone = commentsHelper.getZone(commentMax.position().left, commentMax.position().top,
-        rect ? bp.x : (bp.x / opts.currentScale), rect ? bp.y : (bp.y / opts.currentScale), commentMax.width(), commentMax.height());
-
       if (rect) {
         // rebind comment-minimized
         $commentMin.css({left:(bp.x * opts.currentScale) - ($commentMin.width() / 2),
           top:(bp.y * opts.currentScale) - ($commentMin.height() / 2)});
       }
+
+      if (arrow.isHidden) {
+        return;
+      }
+
+      var zone = commentsHelper.getZone(commentMax.position().left, commentMax.position().top,
+        rect ? bp.x : (bp.x / opts.currentScale), rect ? bp.y : (bp.y / opts.currentScale), commentMax.width(), commentMax.height());
 
       var coords = this.getArrowCoords($commentMin, zone);
 
@@ -1124,6 +1130,8 @@ $(function () {
       arrow.segments[1].point.y = coords.y1 / opts.currentScale;
       arrow.segments[2].point.x = coords.x2 / opts.currentScale;
       arrow.segments[2].point.y = coords.y2 / opts.currentScale;
+
+      window.room.redraw();
     }
 
   };
