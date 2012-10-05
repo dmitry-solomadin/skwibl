@@ -742,14 +742,15 @@ $(function () {
         commentMax.css({left:(commentMax.position().left + dx) + "px", top:(commentMax.position().top + dy) + "px"});
 
         commentsHelper.redrawArrow(commentMin);
+        window.room.redraw();
       }});
 
       commentMin.drags({onDrag:function (dx, dy) {
         commentMin.css({left:(commentMin.position().left + dx) + "px", top:(commentMin.position().top + dy) + "px"});
 
         commentsHelper.redrawArrow(commentMin);
+        window.room.redraw();
       }});
-
 
       $(document).on("click", function (evt) {
         $(".comment-send:visible").each(function () {

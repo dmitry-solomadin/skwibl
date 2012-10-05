@@ -57,27 +57,30 @@
       $('.draggable').removeClass('draggable');
     });
 
-    return $el.css('cursor', opt.cursor).on("mousedown", function (e) {
-      var $drag = $(this).addClass('draggable');
+    $(document).on("mousemove", function (e) {
+      if (!$el.hasClass("draggable")) {
+        return;
+      }
 
-      $drag.css('z-index', 1000).parents().on("mousemove", function (e) {
-        if (!$drag.data("pdx")) {
-          $drag.data("pdx", e.clientX);
-          $drag.data("pdy", e.clientY);
-        } else {
-          var dx = e.clientX - parseInt($drag.data("pdx")),
-            dy = e.clientY - parseInt($drag.data("pdy"));
+      if (!$el.data("pdx")) {
+        $el.data("pdx", e.clientX);
+        $el.data("pdy", e.clientY);
+      } else {
+        var dx = e.clientX - parseInt($el.data("pdx")),
+          dy = e.clientY - parseInt($el.data("pdy"));
 
-          $drag.data("pdx", e.clientX);
-          $drag.data("pdy", e.clientY);
+        $el.data("pdx", e.clientX);
+        $el.data("pdy", e.clientY);
 
-          if ($drag.hasClass("draggable")) {
-            opt.onDrag(dx, dy);
-          }
-        }
-      });
+        opt.onDrag(dx, dy);
+      }
+    });
 
+    $el.css('cursor', opt.cursor).on("mousedown", function (e) {
+      $el.addClass('draggable');
       e.preventDefault(); // disable selection
     });
+
+    return $el;
   }
 })(jQuery);
