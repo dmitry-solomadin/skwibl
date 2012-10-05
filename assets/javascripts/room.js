@@ -377,7 +377,7 @@ $(function () {
       var scw = $(selectedCanvas).width(), sch = $(selectedCanvas).height();
       var sy = sch / cvh;
 
-      var transformMatrix = new Matrix(sy, 0, 0, sy, 0, 0);
+      var transformMatrix = new Matrix(sy / opts.currentScale, 0, 0, sy /opts.currentScale, 0, 0);
       opts.paper.project.activeLayer.transform(transformMatrix);
       this.redraw();
 
