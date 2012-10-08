@@ -104,9 +104,11 @@ decline = function() {
 
 $(function() {
 
-  if($("#id")[0]) {
-    id = $("#id")[0].value;
+  if (!$("#id")[0]){
+    return;
   }
+
+  id = $("#id")[0].value;
 
   // when the client click add button
   $('#add').click(function() {

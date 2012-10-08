@@ -1,3 +1,8 @@
+body {
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
 /* MISC START */
 
 .fr {
@@ -96,8 +101,8 @@
 }
 
 .canvasSelectDiv a {
-    width: 45px;
-    height: 45px;
+    width: 80px;
+    height: 60px;
     display: inline-block;
     border: 1px solid gray;
 }
@@ -123,6 +128,7 @@
     width: 100%;
     border-top: 1px solid #a1a1a1;
     background: white;
+    z-index: 10;
 }
 
 .canvasFooterTop {
@@ -133,7 +139,7 @@
 
 .canvasFooterBottom {
     padding: 5px 10px;
-    height: 50px;
+    height: 63px;
 }
 
 body.room {
@@ -148,12 +154,18 @@ body.room {
     position: absolute;
     width: 190px;
     box-shadow: #e3e3e3 0 0 3px;
-}
-
-.comment-maximized {
     background: #fcfcfc;
     border: 1px solid #c2e1f5;
     border-radius: 3px;
+    z-index: 2;
+}
+
+.comment-minimized {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    background: url("/images/comment-small.png");
+    z-index: 1;
 }
 
 .comment-remove {
@@ -174,11 +186,9 @@ body.room {
     cursor: pointer !important;
 }
 
-.comment-minimized {
-    position: absolute;
-    width: 25px;
-    height: 25px;
-    background: url("/images/comment-small.png");
+.comment-min-rect {
+    width: 0;
+    height: 0;
 }
 
 .comment-header {
