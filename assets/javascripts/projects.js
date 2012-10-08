@@ -103,7 +103,10 @@ decline = function() {
 };
 
 $(function() {
-  id = $("#id")[0].value;
+
+  if($("#id")[0]) {
+    id = $("#id")[0].value;
+  }
 
   // when the client click add button
   $('#add').click(function() {
@@ -116,7 +119,7 @@ $(function() {
         name: value
       }, function(data, status, xhr) {
         if(status === 'success' && data) {
-          $('#projects').append('<input type="radio" name="project" value="' + data.id + '" onchange="switchProject()">' + data.name + '<br>');
+          $('#projects').append('<input type="radio" name="project" value="' + data.id + '" onchange="switchProject()"><a href="/dev/projects/' + data.id + '">' + data.name + '</a><br>');
         }
       });
     }

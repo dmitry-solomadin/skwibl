@@ -5,7 +5,7 @@
 <% if (projects.length) { %>
   <form id="projects">
     <% projects.forEach(function(project){ %>
-    <input type="radio" name="project" value="<%= project.id %>" onchange="switchProject()"/><%= project.name %><br>
+    <input type="radio" name="project" value="<%= project.id %>" onchange="switchProject()"/><a href="/dev/projects/<%= project.id %>"><%= project.name %></a><br>
     <% }) %>
   </form>
 <% } %>

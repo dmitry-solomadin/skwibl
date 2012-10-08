@@ -15,11 +15,11 @@ exports.configure = function(app, passport) {
 
   app.get('/dev/room', ctrls.mid.isAuth, ctrls.dev.room);
 
-  app.get('/dev/chat', ctrls.mid.isAuth, ctrls.dev.chat);
-
   app.post('/dev/chat', ctrls.mid.isAuth, ctrls.dev.switchProject);
 
   app.get('/dev/projects', ctrls.mid.isAuth, ctrls.dev.projects);
+
+  app.get('/dev/projects/:pid', ctrls.mid.isAuth, ctrls.dev.showProject);
 
   app.post('/dev/projects/get', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.dev.getProject);
 

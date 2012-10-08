@@ -15,15 +15,14 @@ var cfg = require('../config');
 var numCPUs = os.cpus().length;
 
 exports.getUsers = function(clients) {
-  var hsn = clients[0].manager.handshaken
-    , ids = []
-    , users = [];
-  for(el in hsn) {
-    var id = hsn[el].user.id;
-    if(ids.indexOf(id) === -1) {
-      ids.push(id);
-    }
-  };
+  console.log(clients.length);
+  var ids = [];
+  clients.forEach(function(client) {
+    var ssid = client.id
+      , hsn = client.manager.handshaken
+      , id = hsn[ssid].user.id;
+    ids.push(id);
+  });
   return ids;
 };
 
