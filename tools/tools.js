@@ -15,7 +15,6 @@ var cfg = require('../config');
 var numCPUs = os.cpus().length;
 
 exports.getUsers = function(clients) {
-  console.log(clients.length);
   var ids = [];
   clients.forEach(function(client) {
     var ssid = client.id
@@ -146,12 +145,19 @@ exports.exitNotify = function(worker, code, signal) {
 };
 
 exports.startCluster = function(stop, start) {
+  var t;
   if(cluster.isMaster) {
     for(var i = 0; i < numCPUs; i++) {
       cluster.fork();
     }
-    cluster.on('exit', stop);
+    cluster.on('exit', function(worker, code, signal) {
+      clearInterval(t);
+      stop(worker, code, signal);
+    });
   } else {
+    t = setInterval(function() {
+      gc();
+    }, cfg.GC_INTERVAL);
     start(cluster);
   }
 };
