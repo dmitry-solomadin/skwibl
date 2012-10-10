@@ -195,23 +195,25 @@ $(function () {
             var tool = opts.selectedTool;
             var boundingBox = opts.selectedTool.selectionRect;
 
-            // get scale percentages
-            var h = tool.bounds.height;
-            var w = opts.selectedTool.bounds.width;
-            var sx = (w + 2 * event.delta.x) / w;
-            var sy = (h + 2 * event.delta.y) / h;
-
-            // scale tool
-            if (tool.arrow) {
-              // scale arrow
-              tool.arrow.scale(sx, sy);
-              tool.drawTriangle();
+            var scaleZone = window.room.helper.getReflectZone(tool, event.point.x, event.point.y);
+            if (scaleZone) {
+              tool.scaleZone = scaleZone;
             } else {
-              tool.scale(sx, sy);
+              scaleZone = tool.scaleZone;
             }
 
-            // scale bounding box
-            boundingBox.theRect.scale(sx, sy);
+            var zx = scaleZone.zx, zy = scaleZone.zy;
+            var scalePoint = scaleZone.point;
+
+            var dx = event.delta.x;
+            var dy = event.delta.y;
+
+            var scaleFactors = window.room.helper.getScaleFactors(tool, zx, zy, dx, dy);
+            var sx = scaleFactors.sx, sy = scaleFactors.sy;
+
+            // scale tool
+            this.doScale(tool, sx, sy, scalePoint);
+            boundingBox.theRect.scale(sx, sy, scalePoint);
 
             var bx = boundingBox.theRect.bounds.x;
             var by = boundingBox.theRect.bounds.y;
@@ -219,8 +221,8 @@ $(function () {
             var bh = boundingBox.theRect.bounds.height;
 
             // move bounding box controls
-            boundingBox.topLeftRect.position = new Point(bx + bw, by + bh);
-            boundingBox.bottomRightRect.position = new Point(bx, by);
+            boundingBox.topLeftRect.position = new Point(bx, by);
+            boundingBox.bottomRightRect.position = new Point(bx + bw, by + bh);
 
             if (boundingBox.removeButton) {
               boundingBox.removeButton.position = new Point(bx + bw, by);
@@ -241,6 +243,21 @@ $(function () {
       }
     },
 
+    doScale:function (tool, sx, sy, scalePoint) {
+      if (tool.tooltype == "arrow") {
+        tool.arrow.scale(sx, sy, scalePoint);
+        tool.drawTriangle();
+      } else {
+        var transformMatrix = new Matrix().scale(sx, sy,
+          scalePoint || tool.getPosition(true));
+        if (transformMatrix._d == 0 || transformMatrix._a == 0) {
+          return;
+        }
+
+        tool.transform(transformMatrix);
+      }
+    },
+
     onMouseUp:function (canvas, event) {
       event.point = event.point.transform(new Matrix(1 / opts.currentScale, 0, 0, 1 / opts.currentScale, 0, 0));
 
@@ -256,6 +273,10 @@ $(function () {
         if (opts.commentRect) {
           opts.commentRect.commentMin = commentMin;
         }
+      }
+
+      if (opts.tool) {
+        opts.tool.tooltype = opts.tooltype;
       }
 
       if (opts.tooltype == 'straightline' || opts.tooltype == 'arrow' ||
@@ -377,7 +398,7 @@ $(function () {
       var scw = $(selectedCanvas).width(), sch = $(selectedCanvas).height();
       var sy = sch / cvh;
 
-      var transformMatrix = new Matrix(sy / opts.currentScale, 0, 0, sy /opts.currentScale, 0, 0);
+      var transformMatrix = new Matrix(sy / opts.currentScale, 0, 0, sy / opts.currentScale, 0, 0);
       opts.paper.project.activeLayer.transform(transformMatrix);
       this.redraw();
 
@@ -559,20 +580,28 @@ $(function () {
     },
 
     drawSelectRect:function (point) {
-      if (opts.selectedTool) {
-        opts.selectedTool.selectionRect = window.room.helper.createSelectionRectangle(opts.selectedTool);
+      var tool = opts.selectedTool;
+      if (tool) {
+        tool.selectionRect = window.room.helper.createSelectionRectangle(tool);
         $("#removeSelected").removeClass("disabled");
 
-        if (opts.selectedTool.selectionRect.topLeftRect.bounds.contains(point)) {
-          opts.selectedTool.scalersSelected = "topLeft"
-        } else if (opts.selectedTool.selectionRect.bottomRightRect.bounds.contains(point)) {
-          opts.selectedTool.scalersSelected = "bottomRight"
+        if (tool.selectionRect.topLeftRect.bounds.contains(point)) {
+          tool.scalersSelected = true;
+          tool.scaleZone = {
+            point:new Point(tool.bounds.x + tool.bounds.width, tool.bounds.y + tool.bounds.height),
+            zx:-1, zy:-1
+          };
+        } else if (tool.selectionRect.bottomRightRect.bounds.contains(point)) {
+          tool.scalersSelected = true;
+          tool.scaleZone = {
+            point:new Point(tool.bounds.x, tool.bounds.y),
+            zx:1, zy:1
+          };
         } else {
-          opts.selectedTool.scalersSelected = false;
+          tool.scalersSelected = false;
         }
 
-        if (opts.selectedTool.selectionRect.removeButton &&
-          opts.selectedTool.selectionRect.removeButton.bounds.contains(point)) {
+        if (tool.selectionRect.removeButton && tool.selectionRect.removeButton.bounds.contains(point)) {
           window.room.removeSelected();
         }
       }
@@ -606,9 +635,9 @@ $(function () {
         } else if (item.commentMin) {
           var commentRect = item.type != "comment";
           if (!commentRect) {
-            item.commentMin.css({display: fromRemove ? "block" : "none"});
+            item.commentMin.css({display:fromRemove ? "block" : "none"});
           }
-          item.commentMin[0].$maximized.css({display: fromRemove ? "block" : "none"});
+          item.commentMin[0].$maximized.css({display:fromRemove ? "block" : "none"});
           item.commentMin[0].arrow.opacity = fromRemove ? 1 : 0;
           if (commentRect) {
             item.opacity = fromRemove ? 1 : 0;
@@ -646,9 +675,9 @@ $(function () {
         } else if (item.commentMin) {
           var commentRect = item.type != "comment";
           if (!commentRect) {
-            item.commentMin.css({display: fromRemove ? "none" : "block"});
+            item.commentMin.css({display:fromRemove ? "none" : "block"});
           }
-          item.commentMin[0].$maximized.css({display: fromRemove ? "none" : "block"});
+          item.commentMin[0].$maximized.css({display:fromRemove ? "none" : "block"});
           item.commentMin[0].arrow.opacity = fromRemove ? 0 : 1;
           if (commentRect) {
             item.opacity = fromRemove ? 0 : 1;
@@ -898,6 +927,63 @@ $(function () {
       }
 
       return selectionRectGroup;
+    },
+
+    getScaleFactors:function (item, zx, zy, dx, dy) {
+      item = item.arrow ? item.arrow : item;
+      var w = item.bounds.width, h = item.bounds.height;
+
+      if (zx == -1 && zy == -1) {
+        return {sx:Math.abs((w - dx) / w), sy:Math.abs((h - dy) / h)};
+      } else if (zx == 1 && zy == -1) {
+        return {sx:Math.abs((w + dx) / w), sy:Math.abs((h - dy) / h)};
+      } else if (zx == -1 && zy == 1) {
+        return {sx:Math.abs((w - dx) / w), sy:Math.abs((h + dy) / h)};
+      } else if (zx == 1 && zy == 1) {
+        return {sx:Math.abs((w + dx) / w), sy:Math.abs((h + dy) / h)};
+      }
+    },
+
+    getReflectZone:function (item, x, y) {
+      var itemToScale = item.arrow ? item.arrow : item;
+
+      if (itemToScale.bounds.contains(x, y)) {
+        return null; // preserve zone
+      }
+
+      var w = itemToScale.bounds.width, h = itemToScale.bounds.height;
+      var center = new Point(itemToScale.bounds.topLeft.x + (w / 2), itemToScale.bounds.topLeft.y + (h / 2));
+      var cx = center.x, cy = center.y;
+
+      if (x <= cx && y <= cy) {
+        var zone = {x:-1, y:-1};
+        var point = itemToScale.bounds.bottomRight;
+      } else if (x >= cx && y <= cy) {
+        zone = {x:1, y:-1};
+        point = itemToScale.bounds.bottomLeft;
+      } else if (x <= cx && y >= cy) {
+        zone = {x:-1, y:1};
+        point = itemToScale.bounds.topRight;
+      } else if (x >= cx && y >= cy) {
+        zone = {x:1, y:1};
+        point = itemToScale.bounds.topLeft;
+      }
+
+      var dzx = zone.x + item.scaleZone.zx;
+      var dzy = zone.y + item.scaleZone.zy;
+
+      if (dzx == 0 && dzy == 0 && w < 3 && h < 3) {
+        itemToScale.scale(-1, -1);
+        return {zx:zone.x, zy:zone.y, point:point};
+      } else if (dzx == 0 && dzy != 0 && w < 3) {
+        itemToScale.scale(-1, 1);
+        return {zx:zone.x, zy:zone.y, point:point};
+      } else if (dzy == 0 && dzx != 0 && h < 3) {
+        itemToScale.scale(1, -1);
+        return {zx:zone.x, zy:zone.y, point:point};
+      } else {
+        return null; // do not change the zone
+      }
     },
 
     reverseOpacity:function (elem) {
