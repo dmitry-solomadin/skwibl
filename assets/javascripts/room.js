@@ -213,7 +213,6 @@ $(function () {
 
             // scale tool
             this.doScale(tool, sx, sy, scalePoint);
-            boundingBox.theRect.scale(sx, sy, scalePoint);
 
             var bx = boundingBox.theRect.bounds.x;
             var by = boundingBox.theRect.bounds.y;
@@ -244,18 +243,19 @@ $(function () {
     },
 
     doScale:function (tool, sx, sy, scalePoint) {
+      var transformMatrix = new Matrix().scale(sx, sy, scalePoint);
+      if (transformMatrix._d == 0 || transformMatrix._a == 0) {
+        return;
+      }
+
       if (tool.tooltype == "arrow") {
         tool.arrow.scale(sx, sy, scalePoint);
         tool.drawTriangle();
       } else {
-        var transformMatrix = new Matrix().scale(sx, sy,
-          scalePoint || tool.getPosition(true));
-        if (transformMatrix._d == 0 || transformMatrix._a == 0) {
-          return;
-        }
-
         tool.transform(transformMatrix);
       }
+
+      tool.selectionRect.theRect.transform(transformMatrix);
     },
 
     onMouseUp:function (canvas, event) {
