@@ -1013,6 +1013,10 @@ $(function () {
       });
     },
 
+    notifyComment: function(){
+      window.notificator.notify("Drag to comment an area.");
+    },
+
     initUploader:function () {
       var uploader = new qq.FileUploader({
         element:$('#file-uploader')[0],
