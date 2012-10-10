@@ -4,6 +4,7 @@ exports.DOMAIN = process.env.DOMAIN || 'http://localhost';
 exports.HOST = process.env.HOST || 'localhost';
 exports.PORT = process.env.PORT || 3000;
 exports.SOCKET_PORT = 9000;
+exports.ENVIRONMENT = process.env.NODE_ENV || 'development';
 
 exports.GOOGLE_CLIENT_ID = "435757431999.apps.googleusercontent.com";
 exports.GOOGLE_CLIENT_SECRET = "IoZpFsfeyBuRvs2Djbut1wSZ";
@@ -11,11 +12,9 @@ exports.GOOGLE_CLIENT_SECRET = "IoZpFsfeyBuRvs2Djbut1wSZ";
 exports.FACEBOOK_APP_ID = "152821258188092";
 exports.FACEBOOK_APP_SECRET = "3f7244cfb86f62ed14d90626936cb3f1";
 
-exports.VKONTAKTE_APP_ID = "111";
-exports.VKONTAKTE_APP_SECRET = "111";
 
-exports.TWITTER_CONSUMER_KEY = "111";
-exports.TWITTER_CONSUMER_SECRET = "111";
+exports.LINKEDIN_CONSUMER_KEY = "two4f1vl4319";
+exports.LINKEDIN_CONSUMER_SECRET = "CN5FSKF3HYDw74Do";
 
 exports.SITE_SECRET = 'T&murj1n';
 exports.SESSION_KEY = 'express.sid';

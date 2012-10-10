@@ -16,7 +16,7 @@ exports.setUp = function(client, db) {
 
   var mod = {};
 
-  mod.findOrCreate = function(profile, fn) {
+  mod.findOrCreate = function(profile, token, fn) {
     var emails = profile.emails;
     return db.users.findByEmails(emails, function (err, user) {
       if(!user) {
@@ -31,6 +31,7 @@ exports.setUp = function(client, db) {
         , provider: profile.provider
         }, profile.name, emails, function(err, user){
           if(user) {
+            db.users.connect(user.id, user.provider, token);
             return smtp.sendRegMail(user, fn);
           }
           return tools.asyncOpt(fn, err, user);
@@ -52,6 +53,7 @@ exports.setUp = function(client, db) {
         user.emails.concat(diff);
         db.users.addEmails(user.id, user.emails);
       }
+      db.users.connect(user.id, user.provider, token);
       if(user.status === 'unconfirmed') {
         return db.users.persist(user, fn);
       }

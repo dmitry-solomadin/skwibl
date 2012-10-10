@@ -196,6 +196,18 @@ exports.setUp = function(client, db) {
     return tools.asyncOpt(fn, null, values);
   };
 
+  mod.connections = function(id, fn) {
+    client.hgetall('users:' + id + ':connections', fn);
+  };
+
+  mod.connect = function(id, provider, token, fn) {
+    client.hset('users:' + id + ':connections', provider, token, fn);
+  };
+
+  mod.disconnect = function(id, provider, token, fn) {
+    client.hdel('users:' + id + ':connections', provider, fn);
+  };
+
   return mod;
 
 };

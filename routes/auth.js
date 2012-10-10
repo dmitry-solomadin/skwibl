@@ -57,14 +57,14 @@ exports.configure = function(app, passport) {
   app.get('/auth/facebook/callback', ctrls.auth.facebookCb(passport), ctrls.auth.logIn);
 
   /*
-   * auth or register with twitter
+   * auth or register with linkedin
    */
-  app.get('/auth/twitter', ctrls.auth.twitter(passport));
+  app.get('/auth/linkedin', ctrls.auth.linkedin(passport));
 
   /*
-   * twitter callback
+   * linkedin callback
    */
-  app.get('/auth/twitter/callback', ctrls.auth.twitterCb(passport), ctrls.auth.logIn);
+  app.get('/auth/linkedin/callback', ctrls.auth.linkedinCb(passport), ctrls.auth.logIn);
 
   /*
    * logout

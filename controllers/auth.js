@@ -177,18 +177,23 @@ exports.facebookCb = function(passport) {
 
 /*
  * GET
- * Twitter authenticate
+ * LinkedIn authenticate
  */
-exports.twitter = function(passport) {
-  return passport.authenticate('twitter');
+exports.linkedin = function(passport) {
+  return passport.authenticate('linkedin', {
+    scope: [
+      'r_fullprofile'
+    , 'r_emailaddress'
+    ]
+  });
 };
 
 /*
  * GET
- * Twitter authentication callback
+ * LinkedIn authentication callback
  */
-exports.twitterCb = function(passport) {
-  return passport.authenticate('twitter', {
+exports.linkedinCb = function(passport) {
+  return passport.authenticate('linkedin', {
     failureRedirect: '/'
   });
 };

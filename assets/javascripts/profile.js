@@ -1,0 +1,58 @@
+
+var connections = [];
+
+var profileRe = /\/dev\/users\/[\d]+/
+  , path = window.location.pathname;
+
+getUserById = function(id) {
+  for(var i = 0, len = users.length; i < len; i++) {
+    if(users[i].id === id) {
+      return users[i];
+    }
+  }
+};
+
+updateConnections = function() {
+  $('#users').empty();
+  $.each(users, function(key, val) {
+    if(val.status === 'online') {
+      $('#users').append('<div>' + val.id + ' : ' + val.displayName + ' : online</div>');
+    } else {
+      $('#users').append('<div>' + val.id + ' : ' + val.displayName + ' : offline</div>');
+    }
+  });
+};
+
+if(projectsRe.test(path)) {
+
+  facebookOn = function() {
+
+  };
+
+  facebookOff = function() {
+
+  };
+
+  $(function(){
+    // when the client clicks SEND
+    $('#datasend').click(function() {
+      var message = $('#data').val()
+      , id = $("#id")[0].value;
+      $('#data').val('');
+      $('#data').focus();
+      if(message !== '') {
+        addMessage(id, message);
+        chat.send(message);
+      }
+    });
+
+  // when the client hits ENTER on the keyboard
+  $('#data').keypress(function(e) {
+    if(e.which == 13) {
+      $(this).blur();
+      $('#datasend').focus().click();
+    }
+  });
+  });
+
+}

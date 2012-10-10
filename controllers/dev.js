@@ -15,11 +15,11 @@ exports.room = function(req, res) {
 };
 
 exports.projects = function(req, res, next) {
-  db.projects.get(req.user.id, function(err, projects) {
-    var user = req.user
-      , name = tools.getName(user);
+  var user = req.user
+    , name = tools.getName(user);
+  db.projects.get(user.id, function(err, projects) {
     if(!err) {
-      return db.activities.get(req.user.id, function(err, activities) {
+      return db.activities.get(user.id, function(err, activities) {
         if(!err) {
           return res.render('dev/index', {
             template: 'projects'
@@ -67,3 +67,35 @@ exports.getProject = function(req, res) {
     return res.send(false);
   });
 };
+
+exports.profile = function(req, res, next) {
+  var user = req.user
+    , name = tools.getName(user);
+  db.users.connections(user.id, function(err, obj) {
+    if(!err) {
+      var conns = {
+        facebook: 'disconnected'
+      , google: 'disconnected'
+      , linkedin: 'disconnected'
+      };
+      if(obj) {
+        for(el in conns) {
+          if(obj[el]) {
+            conns[el] = 'connected';
+          }
+        }
+      }
+      return res.render('dev/index', {
+        template: 'profile'
+      , id: user.id
+      , name: name
+      , connections: conns
+      });
+    }
+    return next(err);
+  });
+};
+
+exports.connect = function(req, res) {};
+
+exports.disconnect = function(req, res) {};

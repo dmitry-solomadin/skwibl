@@ -29,7 +29,7 @@
     "passport-hash": "*",
     "passport-google-oauth": "*",
     "passport-facebook": "*",
-    "passport-twitter": "*",
+    "passport-linkedin": "*",
     "emailjs": "*",
     "password-generator": "*",
     "hiredis": "*",

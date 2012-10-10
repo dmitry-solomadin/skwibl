@@ -69,5 +69,5 @@ exports.setUp = function(server) {
 exports.start = function(){
   console.log('socket.io serer is started on ' +
   cfg.HOST + ':' + cfg.SOCKET_PORT + ' in ' +
-  process.env.NODE_ENV + ' mode');
+  cfg.ENVIRONMENT + ' mode');
 };
