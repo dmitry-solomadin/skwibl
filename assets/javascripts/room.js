@@ -40,6 +40,7 @@ $(function () {
       });
 
       window.room.helper.initUploader();
+      window.room.helper.initHotkeys();
 
       return false;
     },
@@ -227,11 +228,7 @@ $(function () {
               boundingBox.removeButton.position = new Point(bx + bw, by);
             }
           } else {
-            opts.selectedTool.translate(event.delta);
-
-            if (opts.selectedTool.selectionRect) {
-              opts.selectedTool.selectionRect.translate(event.delta);
-            }
+            window.room.translateSelected(event.delta);
           }
 
           // redraw comment arrow if there is one.
@@ -523,6 +520,18 @@ $(function () {
 
         this.unselect();
         this.redrawWithThumb();
+      }
+    },
+
+    translateSelected: function(deltaPoint) {
+      if (opts.selectedTool) {
+        opts.selectedTool.translate(deltaPoint);
+
+        if (opts.selectedTool.selectionRect) {
+          opts.selectedTool.selectionRect.translate(deltaPoint)
+        }
+
+        window.room.redrawWithThumb();
       }
     },
 
@@ -1028,8 +1037,67 @@ $(function () {
           }
         }
       });
-    }
+    },
 
+    initHotkeys:function () {
+      if (isMac()) {
+        $(document).bind('keydown.meta_z', function () {
+          window.room.prevhistory();
+        });
+
+        $(document).bind('keydown.meta_shift_z', function () {
+          window.room.nexthistory();
+        });
+      } else {
+        $(document).bind('keydown.ctrl_z', function () {
+          window.room.prevhistory();
+        });
+
+        $(document).bind('keydown.ctrl_shift_z', function () {
+          window.room.nexthistory();
+        });
+      }
+
+      $(document).bind('keydown.del', function () {
+        window.room.removeSelected();
+      });
+
+      $(document).bind('keydown.backspace', function () {
+        window.room.removeSelected();
+      });
+
+      $(document).bind('keydown.left', function(){
+        window.room.translateSelected(new Point(-5, 0));
+      });
+
+      $(document).bind('keydown.up', function(){
+        window.room.translateSelected(new Point(0, -5));
+      });
+
+      $(document).bind('keydown.right', function(){
+        window.room.translateSelected(new Point(5, 0));
+      });
+
+      $(document).bind('keydown.down', function(){
+        window.room.translateSelected(new Point(0, 5));
+      })
+
+      $(document).bind('keydown.shift_left', function(){
+        window.room.translateSelected(new Point(-1, 0));
+      });
+
+      $(document).bind('keydown.shift_up', function(){
+        window.room.translateSelected(new Point(0, -1));
+      });
+
+      $(document).bind('keydown.shift_right', function(){
+        window.room.translateSelected(new Point(1, 0));
+      });
+
+      $(document).bind('keydown.shift_down', function(){
+        window.room.translateSelected(new Point(0, 1));
+      })
+    }
   };
 
   var commentsHelper = {

@@ -84,3 +84,7 @@
     return $el;
   }
 })(jQuery);
+
+function isMac(){
+  return /Mac/.test(navigator.userAgent);
+}
