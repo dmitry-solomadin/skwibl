@@ -13,8 +13,8 @@
     "url": "https://github.com/a-tease/http-server.git"
   },
   "scripts": {
-    "start": "node --nouse-idle-notification app & node --nouse-idle-notification server.js",
-    "start_prod": "NODE_ENV=production node --nouse-idle-notification app.js & node --nouse-idle-notification server.js",
+    "start": "node --nouse-idle-notification --expose-gc app & node --nouse-idle-notification --expose-gc server.js",
+    "start_prod": "NODE_ENV=production node --nouse-idle-notification --expose-gc app.js & node --nouse-idle-notification --expose-gc server.js",
     "debug": "node --debug app.js & node-inspector &"
   },
   "dependencies": {
@@ -23,7 +23,6 @@
     "connect-redis": "1.x.x",
     "cookie": "*",
     "ejs": "*",
-    "ejs-locals": "*",
     "socket.io": "*",
     "passport": "*",
     "passport-local": "*",

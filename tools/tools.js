@@ -15,15 +15,13 @@ var cfg = require('../config');
 var numCPUs = os.cpus().length;
 
 exports.getUsers = function(clients) {
-  var hsn = clients[0].manager.handshaken
-    , ids = []
-    , users = [];
-  for(el in hsn) {
-    var id = hsn[el].user.id;
-    if(ids.indexOf(id) === -1) {
-      ids.push(id);
-    }
-  };
+  var ids = [];
+  clients.forEach(function(client) {
+    var ssid = client.id
+      , hsn = client.manager.handshaken
+      , id = hsn[ssid].user.id;
+    ids.push(id);
+  });
   return ids;
 };
 
@@ -147,12 +145,19 @@ exports.exitNotify = function(worker, code, signal) {
 };
 
 exports.startCluster = function(stop, start) {
+  var t;
   if(cluster.isMaster) {
     for(var i = 0; i < numCPUs; i++) {
       cluster.fork();
     }
-    cluster.on('exit', stop);
+    cluster.on('exit', function(worker, code, signal) {
+      clearInterval(t);
+      stop(worker, code, signal);
+    });
   } else {
+    t = setInterval(function() {
+      gc();
+    }, cfg.GC_INTERVAL);
     start(cluster);
   }
 };

@@ -103,6 +103,7 @@ decline = function() {
 };
 
 $(function() {
+
   if (!$("#id")[0]){
     return;
   }
@@ -120,7 +121,7 @@ $(function() {
         name: value
       }, function(data, status, xhr) {
         if(status === 'success' && data) {
-          $('#projects').append('<input type="radio" name="project" value="' + data.id + '" onchange="switchProject()">' + data.name + '<br>');
+          $('#projects').append('<input type="radio" name="project" value="' + data.id + '" onchange="switchProject()"><a href="/dev/projects/' + data.id + '">' + data.name + '</a><br>');
         }
       });
     }

@@ -1,10 +1,15 @@
 <input type="hidden" id="id" value="<%= id %>"/>
 <input type="hidden" id="name" value="<%= name %>"/>
-<div style="float:left;width:100px;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
-<form name="projects" method="POST">
-  <input type="radio" name="project" value="1" onchange="switchProject()" checked="checked"> Project 1<br>
-  <input type="radio" name="project" value="2" onchange="switchProject()"> Project 2<br>
-</form>
+<input type="hidden" id="pid" value="<%= pid %>"/>
+<div style="float:left;width:200px;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
+<a href="/dev/projects"><b>PROJECTS</b></a>
+<% if (projects.length) { %>
+  <form id="projects">
+    <% projects.forEach(function(project){ %>
+    <input type="radio" name="project" value="<%= project.id %>" onchange="switchChatProject()"/><%= project.name %><br>
+    <% }) %>
+  </form>
+<% } %>
 <hr>
 <b>USERS</b>
 <div id="users"></div>

@@ -14,21 +14,6 @@ exports.room = function(req, res) {
   });
 };
 
-exports.chat = function(req, res) {
-  var user = req.user
-    , name = tools.getName(user);
-  return res.render('dev/index', {
-    template: 'chat'
-  , id: user.id
-  , name: name
-  });
-};
-
-exports.switchProject = function(req, res) {
-  console.log('switch to project' + req.body.id);
-  res.send(true);
-};
-
 exports.projects = function(req, res, next) {
   db.projects.get(req.user.id, function(err, projects) {
     var user = req.user
@@ -41,6 +26,29 @@ exports.projects = function(req, res, next) {
           , projects: projects
           , activities: activities
           , id: user.id
+          , name: name
+          });
+        }
+        return next(err);
+      });
+    }
+    return next(err);
+  });
+};
+
+exports.showProject = function(req, res, next) {
+  var pid = req.params.pid;
+  db.projects.set(req.user.id, pid, function(err, val) {
+    if(!err) {
+      return db.projects.get(req.user.id, function(err, projects) {
+        var user = req.user
+          , name = tools.getName(user);
+        if(!err) {
+          return res.render('dev/index', {
+            template: 'chat'
+          , projects: projects
+          , id: user.id
+          , pid: pid
           , name: name
           });
         }

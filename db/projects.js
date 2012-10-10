@@ -85,22 +85,7 @@ exports.setUp = function(client, db) {
   mod.deleteUsers = function(pid, fn) {
     client.smembers('projects:' + pid + ':users', function(err, array) {
       if(!err && array && array.length) {
-        //TODO change to serial
-//         return tools.asyncSerial(array, array.length, function(cid) {
-//           db.projects.remove(pid, cid);
-//         }, function() {
-//           client.del('projects:' + pid + ':users');
-//           return tools.asyncOpt(fn, null, pid);
-//         });
         db.contacts.deleteContacts(pid, array, 0, fn);
-//         return tools.asyncParallel(array, function(left, cid) {
-//           db.projects.remove(pid, cid);
-// //           client.srem('users:' + cid + ':projects', pid);
-//           return tools.asyncDone(left, function() {
-//             client.del('projects:' + pid + ':users');
-//             return tools.asyncOpt(fn, null, pid);
-//           });
-//         });
       }
       client.del('projects:' + pid + ':users');
       return tools.asyncOpt(fn, err, pid);
@@ -219,6 +204,14 @@ exports.setUp = function(client, db) {
       }
       return tools.asyncOpt(fn, err, val);
     });
+  };
+
+  mod.set = function(id, pid, fn) {
+    client.set('users:' + id + ':current', pid, fn);
+  };
+
+  mod.current = function(id, fn) {
+    client.get('users:' + id + ':current', fn);
   };
 
   return mod;

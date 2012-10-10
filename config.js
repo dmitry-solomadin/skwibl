@@ -37,3 +37,5 @@ exports.SESSION_DURATION = 7200;//two hours
 exports.DIRECTORY_PERMISION = 0751;//rwxr-x--x
 
 exports.ACTIONS_BUFFER_SIZE = 50;
+
+exports.GC_INTERVAL = 60000;//1 min
