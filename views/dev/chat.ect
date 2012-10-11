@@ -3,13 +3,13 @@
 <input type="hidden" id="pid" value="<%= pid %>"/>
 <div style="float:left;width:200px;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
 <a href="/dev/projects"><b>PROJECTS</b></a>
-<% if (projects.length) { %>
+<% if @projects.length : %>
   <form id="projects">
-    <% projects.forEach(function(project){ %>
+    <% for project in @projects : %>
     <input type="radio" name="project" value="<%= project.id %>" onchange="switchChatProject()"/><%= project.name %><br>
-    <% }) %>
+    <% end %>
   </form>
-<% } %>
+<% end %>
 <hr>
 <b>USERS</b>
 <div id="users"></div>

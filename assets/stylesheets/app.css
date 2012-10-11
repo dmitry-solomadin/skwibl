@@ -225,4 +225,5 @@ body.room {
     border: 1px solid #FBEED5;
     font-size: 16px;
     background-color: #FCF8E3;
+    box-shadow: #aaa 1px 1px 3px;
 }

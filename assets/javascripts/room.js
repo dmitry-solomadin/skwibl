@@ -523,7 +523,7 @@ $(function () {
       }
     },
 
-    translateSelected: function(deltaPoint) {
+    translateSelected:function (deltaPoint) {
       if (opts.selectedTool) {
         opts.selectedTool.translate(deltaPoint);
 
@@ -1013,7 +1013,7 @@ $(function () {
       });
     },
 
-    notifyComment: function(){
+    notifyComment:function () {
       window.notificator.notify("Drag to comment an area.");
     },
 
@@ -1070,35 +1070,35 @@ $(function () {
         window.room.removeSelected();
       });
 
-      $(document).bind('keydown.left', function(){
+      $(document).bind('keydown.left', function () {
         window.room.translateSelected(new Point(-5, 0));
       });
 
-      $(document).bind('keydown.up', function(){
+      $(document).bind('keydown.up', function () {
         window.room.translateSelected(new Point(0, -5));
       });
 
-      $(document).bind('keydown.right', function(){
+      $(document).bind('keydown.right', function () {
         window.room.translateSelected(new Point(5, 0));
       });
 
-      $(document).bind('keydown.down', function(){
+      $(document).bind('keydown.down', function () {
         window.room.translateSelected(new Point(0, 5));
       })
 
-      $(document).bind('keydown.shift_left', function(){
+      $(document).bind('keydown.shift_left', function () {
         window.room.translateSelected(new Point(-1, 0));
       });
 
-      $(document).bind('keydown.shift_up', function(){
+      $(document).bind('keydown.shift_up', function () {
         window.room.translateSelected(new Point(0, -1));
       });
 
-      $(document).bind('keydown.shift_right', function(){
+      $(document).bind('keydown.shift_right', function () {
         window.room.translateSelected(new Point(1, 0));
       });
 
-      $(document).bind('keydown.shift_down', function(){
+      $(document).bind('keydown.shift_down', function () {
         window.room.translateSelected(new Point(0, 1));
       })
     }
@@ -1312,6 +1312,10 @@ $(function () {
 });
 
 $(document).ready(function () {
+  if (!currentPage("room")) {
+    return;
+  }
+
   window.room.init({paper:paper});
 
   // disable canvas text selection for cursor change

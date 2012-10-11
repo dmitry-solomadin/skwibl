@@ -7,19 +7,20 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <%- include('/shared/application_scripts') %>
+    <% include './shared/application_scripts.ect' %>
 </head>
-<body <% if (template == 'room') { %>class="room"<% } %>>
-<%- include('/header.ejs') %>
+<body <%= "class='room'" if @template == 'room' %>>
+<input type="hidden" id="currentTemplate" value="<%= @template %>"/>
+<% include './header.ect' %>
 
-<% if (template == 'room') { %>
+<% if (@template == 'room') : %>
 <div id="room-content" class="room-content">
-    <%- blocks.template %>
+    <% include "./dev/#{@template}.ect" %>
 </div>
-<% } else { %>
+<% else : %>
 <div id="main-content" class="page tab-pane">
-  <%- blocks.template %>
+  <% include "./dev/#{@template}.ect" %>
 </div>
-<% } %>
+<% end %>
 </body>
 </html>

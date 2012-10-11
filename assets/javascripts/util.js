@@ -88,3 +88,7 @@
 function isMac(){
   return /Mac/.test(navigator.userAgent);
 }
+
+function currentPage(template){
+  return $("#currentTemplate").val() == template
+}

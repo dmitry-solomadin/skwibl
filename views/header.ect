@@ -3,7 +3,7 @@
     <div class="container-fluid">
       <a class="brand" href="/">Skwibl</a>
 
-      <% if (typeof template != 'undefined' && template == 'room') { %>
+      <% if @template && @template == "room" : %>
         <span class="skwibl-btn-group">
           <a href="#" class="btn" data-toggle="dropdown">
             Skwibl
@@ -68,28 +68,28 @@
               <li onclick="window.room.clearCanvas(); return false;">Clear</li>
             </ul>
           </span>
-      <% } %>
+      <% end %>
 
       <div class="btn-group pull-right">
-        <% if (typeof user != 'undefined') { %>
+        <% if @user : %>
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-          <i class="icon-user"></i> <%= user.name %>
+          <i class="icon-user"></i> <%= @user.name %>
           <span class="caret"></span>
         </a>
         <ul class="dropdown-menu">
-          <li><a href="/users/<%= user.id %>" data-remote='true'>Profile</a></li>
+          <li><a href="/users/<%= @user.id %>" data-remote='true'>Profile</a></li>
           <li class="divider"></li>
           <li><a href="/logout">Sign Out</a></li>
         </ul>
-        <% } else { %>
+        <% else : %>
         <a class="btn" href="/registration">Sign Up</a>
         <a id="signInButton" class="btn" href="#" onclick="window.App.Home.showLogin();">
           Sign In
         </a>
-        <% } %>
+        <% end %>
       </div>
 
-      <% if (typeof user != 'undefined') { %>
+      <% if @user : %>
       <div class="nav-collapse">
         <ul class="nav">
           <li><a href="#">Activities</a></li>
@@ -98,7 +98,7 @@
           <li><a href="/files" data-remote="true">Files</a></li>
         </ul>
       </div>
-      <% } %>
+      <% end %>
     </div>
   </div>
 </div>

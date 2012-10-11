@@ -22,7 +22,7 @@
     "connect-flash": "*",
     "connect-redis": "1.x.x",
     "cookie": "*",
-    "ejs": "*",
+    "ect": "*",
     "socket.io": "*",
     "passport": "*",
     "passport-local": "*",

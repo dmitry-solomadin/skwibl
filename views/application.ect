@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Skwibl</title>
+
+  <% include "./shared/application_scripts.ect" %>
+</head>
+<body>
+<% include './header.ect' %>
+
+<div id="main-content" class="page tab-pane">
+  <% include './shared/flash.ect' %>
+
+  <% if @template : %>
+    <% include "./partials/#{@template}.ect"   %>
+  <% end %>
+</div>
+</body>
+</html>
+

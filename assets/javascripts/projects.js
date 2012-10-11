@@ -1,4 +1,3 @@
-
 var project
   , user
   , activity

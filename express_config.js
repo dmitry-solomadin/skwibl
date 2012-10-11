@@ -5,7 +5,7 @@
 
 var express = require('express')
   , flash = require('connect-flash')
-  , ejs_locals = require('ejs-locals');
+  , ect = require('ect');
 
 var routes = require('./routes')
   , ctrls = require('./controllers')
@@ -35,8 +35,8 @@ exports.setUp = function() {
     app.set('port', cfg.PORT);
     app.set('host', cfg.HOST);
     app.set('views', __dirname + '/views');
-    app.engine('ejs', ejs_locals);
-    app.set('view engine', 'ejs');
+    app.engine('ect', ect({ cache: true, watch: true, root: __dirname + '/views' }).render);
+    app.set("view engine", 'ect');
     app.use(express.favicon(__dirname +'/static/public/images/butterfly-tiny.png'));
     app.set('view options', {layout: false});
     app.use(express.logger('dev'));

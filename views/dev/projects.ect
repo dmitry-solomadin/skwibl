@@ -1,14 +1,15 @@
-<input type="hidden" id="id" value="<%= id %>"/>
-<input type="hidden" id="name" value="<%= name %>"/>
+<input type="hidden" id="id" value="<%= @id %>"/>
+<input type="hidden" id="name" value="<%= @name %>"/>
 <div style="float:left;width:100px;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
 <b>PROJECTS</b>
-<% if (projects.length) { %>
+<% if @projects.length : %>
   <form id="projects">
-    <% projects.forEach(function(project){ %>
-    <input type="radio" name="project" value="<%= project.id %>" onchange="switchProject()"/><a href="/dev/projects/<%= project.id %>"><%= project.name %></a><br>
-    <% }) %>
+    <% for project in @projects : %>
+    <input type="radio" name="project" value="<%= project.id %>" onchange="switchProject()"/>
+    <a href="/dev/projects/<%= project.id %>"><%= project.name %></a><br>
+    <% end %>
   </form>
-<% } %>
+<% end %>
 </div>
 <div style="float:left;width:300px;height:300px;border-right:1px solid black;overflow:scroll-y;padding:10px;">
 <div id="management"></div>
@@ -38,11 +39,12 @@
 <b>Activities</b><br>
 <button name="accept" onclick="accept()">accept</button>
 <button name="decline" onclick="decline()">decline</button><hr>
-<% if (activities.length) { %>
+<% if @activities.length : %>
   <form id="activities">
-    <% activities.forEach(function(activity){ %>
-      <input type="radio" name="activity" value="<%= activity.id %>" onchange="switchActivity()"/><%= activity.id + " : " + activity.status%><br>
-    <% }) %>
+    <% for activity in @activities : %>
+      <input type="radio" name="activity" value="<%= activity.id %>" onchange="switchActivity()"/>
+      <%= activity.id + " : " + activity.status%><br>
+    <% end %>
   </form>
-<% } %>
+<% end %>
 </div>
