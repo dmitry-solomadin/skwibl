@@ -42,6 +42,16 @@ $(function () {
       window.room.helper.initUploader();
       window.room.helper.initHotkeys();
 
+      // disable canvas text selection for cursor change
+      var canvas = $("#myCanvas")[0];
+      canvas.onselectstart = function () {
+        return false;
+      };
+
+      canvas.onmousedown = function () {
+        return false;
+      };
+
       return false;
     },
 
@@ -293,6 +303,8 @@ $(function () {
 
       opts.dragPerformed = false;
 
+      canvasIO.send(this.saveState());
+
       this.updateSelectedCanvasThumb();
     },
 
@@ -445,6 +457,8 @@ $(function () {
     // *** Save & restore state ***
 
     restoreState:function (state) {
+      state = JSON.parse(state);
+
       this.eraseCanvas();
 
       $(state).each(function () {
@@ -456,6 +470,8 @@ $(function () {
 
         window.room.createTool(path);
       });
+
+      window.room.redrawWithThumb();
 
       function createSegment(x, y, ix, iy, ox, oy) {
         var handleIn = new Point(ix, iy);
@@ -485,7 +501,7 @@ $(function () {
         elements.push(element);
       });
 
-      return elements;
+      return JSON.stringify(elements);
     },
 
     // *** Item manipulation ***
@@ -1304,6 +1320,12 @@ $(function () {
 
   };
 
+  var canvasIO = io.connect('/canvas', window.copt);
+
+  canvasIO.on('message', function (data) {
+    window.room.restoreState(data.message);
+  });
+
   window.room = room;
   window.room.helper = helper;
 
@@ -1312,21 +1334,11 @@ $(function () {
 });
 
 $(document).ready(function () {
-  if (!currentPage("room")) {
+  if (!currentPage("projects/show")) {
     return;
   }
 
   window.room.init({paper:paper});
-
-  // disable canvas text selection for cursor change
-  var canvas = $("#myCanvas")[0];
-  canvas.onselectstart = function () {
-    return false;
-  };
-
-  canvas.onmousedown = function () {
-    return false;
-  };
 });
 
 function onMouseDown(event) {

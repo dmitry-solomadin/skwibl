@@ -1,3 +1,4 @@
+<% @room = @template && @template == "projects/show"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,16 +7,21 @@
 
   <% include "./shared/application_scripts.ect" %>
 </head>
-<body>
+<body <%= "class='room'" if @room %>>
+<input type="hidden" id="currentTemplate" value="<%= @template %>"/>
 <% include './header.ect' %>
 
+<% if @room : %>
+<div id="room-content" class="room-content">
+  <% include "./#{@template}.ect" %>
+</div>
+<% else : %>
 <div id="main-content" class="page tab-pane">
   <% include './shared/flash.ect' %>
 
-  <% if @template : %>
-    <% include "./partials/#{@template}.ect"   %>
-  <% end %>
+  <% include "./#{@template}.ect" %>
 </div>
+<% end %>
 </body>
 </html>
 

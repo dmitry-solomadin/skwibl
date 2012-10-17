@@ -1,128 +1,139 @@
-var copt = {
-  'connect timeout': 5000,
-  'max reconnection attempts': 5,
-//   'force new connection': true
-};
-
-var users = [];
-
-var projectsRe = /\/dev\/projects\/[\d]+/
-  , path = window.location.pathname;
-
-getUserById = function(id) {
-  for(var i = 0, len = users.length; i < len; i++) {
-    if(users[i].id === id) {
-      return users[i];
-    }
+$(function () {
+  if (!currentPage("projects/show")) {
+    return;
   }
-};
 
-updateUsers = function() {
-  $('#users').empty();
-  $.each(users, function(key, val) {
-    if(val.status === 'online') {
-      $('#users').append('<div>' + val.id + ' : ' + val.displayName + ' : online</div>');
-    } else {
-      $('#users').append('<div>' + val.id + ' : ' + val.displayName + ' : offline</div>');
+  var users = [];
+
+  var chat = {
+    fold:function (link) {
+      $("#chat").animate({left:-305});
+      $("#header-foldable").animate({width:125});
+      $("#canvasFooter").animate({marginLeft:0});
+
+      $(link).attr("onclick", "window.chat.unfold(this); return false;");
+      $(link).html(">>");
+    },
+
+    unfold:function (link) {
+      $("#chat").animate({left:0});
+      $("#header-foldable").data("width", $("#header-foldable").width());
+      $("#header-foldable").animate({width:280});
+      $("#canvasFooter").animate({marginLeft:300});
+
+      $(link).attr("onclick", "window.chat.fold(this); return false;");
+      $(link).html("<<");
+    },
+
+    getUserById:function (id) {
+      for (var i = 0, len = users.length; i < len; i++) {
+        if (users[i].id === id) {
+          return users[i];
+        }
+      }
+    },
+
+    updateUsers:function () {
+      $('#participants').empty();
+      $.each(users, function (key, val) {
+        if (val.status === 'online') {
+          $('#participants').append('<div>' + val.id + ' : ' + val.displayName + ' : online</div>');
+        } else {
+          $('#participants').append('<div>' + val.id + ' : ' + val.displayName + ' : offline</div>');
+        }
+      });
+    },
+
+    addMessage:function (id, message) {
+      $('#conversation-inner').append('<b>' + id + ':</b> ' + message + '<br>');
     }
-  });
-};
+  };
 
-if(projectsRe.test(path)) {
-  var chat = io.connect('/chat', copt);
+  // CHAT IO
+  var chatIO = io.connect('/chat', window.copt);
 
-  chat.on('connect', function() {
+  chatIO.on('connect', function () {
     console.log('connect');
   });
 
-  chat.on('connecting', function() {
+  chatIO.on('connecting', function () {
     console.log('connecting');
   });
 
-  chat.on('connect_failed', function() {
+  chatIO.on('connect_failed', function () {
     console.log('connect_failed');
   });
 
-  chat.on('disconnect', function() {
+  chatIO.on('disconnect', function () {
     console.log('disconnect');
   });
 
-  chat.on('reconnect', function() {
+  chatIO.on('reconnect', function () {
     console.log('reconnect');
   });
 
-  chat.on('reconnecting', function() {
+  chatIO.on('reconnecting', function () {
     console.log('reconnecting');
   });
 
-  chat.on('reconnect_failed', function() {
+  chatIO.on('reconnect_failed', function () {
     console.log('reconnect_failed');
   });
 
-  chat.on('error', function() {
+  chatIO.on('error', function () {
     console.log('error');
   });
 
-  chat.on('message', function(data, cb) {
-    $('#conversation').append('<b>'+ data.id + ':</b> ' + data.message + '<br>');
+  chatIO.on('message', function (data, cb) {
+    $('#conversation-inner').append('<b>' + data.id + ':</b> ' + data.message + '<br>');
   });
 
-  chat.on('enter', function(id, cb) {
-    var user = getUserById(id);
+  chatIO.on('enter', function (id, cb) {
+    var user = window.chat.getUserById(id);
     user.status = 'online';
-    updateUsers();
-    addMessage(id, '<i>User ' + id + ' : ' + user.displayName + ' entered the project</i>');
+    window.chat.updateUsers();
+    window.chat.addMessage(id, '<i>User ' + id + ' : ' + user.displayName + ' entered the project</i>');
   });
 
-  chat.on('exit', function(id, cb) {
-    var user = getUserById(id);
+  chatIO.on('exit', function (id, cb) {
+    var user = window.chat.getUserById(id);
     delete user.status;
-    updateUsers();
-    addMessage(id, '<i>User ' + id + ' : ' + user.displayName + ' leave the project</i>');
+    window.chat.updateUsers();
+    window.chat.addMessage(id, '<i>User ' + id + ' : ' + user.displayName + ' leave the project</i>');
   });
 
-  chat.on('users', function(data) {
+  chatIO.on('users', function (data) {
     users = data;
-    updateUsers();
+    window.chat.updateUsers();
   });
 
-  chat.on('messages', function(data) {
-    $('#conversation').empty();
-    data.forEach(function(val) {
-      addMessage(val.owner, val.data);
+  chatIO.on('messages', function (data) {
+    $('#conversation-inner').empty();
+    data.forEach(function (val) {
+      window.chat.addMessage(val.owner, val.data);
     });
   });
 
-  switchChatProject = function() {
-    var project = $("[name=project]:checked")[0];
-    $('#conversation').empty();
-    chat.emit('switch', project.value);
-  };
-
-  addMessage = function(id, message) {
-    $('#conversation').append('<b>'+ id + ':</b> ' + message + '<br>');
-  };
-
-  $(function(){
-    // when the client clicks SEND
-    $('#datasend').click(function() {
-      var message = $('#data').val()
-	, id = $("#id")[0].value;
-      $('#data').val('');
-      $('#data').focus();
-      if(message !== '') {
-	addMessage(id, message);
-	chat.send(message);
-      }
-    });
-
-    // when the client hits ENTER on the keyboard
-    $('#data').keypress(function(e) {
-      if(e.which == 13) {
-	$(this).blur();
-	$('#datasend').focus().click();
-      }
-    });
+  // when the client clicks SEND
+  $('#chatsend').click(function () {
+    var message = $('#chattext').val()
+      , id = $("#uid")[0].value;
+    $('#chattext').val('');
+    $('#chattext').focus();
+    if (message !== '') {
+      window.chat.addMessage(id, message);
+      chatIO.send(message);
+    }
   });
 
-}
+  // when the client hits ENTER on the keyboard
+  $('#chattext').keypress(function (e) {
+    if (e.which == 13) {
+      $(this).blur();
+      $('#chatsend').focus().click();
+    }
+  });
+
+  window.chat = chat;
+});
+

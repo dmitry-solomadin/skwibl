@@ -4,13 +4,7 @@
 </div>
 <script>
 
-var copt={
-  'connect timeout': 5000,
-  'max reconnection attempts': 5,
-  'force new connection': true
-};
-
-var activity = io.connect('/activity', copt);
+var activity = io.connect('/activity', window.copt);
 
 activity.on('connect', function() {
   console.log('connection established');

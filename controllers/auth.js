@@ -18,13 +18,13 @@ var db = require('../db')
 exports.mainPage = function(req, res) {
   if (req.user) {
     return res.render('index', {
-      template:'user'
+      template:'partials/user'
     , user:req.user
     , error:req.flash('error')});
   }
 
   return res.render('index', {
-    template:'mainpage'
+    template:'partials/mainpage'
   , error:req.flash('error')
   });
 };
@@ -36,13 +36,13 @@ exports.mainPage = function(req, res) {
 exports.regPage = function(req, res) {
   if(req.user){
     return res.render('index', {
-      template: 'user'
+      template: 'partials/user'
     , user: req.user
     , error: req.flash('error')
     });
   }
   return res.render('index', {
-    template: 'mainpage'
+    template: 'partials/mainpage'
   , error: req.flash('error')
   });
 };

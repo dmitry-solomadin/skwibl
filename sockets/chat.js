@@ -68,7 +68,7 @@ exports.configure = function(sio) {
         db.actions.add(socket.project, id, 'chat', msg);
       });
 
-      //TODO temporary function for testing
+      /*
       socket.on('switch', function(project) {
         //assume that project is valid user project
         socket.leave(socket.project);
@@ -79,7 +79,7 @@ exports.configure = function(sio) {
         console.log('switch ',project);
         socket.broadcast.to(project).emit('enter', id);
         sendInitData(project, socket);
-      });
+      });*/
     });
 
   });

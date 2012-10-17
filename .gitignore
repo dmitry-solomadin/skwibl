@@ -6,3 +6,4 @@ npm-debug.log
 .DS_STORE
 .directory
 .idea/
+haproxy.cfg

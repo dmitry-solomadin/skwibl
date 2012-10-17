@@ -8,7 +8,7 @@ $(function () {
         });
 
         var onsuccess = $(this).data("process-submit") ? $(this).data("process-submit") : function (data) {
-          $("#main-content").html(data);
+          $("#main-content").html(content);
         };
 
         $.ajax({

@@ -18,7 +18,15 @@ var tools = require('../tools');
 exports.get = function(req, res, next) {
   db.projects.get(req.user.id, function(err, projects) {
     if(!err) {
-      return res.render('index', { title: req.params.id, template: 'projects' , menu: 3});
+      return db.activities.get(req.user.id, function(err, activities) {
+        if(!err) {
+          return res.render('projects/index', {
+              projects: projects
+            , activities: activities
+          });
+        }
+        return next(err);
+      });
     }
     return next(err);
   });
@@ -29,11 +37,17 @@ exports.get = function(req, res, next) {
  * Enter the project
  */
 exports.show = function(req, res, next) {
-  db.projects.getData(req.params.pid, req.user.id, function(err, projects) {
-    if(!err) {
-      return res.render('index', { title: req.params.pid, template: 'project' , menu: 3});
-    }
-    return next(err);
+  db.projects.set(req.user.id, req.params.pid, function () {
+    db.projects.getData(req.params.pid, req.user.id, function (err, projects) {
+      if (!err) {
+        return res.render('index', {
+          template: "projects/show",
+          user: req.user,
+          projects: projects
+        });
+      }
+      return next(err);
+    });
   });
 };
 

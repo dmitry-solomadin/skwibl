@@ -1,9 +1,19 @@
 <div class="navbar navbar-fixed-top" id="header">
+  <% if @user : %>
+  <input type="hidden" id="uid" value="<%= @user.id %>"/>
+  <% end %>
+
   <div class="navbar-inner">
     <div class="container-fluid">
-      <a class="brand" href="/">Skwibl</a>
+      <% if @room : %>
+        <div class="header-foldable" id="header-foldable">
+          <a class="brand" href="/">Skwibl</a>
 
-      <% if @template && @template == "room" : %>
+          <span class="skwibl-btn-group" style="float:right">
+            <a class="btn" href="#" onclick="window.chat.fold(this); return false;"><<</a>
+          </span>
+        </div>
+
         <span class="skwibl-btn-group">
           <a href="#" class="btn" data-toggle="dropdown">
             Skwibl
@@ -43,8 +53,9 @@
         <span class="skwibl-btn-group">
           <a href="#" id="panTool" class="btn" data-tooltype="pan">Pan</a>
         </span>
-      <span class="skwibl-btn-group">
-          <select class="btn" style="width:75px;" onchange="window.room.setCanvasScale($(this).find(':selected').val())">
+        <span class="skwibl-btn-group">
+          <select class="btn" style="width:75px;"
+                  onchange="window.room.setCanvasScale($(this).find(':selected').val())">
             <option value="0.5">50%</option>
             <option value="0.75">75%</option>
             <option value="1" selected="selected">100%</option>
@@ -56,18 +67,20 @@
           <a class="btn" href="#" onclick="window.room.subtractCanvasScale(); return false;">-</a>
         </span>
         <span class="skwibl-btn-group">
-            <a href="#" class="btn" data-toggle="dropdown">
-              Actions
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu activeMenu" id="actionSelect">
-              <li id="undoLink" onclick="window.room.prevhistory();return false;" class="disabled">Undo</li>
-              <li id="redoLink" onclick="window.room.nexthistory();return false;" class="disabled">Redo</li>
-              <li id="removeSelected" class="disabled" onclick="window.room.removeSelected(); return false;">Remove</li>
-              <li onclick="window.room.restoreState(window.room.saveState())">Save&Restore state</li>
-              <li onclick="window.room.clearCanvas(); return false;">Clear</li>
-            </ul>
-          </span>
+          <a href="#" class="btn" data-toggle="dropdown">
+            Actions
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu activeMenu" id="actionSelect">
+            <li id="undoLink" onclick="window.room.prevhistory();return false;" class="disabled">Undo</li>
+            <li id="redoLink" onclick="window.room.nexthistory();return false;" class="disabled">Redo</li>
+            <li id="removeSelected" class="disabled" onclick="window.room.removeSelected(); return false;">Remove</li>
+            <li onclick="window.room.restoreState(window.room.saveState())">Save&Restore state</li>
+            <li onclick="window.room.clearCanvas(); return false;">Clear</li>
+          </ul>
+        </span>
+      <% else : %>
+        <a class="brand" href="/">Skwibl</a>
       <% end %>
 
       <div class="btn-group pull-right">
@@ -89,11 +102,11 @@
         <% end %>
       </div>
 
-      <% if @user : %>
+      <% if @user and (!@room or !@template): %>
       <div class="nav-collapse">
         <ul class="nav">
           <li><a href="#">Activities</a></li>
-          <li><a href="#about">Projects</a></li>
+          <li><a href="/projects" data-remote="true">Projects</a></li>
           <li><a href="#contact">Contacts</a></li>
           <li><a href="/files" data-remote="true">Files</a></li>
         </ul>
@@ -144,3 +157,4 @@
     </div>
   </form>
 </div>
+
