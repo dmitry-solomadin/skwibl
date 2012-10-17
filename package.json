@@ -24,6 +24,7 @@
     "cookie": "*",
     "ejs": "*",
     "socket.io": "*",
+    "request": "*",
     "passport": "*",
     "passport-local": "*",
     "passport-hash": "*",

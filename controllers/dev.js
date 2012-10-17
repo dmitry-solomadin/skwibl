@@ -1,6 +1,7 @@
 
 var db = require('../db')
-  , tools = require('../tools');
+  , tools = require('../tools')
+  , cfg = require('../config');
 
 exports.player = function(req, res) {
   return res.render('dev/index', {
@@ -96,6 +97,25 @@ exports.profile = function(req, res, next) {
   });
 };
 
-exports.connect = function(req, res) {};
+exports.connect = function(req, res) {
+  console.log('connect', req.body.provider);
+  return res.redirect('https://graph.facebook.com/oauth/authorize?'
+//   + 'type=user_agent&'
+  + 'client_id=' + cfg.FACEBOOK_APP_ID + '&'
+  + 'redirect_uri=http%3A%2F%2Flocalhost/connect/facebook/callback&'
+  + 'scope=email,user_online_presence');//, function (error, response, body) {
+//     if (!error && response.statusCode == 200) {
+//       console.log(body);
+//       return res.redirect();
+//     }
+//   });
+//   db.users.addConnection(req.user.id, req.body.provider, function(err) {
+//     tools.returnStatus(err, res);
+//   });
+};
 
-exports.disconnect = function(req, res) {};
+exports.disconnect = function(req, res) {
+  db.users.disconnect(req.user.id, req.body.provider, function(err) {
+    tools.returnStatus(err, res);
+  });
+};

@@ -23,15 +23,31 @@ updateConnections = function() {
   });
 };
 
+facebookOn = function() {
+  window.location = '/connect/facebook';/*, {
+    provider: 'facebook'
+  }, function(data, status, xhr) {
+    if(status === 'success') {
+      var facebook = $("#facebook");
+      facebook.html('');
+      facebook.html('connected');
+    }
+  });*/
+};
+
+facebookOff = function() {
+  $.post('/dev/disconnect', {
+    provider: 'facebook'
+  }, function(data, status, xhr) {
+    if(status === 'success') {
+      var facebook = $("#facebook");
+      facebook.html('');
+      facebook.html('disconnected');
+    }
+  });
+};
+
 if(projectsRe.test(path)) {
-
-  facebookOn = function() {
-
-  };
-
-  facebookOff = function() {
-
-  };
 
   $(function(){
     // when the client clicks SEND

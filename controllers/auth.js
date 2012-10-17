@@ -7,9 +7,13 @@
  * Module dependencies.
  */
 
+var request = require('request')
+  , qs = require('querystring');
+
 var db = require('../db')
   , smtp = require('../smtp')
-  , tools = require('../tools');
+  , tools = require('../tools')
+  , cfg = require('../config');
 
 /*
  * GET
@@ -131,6 +135,7 @@ exports.hash = function(passport) {
  * Google authenticate
  */
 exports.google = function(passport) {
+  //patch to access_type=offline or save token into session
   return passport.authenticate('google', {
     scope: [
       'https://www.googleapis.com/auth/userinfo.profile'
@@ -157,6 +162,7 @@ exports.facebook = function(passport) {
   return passport.authenticate('facebook', {
     scope: [
       'email'
+    , 'offline_access'
     , 'user_status'
     , 'user_checkins'
     , 'user_photos'
@@ -172,6 +178,40 @@ exports.facebook = function(passport) {
 exports.facebookCb = function(passport) {
   return passport.authenticate('facebook', {
     failureRedirect: '/'
+  });
+};
+
+/*
+ * POST
+ * Facebook connect
+ */
+exports.connectFacebook = function(req, res, next) {
+  return res.redirect('https://graph.facebook.com/oauth/authorize?'
+  + 'client_id=' + cfg.FACEBOOK_APP_ID + '&'
+  + 'redirect_uri=http%3A%2F%2Flocalhost/connect/facebook/callback&'
+  + 'scope=email,user_online_presence');
+};
+
+/*
+ * GET
+ * Facebook connect callback
+ */
+exports.connectFacebookCb = function(req, res) {
+  var code = req.query['code']
+    , tokenURL = 'https://graph.facebook.com/oauth/access_token?'
+    + 'client_id=' + cfg.FACEBOOK_APP_ID
+    + '&redirect_uri=http%3A%2F%2Flocalhost/connect/facebook/callback'
+    + '&client_secret=' + cfg.FACEBOOK_APP_SECRET
+    + '&code=' + code;
+  return request(tokenURL, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      //TODO save access_token
+      var ans = qs.parse(body);
+      return db.users.connect(req.user.id, 'facebook', ans.access_token, function(err, val) {
+        return res.redirect('/dev/users/' + req.user.id);
+      });
+    }
+    return res.redirect('/dev/users/' + req.user.id);
   });
 };
 

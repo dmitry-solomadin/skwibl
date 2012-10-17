@@ -52,9 +52,19 @@ exports.configure = function(app, passport) {
   app.get('/auth/facebook', ctrls.auth.facebook(passport), ctrls.aux.empty);
 
   /*
-   * facebook callback
+   * facebook auth callback
    */
   app.get('/auth/facebook/callback', ctrls.auth.facebookCb(passport), ctrls.auth.logIn);
+
+  /*
+   * connect facebook
+   */
+  app.get('/connect/facebook', ctrls.auth.connectFacebook);
+
+  /*
+   * connect facebook callback
+   */
+  app.get('/connect/facebook/callback', ctrls.auth.connectFacebookCb);
 
   /*
    * auth or register with linkedin

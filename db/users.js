@@ -204,7 +204,7 @@ exports.setUp = function(client, db) {
     client.hset('users:' + id + ':connections', provider, token, fn);
   };
 
-  mod.disconnect = function(id, provider, token, fn) {
+  mod.disconnect = function(id, provider, fn) {
     client.hdel('users:' + id + ':connections', provider, fn);
   };
 
