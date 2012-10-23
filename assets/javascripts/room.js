@@ -105,8 +105,9 @@ $(function () {
         window.room.drawSelectRect(event.point);
       }
 
-      /* this should be */
+      /* this should be todo recall why? :) */
       if (opts.tooltype == 'line' || opts.tooltype == 'highligher') {
+        opts.tool.selectable = true;
         this.addHistoryTool();
       }
     },
@@ -288,11 +289,13 @@ $(function () {
 
       if (opts.tooltype == 'straightline' || opts.tooltype == 'arrow' ||
         opts.tooltype == 'circle' || opts.tooltype == 'rectangle') {
+        opts.tool.selectable = true;
         this.addHistoryTool();
       }
 
       if (opts.tooltype == 'comment') {
         if (opts.commentRect) {
+          opts.tool.selectable = true;
           this.addHistoryTool();
         } else {
           this.addHistoryTool({type:"comment", commentMin:commentMin});
@@ -336,7 +339,7 @@ $(function () {
 
     clearCanvas:function () {
       window.room.addHistoryTool({
-        type:"clear", tools:this.getHistoryTools()
+        type:"clear", tools:this.getSelectableTools()
       });
       window.room.helper.setOpacityElems(opts.historytools, 0);
 
@@ -456,10 +459,12 @@ $(function () {
 
     // *** Save & restore state ***
 
-    restoreState:function (state) {
+    restoreState:function (state, initial) {
       state = JSON.parse(state);
 
-      this.eraseCanvas();
+      if (initial) {
+        this.eraseCanvas();
+      }
 
       $(state).each(function () {
         var path = new opts.paper.Path();
@@ -467,6 +472,7 @@ $(function () {
           path.addSegment(createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
         });
         path.closed = this.closed;
+        path.selectable = true;
 
         window.room.createTool(path);
       });
@@ -581,7 +587,7 @@ $(function () {
 
       if (!selected) {
         var previousSelectedTool = opts.selectedTool;
-        $(window.room.getHistoryTools()).each(function () {
+        $(window.room.getSelectableTools()).each(function () {
           if (this.isImage) {
             return true; // uploaded image is not selectable.
           }
@@ -721,14 +727,18 @@ $(function () {
       });
     },
 
-    getHistoryTools:function () {
-      var visibleHistoryTools = new Array();
-      $(opts.historytools).each(function () {
-        if (!this.type && this.opacity != 0) {
-          visibleHistoryTools.push(this);
+    getSelectableTools:function () {
+      // get all tools that are visible and have special marker
+      var selectableTools = new Array();
+      $(opts.paper.project.activeLayer.children).each(function () {
+        if (this.selectable && this.opacity != 0) {
+          selectableTools.push(this);
         }
       });
-      return visibleHistoryTools;
+
+      console.log(selectableTools);
+
+      return selectableTools;
     },
 
     getAllHistoryTools:function () {
@@ -1323,7 +1333,7 @@ $(function () {
   var canvasIO = io.connect('/canvas', window.copt);
 
   canvasIO.on('message', function (data) {
-    window.room.restoreState(data.message);
+    window.room.restoreState(data.message, false);
   });
 
   window.room = room;
