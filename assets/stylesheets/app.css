@@ -131,7 +131,9 @@ body {
     bottom: 0;
     position: fixed;
     width: 100%;
-    margin-left: 300px;
+    padding-left: 300px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
     border-top: 1px solid #a1a1a1;
     background: white;
     z-index: 10;
@@ -238,6 +240,7 @@ body.room {
     padding: 10px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
+    z-index: 11;
 }
 
 .chat .conversation-controls {
