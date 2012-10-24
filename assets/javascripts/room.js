@@ -364,8 +364,18 @@ $(function () {
     },
 
     eraseCanvas:function () {
-      $(opts.paper.project.activeLayer.children).each(function () {
-        this.remove();
+      $(opts.historytools).each(function () {
+        if (!this.type) {
+          this.remove();
+        }
+
+        if (this.commentMin) {
+          $(this.commentMin).hide();
+          if (this.commentMin[0].$maximized[0]) {
+            this.commentMin[0].$maximized.hide();
+            this.commentMin[0].arrow.opacity = 0;
+          }
+        }
       });
     },
 
@@ -760,6 +770,14 @@ $(function () {
       $(history).each(function () {
         if (!this.type) {
           opts.paper.project.activeLayer.addChild(this);
+        }
+
+        if (this.commentMin) {
+          $(this.commentMin).show();
+          if (this.commentMin[0].$maximized[0]) {
+            this.commentMin[0].$maximized.show();
+            this.commentMin[0].arrow.opacity = 1;
+          }
         }
       });
     },
