@@ -139,6 +139,10 @@ body {
     z-index: 10;
 }
 
+.canvasFooterInner{
+    width: 100%;
+}
+
 .canvasFooterTop {
     height: 20px;
     background: #e3e3e3;

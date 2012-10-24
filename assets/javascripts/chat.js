@@ -9,7 +9,12 @@ $(function () {
     fold:function (link) {
       $("#chat").animate({left:-305});
       $("#header-foldable").animate({width:125});
-      $("#canvasFooter").animate({marginLeft:0});
+      $("#canvasFooter").animate({paddingLeft:0});
+      $(".canvasFooterInner").animate({width:$(window).width()},
+        function () {
+          $(".canvasFooterInner").css({width:"100%"})
+        });
+
 
       $(link).attr("onclick", "window.chat.unfold(this); return false;");
       $(link).html(">>");
@@ -19,7 +24,11 @@ $(function () {
       $("#chat").animate({left:0});
       $("#header-foldable").data("width", $("#header-foldable").width());
       $("#header-foldable").animate({width:280});
-      $("#canvasFooter").animate({marginLeft:300});
+      $("#canvasFooter").animate({paddingLeft:300});
+      $(".canvasFooterInner").animate({width:$(window).width() - 300},
+        function () {
+          $(".canvasFooterInner").css({width:"100%"})
+        });
 
       $(link).attr("onclick", "window.chat.fold(this); return false;");
       $(link).html("<<");
