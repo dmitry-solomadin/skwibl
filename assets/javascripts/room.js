@@ -64,10 +64,16 @@ $(function () {
       $(canvas).css({cursor:"default"});
 
       if (opts.selectedTool && opts.selectedTool.selectionRect) {
-        if (opts.selectedTool.selectionRect.bottomRightRect.bounds.contains(event.point)) {
+        if (opts.selectedTool.selectionRect.bottomRightScaler.bounds.contains(event.point)) {
           $(canvas).css({cursor:"se-resize"});
-        } else if (opts.selectedTool.selectionRect.topLeftRect.bounds.contains(event.point)) {
+        } else if (opts.selectedTool.selectionRect.topLeftScaler.bounds.contains(event.point)) {
           $(canvas).css({cursor:"nw-resize"});
+        } else if (opts.selectedTool.selectionRect.topRightScaler.bounds.contains(event.point)) {
+          $(canvas).css({cursor:"ne-resize"});
+        } else if (opts.selectedTool.selectionRect.bottomLeftScaler.bounds.contains(event.point)) {
+          $(canvas).css({cursor:"sw-resize"});
+        } else if (opts.selectedTool.selectionRect.removeButton.bounds.contains(event.point)) {
+          $(canvas).css({cursor:"pointer"});
         }
       }
     },
@@ -206,7 +212,6 @@ $(function () {
         if (opts.selectedTool) {
           if (opts.selectedTool.scalersSelected) {
             var tool = opts.selectedTool;
-            var boundingBox = opts.selectedTool.selectionRect;
 
             var scaleZone = window.room.helper.getReflectZone(tool, event.point.x, event.point.y);
             if (scaleZone) {
@@ -227,18 +232,8 @@ $(function () {
             // scale tool
             this.doScale(tool, sx, sy, scalePoint);
 
-            var bx = boundingBox.theRect.bounds.x;
-            var by = boundingBox.theRect.bounds.y;
-            var bw = boundingBox.theRect.bounds.width;
-            var bh = boundingBox.theRect.bounds.height;
-
-            // move bounding box controls
-            boundingBox.topLeftRect.position = new Point(bx, by);
-            boundingBox.bottomRightRect.position = new Point(bx + bw, by + bh);
-
-            if (boundingBox.removeButton) {
-              boundingBox.removeButton.position = new Point(bx + bw, by);
-            }
+            tool.selectionRect.remove();
+            tool.selectionRect = window.room.helper.createSelectionRectangle(tool);
           } else {
             window.room.translateSelected(event.delta);
           }
@@ -524,7 +519,6 @@ $(function () {
         });
         path.closed = fromElement.closed;
         path.selectable = true;
-        console.log(fromElement);
         path.elementId = fromElement.elementId;
 
         window.room.createTool(path, {
@@ -619,8 +613,7 @@ $(function () {
 
       // Select scalers or remove buttton has highest priority.
       if (opts.selectedTool && opts.selectedTool.selectionRect &&
-        (opts.selectedTool.selectionRect.topLeftRect.bounds.contains(point) ||
-          opts.selectedTool.selectionRect.bottomRightRect.bounds.contains(point) ||
+        (window.room.helper.elementInArrayContainsPoint(opts.selectedTool.selectionRect.scalers, point) ||
           (opts.selectedTool.selectionRect.removeButton &&
             opts.selectedTool.selectionRect.removeButton.bounds.contains(point)))) {
         selected = true;
@@ -663,17 +656,29 @@ $(function () {
         tool.selectionRect = window.room.helper.createSelectionRectangle(tool);
         $("#removeSelected").removeClass("disabled");
 
-        if (tool.selectionRect.topLeftRect.bounds.contains(point)) {
+        if (tool.selectionRect.topLeftScaler.bounds.contains(point)) {
           tool.scalersSelected = true;
           tool.scaleZone = {
             point:new Point(tool.bounds.x + tool.bounds.width, tool.bounds.y + tool.bounds.height),
             zx:-1, zy:-1
           };
-        } else if (tool.selectionRect.bottomRightRect.bounds.contains(point)) {
+        } else if (tool.selectionRect.bottomRightScaler.bounds.contains(point)) {
           tool.scalersSelected = true;
           tool.scaleZone = {
             point:new Point(tool.bounds.x, tool.bounds.y),
             zx:1, zy:1
+          };
+        } else if (tool.selectionRect.topRightScaler.bounds.contains(point)) {
+          tool.scalersSelected = true;
+          tool.scaleZone = {
+            point:new Point(tool.bounds.x, tool.bounds.y + tool.bounds.height),
+            zx:1, zy:-1
+          };
+        } else if (tool.selectionRect.bottomLeftScaler.bounds.contains(point)) {
+          tool.scalersSelected = true;
+          tool.scaleZone = {
+            point:new Point(tool.bounds.x + tool.bounds.width, tool.bounds.y),
+            zx:-1, zy:1
           };
         } else {
           tool.scalersSelected = false;
@@ -976,30 +981,28 @@ $(function () {
 
       var selectRectWidth = 8;
       var selectRectHalfWidth = selectRectWidth / 2;
-      var topLeftRect = new Path.Rectangle(bounds.x - additionalBound - selectRectHalfWidth,
-        bounds.y - additionalBound - selectRectHalfWidth, selectRectWidth, selectRectWidth);
-      // segemnts swap for fillColor to work.
-      var s = topLeftRect.segments[2];
-      topLeftRect.segments[2] = topLeftRect.segments[0];
-      topLeftRect.segments[0] = s;
-
-      var bottomRightRect = new Path.Rectangle(bounds.x + bounds.width + additionalBound - selectRectHalfWidth,
-        bounds.y + bounds.height + additionalBound - selectRectHalfWidth, selectRectWidth, selectRectWidth);
-      // segemnts swap for fillColor to work.
-      var s = bottomRightRect.segments[2];
-      bottomRightRect.segments[2] = bottomRightRect.segments[0];
-      bottomRightRect.segments[0] = s;
+      var topLeftScaler = new Path.Oval(new opts.paper.Rectangle(bounds.x - additionalBound - selectRectHalfWidth,
+        bounds.y - additionalBound - selectRectHalfWidth, selectRectWidth, selectRectWidth));
+      var bottomRightScaler = new Path.Oval(new opts.paper.Rectangle(bounds.x + bounds.width + additionalBound - selectRectHalfWidth,
+        bounds.y + bounds.height + additionalBound - selectRectHalfWidth, selectRectWidth, selectRectWidth));
+      var topRightScaler = new Path.Oval(new opts.paper.Rectangle(bounds.x + bounds.width + additionalBound - selectRectHalfWidth,
+        bounds.y - additionalBound - selectRectHalfWidth, selectRectWidth, selectRectWidth));
+      var bottomLeftScaler = new Path.Oval(new opts.paper.Rectangle(bounds.x - additionalBound - selectRectHalfWidth,
+        bounds.y + bounds.height + additionalBound - selectRectHalfWidth, selectRectWidth, selectRectWidth));
 
       if (!selectedTool.commentMin) {
         var removeButton = new Raster(removeImg);
-        removeButton.position = new Point(selectionRect.bounds.x + selectionRect.bounds.width, selectionRect.bounds.y);
+        removeButton.position = new Point(selectionRect.bounds.x + selectionRect.bounds.width + 12, selectionRect.bounds.y - 12);
       }
 
-      var selectionRectGroup = new Group([selectionRect, topLeftRect, bottomRightRect]);
+      var selectionRectGroup = new Group([selectionRect, topLeftScaler, bottomRightScaler, topRightScaler, bottomLeftScaler]);
 
       selectionRectGroup.theRect = selectionRect;
-      selectionRectGroup.topLeftRect = topLeftRect;
-      selectionRectGroup.bottomRightRect = bottomRightRect;
+      selectionRectGroup.topLeftScaler = topLeftScaler;
+      selectionRectGroup.bottomRightScaler = bottomRightScaler;
+      selectionRectGroup.topRightScaler = topRightScaler;
+      selectionRectGroup.bottomLeftScaler = bottomLeftScaler;
+      selectionRectGroup.scalers = [topLeftScaler, bottomRightScaler, topRightScaler, bottomLeftScaler];
 
       if (!selectedTool.commentMin) {
         selectionRectGroup.removeButton = removeButton;
@@ -1007,8 +1010,10 @@ $(function () {
       }
 
       window.room.createTool(selectionRect, {color:"#a0a0aa", width:.5, opacity:1, dashArray:[3, 3]});
-      window.room.createTool(topLeftRect, {color:"#202020", width:1, opacity:1, fillColor:"white"});
-      window.room.createTool(bottomRightRect, {color:"#202020", width:1, opacity:1, fillColor:"white"});
+      window.room.createTool(topLeftScaler, {color:"#202020", width:1, opacity:1, fillColor:"white"});
+      window.room.createTool(bottomRightScaler, {color:"#202020", width:1, opacity:1, fillColor:"white"});
+      window.room.createTool(topRightScaler, {color:"#202020", width:1, opacity:1, fillColor:"white"});
+      window.room.createTool(bottomLeftScaler, {color:"#202020", width:1, opacity:1, fillColor:"white"});
 
       if (!selectedTool.commentMin) {
         window.room.createTool(removeButton);
@@ -1120,6 +1125,18 @@ $(function () {
           }
         }
       });
+    },
+
+    elementInArrayContainsPoint:function (array, point) {
+      var found = null;
+      $(array).each(function () {
+        if (this.bounds.contains(point)) {
+          found = this;
+          return false;
+        }
+      });
+
+      return found;
     },
 
     initHotkeys:function () {
