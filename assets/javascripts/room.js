@@ -1,4 +1,5 @@
 $(function () {
+  var nextId = 1;
   var opts = {};
   var savedOpts = new Array();
 
@@ -105,7 +106,7 @@ $(function () {
         window.room.drawSelectRect(event.point);
       }
 
-      /* this should be todo recall why? :) */
+      /* this should be here because sometimes mouse up event won't fire. */
       if (opts.tooltype == 'line' || opts.tooltype == 'highligher') {
         opts.tool.selectable = true;
         this.addHistoryTool();
@@ -306,9 +307,24 @@ $(function () {
 
       opts.dragPerformed = false;
 
-      canvasIO.send(this.saveState());
+      if (opts.tooltype == 'straightline' || opts.tooltype == 'arrow' ||
+        opts.tooltype == 'circle' || opts.tooltype == 'rectangle' ||
+        opts.tooltype == 'line' || opts.tooltype == 'highligher') {
+        opts.tool.elementId = this.getNextIdAndIncrement();
+
+        canvasIO.emit("elementUpdate", this.prepareElementToSend(opts.tool));
+        canvasIO.emit("nextId");
+      } else if (opts.tooltype == 'select' && opts.selectedTool) {
+        canvasIO.emit("elementUpdate", this.prepareElementToSend(opts.selectedTool));
+      }
 
       this.updateSelectedCanvasThumb();
+    },
+
+    getNextIdAndIncrement:function () {
+      var prevId = nextId;
+      nextId = nextId + 1;
+      return prevId;
     },
 
     // *** Image upload & canvas manipulation ***
@@ -459,23 +475,27 @@ $(function () {
 
     // *** Save & restore state ***
 
-    restoreState:function (state, initial) {
+    addOrUpdateElement:function (state, initial) {
+      this.unselect();
       state = JSON.parse(state);
 
       if (initial) {
         this.eraseCanvas();
+
+        $(state).each(function () {
+          createNewElement(this);
+        })
+      } else {
+        var foundPath = window.room.helper.findByElementId(paper.project.activeLayer.children, state.elementId);
+        if (foundPath) {
+          foundPath.removeSegments();
+          $(state.segments).each(function () {
+            foundPath.addSegment(createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
+          });
+        } else {
+          createNewElement(state);
+        }
       }
-
-      $(state).each(function () {
-        var path = new opts.paper.Path();
-        $(this.segments).each(function () {
-          path.addSegment(createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
-        });
-        path.closed = this.closed;
-        path.selectable = true;
-
-        window.room.createTool(path);
-      });
 
       window.room.redrawWithThumb();
 
@@ -486,28 +506,45 @@ $(function () {
 
         return new opts.paper.Segment(firstPoint, handleIn, handleOut);
       }
+
+      function createNewElement(fromElement) {
+        var path = new opts.paper.Path();
+        $(fromElement.segments).each(function () {
+          path.addSegment(createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
+        });
+        path.closed = fromElement.closed;
+        path.selectable = true;
+        console.log(fromElement);
+        path.elementId = fromElement.elementId;
+
+        window.room.createTool(path, {
+          color:fromElement.strokeColor,
+          width:fromElement.strokeWidth,
+          opacity:fromElement.opacity
+        });
+      }
     },
 
-    saveState:function () {
-      var elements = [];
-      $(paper.project.activeLayer.children).each(function () {
-        var element = {};
-        element.segments = [];
-        element.closed = this.closed;
-        $(this.segments).each(function () {
-          element.segments.push({
-            x:this.point.x,
-            y:this.point.y,
-            ix:this.handleIn.x,
-            iy:this.handleIn.y,
-            ox:this.handleOut.x,
-            oy:this.handleOut.y
-          });
+    prepareElementToSend:function (elementToSend) {
+      var element = {};
+      element.segments = [];
+      element.elementId = elementToSend.elementId;
+      element.closed = elementToSend.closed;
+      element.strokeColor = elementToSend.strokeColor.toCssString();
+      element.strokeWidth = elementToSend.strokeWidth;
+      element.opacity = elementToSend.opacity;
+      $(elementToSend.segments).each(function () {
+        element.segments.push({
+          x:this.point.x,
+          y:this.point.y,
+          ix:this.handleIn.x,
+          iy:this.handleIn.y,
+          ox:this.handleOut.x,
+          oy:this.handleOut.y
         });
-        elements.push(element);
       });
 
-      return JSON.stringify(elements);
+      return JSON.stringify(element);
     },
 
     // *** Item manipulation ***
@@ -735,8 +772,6 @@ $(function () {
           selectableTools.push(this);
         }
       });
-
-      console.log(selectableTools);
 
       return selectableTools;
     },
@@ -1127,6 +1162,17 @@ $(function () {
       $(document).bind('keydown.shift_down', function () {
         window.room.translateSelected(new Point(0, 1));
       })
+    },
+
+    findByElementId:function (array, id) {
+      var foundElement = null;
+      $(array).each(function () {
+        if (id == this.elementId) {
+          foundElement = this
+          return false; // break;
+        }
+      })
+      return foundElement;
     }
   };
 
@@ -1332,8 +1378,12 @@ $(function () {
 
   var canvasIO = io.connect('/canvas', window.copt);
 
-  canvasIO.on('message', function (data) {
-    window.room.restoreState(data.message, false);
+  canvasIO.on('elementUpdate', function (data) {
+    window.room.addOrUpdateElement(data.message, false);
+  });
+
+  canvasIO.on('nextId', function () {
+    nextId = nextId + 1;
   });
 
   window.room = room;
