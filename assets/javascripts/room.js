@@ -7,16 +7,7 @@ $(function () {
   var COMMENT_STYLE = {width:"2", color:"#C2E1F5"};
 
   var defaultOpts = {
-    paper:undefined,
-    tool:undefined,
-    selectedTool:undefined,
-    image:undefined,
-    historytools:{
-      eligibleHistory:[],
-      allHistory:[]
-    },
     tooltype:'line',
-    historyCounter:undefined,
     color:'#404040',
     defaultWidth:2,
     currentScale:1,
@@ -26,7 +17,7 @@ $(function () {
   var room = {
     init:function (opt) {
       $.extend(opts, opt);
-      $.extend(opts, defaultOpts);
+      room.initOpts(opts);
 
       savedOpts.push(opts);
 
@@ -83,6 +74,14 @@ $(function () {
           $(canvas).css({cursor:"pointer"});
         }
       }
+    },
+
+    initOpts:function (opts) {
+      $.extend(opts, defaultOpts);
+      opts.historytools = {
+        eligibleHistory:[],
+        allHistory:[]
+      };
     },
 
     onMouseDown:function (canvas, event) {
@@ -364,7 +363,7 @@ $(function () {
           this.opacity = 0;
         }
 
-        if (this.commentMin){
+        if (this.commentMin) {
           commentsHelper.hideComment(this.commentMin);
         }
       });
@@ -386,7 +385,7 @@ $(function () {
         }
       });
 
-      room.redrawWithThumb();
+      room.redraw();
     },
 
     restoreCanvas:function () {
@@ -441,7 +440,7 @@ $(function () {
 
       var oldOpts = opts;
       opts = {};
-      $.extend(opts, defaultOpts);
+      room.initOpts(opts);
 
       opts.paper = oldOpts.paper;
       savedOpts.push(opts);
@@ -1601,6 +1600,7 @@ $(function () {
 
   canvasIO.on('eraseCanvas', function () {
     window.room.eraseCanvas();
+    window.room.redrawWithThumb();
   });
 
   canvasIO.on('nextId', function () {
