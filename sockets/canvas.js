@@ -55,6 +55,13 @@ exports.configure = function (sio) {
         });
       });
 
+      socket.on('commentText', function (msg, cb) {
+        socket.broadcast.to(socket.project).emit("commentText", {
+          id:id
+          , message:msg
+        });
+      });
+
       socket.on('nextId', function (msg, cb) {
         socket.broadcast.to(socket.project).emit("nextId");
       });

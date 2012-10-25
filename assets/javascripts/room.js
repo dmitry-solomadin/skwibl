@@ -298,7 +298,7 @@ $(function () {
           opts.tool.eligible = true;
           this.addHistoryTool();
         } else {
-          this.addHistoryTool({type:"comment", commentMin:commentMin, eligible: true});
+          this.addHistoryTool({type:"comment", commentMin:commentMin, eligible:true});
         }
       }
 
@@ -357,7 +357,7 @@ $(function () {
 
     clearCanvas:function () {
       window.room.addHistoryTool({
-        type:"clear", tools:this.getSelectableTools(), eligible: true
+        type:"clear", tools:this.getSelectableTools(), eligible:true
       });
       window.room.helper.setOpacityElems(opts.historytools.allHistory, 0);
 
@@ -485,7 +485,13 @@ $(function () {
       return canvasOpts;
     },
 
-    // *** Save & restore state ***
+    // *** SOCKETS ***
+
+    addOrUpdateCommentText:function (state) {
+      var foundComment = window.room.helper.findByElementId(opts.historytools.allHistory, state.elementId);
+      console.log(foundComment);
+      this.addCommentText(foundComment.commentMin, state.text, false);
+    },
 
     addOrUpdateComment:function (state, initial) {
       if (initial) {
@@ -519,7 +525,7 @@ $(function () {
           rect.eligible = false;
           window.room.addHistoryTool(rect);
         } else {
-          window.room.addHistoryTool({type:"comment", commentMin:commentMin, eligible: false});
+          window.room.addHistoryTool({type:"comment", commentMin:commentMin, eligible:false});
         }
       }
 
@@ -545,7 +551,7 @@ $(function () {
             foundPath.addSegment(createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
           });
 
-          if (foundPath.commentMin){
+          if (foundPath.commentMin) {
             commentsHelper.redrawArrow(foundPath.commentMin);
           }
         } else {
@@ -661,7 +667,7 @@ $(function () {
     removeSelected:function () {
       if (opts.selectedTool) {
         // add new 'remove' item into history and link it to removed item.
-        window.room.addHistoryTool({type:"remove", tool:opts.selectedTool, eligible: true});
+        window.room.addHistoryTool({type:"remove", tool:opts.selectedTool, eligible:true});
         opts.selectedTool.opacity = 0;
 
         this.unselect();
@@ -980,12 +986,9 @@ $(function () {
       });
 
       $(commentMax).find(".comment-send").on("click", function () {
-        var commentContent = $(this).parent(".comment-content");
-        var commentTextarea = commentContent.find(".comment-reply");
-        var commentText = commentTextarea.val();
+        var commentTextarea = commentMax.find(".comment-reply");
+        room.addCommentText(commentMin, commentTextarea.val(), true);
         commentTextarea.val("");
-
-        commentContent.prepend("<div class='comment-text'>" + commentText + "</div>");
       });
 
       commentMin[0].$maximized = commentMax;
@@ -1013,6 +1016,19 @@ $(function () {
       commentMin[0].arrow = path;
 
       return commentMin;
+    },
+
+    addCommentText:function (commentMin, text, emit) {
+      var commentContent = commentMin[0].$maximized.find(".comment-content");
+
+      commentContent.prepend("<div class='comment-text'>" + text + "</div>");
+
+      if (emit){
+        canvasIO.emit("commentText", {
+          elementId:commentMin.elementId,
+          text:text
+        });
+      }
     },
 
     hideComment:function ($commentmin) {
@@ -1049,9 +1065,9 @@ $(function () {
         window.room.redraw();
 
         if ($commentmin[0].rect) {
-          this.addHistoryTool({type:"remove", tool:$commentmin[0].rect, eligible: true});
+          this.addHistoryTool({type:"remove", tool:$commentmin[0].rect, eligible:true});
         } else {
-          this.addHistoryTool({type:"remove", tool:{type:"comment", commentMin:$commentmin, eligible: true}});
+          this.addHistoryTool({type:"remove", tool:{type:"comment", commentMin:$commentmin, eligible:true}});
         }
       }
     },
@@ -1279,7 +1295,7 @@ $(function () {
 
       $(document).bind('keydown.down', function () {
         window.room.translateSelected(new Point(0, 5));
-      })
+      });
 
       $(document).bind('keydown.shift_left', function () {
         window.room.translateSelected(new Point(-1, 0));
@@ -1523,6 +1539,10 @@ $(function () {
 
   canvasIO.on('commentUpdate', function (data) {
     window.room.addOrUpdateComment(data.message, false);
+  });
+
+  canvasIO.on('commentText', function (data) {
+    window.room.addOrUpdateCommentText(data.message, false);
   });
 
   canvasIO.on('nextId', function () {
