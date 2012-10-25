@@ -3,12 +3,18 @@ $(function () {
   var opts = {};
   var savedOpts = new Array();
 
+  var COMMENT_RECTANGLE_ROUNDNESS = 8;
+  var COMMENT_STYLE = {width:"2", color:"#C2E1F5"};
+
   var defaultOpts = {
     paper:undefined,
     tool:undefined,
     selectedTool:undefined,
     image:undefined,
-    historytools:[],
+    historytools:{
+      eligibleHistory:[],
+      allHistory:[]
+    },
     tooltype:'line',
     historyCounter:undefined,
     color:'#404040',
@@ -72,7 +78,8 @@ $(function () {
           $(canvas).css({cursor:"ne-resize"});
         } else if (opts.selectedTool.selectionRect.bottomLeftScaler.bounds.contains(event.point)) {
           $(canvas).css({cursor:"sw-resize"});
-        } else if (opts.selectedTool.selectionRect.removeButton.bounds.contains(event.point)) {
+        } else if (opts.selectedTool.selectionRect.removeButton &&
+          opts.selectedTool.selectionRect.removeButton.bounds.contains(event.point)) {
           $(canvas).css({cursor:"pointer"});
         }
       }
@@ -114,14 +121,12 @@ $(function () {
 
       /* this should be here because sometimes mouse up event won't fire. */
       if (opts.tooltype == 'line' || opts.tooltype == 'highligher') {
-        opts.tool.selectable = true;
+        opts.tool.eligible = true;
         this.addHistoryTool();
       }
     },
 
     onMouseDrag:function (canvas, event) {
-      opts.dragPerformed = true;
-
       event.point = event.point.transform(new Matrix(1 / opts.currentScale, 0, 0, 1 / opts.currentScale, 0, 0));
 
       if (opts.tooltype == 'line') {
@@ -149,10 +154,9 @@ $(function () {
           x = event.point.x, y = event.point.y, w = sizes.x, h = sizes.y;
         }
 
-        var rectangle = new Path.RoundRectangle(x, y, w, h, 8, 8);
+        var rectangle = new Path.RoundRectangle(x, y, w, h, COMMENT_RECTANGLE_ROUNDNESS, COMMENT_RECTANGLE_ROUNDNESS);
         opts.commentRect = rectangle;
-
-        this.createTool(rectangle, {width:"2", color:"#C2E1F5"});
+        this.createTool(rectangle, COMMENT_STYLE);
         opts.tool.removeOnDrag();
       } else if (opts.tooltype == 'straightline') {
         opts.tool.lastSegment.point = event.point;
@@ -285,32 +289,35 @@ $(function () {
 
       if (opts.tooltype == 'straightline' || opts.tooltype == 'arrow' ||
         opts.tooltype == 'circle' || opts.tooltype == 'rectangle') {
-        opts.tool.selectable = true;
+        opts.tool.eligible = true;
         this.addHistoryTool();
       }
 
       if (opts.tooltype == 'comment') {
         if (opts.commentRect) {
-          opts.tool.selectable = true;
+          opts.tool.eligible = true;
           this.addHistoryTool();
         } else {
-          this.addHistoryTool({type:"comment", commentMin:commentMin});
+          this.addHistoryTool({type:"comment", commentMin:commentMin, eligible: true});
         }
-
-        window.room.setTooltype("select");
       }
-
-      opts.dragPerformed = false;
 
       if (opts.tooltype == 'straightline' || opts.tooltype == 'arrow' ||
         opts.tooltype == 'circle' || opts.tooltype == 'rectangle' ||
         opts.tooltype == 'line' || opts.tooltype == 'highligher') {
         opts.tool.elementId = this.getNextIdAndIncrement();
-
         canvasIO.emit("elementUpdate", this.prepareElementToSend(opts.tool));
+        canvasIO.emit("nextId");
+      } else if (opts.tooltype == "comment") {
+        commentMin.elementId = this.getNextIdAndIncrement();
+        canvasIO.emit("commentUpdate", this.prepareCommentToSend(commentMin));
         canvasIO.emit("nextId");
       } else if (opts.tooltype == 'select' && opts.selectedTool) {
         canvasIO.emit("elementUpdate", this.prepareElementToSend(opts.selectedTool));
+      }
+
+      if (opts.tooltype == 'comment') {
+        window.room.setTooltype("select");
       }
 
       this.updateSelectedCanvasThumb();
@@ -350,16 +357,16 @@ $(function () {
 
     clearCanvas:function () {
       window.room.addHistoryTool({
-        type:"clear", tools:this.getSelectableTools()
+        type:"clear", tools:this.getSelectableTools(), eligible: true
       });
-      window.room.helper.setOpacityElems(opts.historytools, 0);
+      window.room.helper.setOpacityElems(opts.historytools.allHistory, 0);
 
       this.unselect();
       this.redrawWithThumb();
     },
 
     eraseCanvas:function () {
-      $(opts.historytools).each(function () {
+      $(opts.historytools.allHistory).each(function () {
         if (!this.type) {
           this.remove();
         }
@@ -463,7 +470,7 @@ $(function () {
       this.eraseCanvas();
       opts = canvasOpts;
 
-      this.restoreFromHistory(opts.historytools);
+      this.restoreFromHistory(opts.historytools.allHistory);
 
       $(anchor).addClass("canvasSelected");
     },
@@ -480,23 +487,67 @@ $(function () {
 
     // *** Save & restore state ***
 
+    addOrUpdateComment:function (state, initial) {
+      if (initial) {
+        $(state).each(function () {
+          createNewComment(this);
+        })
+      } else {
+        var foundComment = window.room.helper.findByElementId(opts.historytools.allHistory, state.elementId);
+        if (foundComment) {
+          updateComment(foundComment, state)
+        } else {
+          createNewComment(state);
+        }
+      }
+
+      window.room.redrawWithThumb();
+
+      function createNewComment(comment) {
+        var rect = null;
+        if (comment.rect) {
+          var rect = new Path.RoundRectangle(comment.rect.x, comment.rect.y, comment.rect.w, comment.rect.h,
+            COMMENT_RECTANGLE_ROUNDNESS, COMMENT_RECTANGLE_ROUNDNESS);
+          window.room.createTool(rect, COMMENT_STYLE);
+        }
+
+        var commentMin = window.room.createComment(comment.min.x, comment.min.y, rect, comment.max);
+        commentMin.elementId = comment.elementId;
+
+        if (rect) {
+          rect.commentMin = commentMin;
+          rect.eligible = false;
+          window.room.addHistoryTool(rect);
+        } else {
+          window.room.addHistoryTool({type:"comment", commentMin:commentMin, eligible: false});
+        }
+      }
+
+      function updateComment(comment, updatedComment) {
+        comment.commentMin.css({left:updatedComment.min.x, top:updatedComment.min.y});
+        comment.commentMin[0].$maximized.css({left:updatedComment.max.x, top:updatedComment.max.y});
+        commentsHelper.redrawArrow(comment.commentMin);
+      }
+    },
+
     addOrUpdateElement:function (state, initial) {
       this.unselect();
-      state = JSON.parse(state);
 
       if (initial) {
-        this.eraseCanvas();
-
         $(state).each(function () {
           createNewElement(this);
         })
       } else {
-        var foundPath = window.room.helper.findByElementId(paper.project.activeLayer.children, state.elementId);
+        var foundPath = window.room.helper.findByElementId(opts.historytools.allHistory, state.elementId);
         if (foundPath) {
           foundPath.removeSegments();
           $(state.segments).each(function () {
             foundPath.addSegment(createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
           });
+
+          if (foundPath.commentMin){
+            commentsHelper.redrawArrow(foundPath.commentMin);
+          }
         } else {
           createNewElement(state);
         }
@@ -518,7 +569,6 @@ $(function () {
           path.addSegment(createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
         });
         path.closed = fromElement.closed;
-        path.selectable = true;
         path.elementId = fromElement.elementId;
 
         window.room.createTool(path, {
@@ -526,7 +576,40 @@ $(function () {
           width:fromElement.strokeWidth,
           opacity:fromElement.opacity
         });
+
+        path.eligible = false;
+        window.room.addHistoryTool(path);
       }
+    },
+
+    prepareCommentToSend:function (commentMin) {
+      var comment = {
+        min:{
+          x:commentMin.position().left,
+          y:commentMin.position().top
+        },
+        elementId:commentMin.elementId
+      };
+
+      var commentMax = commentMin[0].$maximized[0];
+      if (commentMax) {
+        comment.max = {
+          x:$(commentMax).position().left,
+          y:$(commentMax).position().top
+        }
+      }
+
+      var commentRect = commentMin[0].rect;
+      if (commentRect) {
+        comment.rect = {
+          x:commentRect.bounds.x,
+          y:commentRect.bounds.y,
+          w:commentRect.bounds.width,
+          h:commentRect.bounds.height
+        }
+      }
+
+      return comment;
     },
 
     prepareElementToSend:function (elementToSend) {
@@ -548,7 +631,7 @@ $(function () {
         });
       });
 
-      return JSON.stringify(element);
+      return element;
     },
 
     // *** Item manipulation ***
@@ -578,7 +661,7 @@ $(function () {
     removeSelected:function () {
       if (opts.selectedTool) {
         // add new 'remove' item into history and link it to removed item.
-        window.room.addHistoryTool({type:"remove", tool:opts.selectedTool});
+        window.room.addHistoryTool({type:"remove", tool:opts.selectedTool, eligible: true});
         opts.selectedTool.opacity = 0;
 
         this.unselect();
@@ -628,7 +711,7 @@ $(function () {
       if (!selected) {
         var previousSelectedTool = opts.selectedTool;
         $(window.room.getSelectableTools()).each(function () {
-          if (this.isImage) {
+          if (this.isImage || this.type) {
             return true; // uploaded image is not selectable.
           }
 
@@ -700,7 +783,7 @@ $(function () {
       $("#redoLink").removeClass("disabled");
 
       opts.historyCounter = opts.historyCounter - 1;
-      var item = opts.historytools[opts.historyCounter];
+      var item = opts.historytools.eligibleHistory[opts.historyCounter];
       if (typeof(item) != 'undefined') {
         executePrevHistory(item);
         this.redrawWithThumb();
@@ -732,13 +815,13 @@ $(function () {
     },
 
     nexthistory:function () {
-      if (opts.historyCounter == opts.historytools.length) {
+      if (opts.historyCounter == opts.historytools.eligibleHistory.length) {
         return;
       }
 
       $("#undoLink").removeClass("disabled");
 
-      var item = opts.historytools[opts.historyCounter];
+      var item = opts.historytools.eligibleHistory[opts.historyCounter];
       if (typeof(item) != 'undefined') {
         executeNextHistory(item);
 
@@ -746,7 +829,7 @@ $(function () {
         this.redrawWithThumb();
       }
 
-      if (opts.historyCounter == opts.historytools.length) {
+      if (opts.historyCounter == opts.historytools.eligibleHistory.length) {
         $("#redoLink").addClass("disabled");
       }
 
@@ -790,8 +873,8 @@ $(function () {
     getSelectableTools:function () {
       // get all tools that are visible and have special marker
       var selectableTools = new Array();
-      $(opts.paper.project.activeLayer.children).each(function () {
-        if (this.selectable && this.opacity != 0) {
+      $(opts.historytools.allHistory).each(function () {
+        if (this.opacity != 0) {
           selectableTools.push(this);
         }
       });
@@ -800,26 +883,31 @@ $(function () {
     },
 
     getAllHistoryTools:function () {
-      return opts.historytools;
+      return opts.historytools.allHistory;
     },
 
     addHistoryTool:function (tool) {
       var tool = tool ? tool : opts.tool;
-      if (opts.historyCounter != opts.historytools.length) { // rewrite history
-        opts.historytools = opts.historytools.slice(0, opts.historyCounter)
+      if (opts.historyCounter != opts.historytools.eligibleHistory.length) { // rewrite history
+        opts.historytools.eligibleHistory = opts.historytools.eligibleHistory.slice(0, opts.historyCounter)
       }
 
-      opts.historytools.push(tool);
+      if (tool.eligible) {
+        opts.historytools.eligibleHistory.push(tool);
+      }
+      opts.historytools.allHistory.push(tool);
 
-      opts.historyCounter = opts.historytools.length;
+      opts.historyCounter = opts.historytools.eligibleHistory.length;
 
-      $("#undoLink").removeClass("disabled");
-      $("#redoLink").addClass("disabled");
+      if (tool.eligible) {
+        $("#undoLink").removeClass("disabled");
+        $("#redoLink").addClass("disabled");
+      }
     },
 
     // *** Comments ***
 
-    createComment:function (x, y, rect) {
+    createComment:function (x, y, rect, max) {
       var COMMENT_SHIFT_X = 75;
       var COMMENT_SHIFT_Y = -135;
 
@@ -832,7 +920,9 @@ $(function () {
       commentMin.css({left:x, top:y});
 
       var commentMax = $("<div class='comment-maximized'></div>");
-      commentMax.css({left:x + COMMENT_SHIFT_X, top:y + COMMENT_SHIFT_Y});
+      var max_x = max ? max.x : x + COMMENT_SHIFT_X;
+      var max_y = max ? max.y : y + COMMENT_SHIFT_Y;
+      commentMax.css({left:max_x, top:max_y});
       var commentHeader = $("<div class='comment-header'>" +
         "<div class='fr'><span class='comment-minimize'></span><span class='comment-remove'></span></div>" +
         "</div>");
@@ -856,17 +946,26 @@ $(function () {
         "</div>");
       commentMax.append(commentContent);
 
-      commentHeader.drags({onDrag:function (dx, dy) {
-        commentMax.css({left:(commentMax.position().left + dx) + "px", top:(commentMax.position().top + dy) + "px"});
+      commentHeader.drags({
+        onDrag:function (dx, dy) {
+          commentMax.css({left:(commentMax.position().left + dx) + "px", top:(commentMax.position().top + dy) + "px"});
+          commentsHelper.redrawArrow(commentMin);
+        },
+        onAfterDrag:function () {
+          canvasIO.emit("commentUpdate", window.room.prepareCommentToSend(commentMin));
+        }
+      });
 
-        commentsHelper.redrawArrow(commentMin);
-      }});
-
-      commentMin.drags({onDrag:function (dx, dy) {
-        commentMin.css({left:(commentMin.position().left + dx) + "px", top:(commentMin.position().top + dy) + "px"});
-
-        commentsHelper.redrawArrow(commentMin);
-      }});
+      commentMin.drags({
+        onDrag:function (dx, dy) {
+          commentMin.css({left:(commentMin.position().left + dx) + "px", top:(commentMin.position().top + dy) + "px"});
+          commentsHelper.redrawArrow(commentMin);
+          canvasIO.emit("commentUpdate", window.room.prepareCommentToSend(commentMin));
+        },
+        onAfterDrag:function () {
+          canvasIO.emit("commentUpdate", window.room.prepareCommentToSend(commentMin));
+        }
+      });
 
       $(document).on("click", function (evt) {
         $(".comment-send:visible").each(function () {
@@ -950,9 +1049,9 @@ $(function () {
         window.room.redraw();
 
         if ($commentmin[0].rect) {
-          this.addHistoryTool({type:"remove", tool:$commentmin[0].rect});
+          this.addHistoryTool({type:"remove", tool:$commentmin[0].rect, eligible: true});
         } else {
-          this.addHistoryTool({type:"remove", tool:{type:"comment", commentMin:$commentmin}});
+          this.addHistoryTool({type:"remove", tool:{type:"comment", commentMin:$commentmin, eligible: true}});
         }
       }
     },
@@ -1202,8 +1301,13 @@ $(function () {
     findByElementId:function (array, id) {
       var foundElement = null;
       $(array).each(function () {
+        if (this.commentMin && id == this.commentMin.elementId) {
+          foundElement = this;
+          return false; // break;
+        }
+
         if (id == this.elementId) {
-          foundElement = this
+          foundElement = this;
           return false; // break;
         }
       })
@@ -1415,6 +1519,10 @@ $(function () {
 
   canvasIO.on('elementUpdate', function (data) {
     window.room.addOrUpdateElement(data.message, false);
+  });
+
+  canvasIO.on('commentUpdate', function (data) {
+    window.room.addOrUpdateComment(data.message, false);
   });
 
   canvasIO.on('nextId', function () {

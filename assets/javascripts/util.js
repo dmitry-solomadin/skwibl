@@ -54,7 +54,12 @@
     var $el = this;
 
     $(document).on("mouseup", function () {
-      $('.draggable').removeClass('draggable');
+      var draggedObject = $('.draggable');
+      if (draggedObject[0] && opt.onAfterDrag) {
+        opt.onAfterDrag();
+      }
+
+      draggedObject.removeClass('draggable');
     });
 
     $(document).on("mousemove", function (e) {
@@ -78,6 +83,8 @@
 
     $el.css('cursor', opt.cursor).on("mousedown", function (e) {
       $el.addClass('draggable');
+      $el.data("pdx", "");
+      $el.data("pdy", "");
       e.preventDefault(); // disable selection
     });
 
@@ -85,10 +92,10 @@
   }
 })(jQuery);
 
-function isMac(){
+function isMac() {
   return /Mac/.test(navigator.userAgent);
 }
 
-function currentPage(template){
+function currentPage(template) {
   return $("#currentTemplate").val() == template
 }

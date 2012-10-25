@@ -42,11 +42,17 @@ exports.configure = function (sio) {
       });
 
       socket.on('elementUpdate', function (msg, cb) {
-        socket.broadcast.to(socket.project).emit("elementUpdate",
-          {
+        socket.broadcast.to(socket.project).emit("elementUpdate", {
             id:id
             , message:msg
           });
+      });
+
+      socket.on('commentUpdate', function (msg, cb) {
+        socket.broadcast.to(socket.project).emit("commentUpdate", {
+          id:id
+          , message:msg
+        });
       });
 
       socket.on('nextId', function (msg, cb) {
