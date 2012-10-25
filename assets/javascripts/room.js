@@ -193,7 +193,7 @@ $(function () {
 
         triangle.removeOnDrag();
       } else if (opts.tooltype == 'pan') {
-        $(this.getAllHistoryTools()).each(function () {
+        $(opts.historytools.allHistory).each(function () {
           if (this.commentMin) {
             var commentRect = this.type != "comment";
 
@@ -359,10 +359,20 @@ $(function () {
       window.room.addHistoryTool({
         type:"clear", tools:this.getSelectableTools(), eligible:true
       });
-      window.room.helper.setOpacityElems(opts.historytools.allHistory, 0);
+      $(opts.historytools.allHistory).each(function () {
+        if (!this.type) {
+          this.opacity = 0;
+        }
+
+        if (this.commentMin){
+          commentsHelper.hideComment(this.commentMin);
+        }
+      });
 
       this.unselect();
       this.redrawWithThumb();
+
+      canvasIO.emit("eraseCanvas");
     },
 
     eraseCanvas:function () {
@@ -372,11 +382,21 @@ $(function () {
         }
 
         if (this.commentMin) {
-          $(this.commentMin).hide();
-          if (this.commentMin[0].$maximized[0]) {
-            this.commentMin[0].$maximized.hide();
-            this.commentMin[0].arrow.opacity = 0;
-          }
+          commentsHelper.hideComment(this.commentMin);
+        }
+      });
+
+      room.redrawWithThumb();
+    },
+
+    restoreCanvas:function () {
+      $(opts.historytools.allHistory).each(function () {
+        if (!this.type) {
+          opts.paper.project.activeLayer.addChild(this);
+        }
+
+        if (this.commentMin) {
+          commentsHelper.showComment(this.commentMin);
         }
       });
     },
@@ -389,7 +409,7 @@ $(function () {
 
       opts.paper.project.activeLayer.transform(transformMatrix);
 
-      $(this.getAllHistoryTools()).each(function () {
+      $(opts.historytools.allHistory).each(function () {
         if (this.commentMin) {
           this.commentMin.css({top:this.commentMin.position().top * finalScale,
             left:this.commentMin.position().left * finalScale});
@@ -467,10 +487,9 @@ $(function () {
         alert("No canvas opts by given index=" + index);
       }
 
-      this.eraseCanvas();
+      room.eraseCanvas();
       opts = canvasOpts;
-
-      this.restoreFromHistory(opts.historytools.allHistory);
+      room.restoreCanvas();
 
       $(anchor).addClass("canvasSelected");
     },
@@ -487,23 +506,22 @@ $(function () {
 
     // *** SOCKETS ***
 
-    addOrUpdateCommentText:function (state) {
-      var foundComment = window.room.helper.findByElementId(opts.historytools.allHistory, state.elementId);
-      console.log(foundComment);
-      this.addCommentText(foundComment.commentMin, state.text, false);
+    addOrUpdateCommentText:function (data) {
+      var foundComment = helper.findByElementId(data.elementId);
+      commentsHelper.addCommentText(foundComment.commentMin, data.text, false);
     },
 
-    addOrUpdateComment:function (state, initial) {
+    addOrUpdateComment:function (data, initial) {
       if (initial) {
-        $(state).each(function () {
+        $(data).each(function () {
           createNewComment(this);
         })
       } else {
-        var foundComment = window.room.helper.findByElementId(opts.historytools.allHistory, state.elementId);
+        var foundComment = helper.findByElementId(data.elementId);
         if (foundComment) {
-          updateComment(foundComment, state)
+          updateComment(foundComment, data)
         } else {
-          createNewComment(state);
+          createNewComment(data);
         }
       }
 
@@ -536,18 +554,39 @@ $(function () {
       }
     },
 
-    addOrUpdateElement:function (state, initial) {
-      this.unselect();
+    socketRemoveElement:function (data) {
+      helper.findByElementId(data).remove();
 
+      this.unselectIfSelected(data);
+      this.redrawWithThumb();
+    },
+
+    socketRemoveComment:function (data) {
+      var element = helper.findByElementId(data);
+
+      var commentMin = element.commentMin;
+      commentMin[0].$maximized.remove();
+      commentMin[0].arrow.remove();
+      if (commentMin[0].rect) {
+        commentMin[0].rect.remove();
+      }
+      commentMin.remove();
+
+      this.unselectIfSelected(data);
+      this.redrawWithThumb();
+    },
+
+    addOrUpdateElement:function (data, initial) {
       if (initial) {
-        $(state).each(function () {
+        $(data).each(function () {
           createNewElement(this);
         })
       } else {
-        var foundPath = window.room.helper.findByElementId(opts.historytools.allHistory, state.elementId);
+        var foundPath = helper.findByElementId(data.elementId);
         if (foundPath) {
+          this.unselectIfSelected(foundPath.elementId);
           foundPath.removeSegments();
-          $(state.segments).each(function () {
+          $(data.segments).each(function () {
             foundPath.addSegment(createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
           });
 
@@ -555,7 +594,7 @@ $(function () {
             commentsHelper.redrawArrow(foundPath.commentMin);
           }
         } else {
-          createNewElement(state);
+          createNewElement(data);
         }
       }
 
@@ -670,6 +709,8 @@ $(function () {
         window.room.addHistoryTool({type:"remove", tool:opts.selectedTool, eligible:true});
         opts.selectedTool.opacity = 0;
 
+        canvasIO.emit("elementRemove", opts.selectedTool.elementId);
+
         this.unselect();
         this.redrawWithThumb();
       }
@@ -692,6 +733,13 @@ $(function () {
         opts.selectedTool.selectionRect.remove();
       }
       opts.selectedTool = null;
+    },
+
+    unselectIfSelected:function (elementId) {
+      if (opts.selectedTool && opts.selectedTool.selectionRect && opts.selectedTool.elementId == elementId) {
+        opts.selectedTool.selectionRect.remove();
+        opts.selectedTool = null;
+      }
     },
 
     testSelect:function (point) {
@@ -799,20 +847,18 @@ $(function () {
         $("#undoLink").addClass("disabled");
       }
 
-      function executePrevHistory(item, fromRemove) {
+      function executePrevHistory(item, reverse) {
         if (item.type == "remove") {
           executePrevHistory(item.tool, true);
         } else if (item.type == "clear") {
-          window.room.helper.setOpacityElems(item.tools, 1);
+          $(item.tools).each(function () {
+            executePrevHistory(this, true);
+          });
         } else if (item.commentMin) {
-          var commentRect = item.type != "comment";
-          if (!commentRect) {
-            item.commentMin.css({display:fromRemove ? "block" : "none"});
-          }
-          item.commentMin[0].$maximized.css({display:fromRemove ? "block" : "none"});
-          item.commentMin[0].arrow.opacity = fromRemove ? 1 : 0;
-          if (commentRect) {
-            item.opacity = fromRemove ? 1 : 0;
+          if (reverse) {
+            commentsHelper.showComment(item.commentMin);
+          } else {
+            commentsHelper.hideComment(item.commentMin);
           }
         } else {
           window.room.helper.reverseOpacity(item);
@@ -839,41 +885,23 @@ $(function () {
         $("#redoLink").addClass("disabled");
       }
 
-      function executeNextHistory(item, fromRemove) {
+      function executeNextHistory(item, reverse) {
         if (item.type == "remove") {
           executeNextHistory(item.tool, true);
         } else if (item.type == "clear") {
-          window.room.helper.setOpacityElems(item.tools, 0);
+          $(item.tools).each(function () {
+            executeNextHistory(this, true);
+          });
         } else if (item.commentMin) {
-          var commentRect = item.type != "comment";
-          if (!commentRect) {
-            item.commentMin.css({display:fromRemove ? "none" : "block"});
-          }
-          item.commentMin[0].$maximized.css({display:fromRemove ? "none" : "block"});
-          item.commentMin[0].arrow.opacity = fromRemove ? 0 : 1;
-          if (commentRect) {
-            item.opacity = fromRemove ? 0 : 1;
+          if (reverse) {
+            commentsHelper.hideComment(item.commentMin);
+          } else {
+            commentsHelper.showComment(item.commentMin);
           }
         } else {
           window.room.helper.reverseOpacity(item);
         }
       }
-    },
-
-    restoreFromHistory:function (history) {
-      $(history).each(function () {
-        if (!this.type) {
-          opts.paper.project.activeLayer.addChild(this);
-        }
-
-        if (this.commentMin) {
-          $(this.commentMin).show();
-          if (this.commentMin[0].$maximized[0]) {
-            this.commentMin[0].$maximized.show();
-            this.commentMin[0].arrow.opacity = 1;
-          }
-        }
-      });
     },
 
     getSelectableTools:function () {
@@ -886,10 +914,6 @@ $(function () {
       });
 
       return selectableTools;
-    },
-
-    getAllHistoryTools:function () {
-      return opts.historytools.allHistory;
     },
 
     addHistoryTool:function (tool) {
@@ -934,15 +958,15 @@ $(function () {
         "</div>");
 
       commentHeader.find(".comment-minimize").on("click", function () {
-        window.room.hideComment(commentMin);
+        commentsHelper.foldComment(commentMin);
       });
 
       commentHeader.find(".comment-remove").on("click", function () {
-        window.room.removeComment(commentMin);
+        commentsHelper.removeComment(commentMin);
       });
 
       commentMin.on("mousedown", function () {
-        window.room.showComment(commentMin);
+        commentsHelper.unfoldComment(commentMin);
       });
 
       commentMax.append(commentHeader);
@@ -987,7 +1011,7 @@ $(function () {
 
       $(commentMax).find(".comment-send").on("click", function () {
         var commentTextarea = commentMax.find(".comment-reply");
-        room.addCommentText(commentMin, commentTextarea.val(), true);
+        commentsHelper.addCommentText(commentMin, commentTextarea.val(), true);
         commentTextarea.val("");
       });
 
@@ -1016,60 +1040,6 @@ $(function () {
       commentMin[0].arrow = path;
 
       return commentMin;
-    },
-
-    addCommentText:function (commentMin, text, emit) {
-      var commentContent = commentMin[0].$maximized.find(".comment-content");
-
-      commentContent.prepend("<div class='comment-text'>" + text + "</div>");
-
-      if (emit){
-        canvasIO.emit("commentText", {
-          elementId:commentMin.elementId,
-          text:text
-        });
-      }
-    },
-
-    hideComment:function ($commentmin) {
-      $commentmin[0].$maximized.hide();
-      $commentmin[0].arrow.opacity = 0;
-      $commentmin[0].arrow.isHidden = true;
-      $commentmin.show();
-
-      window.room.redraw();
-    },
-
-    showComment:function ($commentmin) {
-      $commentmin[0].$maximized.show();
-      $commentmin[0].arrow.opacity = 1;
-      $commentmin[0].arrow.isHidden = false;
-
-      commentsHelper.redrawArrow($commentmin); // the comment position might have been changed.
-
-      if ($commentmin[0].rect) {
-        $commentmin.hide();
-      }
-
-      window.room.redraw();
-    },
-
-    removeComment:function ($commentmin) {
-      if (confirm("Are you sure?")) {
-        $commentmin[0].$maximized.hide();
-        $commentmin[0].arrow.opacity = 0;
-        if ($commentmin[0].rect) {
-          $commentmin[0].rect.opacity = 0;
-        }
-        $commentmin.hide();
-        window.room.redraw();
-
-        if ($commentmin[0].rect) {
-          this.addHistoryTool({type:"remove", tool:$commentmin[0].rect, eligible:true});
-        } else {
-          this.addHistoryTool({type:"remove", tool:{type:"comment", commentMin:$commentmin, eligible:true}});
-        }
-      }
     },
 
     // *** Misc methods ***
@@ -1314,9 +1284,9 @@ $(function () {
       })
     },
 
-    findByElementId:function (array, id) {
+    findByElementId:function (id) {
       var foundElement = null;
-      $(array).each(function () {
+      $(opts.historytools.allHistory).each(function () {
         if (this.commentMin && id == this.commentMin.elementId) {
           foundElement = this;
           return false; // break;
@@ -1527,6 +1497,82 @@ $(function () {
       arrow.segments[2].point.y = coords.y2 / opts.currentScale;
 
       window.room.redrawWithThumb();
+    },
+
+    removeComment:function ($commentmin) {
+      if (confirm("Are you sure?")) {
+        $commentmin[0].$maximized.hide();
+        $commentmin[0].arrow.opacity = 0;
+        if ($commentmin[0].rect) {
+          $commentmin[0].rect.opacity = 0;
+        }
+        $commentmin.hide();
+
+        if ($commentmin[0].rect) {
+          room.addHistoryTool({type:"remove", tool:$commentmin[0].rect, eligible:true});
+        } else {
+          room.addHistoryTool({type:"remove", tool:{type:"comment", commentMin:$commentmin}, eligible:true});
+        }
+
+        canvasIO.emit("commentRemove", $commentmin.elementId);
+        room.redraw();
+      }
+    },
+
+    hideComment:function ($commentmin) {
+      $commentmin[0].$maximized.hide();
+      $commentmin[0].arrow.opacity = 0;
+      $commentmin[0].arrow.isHidden = true;
+      $commentmin.hide();
+      if ($commentmin[0].rect) {
+        $commentmin[0].rect.opacity = 0;
+      }
+    },
+
+    showComment:function ($commentmin) {
+      $commentmin[0].$maximized.show();
+      $commentmin[0].arrow.opacity = 1;
+      $commentmin[0].arrow.isHidden = false;
+      $commentmin.show();
+      if ($commentmin[0].rect) {
+        $commentmin[0].rect.opacity = 1;
+      }
+    },
+
+    foldComment:function ($commentmin) {
+      $commentmin[0].$maximized.hide();
+      $commentmin[0].arrow.opacity = 0;
+      $commentmin[0].arrow.isHidden = true;
+      $commentmin.show();
+
+      window.room.redraw();
+    },
+
+    unfoldComment:function ($commentmin) {
+      $commentmin[0].$maximized.show();
+      $commentmin[0].arrow.opacity = 1;
+      $commentmin[0].arrow.isHidden = false;
+
+      commentsHelper.redrawArrow($commentmin); // the comment position might have been changed.
+
+      if ($commentmin[0].rect) {
+        $commentmin.hide();
+      }
+
+      window.room.redraw();
+    },
+
+    addCommentText:function (commentMin, text, emit) {
+      var commentContent = commentMin[0].$maximized.find(".comment-content");
+
+      commentContent.prepend("<div class='comment-text'>" + text + "</div>");
+
+      if (emit) {
+        canvasIO.emit("commentText", {
+          elementId:commentMin.elementId,
+          text:text
+        });
+      }
     }
 
   };
@@ -1537,12 +1583,24 @@ $(function () {
     window.room.addOrUpdateElement(data.message, false);
   });
 
+  canvasIO.on('elementRemove', function (data) {
+    window.room.socketRemoveElement(data.message);
+  });
+
   canvasIO.on('commentUpdate', function (data) {
     window.room.addOrUpdateComment(data.message, false);
   });
 
+  canvasIO.on('commentRemove', function (data) {
+    window.room.socketRemoveComment(data.message);
+  });
+
   canvasIO.on('commentText', function (data) {
-    window.room.addOrUpdateCommentText(data.message, false);
+    window.room.addOrUpdateCommentText(data.message);
+  });
+
+  canvasIO.on('eraseCanvas', function () {
+    window.room.eraseCanvas();
   });
 
   canvasIO.on('nextId', function () {

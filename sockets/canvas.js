@@ -42,24 +42,27 @@ exports.configure = function (sio) {
       });
 
       socket.on('elementUpdate', function (msg, cb) {
-        socket.broadcast.to(socket.project).emit("elementUpdate", {
-            id:id
-            , message:msg
-          });
+        socket.broadcast.to(socket.project).emit("elementUpdate", {id:id, message:msg});
+      });
+
+      socket.on('elementRemove', function (msg, cb) {
+        socket.broadcast.to(socket.project).emit("elementRemove", {id:id, message:msg});
       });
 
       socket.on('commentUpdate', function (msg, cb) {
-        socket.broadcast.to(socket.project).emit("commentUpdate", {
-          id:id
-          , message:msg
-        });
+        socket.broadcast.to(socket.project).emit("commentUpdate", {id:id, message:msg});
+      });
+
+      socket.on('commentRemove', function (msg, cb) {
+        socket.broadcast.to(socket.project).emit("commentRemove", {id:id, message:msg});
       });
 
       socket.on('commentText', function (msg, cb) {
-        socket.broadcast.to(socket.project).emit("commentText", {
-          id:id
-          , message:msg
-        });
+        socket.broadcast.to(socket.project).emit("commentText", {id:id, message:msg});
+      });
+
+      socket.on('eraseCanvas', function (msg, cb) {
+        socket.broadcast.to(socket.project).emit("eraseCanvas");
       });
 
       socket.on('nextId', function (msg, cb) {
