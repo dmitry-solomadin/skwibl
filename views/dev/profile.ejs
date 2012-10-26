@@ -1,14 +1,22 @@
 <input type="hidden" id="id" value="<%= id %>"/>
 <input type="hidden" id="name" value="<%= name %>"/>
-<button name="facebookOn" onclick="facebookOn()">Connect</button>
-<button name="facebookOff" onclick="facebookOff()">Disconnect</button>
+<button name="facebookOn" onclick="connect('facebook')">Connect</button>
+<button name="facebookOff" onclick="disconnect('facebook')">Disconnect</button>
 Facebook: <%= connections.facebook %>
 <div id="facebook"></div><hr>
-<button name="googleOn" onclick="googleOn()">Connect</button>
-<button name="googleOff" onclick="googleOff()">Disconnect</button>
+<button name="googleOn" onclick="connect('google')">Connect</button>
+<button name="googleOff" onclick="disconnect('google')">Disconnect</button>
 Google: <%= connections.google %>
 <div id="google"></div><hr>
-<button name="linkedinOn" onclick="linkedinOn()">Connect</button>
-<button name="linkedinOff" onclick="linkedinOff()">Disconnect</button>
+<button name="linkedinOn" onclick="connect('linkedin')">Connect</button>
+<button name="linkedinOff" onclick="disconnect('linkedin')">Disconnect</button>
 LinkedIn: <%= connections.linkedin %>
 <div id="linkedin"></div><hr>
+<button name="dropboxOn" onclick="connect('dropbox')">Connect</button>
+<button name="dropboxOff" onclick="disconnect('dropbox')">Disconnect</button>
+Dropbox: <%= connections.dropbox %>
+<div id="dropbox"></div><hr>
+<button name="yahooOn" onclick="connect('yahoo')">Connect</button>
+<button name="yahooOff" onclick="disconnect('yahoo')">Disconnect</button>
+Yahoo: <%= connections.yahoo %>
+<div id="yahoo"></div><hr>

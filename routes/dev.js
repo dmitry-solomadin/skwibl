@@ -23,10 +23,6 @@ exports.configure = function(app, passport) {
 
   app.post('/dev/projects/get', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.dev.getProject);
 
-  app.get('/dev/users/:id', ctrls.dev.profile);
-
-  app.post('/dev/connect', ctrls.mid.isAuth, ctrls.dev.connect);
-
-  app.post('/dev/disconnect', ctrls.mid.isAuth, ctrls.dev.disconnect);
+  app.get('/dev/conns', ctrls.mid.isAuth, ctrls.dev.connections);
 
 };

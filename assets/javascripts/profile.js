@@ -23,25 +23,17 @@ updateConnections = function() {
   });
 };
 
-facebookOn = function() {
-  window.location = '/connect/facebook';/*, {
-    provider: 'facebook'
-  }, function(data, status, xhr) {
-    if(status === 'success') {
-      var facebook = $("#facebook");
-      facebook.html('');
-      facebook.html('connected');
-    }
-  });*/
+connect = function(provider) {
+  window.location = '/connect/' + provider;
 };
 
-facebookOff = function() {
-  $.post('/dev/disconnect', {
-    provider: 'facebook'
+disconnect = function(provider) {
+  $.post('/auth/disconnect', {
+    provider: provider
   }, function(data, status, xhr) {
     if(status === 'success') {
-      var facebook = $("#facebook");
-      facebook.html('');
+      var facebook = $("#" + provider);
+      facebook.empty();
       facebook.html('disconnected');
     }
   });

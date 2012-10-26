@@ -155,6 +155,43 @@ exports.googleCb = function(passport) {
 };
 
 /*
+ * POST
+ * Google connect
+ */
+exports.connectGoogle = function(req, res, next) {
+  return res.redirect('https://accounts.google.com/o/oauth2/auth?'
+  + 'client_id=' + cfg.GOOGLE_CLIENT_ID + '&'
+  + 'redirect_uri=http%3A%2F%2Flocalhost/connect/google/callback&'
+  + 'response_type=code&' + 'scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile');//&access_type=offline');
+};
+
+/*
+ * GET
+ * Google connect callback
+ */
+exports.connectGoogleCb = function(req, res) {
+  var code = req.query['code']
+    , tokenURL = 'https://accounts.google.com/o/oauth2/token'
+    , oauth = {
+      code: code
+    , client_id: cfg.GOOGLE_CLIENT_ID
+    , client_secret: cfg.GOOGLE_CLIENT_SECRET
+    , redirect_uri: 'http://localhost/connect/google/callback'
+    , grant_type: 'authorization_code'
+    };
+    return request.post(tokenURL, function(error, response, body) {
+    if (!error && response.statusCode == 200) {
+      var ans = JSON.parse(body);
+      console.log(body);
+      return db.auth.connect(req.user.id, 'google', ans.access_token, function(err, val) {
+        return res.redirect('/dev/conns');
+      });
+    }
+    return res.redirect('/dev/conns');
+  }).form(oauth);
+};
+
+/*
  * GET
  * Facebook authenticate
  */
@@ -203,15 +240,15 @@ exports.connectFacebookCb = function(req, res) {
     + '&redirect_uri=http%3A%2F%2Flocalhost/connect/facebook/callback'
     + '&client_secret=' + cfg.FACEBOOK_APP_SECRET
     + '&code=' + code;
-  return request(tokenURL, function (error, response, body) {
+  return request(tokenURL, function(error, response, body) {
     if (!error && response.statusCode == 200) {
-      //TODO save access_token
       var ans = qs.parse(body);
-      return db.users.connect(req.user.id, 'facebook', ans.access_token, function(err, val) {
-        return res.redirect('/dev/users/' + req.user.id);
+      console.log(body);
+      return db.auth.connect(req.user.id, 'facebook', ans.access_token, function(err, val) {
+        return res.redirect('/dev/conns');
       });
     }
-    return res.redirect('/dev/users/' + req.user.id);
+    return res.redirect('/dev/conns');
   });
 };
 
@@ -220,12 +257,7 @@ exports.connectFacebookCb = function(req, res) {
  * LinkedIn authenticate
  */
 exports.linkedin = function(passport) {
-  return passport.authenticate('linkedin', {
-    scope: [
-      'r_fullprofile'
-    , 'r_emailaddress'
-    ]
-  });
+  return passport.authenticate('linkedin');
 };
 
 /*
@@ -235,6 +267,98 @@ exports.linkedin = function(passport) {
 exports.linkedinCb = function(passport) {
   return passport.authenticate('linkedin', {
     failureRedirect: '/'
+  });
+};
+
+exports.connectLinkedin = function(req, res) {
+  var oauth = {
+      callback: 'http://localhost/connect/linkedin/callback/'
+    , consumer_key: cfg.LINKEDIN_CONSUMER_KEY
+    , consumer_secret: cfg.LINKEDIN_CONSUMER_SECRET
+    }
+    , url = '   https://api.linkedin.com/uas/oauth/requestToken?scope=r_basicprofile+r_emailaddress';
+  return request.post({url: url, oauth: oauth}, function(error, responce, body) {
+    console.log(error, responce.statusCode);
+    console.log(body);
+    if(!error && responce.statusCode == 200) {
+      var ans = qs.parse(body);
+      console.log(ans);
+      res.redirect(ans.xoauth_request_auth_url + '?oauth_token=' + ans.oauth_token);
+    }
+  });
+};
+
+exports.connectLinkedinCb = function(req, res) {
+  var token = req.query['oauth_token']
+    , verifier = req.query['oauth_verifier'];
+  return db.auth.connect(req.user.id, 'linkedin', token, function(err, val) {
+    return res.redirect('/dev/conns');
+  });
+};
+
+exports.connectDropbox = function(req, res) {
+  var oauth = {
+    callback: 'http://localhost/connect/dropbox/callback/'
+  , consumer_key: cfg.DROPBOX_APP_KEY
+  , consumer_secret: cfg.DROPBOX_APP_SECRET
+  }
+  , url = 'https://api.dropbox.com/1/oauth/request_token';
+  return request.post({url: url, oauth: oauth}, function(error, responce, body) {
+    console.log(error, responce.statusCode);
+    console.log(body);
+    if(!error && responce.statusCode == 200) {
+      var ans = qs.parse(body);
+      console.log(ans);
+      res.redirect('https://www.dropbox.com/1/oauth/authorize?oauth_token='
+      + ans.oauth_token +
+      '&oauth_callback=http://localhost/connect/dropbox/callback'
+      );
+    }
+  });
+};
+
+exports.connectDropboxCb = function(req, res) {
+  var token = req.query['oauth_token']
+    , uid = req.query['uid'];
+  return db.auth.connect(req.user.id, 'dropbox', token, function(err, val) {
+    return res.redirect('/dev/conns');
+  });
+};
+
+//Yahoo does not support localhost
+exports.connectYahoo = function(req, res) {
+  var oauth = {
+    callback: 'http://localhost/connect/linkedin/callback/'
+  , consumer_key: cfg.YAHOO_CONSUMER_KEY
+  , consumer_secret: cfg.YAHOO_CONSUMER_SECRET
+  }
+  , url = 'https://api.login.yahoo.com/oauth/v2/get_request_token';
+  return request.post({url: url, oauth: oauth}, function(error, responce, body) {
+    console.log(error, responce.statusCode);
+    console.log(body);
+    if(!error && responce.statusCode == 200) {
+      var ans = qs.parse(body);
+      console.log(ans);
+      res.redirect(ans.xoauth_request_auth_url + '?oauth_token=' + ans.oauth_token);
+    }
+  });
+};
+
+exports.connectYahooCb = function(req, res) {
+  var token = req.query['oauth_token']
+    , verifier = req.query['oauth_verifier'];
+  return db.auth.connect(req.user.id, 'dropbox', token, function(err, val) {
+    return res.redirect('/dev/conns');
+  });
+};
+
+/*
+ * POST
+ * Disconnect side service
+ */
+exports.disconnect = function(req, res) {
+  db.auth.disconnect(req.user.id, req.body.provider, function(err) {
+    tools.returnStatus(err, res);
   });
 };
 

@@ -2,28 +2,36 @@
 exports.DOMAIN = process.env.DOMAIN || 'http://localhost';
 
 exports.HOST = process.env.HOST || 'localhost';
-exports.PORT = process.env.PORT || 3000;
+exports.PORT = 3000;
 exports.SOCKET_PORT = 9000;
 exports.ENVIRONMENT = process.env.NODE_ENV || 'development';
 
 exports.GOOGLE_CLIENT_ID = "435757431999.apps.googleusercontent.com";
 exports.GOOGLE_CLIENT_SECRET = "IoZpFsfeyBuRvs2Djbut1wSZ";
 
-exports.FACEBOOK_APP_ID = "152821258188092";
-exports.FACEBOOK_APP_SECRET = "3f7244cfb86f62ed14d90626936cb3f1";
+exports.FACEBOOK_APP_ID = "513105425381842";
+exports.FACEBOOK_APP_SECRET = "ad4fc590e9e78619bcf076c4cda6bfb3";
 
 
 exports.LINKEDIN_CONSUMER_KEY = "two4f1vl4319";
 exports.LINKEDIN_CONSUMER_SECRET = "CN5FSKF3HYDw74Do";
 
-exports.SITE_SECRET = 'T&murj1n';
-exports.SESSION_KEY = 'express.sid';
+exports.DROPBOX_APP_KEY = "btskqrr7wnr3k20";
+exports.DROPBOX_APP_SECRET = "cd23he9pnhymnly";
 
-exports.SMTP_USER = "skwibl.noreply@gmail.com";
-exports.SMTP_PASSWORD = "dfylthdfhlty";
+exports.YAHOO_CONSUMER_KEY = "dj0yJmk9SlR3RUNVNGU4cnlMJmQ9WVdrOWJHOWtORlZ3TnpnbWNHbzlNVEkwTkRBeU16RTJNZy0tJnM9Y29uc3VtZXJzZWNyZXQmeD1kOQ--";
+exports.YAHOO_CONSUMER_SECRET = "5e758be1dfc89d2c53fb90b98299598656f7e4f2";
+
+exports.BEHANCE_API_KEY = "s7cImnmGx7l1Qa4gIFrm91CDph7PvMhP";
+
+exports.SITE_SECRET = 'gohph5aer8Edee&V';
+exports.SESSION_KEY = 'sid';
+
+exports.SMTP_USER = "noreply@skwibl.com";
+exports.SMTP_PASSWORD = "soo8aeyaXa3U";
 exports.SMTP_HOST = "smtp.gmail.com";
 exports.SMTP_SSL = true;
-exports.SMTP_NOREPLY = "no-reply@skwibl.com";
+exports.SMTP_NOREPLY = "noreply@skwibl.com";
 
 exports.PASSWORD_LENGTH = 12;
 exports.PASSWORD_MIN_LENGTH = 6;
