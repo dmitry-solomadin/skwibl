@@ -1202,7 +1202,7 @@ $(function () {
           $(uploader._listElement).css('dispaly', 'none');
           if (responseJSON.fileName) {
             var image = new Image();
-            image.src = "/public/images/avatar.png";
+            image.src = "/assets/images/avatar.png";
             $(image).on("load", function () {
               window.room.handleUpload(image);
             })

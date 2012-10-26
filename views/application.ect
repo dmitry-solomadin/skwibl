@@ -5,7 +5,8 @@
   <meta charset="utf-8">
   <title>Skwibl</title>
 
-  <% include "./shared/application_scripts.ect" %>
+  <%- include './shared/application_scripts.ect' %>
+
 </head>
 <body <%= "class='room'" if @room %>>
 <input type="hidden" id="currentTemplate" value="<%= @template %>"/>

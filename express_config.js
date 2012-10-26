@@ -5,10 +5,12 @@
 
 var express = require('express')
   , flash = require('connect-flash')
+  , connect_assets = require('connect-assets')
   , ect = require('ect');
 
 var routes = require('./routes')
   , ctrls = require('./controllers')
+  , helpers = require('./helpers')
   , db = require('./db')
   , cfg = require('./config');
 
@@ -34,10 +36,11 @@ exports.setUp = function() {
   app.configure(function(){
     app.set('port', cfg.PORT);
     app.set('host', cfg.HOST);
+    app.use(connect_assets());
     app.set('views', __dirname + '/views');
     app.engine('ect', ect({ cache: true, watch: true, root: __dirname + '/views' }).render);
     app.set("view engine", 'ect');
-    app.use(express.favicon(__dirname +'/static/public/images/butterfly-tiny.png'));
+    app.use(express.favicon(__dirname +'/assets/images/butterfly-tiny.png'));
     app.set('view options', {layout: false});
     app.use(express.logger('dev'));
     app.use(express.bodyParser());
@@ -57,6 +60,15 @@ exports.setUp = function() {
     app.use(ctrls.aux.notFound);
     //   app.use(ctrls.error);
   });
+
+  app.locals = {
+    css: helpers.application_helper.css,
+    js: helpers.application_helper.js
+  };
+
+  app.locals.alerty = function(lol){
+    console.log(lol);
+  };
 
   routes.configure(app, passport);
 

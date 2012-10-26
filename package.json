@@ -34,7 +34,9 @@
     "password-generator": "*",
     "hiredis": "*",
     "redis": "0.7.2",
-    "underscore": "*"
+    "underscore": "*",
+    "coffee-script": "*",
+    "connect-assets": "*"
   },
   "devDependencies": {
     "node-inspector": "0.2.x"

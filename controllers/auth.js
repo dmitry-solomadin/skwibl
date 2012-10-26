@@ -34,17 +34,9 @@ exports.mainPage = function(req, res) {
  * registration page
  */
 exports.regPage = function(req, res) {
-  if(req.user){
-    return res.render('index', {
-      template: 'partials/user'
-    , user: req.user
-    , error: req.flash('error')
-    });
-  }
   return res.render('index', {
-    template: 'partials/mainpage'
-  , error: req.flash('error')
-  });
+    template:'partials/registration'
+    , error:req.flash('error')});
 };
 
 /*
