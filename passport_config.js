@@ -12,7 +12,7 @@ var LocalStrategy = require('passport-local').Strategy
   , HashStrategy = require('passport-hash').Strategy
   , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
   , FacebookStrategy = require('passport-facebook').Strategy
-  , TwitterStrategy = require('passport-twitter').Strategy
+  , LinkedInStrategy = require('passport-linkedin').Strategy
   , cookie = require('cookie');
 
 exports.setUp = function() {
@@ -73,7 +73,7 @@ exports.setUp = function() {
     clientSecret: cfg.GOOGLE_CLIENT_SECRET,
     callbackURL: cfg.DOMAIN + '/auth/google/callback'
   }, function(accessToken, refreshToken, profile, done) {
-    db.auth.findOrCreate(profile, done);
+    db.auth.findOrCreate(profile, accessToken, done);
   }));
 
   passport.use(new FacebookStrategy({
@@ -81,16 +81,16 @@ exports.setUp = function() {
     clientSecret: cfg.FACEBOOK_APP_SECRET,
     callbackURL: cfg.DOMAIN + '/auth/facebook/callback'
   }, function(accessToken, refreshToken, profile, done) {
-    db.auth.findOrCreate(profile, done);
+    db.auth.findOrCreate(profile, accessToken, done);
   }));
 
-  passport.use(new TwitterStrategy({
-    consumerKey: cfg.TWITTER_CONSUMER_KEY,
-    consumerSecret: cfg.TWITTER_CONSUMER_SECRET,
-    callbackURL: cfg.DOMAIN + '/auth/twitter/callback'
+  passport.use(new LinkedInStrategy({
+    consumerKey: cfg.LINKEDIN_CONSUMER_KEY,
+    consumerSecret: cfg.LINKEDIN_CONSUMER_SECRET,
+    callbackURL: cfg.DOMAIN + '/auth/linkedin/callback'
   },
   function(token, tokenSecret, profile, done) {
-    db.auth.findOrCreate(profile, done);
+    db.auth.findOrCreate(profile, token, done);
   }));
 
   return passport;

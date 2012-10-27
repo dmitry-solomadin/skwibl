@@ -1,3 +1,8 @@
+var projectRe = /\/projects\/[\d]+/;
+var path = window.location.pathname;
+
+if(projectRe.test(path)) {
+
 $(function () {
   var nextId = 1;
   var opts = {};
@@ -15,7 +20,7 @@ $(function () {
   };
 
   var room = {
-    init:function (opt) {
+    init: function(opt) {
       $.extend(opts, opt);
       room.initOpts(opts);
 
@@ -1636,4 +1641,6 @@ function onMouseUp(event) {
 
 function onMouseMove(event) {
   window.room.onMouseMove($("#myCanvas"), event);
+}
+
 }
