@@ -62,8 +62,7 @@ exports.setUp = function() {
   });
 
   app.locals = {
-    css: helpers.application_helper.css,
-    js: helpers.application_helper.js
+    current_user: helpers.application_helper.current_user
   };
 
   app.locals.alerty = function(lol){
