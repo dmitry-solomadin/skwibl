@@ -13,7 +13,7 @@
     "url": "https://github.com/a-tease/http-server.git"
   },
   "scripts": {
-    "start": "node --nouse-idle-notification --expose-gc app & node --nouse-idle-notification --expose-gc server.js & node_modules/coffee-script/bin/coffee -c assets/js/",
+    "start": "node_modules/coffee-script/bin/coffee --compile --output assets/js assets/coffee/ & node --nouse-idle-notification --expose-gc app & node --nouse-idle-notification --expose-gc server.js",
     "start_prod": "NODE_ENV=production node --nouse-idle-notification --expose-gc app.js & node --nouse-idle-notification --expose-gc server.js",
     "debug": "node --debug app.js & node-inspector &"
   },

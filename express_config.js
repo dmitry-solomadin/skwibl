@@ -5,7 +5,6 @@
 
 var express = require('express')
   , flash = require('connect-flash')
-  , connect_assets = require('connect-assets')
   , ect = require('ect');
 
 var routes = require('./routes')
@@ -36,7 +35,6 @@ exports.setUp = function() {
   app.configure(function(){
     app.set('port', cfg.PORT);
     app.set('host', cfg.HOST);
-    app.use(connect_assets());
     app.set('views', __dirname + '/views');
     app.engine('ect', ect({ cache: true, watch: true, root: __dirname + '/views' }).render);
     app.set("view engine", 'ect');
@@ -56,18 +54,14 @@ exports.setUp = function() {
     app.use(flash());
     app.use(app.router);
 	  app.use(express.static(__dirname + '/assets'));
-    app.use(express.static(__dirname + '/static'));
+    app.use(express.static(__dirname + '/vendor'));
     app.use(ctrls.aux.notFound);
     //   app.use(ctrls.error);
   });
 
-  app.locals = {
-    current_user: helpers.application_helper.current_user
-  };
-
-  app.locals.alerty = function(lol){
-    console.log(lol);
-  };
+//  app.locals = {
+//    current_user: helpers.application_helper.current_user
+//  };
 
   routes.configure(app, passport);
 

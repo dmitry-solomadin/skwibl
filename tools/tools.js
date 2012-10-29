@@ -156,7 +156,7 @@ exports.startCluster = function(stop, start) {
     });
   } else {
     t = setInterval(function() {
-//      gc();
+      gc();
     }, cfg.GC_INTERVAL);
     start(cluster);
   }

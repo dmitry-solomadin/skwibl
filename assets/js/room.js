@@ -1,8 +1,3 @@
-var projectRe = /\/projects\/[\d]+/;
-var path = window.location.pathname;
-
-if(projectRe.test(path)) {
-
 $(function () {
   var nextId = 1;
   var opts = {};
@@ -54,6 +49,37 @@ $(function () {
       canvas.onmousedown = function () {
         return false;
       };
+
+      window.room.canvasIO = io.connect('/canvas', window.copt);
+
+      window.room.canvasIO.on('elementUpdate', function (data) {
+        window.room.addOrUpdateElement(data.message, false);
+      });
+
+      window.room.canvasIO.on('elementRemove', function (data) {
+        window.room.socketRemoveElement(data.message);
+      });
+
+      window.room.canvasIO.on('commentUpdate', function (data) {
+        window.room.addOrUpdateComment(data.message, false);
+      });
+
+      window.room.canvasIO.on('commentRemove', function (data) {
+        window.room.socketRemoveComment(data.message);
+      });
+
+      window.room.canvasIO.on('commentText', function (data) {
+        window.room.addOrUpdateCommentText(data.message);
+      });
+
+      window.room.canvasIO.on('eraseCanvas', function () {
+        window.room.eraseCanvas();
+        window.room.redrawWithThumb();
+      });
+
+      window.room.canvasIO.on('nextId', function () {
+        nextId = nextId + 1;
+      });
 
       return false;
     },
@@ -310,14 +336,14 @@ $(function () {
         opts.tooltype == 'circle' || opts.tooltype == 'rectangle' ||
         opts.tooltype == 'line' || opts.tooltype == 'highligher') {
         opts.tool.elementId = this.getNextIdAndIncrement();
-        canvasIO.emit("elementUpdate", this.prepareElementToSend(opts.tool));
-        canvasIO.emit("nextId");
+        window.room.canvasIO.emit("elementUpdate", this.prepareElementToSend(opts.tool));
+        window.room.canvasIO.emit("nextId");
       } else if (opts.tooltype == "comment") {
         commentMin.elementId = this.getNextIdAndIncrement();
-        canvasIO.emit("commentUpdate", this.prepareCommentToSend(commentMin));
-        canvasIO.emit("nextId");
+        window.room.canvasIO.emit("commentUpdate", this.prepareCommentToSend(commentMin));
+        window.room.canvasIO.emit("nextId");
       } else if (opts.tooltype == 'select' && opts.selectedTool) {
-        canvasIO.emit("elementUpdate", this.prepareElementToSend(opts.selectedTool));
+        window.room.canvasIO.emit("elementUpdate", this.prepareElementToSend(opts.selectedTool));
       }
 
       if (opts.tooltype == 'comment') {
@@ -376,7 +402,7 @@ $(function () {
       this.unselect();
       this.redrawWithThumb();
 
-      canvasIO.emit("eraseCanvas");
+      window.room.canvasIO.emit("eraseCanvas");
     },
 
     eraseCanvas:function () {
@@ -713,7 +739,7 @@ $(function () {
         window.room.addHistoryTool({type:"remove", tool:opts.selectedTool, eligible:true});
         opts.selectedTool.opacity = 0;
 
-        canvasIO.emit("elementRemove", opts.selectedTool.elementId);
+        window.room.canvasIO.emit("elementRemove", opts.selectedTool.elementId);
 
         this.unselect();
         this.redrawWithThumb();
@@ -986,7 +1012,7 @@ $(function () {
           commentsHelper.redrawArrow(commentMin);
         },
         onAfterDrag:function () {
-          canvasIO.emit("commentUpdate", window.room.prepareCommentToSend(commentMin));
+          window.room.canvasIO.emit("commentUpdate", window.room.prepareCommentToSend(commentMin));
         }
       });
 
@@ -994,10 +1020,10 @@ $(function () {
         onDrag:function (dx, dy) {
           commentMin.css({left:(commentMin.position().left + dx) + "px", top:(commentMin.position().top + dy) + "px"});
           commentsHelper.redrawArrow(commentMin);
-          canvasIO.emit("commentUpdate", window.room.prepareCommentToSend(commentMin));
+          window.room.canvasIO.emit("commentUpdate", window.room.prepareCommentToSend(commentMin));
         },
         onAfterDrag:function () {
-          canvasIO.emit("commentUpdate", window.room.prepareCommentToSend(commentMin));
+          window.room.canvasIO.emit("commentUpdate", window.room.prepareCommentToSend(commentMin));
         }
       });
 
@@ -1518,7 +1544,7 @@ $(function () {
           room.addHistoryTool({type:"remove", tool:{type:"comment", commentMin:$commentmin}, eligible:true});
         }
 
-        canvasIO.emit("commentRemove", $commentmin.elementId);
+        window.room.canvasIO.emit("commentRemove", $commentmin.elementId);
         room.redraw();
       }
     },
@@ -1572,7 +1598,7 @@ $(function () {
       commentContent.prepend("<div class='comment-text'>" + text + "</div>");
 
       if (emit) {
-        canvasIO.emit("commentText", {
+        window.room.canvasIO.emit("commentText", {
           elementId:commentMin.elementId,
           text:text
         });
@@ -1580,37 +1606,6 @@ $(function () {
     }
 
   };
-
-  var canvasIO = io.connect('/canvas', window.copt);
-
-  canvasIO.on('elementUpdate', function (data) {
-    window.room.addOrUpdateElement(data.message, false);
-  });
-
-  canvasIO.on('elementRemove', function (data) {
-    window.room.socketRemoveElement(data.message);
-  });
-
-  canvasIO.on('commentUpdate', function (data) {
-    window.room.addOrUpdateComment(data.message, false);
-  });
-
-  canvasIO.on('commentRemove', function (data) {
-    window.room.socketRemoveComment(data.message);
-  });
-
-  canvasIO.on('commentText', function (data) {
-    window.room.addOrUpdateCommentText(data.message);
-  });
-
-  canvasIO.on('eraseCanvas', function () {
-    window.room.eraseCanvas();
-    window.room.redrawWithThumb();
-  });
-
-  canvasIO.on('nextId', function () {
-    nextId = nextId + 1;
-  });
 
   window.room = room;
   window.room.helper = helper;
@@ -1641,6 +1636,4 @@ function onMouseUp(event) {
 
 function onMouseMove(event) {
   window.room.onMouseMove($("#myCanvas"), event);
-}
-
 }
