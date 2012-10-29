@@ -34,7 +34,7 @@
         });
       }
     };
-    app.initRemote;
+    app.initRemote();
     return App = app;
   });
 

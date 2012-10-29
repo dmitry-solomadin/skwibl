@@ -23,7 +23,7 @@ $ ->
         return false
   }
 
-  app.initRemote
+  app.initRemote()
 
   App = app
 
