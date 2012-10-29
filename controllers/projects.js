@@ -43,6 +43,7 @@ exports.show = function(req, res, next) {
         return res.render('index', {
           template: "projects/show",
           user: req.user,
+          pid: req.params.pid,
           projects: projects
         });
       }

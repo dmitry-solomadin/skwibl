@@ -1225,7 +1225,9 @@ $(function () {
         multiple:true,
         cancel:'Cancel',
         debug:false,
-        params:{'entity':3},
+        params:{
+          pid: $("#pid").val()
+        },
         onSubmit:function (id, fileName) {
           $(uploader._listElement).css('dispaly', 'none');
         },

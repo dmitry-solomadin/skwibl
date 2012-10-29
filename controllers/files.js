@@ -49,7 +49,7 @@ exports.update = function(req, res) {
  */
 exports.upload = function(req, res, next) {
   if(req.xhr){
-    var dirName = './static/private/' +  req.user.id
+    var dirName = './uploads/' +  req.query.pid
       , dir = fs.mkdir(dirName, cfg.DIRECTORY_PERMISION);
     var fSize = req.header('x-file-size')
       , fType = req.header('x-file-type')
