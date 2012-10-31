@@ -1235,7 +1235,7 @@ $(function () {
           $(uploader._listElement).css('dispaly', 'none');
           if (responseJSON.fileName) {
             var image = new Image();
-            image.src = "/assets/images/avatar.png";
+            image.src = "/images/avatar.png";
             $(image).on("load", function () {
               window.room.handleUpload(image);
             })

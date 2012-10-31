@@ -5,21 +5,26 @@
 
 var express = require('express')
   , flash = require('connect-flash')
-  , ect = require('ect');
+  , ect = require('ect')
+  , path = require('path');
 
-var routes = require('./routes')
-  , ctrls = require('./controllers')
-  , helpers = require('./helpers')
-  , db = require('./db')
-  , cfg = require('./config');
+var routes = require('../routes')
+  , ctrls = require('../controllers')
+  , helpers = require('../helpers')
+  , db = require('../db')
+  , cfg = require('../config');
 
-var passport_config = require('./passport_config');
+var passportUp = require('./passport');
 
 exports.setUp = function() {
 
   var app = express();
 
-  var passport = passport_config.setUp();
+  var passport = passportUp.setUp();
+
+  var viewsDir = path.join(__dirname, '../views')
+    , assetsDir = path.join(__dirname, '../assets')
+    , vendorDir = path.join(__dirname, '../vendor');
 
   app.configure('development', function(){
     app.use(express.errorHandler({
@@ -35,10 +40,14 @@ exports.setUp = function() {
   app.configure(function(){
     app.set('port', cfg.PORT);
     app.set('host', cfg.HOST);
-    app.set('views', __dirname + '/views');
-    app.engine('ect', ect({ cache: true, watch: true, root: __dirname + '/views' }).render);
+    app.set('views', viewsDir);
+    app.engine('ect', ect({
+      cache: true
+    , watch: true
+    , root: viewsDir
+    }).render);
     app.set("view engine", 'ect');
-    app.use(express.favicon(__dirname +'/assets/images/butterfly-tiny.png'));
+    app.use(express.favicon(assetsDir + '/images/butterfly-tiny.png'));
     app.set('view options', {layout: false});
     app.use(express.logger('dev'));
     app.use(express.bodyParser());
@@ -53,8 +62,8 @@ exports.setUp = function() {
     app.use(passport.session());
     app.use(flash());
     app.use(app.router);
-	  app.use(express.static(__dirname + '/assets'));
-    app.use(express.static(__dirname + '/vendor'));
+    app.use(express.static(assetsDir));
+    app.use(express.static(vendorDir));
     app.use(ctrls.aux.notFound);
     //   app.use(ctrls.error);
   });

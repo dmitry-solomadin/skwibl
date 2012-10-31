@@ -33,6 +33,25 @@ exports.SMTP_HOST = "smtp.gmail.com";
 exports.SMTP_SSL = true;
 exports.SMTP_NOREPLY = "noreply@skwibl.com";
 
+exports.VIDEO_EXT = [
+  '.3g2'
+, '.3gp'
+, '.asf'
+, '.avi'
+, '.m4v'
+, '.mov'
+, '.mp4'
+, '.wmv'
+];
+exports.IMAGES_EXT = [
+  '.jpeg'
+, '.jpg'
+, '.gif'
+, '.png'
+, '.bmp'
+, '.svg'
+];
+
 exports.PASSWORD_LENGTH = 12;
 exports.PASSWORD_MIN_LENGTH = 6;
 exports.PASSWORD_EASYTOREMEMBER = false;
@@ -42,6 +61,7 @@ exports.SESSION_DURATION = 7200;//two hours
 // exports.CONFIRM_EXPIRE = 604800;//one week
 
 exports.DIRECTORY_PERMISION = 0751;//rwxr-x--x
+exports.FILE_PERMISSION = 0640;//rw-r-----
 
 exports.ACTIONS_BUFFER_SIZE = 50;
 

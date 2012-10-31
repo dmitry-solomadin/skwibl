@@ -1,0 +1,187 @@
+#!/bin/bash
+
+
+## dynamic server
+DYN='app.js'
+
+## socket server
+SOC='server.js'
+
+## coffee executable
+COFFEE='node_modules/coffee-script/bin/coffee'
+
+## coffee dir
+COFFEE_DIR='assets/coffee/'
+
+## coffee output
+JS_OUTPUT_DIR='assets/js'
+
+## uploads dir
+UPLOADS_DIR='uploads'
+
+## patches dir
+PATCHES_DIR='patches'
+
+## node modules dir
+MODULES_DIR='node_modules'
+
+## external server configurations dir
+EXTERNAL='external'
+
+## temporary file template
+TMP_TEMPLATE='~'
+
+## node execution command
+NODE_CMD='node --nouse-idle-notification --expose-gc'
+
+## node debug command for dynamic server
+DEBUG_CMD='node --debug $DYN & node-inspector &'
+
+## redis flush command
+FLUSH_REDIS_CMD='redis-cli flushall'
+
+## usage string
+USAGE="Usage: $0 -b -c -d -e -i -p -r -s -u -h \n\n
+      -b Build the project \n
+      -c Clean the project auxiliary files \n
+      -d Deploy the project \n
+      -e Run skwibl in debug mode \n
+      -i Init the project \n
+      -p Run skwibl in production mode \n
+      -r Reset the project \n
+      -s Start skwibl \n
+      -u Update project dependencies \n\n
+      -h This prompt \n"
+
+## patch procedure
+function patch {
+  echo "patching"
+  cp -Rfu $PATCHES_DIR/* $MODULES_DIR
+}
+
+## check if coffee is installed
+if [ ! -e $COFFEE ]; then
+  npm install -d
+  patch
+fi
+
+## clean procedure
+function clean {
+  echo "cleaning"
+  find ./ -name \*$TMP_TEMPLATE -delete
+}
+
+## build procedure
+function build {
+  echo "building"
+  $COFFEE --compile --output $JS_OUTPUT_DIR $COFFEE_DIR
+}
+
+## init procedure
+function init {
+  echo "init project directories"
+  if [ ! -e $UPLOADS_DIR ]; then
+    mkdir $UPLOADS_DIR
+  fi
+}
+
+## reset procedure
+function reset {
+  echo "resetting"
+  rm -rf $MODULES_DIR
+  rm -rf $UPLOADS_DIR
+  # Uncomment next line when switch to coffee
+#   rm -f $JS_OUTPUT_DIR/*.*
+  eval $FLUSH_REDIS_CMD
+  npm install -d
+}
+
+## start procedure
+function start {
+  echo "starting"
+  eval "$NODE_CMD $DYN & $NODE_CMD $SOC"
+}
+
+## run in production procedure
+function product {
+  echo "production starting"
+  eval "NODE_ENV=production $NODE_CMD $DYN & NODE_ENV=production  $NODE_CMD $SOC"
+}
+
+## deploy procedure
+function deploy {
+  echo "deploing"
+  sudo nginx -s stop
+  sudo update-rc.d haproxy remove
+  sudo cp -fu $EXTERNAL/nginx.conf /etc/nginx/
+  sudo cp -fu $EXTERNAL/haproxy.cfg /etc/haproxy/
+  sudo cp -fu $EXTERNAL/haproxy /etc/init.d/
+  sudo update-rc.d haproxy defaults
+  sudo nginx
+  sudo service haproxy restart
+}
+
+## debug procedure
+function debug {
+  echo "debugg starting"
+  eval $DEBUG_CMD
+}
+
+## update procedure
+function update {
+  echo "updating"
+  npm install -d
+  npm update
+  patch
+}
+
+## options check and parse
+while getopts ":bcdeiprsuh" opt; do
+  case "$opt" in
+    "b")
+      build
+      exit 0;;
+    "c")
+      clean
+      exit 0;;
+    "d")
+      init
+      build
+      deploy
+      exit 0;;
+    "e")
+      init
+      build
+      debug;;
+    "i")
+      init
+      exit 0;;
+    "p")
+      init
+      build
+      product;;
+    "r")
+      read -p "You are going to reset project files and flush db. Do you want to continue (y/n)?" REPLY
+      if [ $REPLY == 'y' ]; then
+        clean
+        reset
+      fi
+      exit 0;;
+    "s")
+      init
+      build
+      start;;
+    "u")
+      update
+      exit 0;;
+    "h")
+      echo -e $USAGE
+      exit 0;;
+    "?")
+      echo "Invalid option $OPTARG. Try $0 -h for help"
+      exit 1;;
+    *)
+      echo "Unknown error while processing options"
+      exit 1;;
+  esac
+done

@@ -5,8 +5,8 @@
 
 var passport = require('passport');
 
-var db = require('./db')
-  , cfg = require('./config');
+var db = require('../db')
+  , cfg = require('../config');
 
 var LocalStrategy = require('passport-local').Strategy
   , HashStrategy = require('passport-hash').Strategy

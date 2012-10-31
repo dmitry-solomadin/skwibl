@@ -9,7 +9,8 @@
 var fs = require('fs')
   , path = require('path');
 
-var cfg = require('../config');
+var tools = require('../tools')
+  , cfg = require('../config');
 
 /*
  * GET
@@ -48,33 +49,44 @@ exports.update = function(req, res) {
  * Upload file
  */
 exports.upload = function(req, res, next) {
+  //TODO implement upload continue
   if(req.xhr){
-    var dirName = './uploads/' +  req.query.pid
-      , dir = fs.mkdir(dirName, cfg.DIRECTORY_PERMISION);
-    var fSize = req.header('x-file-size')
-      , fType = req.header('x-file-type')
-      , basename = path.basename
-      , fName = basename(req.header('x-file-name'));
-    var ws = fs.createWriteStream(dirName + '/' + fName);
+    var dir = './uploads/' +  req.query.pid
+      , size = req.header('x-file-size')
+      , name = path.basename(req.header('x-file-name'))
+      , type = tools.getFileType(path.extname(fName));
+    tools.createProjectDir(dir, function(err) {
+      if(err) {
+        return next(err);
+      }
+      return tools.createProjectFileDir(dir, type, function(err) {
+        if(err) {
+          return next(err);
+        }
+        var ws = fs.createWriteStream(dir + '/' + type + '/' + name, {
+          mode: cfg.FILE_PERMISSION
+        });
 
-    // TODO parse mime type
+        req.on('data', function(chunk) {
+          ws.write(chunk);
+        });
 
-    req.on('data', function(chunk) { 
-      ws.write(chunk);
-    });
+        req.on('end', function() {
+          return res.json({
+            success: true
+          , fileName: name
+          });
+        });
 
-    req.on('end', function() {
-      return res.json({
-        success: true
-      , fileName: fName
+        req.on('close', function() {
+          return res.json({
+            success: false
+          , fileName: name
+          });
+        });
       });
     });
-
-    req.on('close', function() {
-      return res.json({
-        success: false
-      , fileName: fName
-      });
-    });
+  } else {
+    return next(new Error('Can not upload file this way.'));
   }
 };

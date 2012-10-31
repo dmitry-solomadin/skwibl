@@ -84,6 +84,62 @@ exports.returnStatus = function(err, res) {
   res.send(false);
 };
 
+exports.getFileType = function(ext) {
+  if(cfg.VIDEO_EXT.indexOf(ext) !== -1) {
+    return 'videos';
+  } else if(cfg.IMAGE_EXT.indexOf(ext) !== -1) {
+    return 'images';
+  }
+  return null;
+};
+
+exports.createProjectDir = function(dir, fn) {
+  fs.exists(dir, function(exists) {
+    if(!exists) {
+      return fs.mkdir(dir, cfg.DIRECTORY_PERMISION, function(err) {
+        if(err) {
+          return fn(new Error('Can not create project directory'));
+        }
+        return fn(null);
+      });
+    }
+    return fn(null);
+  });
+};
+
+exports.createProjectFileDir = function(dir, type, fn) {
+  switch(type) {
+    case 'videos':
+      fs.exists(dir + '/videos', function(exists) {
+        if(!exists) {
+          return fs.mkdir(dir + '/videos', function(err) {
+            if(err) {
+              return fn(err);
+            }
+            return fn(null);
+          });
+        }
+        return fn(null);
+      });
+      break;
+    case 'images':
+      fs.exists(dir + '/images', function(exists) {
+        if(!exists) {
+          return fs.mkdir(dir + '/images', function(err) {
+            if(err) {
+              return fn(err);
+            }
+            return fn(null);
+          });
+        }
+        return fn(null);
+      });
+      break;
+    default:
+      return fn(new Error('Unsopported file type'));
+  }
+};
+
 exports.include = function(dir, fn) {
   fs.readdirSync(dir).forEach(function(name){
     var len = name.length
