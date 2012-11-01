@@ -94,6 +94,7 @@ function reset {
 #   rm -f $JS_OUTPUT_DIR/*.*
   eval $FLUSH_REDIS_CMD
   npm install -d
+  patch
 }
 
 ## start procedure

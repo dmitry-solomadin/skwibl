@@ -7,9 +7,11 @@
  * Module dependencies.
  */
 
-var _ = require('underscore');
+var fs = require('fs')
+  , _ = require('underscore');
 
-var tools = require('../tools');
+var tools = require('../tools')
+    cfg = require('../config');
 
 exports.setUp = function(client, db) {
 
@@ -67,6 +69,11 @@ exports.setUp = function(client, db) {
   mod.add = function(uid, name, fn) {
     client.incr('projects:next', function(err, val) {
       if(!err) {
+        var dir = './uploads/' + val;
+        fs.mkdir(dir, cfg.DIRECTORY_PERMISSION, function(err) {
+          fs.mkdir(dir + '/videos', cfg.DIRECTORY_PERMISSION);
+          fs.mkdir(dir + '/images', cfg.DIRECTORY_PERMISSION);
+        });
         var project = {};
         project.id = val;
         project.name = name;

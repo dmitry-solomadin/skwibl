@@ -33,7 +33,7 @@ exports.SMTP_HOST = "smtp.gmail.com";
 exports.SMTP_SSL = true;
 exports.SMTP_NOREPLY = "noreply@skwibl.com";
 
-exports.VIDEO_EXT = [
+exports.VIDEOS_EXT = [
   '.3g2'
 , '.3gp'
 , '.asf'
