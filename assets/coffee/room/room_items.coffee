@@ -1,5 +1,5 @@
 $ ->
-  class RoomItems extends App.RoomComponent
+  class RoomItems
 
     constructor: ->
       @removeImg = new Image()
@@ -9,73 +9,73 @@ $ ->
 
     create: (tool, settings) ->
       settings = {} unless settings
-      @opts().tool = tool unless settings.justCreate
+      opts.tool = tool unless settings.justCreate
 
-      @opts().tool.strokeColor = if settings.color then settings.color else @opts().color
-      @opts().tool.strokeWidth = if settings.width then settings.width else @opts().defaultWidth
-      @opts().tool.fillColor = settings.fillColor if settings.fillColor
-      @opts().tool.opacity = if settings.opacity then settings.opacity else @opts().opacity
-      @opts().tool.dashArray = if settings.dashArray then settings.dashArray else undefined
+      opts.tool.strokeColor = if settings.color then settings.color else opts.color
+      opts.tool.strokeWidth = if settings.width then settings.width else opts.defaultWidth
+      opts.tool.fillColor = settings.fillColor if settings.fillColor
+      opts.tool.opacity = if settings.opacity then settings.opacity else opts.opacity
+      opts.tool.dashArray = if settings.dashArray then settings.dashArray else undefined
 
     removeSelected: ->
-      if @opts().selectedTool
+      if opts.selectedTool
         # add new 'remove' item into history and link it to removed item.
-        @room().history.add({type: "remove", tool: @opts().selectedTool, eligible: true})
-        @opts().selectedTool.opacity = 0
+        room.history.add({type: "remove", tool: opts.selectedTool, eligible: true})
+        opts.selectedTool.opacity = 0
 
-        @room().socket.emit("elementRemove", @opts().selectedTool.elementId)
+        room.socket.emit("elementRemove", opts.selectedTool.elementId)
 
         @unselect()
-        @room().redrawWithThumb()
+        room.redrawWithThumb()
 
     translateSelected: (deltaPoint) ->
-      if @opts().selectedTool
-        @opts().selectedTool.translate(deltaPoint)
-        @opts().selectedTool.selectionRect.translate(deltaPoint) if @opts().selectedTool.selectionRect
-        @room().redrawWithThumb()
+      if opts.selectedTool
+        opts.selectedTool.translate(deltaPoint)
+        opts.selectedTool.selectionRect.translate(deltaPoint) if opts.selectedTool.selectionRect
+        room.redrawWithThumb()
 
     unselectIfSelected: (elementId) ->
-      if @opts().selectedTool and @opts().selectedTool.selectionRect and @opts().selectedTool.elementId == elementId
+      if opts.selectedTool and opts.selectedTool.selectionRect and opts.selectedTool.elementId == elementId
         @unselect()
 
     unselect: () ->
-      @opts().selectedTool.selectionRect.remove() if @opts().selectedTool and @opts().selectedTool.selectionRect
-      @opts().selectedTool = null;
+      opts.selectedTool.selectionRect.remove() if opts.selectedTool and opts.selectedTool.selectionRect
+      opts.selectedTool = null;
 
     # ITEMS SELECT
 
     testSelect: (point) ->
-      selectTimeDelta = if @opts().selectTime then new Date().getTime() - @opts().selectTime else undefined
+      selectTimeDelta = if opts.selectTime then new Date().getTime() - opts.selectTime else undefined
 
-      @opts().selectTime = new Date().getTime()
-      alreadySelected = @opts().selectedTool and @opts().selectedTool.selectionRect
+      opts.selectTime = new Date().getTime()
+      alreadySelected = opts.selectedTool and opts.selectedTool.selectionRect
       selected = false
 
       # Select scalers or remove buttton has highest priority.
       if alreadySelected
-        if @room().helper.elementInArrayContainsPoint(@opts().selectedTool.selectionRect.scalers, point) ||
-        (@opts().selectedTool.selectionRect.removeButton && @opts().selectedTool.selectionRect.removeButton.bounds.contains(point))
+        if room.helper.elementInArrayContainsPoint(opts.selectedTool.selectionRect.scalers, point) ||
+        (opts.selectedTool.selectionRect.removeButton && opts.selectedTool.selectionRect.removeButton.bounds.contains(point))
           selected = true
 
       # Already selected item has next highest priority if time between selectes was big.
-      selected = true if selectTimeDelta > 750 and alreadySelected and @opts().selectedTool.selectionRect.bounds.contains(point)
+      selected = true if selectTimeDelta > 750 and alreadySelected and opts.selectedTool.selectionRect.bounds.contains(point)
 
       unless selected
-        previousSelectedTool = @opts().selectedTool
-        for element in @room().history.getSelectableTools()
+        previousSelectedTool = opts.selectedTool
+        for element in room.history.getSelectableTools()
           continue if element.isImage or element.type
 
           if element.bounds.contains(point)
-            @opts().selectedTool = element
+            opts.selectedTool = element
             selected = true
 
-          if selectTimeDelta < 750 and @opts().selectedTool and previousSelectedTool
-              if @opts().selectedTool.id == previousSelectedTool.id then continue else break
+          if selectTimeDelta < 750 and opts.selectedTool and previousSelectedTool
+              if opts.selectedTool.id == previousSelectedTool.id then continue else break
 
-      @opts().selectedTool = null unless selected
+      opts.selectedTool = null unless selected
 
     drawSelectRect: (point) ->
-      tool = @opts().selectedTool
+      tool = opts.selectedTool
       if tool
         tool.selectionRect = @createSelectionRectangle(tool)
         $("#removeSelected").removeClass("disabled")

@@ -21,13 +21,12 @@
       Room.prototype.init = function() {
         var canvas;
         this.initOpts();
-        this.savedOpts.push(this.opts);
         $("#toolSelect > li, #panTool, #selectTool").on("click", function() {
-          return App.room.opts.tooltype = $(this).data("tooltype");
+          return opts.tooltype = $(this).data("tooltype");
         });
         $('.color').click(function() {
           $('.color').removeClass('activen');
-          App.room.opts.color = $(this).attr('data-color');
+          opts.color = $(this).attr('data-color');
           return $(this).addClass('activen');
         });
         $(document).on("click", "#canvasSelectDiv a", function() {
@@ -48,12 +47,18 @@
 
       Room.prototype.initOpts = function() {
         this.opts = {};
-        App.room.opts = this.opts;
+        window.opts = this.opts;
         $.extend(this.opts, this.defaultOpts);
-        return this.opts.historytools = {
+        this.opts.historytools = {
           eligibleHistory: new Array,
           allHistory: new Array
         };
+        return this.savedOpts.push(this.opts);
+      };
+
+      Room.prototype.setOpts = function(opts) {
+        this.opts = opts;
+        return window.opts = opts;
       };
 
       Room.prototype.onMouseMove = function(canvas, event) {
@@ -349,6 +354,8 @@
       return App.room.onMouseMove($("#myCanvas"), event);
     };
     App.room.init();
+    window.room = App.room;
+    window.opts = App.room.opts;
     return paper.view.setViewSize(Rectangle.create(0, 0, $("body").width(), $("body").height()).getSize());
   });
 

@@ -1,5 +1,5 @@
 $ ->
-  class RoomComments extends App.RoomComponent
+  class RoomComments
 
     constructor: ->
       @SIDE_OFFSET = 15
@@ -44,14 +44,14 @@ $ ->
           commentMax.css(left: (commentMax.position().left + dx) + "px", top: (commentMax.position().top + dy) + "px")
           @redrawArrow(commentMin)
         onAfterDrag: =>
-          @room().socket.emit("commentUpdate", @room().socketHelper.prepareCommentToSend(commentMin))
+          room.socket.emit("commentUpdate", room.socketHelper.prepareCommentToSend(commentMin))
 
       commentMin.drags
         onDrag: (dx, dy) =>
           commentMin.css({left: (commentMin.position().left + dx) + "px", top: (commentMin.position().top + dy) + "px"})
           @redrawArrow(commentMin)
         onAfterDrag: =>
-          @room().socket.emit("commentUpdate", @room().socketHelper.prepareCommentToSend(commentMin))
+          room.socket.emit("commentUpdate", room.socketHelper.prepareCommentToSend(commentMin))
 
       $(document).on "click", (evt) =>
         for commentSendButton in $(".comment-send:visible")
@@ -94,14 +94,14 @@ $ ->
     getZone: (left, top, x0, y0, w, h) ->
       c = @getCommentCoords(left, top, w, h)
 
-      c.xtl = c.xtl / @opts().currentScale
-      c.ytl = c.ytl / @opts().currentScale
-      c.xtr = c.xtr / @opts().currentScale
-      c.ytr = c.ytr / @opts().currentScale
-      c.xbl = c.xbl / @opts().currentScale
-      c.ybl = c.ybl / @opts().currentScale
-      c.xbr = c.xbr / @opts().currentScale
-      c.ybr = c.ybr / @opts().currentScale
+      c.xtl = c.xtl / opts.currentScale
+      c.ytl = c.ytl / opts.currentScale
+      c.xtr = c.xtr / opts.currentScale
+      c.ytr = c.ytr / opts.currentScale
+      c.xbl = c.xbl / opts.currentScale
+      c.ybl = c.ybl / opts.currentScale
+      c.xbr = c.xbr / opts.currentScale
+      c.ybr = c.ybr / opts.currentScale
 
       return 1 if x0 <= c.xtl and y0 <= c.ytl
       return 2 if x0 > c.xtl and x0 < c.xtr and y0 < c.ytl
@@ -201,8 +201,8 @@ $ ->
         rect.ybl = rect.bounds.y + rect.bounds.height
         rect.xbr = rect.bounds.x + rect.bounds.width
         rect.ybr = rect.bounds.y + rect.bounds.height
-        rect.center = new Point((rect.bounds.x + (rect.bounds.width / 2)) * @room().opts.currentScale,
-        (rect.bounds.y + (rect.bounds.height / 2)) * @room().opts.currentScale)
+        rect.center = new Point((rect.bounds.x + (rect.bounds.width / 2)) * room.opts.currentScale,
+        (rect.bounds.y + (rect.bounds.height / 2)) * room.opts.currentScale)
 
         if cmX <= rect.center.x and cmY <= rect.center.y
           return x: rect.xtl, y: rect.ytl
@@ -226,13 +226,13 @@ $ ->
 
       if rect
         # rebind comment-minimized
-        $commentMin.css({left: (bp.x * @opts().currentScale) - ($commentMin.width() / 2),
-        top: (bp.y * @opts().currentScale) - ($commentMin.height() / 2)})
+        $commentMin.css({left: (bp.x * opts.currentScale) - ($commentMin.width() / 2),
+        top: (bp.y * opts.currentScale) - ($commentMin.height() / 2)})
 
       return if arrow.isHidden
 
-      bpx = if rect then bp.x else bp.x / @room().opts.currentScale
-      bpy = if rect then bp.y else bp.y / @room().opts.currentScale
+      bpx = if rect then bp.x else bp.x / room.opts.currentScale
+      bpy = if rect then bp.y else bp.y / room.opts.currentScale
       zone = @getZone(commentMax.position().left, commentMax.position().top, bpx, bpy, commentMax.width(), commentMax.height())
 
       coords = @getArrowCoords($commentMin, zone)
@@ -243,14 +243,14 @@ $ ->
       else
         arrow.opacity = 1
 
-      arrow.segments[0].point.x = if rect then coords.x0 else coords.x0 / @opts().currentScale
-      arrow.segments[0].point.y = if rect then coords.y0 else coords.y0 / @opts().currentScale
-      arrow.segments[1].point.x = coords.x1 / @opts().currentScale
-      arrow.segments[1].point.y = coords.y1 / @opts().currentScale
-      arrow.segments[2].point.x = coords.x2 / @opts().currentScale
-      arrow.segments[2].point.y = coords.y2 / @opts().currentScale
+      arrow.segments[0].point.x = if rect then coords.x0 else coords.x0 / opts.currentScale
+      arrow.segments[0].point.y = if rect then coords.y0 else coords.y0 / opts.currentScale
+      arrow.segments[1].point.x = coords.x1 / opts.currentScale
+      arrow.segments[1].point.y = coords.y1 / opts.currentScale
+      arrow.segments[2].point.x = coords.x2 / opts.currentScale
+      arrow.segments[2].point.y = coords.y2 / opts.currentScale
 
-      @room().redrawWithThumb()
+      room.redrawWithThumb()
 
     removeComment: ($commentmin) ->
       if confirm("Are you sure?")
@@ -260,13 +260,13 @@ $ ->
         $commentmin.hide()
 
         if $commentmin[0].rect
-          @room().history.add(type: "remove", tool: $commentmin[0].rect, eligible: true)
+          room.history.add(type: "remove", tool: $commentmin[0].rect, eligible: true)
         else
           tool = {type: "comment", commentMin: $commentmin}
-          @room().history.add({type: "remove", tool: tool, eligible: true})
+          room.history.add({type: "remove", tool: tool, eligible: true})
 
-        @room().socket.emit("commentRemove", $commentmin.elementId)
-        @room().redraw()
+        room.socket.emit("commentRemove", $commentmin.elementId)
+        room.redraw()
 
     hideComment: ($commentmin) ->
       $commentmin[0].$maximized.hide()
@@ -288,7 +288,7 @@ $ ->
       $commentmin[0].arrow.isHidden = true
       $commentmin.show()
 
-      @room().redraw()
+      room.redraw()
 
     unfoldComment: ($commentmin) ->
       $commentmin[0].$maximized.show()
@@ -300,12 +300,12 @@ $ ->
 
       $commentmin.hide() if $commentmin[0].rect
 
-      @room().redraw()
+      room.redraw()
 
     addCommentText: (commentMin, text, emit) ->
       commentContent = commentMin[0].$maximized.find(".comment-content")
       commentContent.prepend("<div class='comment-text'>#{text}</div>")
 
-      @room().socket.emit("commentText", {elementId: commentMin.elementId, text: text}) if emit
+      room.socket.emit("commentText", {elementId: commentMin.elementId, text: text}) if emit
 
   App.room.comments = new RoomComments

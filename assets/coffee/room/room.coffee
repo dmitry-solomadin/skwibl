@@ -14,14 +14,12 @@ $ ->
     init: ->
       @initOpts()
 
-      @savedOpts.push(@opts)
-
       $("#toolSelect > li, #panTool, #selectTool").on "click", ->
-        App.room.opts.tooltype = $(@).data("tooltype")
+        opts.tooltype = $(@).data("tooltype")
 
       $('.color').click ->
         $('.color').removeClass('activen')
-        App.room.opts.color = $(@).attr('data-color')
+        opts.color = $(@).attr('data-color')
         $(@).addClass('activen')
 
       $(document).on "click", "#canvasSelectDiv a", ->
@@ -40,11 +38,16 @@ $ ->
 
     initOpts: ->
       @opts = {}
-      App.room.opts = @opts
+      window.opts = @opts
       $.extend(@opts, @defaultOpts)
       @opts.historytools =
         eligibleHistory: new Array
         allHistory: new Array
+      @savedOpts.push(@opts)
+
+    setOpts: (opts) ->
+      @opts = opts
+      window.opts = opts
 
     # Mouse events handling
 
@@ -297,6 +300,9 @@ $ ->
   tool.onMouseMove = (event) -> App.room.onMouseMove($("#myCanvas"), event)
 
   App.room.init()
+
+  window.room = App.room
+  window.opts = App.room.opts
 
   # resizing canvas
   paper.view.setViewSize(Rectangle.create(0, 0, $("body").width(), $("body").height()).getSize())
