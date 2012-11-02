@@ -166,8 +166,7 @@
       };
 
       RoomComments.prototype.getArrowPos = function(zone, c, w, h) {
-        var h2, w2, x1, x2, y1, y2,
-          _this = this;
+        var h2, w2, x1, x2, y1, y2;
         x1 = 0;
         y1 = 0;
         x2 = 0;
@@ -176,71 +175,52 @@
         h2 = h / 2;
         switch (zone) {
           case 1:
-            (function() {
-              x1 = c.xtl;
-              y1 = c.ytl + _this.CORNER_OFFSET;
-              x2 = c.xtl + _this.CORNER_OFFSET;
-              return y2 = c.ytl;
-            })();
+            x1 = c.xtl;
+            y1 = c.ytl + this.CORNER_OFFSET;
+            x2 = c.xtl + this.CORNER_OFFSET;
+            y2 = c.ytl;
             break;
           case 2:
-            (function() {
-              x2 = c.xtl + w2 + _this.SIDE_OFFSET;
-              y2 = c.ytl;
-              x1 = c.xtl + w2 - _this.SIDE_OFFSET;
-              return y1 = c.ytl;
-            })();
+            x2 = c.xtl + w2 + this.SIDE_OFFSET;
+            y2 = c.ytl;
+            x1 = c.xtl + w2 - this.SIDE_OFFSET;
+            y1 = c.ytl;
             break;
           case 3:
-            (function() {
-              x1 = c.xtr - _this.CORNER_OFFSET;
-              y1 = c.ytr;
-              x2 = c.xtr;
-              return y2 = c.ytr + _this.CORNER_OFFSET;
-            })();
+            x1 = c.xtr - this.CORNER_OFFSET;
+            y1 = c.ytr;
+            x2 = c.xtr;
+            y2 = c.ytr + this.CORNER_OFFSET;
             break;
           case 4:
-            (function() {
-              x1 = c.xtl;
-              y1 = c.ytl + h2 + _this.SIDE_OFFSET;
-              x2 = c.xtl;
-              return y2 = c.ytl + h2 - _this.SIDE_OFFSET;
-            })();
-            break;
-          case 5:
-            (function() {})();
+            x1 = c.xtl;
+            y1 = c.ytl + h2 + this.SIDE_OFFSET;
+            x2 = c.xtl;
+            y2 = c.ytl + h2 - this.SIDE_OFFSET;
             break;
           case 6:
-            (function() {
-              x1 = c.xtr;
-              y1 = c.ytr + h2 - _this.SIDE_OFFSET;
-              x2 = c.xtr;
-              return y2 = c.ytr + h2 + _this.SIDE_OFFSET;
-            })();
+            x1 = c.xtr;
+            y1 = c.ytr + h2 - this.SIDE_OFFSET;
+            x2 = c.xtr;
+            y2 = c.ytr + h2 + this.SIDE_OFFSET;
             break;
           case 7:
-            (function() {
-              x1 = c.xbl + _this.CORNER_OFFSET;
-              y1 = c.ybl;
-              x2 = c.xbl;
-              return y2 = c.ybl - _this.CORNER_OFFSET;
-            })();
+            x1 = c.xbl + this.CORNER_OFFSET;
+            y1 = c.ybl;
+            x2 = c.xbl;
+            y2 = c.ybl - this.CORNER_OFFSET;
             break;
           case 8:
-            (function() {
-              x1 = c.xbl + w2 + _this.SIDE_OFFSET;
-              y1 = c.ybl;
-              x2 = c.xbl + w2 - _this.SIDE_OFFSET;
-              return y2 = c.ybl;
-            })();
+            x1 = c.xbl + w2 + this.SIDE_OFFSET;
+            y1 = c.ybl;
+            x2 = c.xbl + w2 - this.SIDE_OFFSET;
+            y2 = c.ybl;
             break;
           case 9:
-            (function() {
-              x1 = c.xbr;
-              y1 = c.ybr - _this.CORNER_OFFSET;
-              x2 = c.xbr - _this.CORNER_OFFSET;
-              return y2 = c.ybr;
-            })();
+            x1 = c.xbr;
+            y1 = c.ybr - this.CORNER_OFFSET;
+            x2 = c.xbr - this.CORNER_OFFSET;
+            y2 = c.ybr;
         }
         return {
           x1: x1,
@@ -348,6 +328,23 @@
         arrow.segments[2].point.x = coords.x2 / opts.currentScale;
         arrow.segments[2].point.y = coords.y2 / opts.currentScale;
         return room.redrawWithThumb();
+      };
+
+      RoomComments.prototype.translate = function(commentMin, dx, dy) {
+        var maximized;
+        commentMin.css({
+          top: commentMin.position().top + dy,
+          left: commentMin.position().left + dx
+        });
+        commentMin[0].arrow.translate(new Point(dx, dy));
+        maximized = commentMin[0].$maximized;
+        maximized.css({
+          top: maximized.position().top + dy,
+          left: maximized.position().left + dx
+        });
+        if (commentMin[0].rect) {
+          return commentMin[0].rect.translate(new Point(dx, dy));
+        }
       };
 
       RoomComments.prototype.removeComment = function($commentmin) {

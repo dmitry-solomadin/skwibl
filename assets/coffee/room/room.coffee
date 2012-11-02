@@ -52,11 +52,11 @@ $ ->
     # Mouse events handling
 
     onMouseMove: (canvas, event) ->
-      event.point = event.point.transform(new Matrix(1 / @opts.currentScale, 0, 0, 1 / @opts.currentScale, 0, 0))
+      event.point = @applyCurrentScale(event.point)
 
       $(canvas).css({cursor: "default"})
 
-      selectedTool = @opts.selectedTool
+      selectedTool = @items.selected()
       if selectedTool && selectedTool.selectionRect
         if selectedTool.selectionRect.bottomRightScaler.bounds.contains(event.point)
           $(canvas).css(cursor: "se-resize")
@@ -70,203 +70,155 @@ $ ->
           $(canvas).css(cursor: "pointer")
 
     onMouseDown: (canvas, event) ->
-      event.point = event.point.transform(new Matrix(1 / @opts.currentScale, 0, 0, 1 / @opts.currentScale, 0, 0))
-      ;
+      event.point = @applyCurrentScale(event.point)
 
       $("#removeSelected").addClass("disabled")
-      if @opts.selectedTool && @opts.selectedTool.selectionRect
-        @opts.selectedTool.selectionRect.remove()
 
-      @opts.commentRect = null
+      @items.selected().selectionRect.remove() if @items.selected() && @items.selected().selectionRect
 
-      if @opts.tooltype == 'line'
-        @items.create(new Path())
-      else if @opts.tooltype == 'highligher'
-        @items.create(new Path(), {color: @opts.color, width: 15, opacity: 0.7})
-      else if @opts.tooltype == 'straightline'
-        @items.create(new Path())
-        ;
-        @opts.tool.add(event.point) if @opts.tool.segments.length == 0
-        @opts.tool.add(event.point)
-      else if @opts.tooltype == 'arrow'
-        arrow = new Path()
-        arrow.arrow = arrow
-        @items.create(arrow)
-        @opts.tool.add(event.point) if @opts.tool.segments.length == 0
-        @opts.tool.add(event.point)
-        @opts.tool.lineStart = event.point
-      else if @opts.tooltype == "select"
-        @items.testSelect(event.point)
-        @items.drawSelectRect(event.point)
+      @opts.tool = null
 
-      # this should be here because sometimes mouse up event won't fire.
-      if @opts.tooltype == 'line' or @opts.tooltype == 'highligher'
-        @opts.tool.eligible = true
-        @history.add()
+      switch @opts.tooltype
+        when 'line'
+          @items.create(new Path())
+        when 'highligher'
+          @items.create(new Path(), {color: @opts.color, width: 15, opacity: 0.7})
+        when 'straightline'
+          @items.create(new Path())
+          @opts.tool.add(event.point) for [0..1]
+        when 'arrow'
+          arrow = new Path()
+          arrow.arrow = arrow
+          @items.create(arrow)
+          @opts.tool.add(event.point) for [0..1]
+          @opts.tool.lineStart = event.point
+        when "select"
+          @items.testSelect(event.point)
+          @items.drawSelectRect(event.point)
 
     onMouseDrag: (canvas, event) ->
-      event.point = event.point.transform(new Matrix(1 / @opts.currentScale, 0, 0, 1 / @opts.currentScale, 0, 0))
+      event.point = @applyCurrentScale(event.point)
 
       deltaPoint = event.downPoint.subtract(event.point)
 
-      if @opts.tooltype == 'line'
-        @opts.tool.add(event.point)
-        @opts.tool.smooth()
-      else if @opts.tooltype == 'highligher'
-        @opts.tool.add(event.point)
-        @opts.tool.smooth()
-      else if @opts.tooltype == 'circle'
-        rectangle = new Rectangle(event.point.x, event.point.y, deltaPoint.x, deltaPoint.y)
-        @items.create(new Path.Oval(rectangle))
-        @opts.tool.removeOnDrag()
-      else if @opts.tooltype == 'rectangle'
-        rectangle = new Rectangle(event.point.x, event.point.y, deltaPoint.x, deltaPoint.y)
-        @items.create(new Path.Rectangle(rectangle))
-        @opts.tool.removeOnDrag()
-      else if @opts.tooltype == 'comment'
-        if deltaPoint.x < 0 and deltaPoint.y < 0
-          x = event.downPoint.x
-          y = event.downPoint.y
-          w = Math.abs(deltaPoint.x)
-          h = Math.abs(deltaPoint.y)
-        else
-          x = event.point.x
-          y = event.point.y
-          w = deltaPoint.x
-          h = deltaPoint.y
-
-        rectangle = new Path.RoundRectangle(x, y, w, h,
-        @comments.COMMENT_RECTANGLE_ROUNDNESS, @comments.COMMENT_RECTANGLE_ROUNDNESS)
-        @opts.commentRect = rectangle
-        @items.create(rectangle, @comments.COMMENT_STYLE)
-        @opts.tool.removeOnDrag()
-      else if @opts.tooltype == 'straightline'
-        @opts.tool.lastSegment.point = event.point
-      else if @opts.tooltype == 'arrow'
-        arrow = @opts.tool.arrow
-        arrow.lastSegment.point = event.point
-
-        arrowGroup = new Group([arrow])
-        arrowGroup.arrow = arrow
-        arrowGroup.drawTriangle = ->
-          vector = @arrow.lastSegment.point - @arrow.segments[0].point
-          vector = vector.normalize(10)
-          if @triangle
-            @triangle.segments[0].point = @arrow.lastSegment.point + vector.rotate(135)
-            @triangle.segments[1].point = @arrow.lastSegment.point
-            @triangle.segments[2].point = @arrow.lastSegment.point + vector.rotate(-135)
+      switch @opts.tooltype
+        when 'line'
+          @opts.tool.add(event.point)
+          @opts.tool.smooth()
+        when 'highligher'
+          @opts.tool.add(event.point)
+          @opts.tool.smooth()
+        when 'circle'
+          rectangle = new Rectangle(event.point.x, event.point.y, deltaPoint.x, deltaPoint.y)
+          @items.create(new Path.Oval(rectangle))
+          @opts.tool.removeOnDrag()
+        when 'rectangle'
+          rectangle = new Rectangle(event.point.x, event.point.y, deltaPoint.x, deltaPoint.y)
+          @items.create(new Path.Rectangle(rectangle))
+          @opts.tool.removeOnDrag()
+        when 'comment'
+          if deltaPoint.x < 0 and deltaPoint.y < 0
+            x = event.downPoint.x
+            y = event.downPoint.y
+            w = Math.abs(deltaPoint.x)
+            h = Math.abs(deltaPoint.y)
           else
-            triangle = new Path([
-              @arrow.lastSegment.point + vector.rotate(135)
-              @arrow.lastSegment.point
-              @arrow.lastSegment.point + vector.rotate(-135)
-            ])
-            @triangle = triangle
-            @addChild(triangle)
+            x = event.point.x
+            y = event.point.y
+            w = deltaPoint.x
+            h = deltaPoint.y
 
-          @triangle
+          rectangle = new Path.RoundRectangle(x, y, w, h,
+          @comments.COMMENT_RECTANGLE_ROUNDNESS, @comments.COMMENT_RECTANGLE_ROUNDNESS)
+          rectangle.isCommentRect = true
+          @items.create(rectangle, @comments.COMMENT_STYLE)
+          @opts.tool.removeOnDrag()
+        when 'straightline'
+          @opts.tool.lastSegment.point = event.point
+        when 'arrow'
+          arrow = @opts.tool.arrow
+          arrow.lastSegment.point = event.point
 
-        triangle = arrowGroup.drawTriangle()
-        @items.create(triangle)
+          arrowGroup = new Group([arrow])
+          arrowGroup.arrow = arrow
+          arrowGroup.drawTriangle = ->
+            vector = @arrow.lastSegment.point - @arrow.segments[0].point
+            vector = vector.normalize(10)
+            if @triangle
+              @triangle.segments[0].point = @arrow.lastSegment.point + vector.rotate(135)
+              @triangle.segments[1].point = @arrow.lastSegment.point
+              @triangle.segments[2].point = @arrow.lastSegment.point + vector.rotate(-135)
+            else
+              triangle = new Path([
+                @arrow.lastSegment.point + vector.rotate(135)
+                @arrow.lastSegment.point
+                @arrow.lastSegment.point + vector.rotate(-135)
+              ])
+              @triangle = triangle
+              @addChild(triangle)
 
-        @opts.tool = arrowGroup
+            @triangle
 
-        triangle.removeOnDrag()
-      else if @opts.tooltype == 'pan'
-        for element in @opts.historytools.allHistory
-          if element.commentMin
-            commentRect = element.type != "comment"
+          triangle = arrowGroup.drawTriangle()
+          @items.create(triangle)
 
-            dx = @opts.currentScale * event.delta.x
-            dy = @opts.currentScale * event.delta.y
+          @opts.tool = arrowGroup
 
-            element.commentMin.css({top: element.commentMin.position().top + dy,
-            left: element.commentMin.position().left + dx})
-            element.commentMin[0].arrow.translate(event.delta)
-            element.commentMin[0].$maximized.css({top: element.commentMin[0].$maximized.position().top + dy,
-            left: element.commentMin[0].$maximized.position().left + dx})
+          triangle.removeOnDrag()
+        when 'pan'
+          @items.pan(event.delta.x, event.delta.y)
+        when 'select'
+          scalersSelected = @items.selected() and @items.selected().scalersSelected
+          if scalersSelected then @items.sacleSelected(event) else @items.translateSelected(event.delta)
 
-            element.translate(event.delta) if commentRect
-          else if !element.type and element.translate
-            element.translate(event.delta)
-      else if @opts.tooltype == 'select'
-        if @opts.selectedTool and @opts.selectedTool.scalersSelected
-          tool = @opts.selectedTool
-
-          scaleZone = @items.getReflectZone(tool, event.point.x, event.point.y)
-          if scaleZone then tool.scaleZone = scaleZone else scaleZone = tool.scaleZone
-
-          zx = scaleZone.zx
-          zy = scaleZone.zy
-          scalePoint = scaleZone.point
-
-          dx = event.delta.x
-          dy = event.delta.y
-
-          scaleFactors = @items.getScaleFactors(tool, zx, zy, dx, dy)
-          sx = scaleFactors.sx
-          sy = scaleFactors.sy
-
-          # scale tool
-          @items.doScale(tool, sx, sy, scalePoint)
-
-          tool.selectionRect.remove()
-          tool.selectionRect = @items.createSelectionRectangle(tool)
-        else
-          @items.translateSelected(event.delta)
-
-        # redraw comment arrow if there is one.
-        if @opts.selectedTool.commentMin
-          @comments.redrawArrow(@opts.selectedTool.commentMin)
+          # redraw comment arrow if there is one.
+          @comments.redrawArrow(@items.selected().commentMin) if @items.selected().commentMin
 
     onMouseUp: (canvas, event) ->
-      event.point = event.point.transform(new Matrix(1 / @opts.currentScale, 0, 0, 1 / @opts.currentScale, 0, 0))
+      event.point = @applyCurrentScale(event.point)
+      tooltype = @opts.tooltype
 
-      if @opts.tooltype == 'line'
-        @opts.tool.add(event.point)
-        @opts.tool.simplify(10)
-      if @opts.tooltype == 'highligher'
-        @opts.tool.add(event.point)
-        @opts.tool.simplify(10)
-      if @opts.tooltype == "comment"
-        commentMin = @comments.create(event.point.x, event.point.y, @opts.commentRect)
+      switch tooltype
+        when 'line'
+          @opts.tool.add(event.point)
+          @opts.tool.simplify(10)
+        when 'highligher'
+          @opts.tool.add(event.point)
+          @opts.tool.simplify(10)
+        when "comment"
+          commentRect = if @opts.tool and @opts.tool.isCommentRect then @opts.tool else null
+          commentMin = @comments.create(event.point.x, event.point.y, commentRect)
+          commentRect.commentMin = commentMin if commentRect
 
-        if @opts.commentRect
-          @opts.commentRect.commentMin = commentMin
-
-      if @opts.tool
-        @opts.tool.tooltype = @opts.tooltype
-
-      if @opts.tooltype == 'straightline' or @opts.tooltype == 'arrow' or
-      @opts.tooltype == 'circle' or @opts.tooltype == 'rectangle'
-        @opts.tool.eligible = true
-        @history.add()
-
-      if @opts.tooltype == 'comment'
-        if @opts.commentRect
+      switch tooltype
+        when 'straightline', 'arrow', 'circle', 'rectangle', 'line', 'highligher'
           @opts.tool.eligible = true
           @history.add()
-        else
-          @history.add(type: "comment", commentMin: commentMin, eligible: true)
 
-      if @opts.tooltype == 'straightline' or @opts.tooltype == 'arrow' or @opts.tooltype == 'circle' or
-      @opts.tooltype == 'rectangle' or @opts.tooltype == 'line' or @opts.tooltype == 'highligher'
-        @opts.tool.elementId = @getNextIdAndIncrement()
-        @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@opts.tool))
-        @socket.emit("nextId")
-      else if @opts.tooltype == "comment"
-        commentMin.elementId = @getNextIdAndIncrement()
-        @socket.emit("commentUpdate", @socketHelper.prepareCommentToSend(commentMin))
-        @socket.emit("nextId")
-      else if @opts.tooltype == 'select' && @opts.selectedTool
-        @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@opts.selectedTool))
+          @opts.tool.elementId = @getNextIdAndIncrement()
+          @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@opts.tool))
+          @socket.emit("nextId")
+        when "comment"
+          if commentRect
+            @opts.tool.eligible = true
+            @history.add()
+          else
+            @history.add(type: "comment", commentMin: commentMin, eligible: true)
 
+          commentMin.elementId = @getNextIdAndIncrement()
+          @socket.emit("commentUpdate", @socketHelper.prepareCommentToSend(commentMin))
+          @socket.emit("nextId")
+        when 'select'
+          @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@items.selected())) if @items.selected()
 
-      @opts.tooltype = "select" if @opts.tooltype == 'comment'
+      @opts.tooltype = "select" if tooltype == 'comment'
 
       @canvas.updateSelectedThumb()
 
     # Misc methods
+
+    applyCurrentScale: (point) ->
+      point.transform(new Matrix(1 / @opts.currentScale, 0, 0, 1 / @opts.currentScale, 0, 0))
 
     getNextIdAndIncrement: ->
       prevId = @opts.nextId

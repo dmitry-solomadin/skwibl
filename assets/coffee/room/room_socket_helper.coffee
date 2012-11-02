@@ -5,20 +5,12 @@ $ ->
       socket = io.connect('/canvas', window.copt)
       App.room.socket = socket
 
-      socket.on 'elementUpdate', (data) =>
-        @addOrUpdateElement data.message, false
-
-      socket.on 'elementRemove', (data) =>
-        @socketRemoveElement data.message
-
-      socket.on 'commentUpdate', (data) =>
-        @addOrUpdateComment(data.message, false)
-
-      socket.on 'commentRemove', (data) =>
-        @socketRemoveComment(data.message)
-
-      socket.on 'commentText', (data) =>
-        @addOrUpdateCommentText(data.message)
+      socket.on 'elementUpdate', (data) => @addOrUpdateElement(data.message, false)
+      socket.on 'elementRemove', (data) => @socketRemoveElement(data.message)
+      socket.on 'commentUpdate', (data) => @addOrUpdateComment(data.message, false)
+      socket.on 'commentRemove', (data) => @socketRemoveComment(data.message)
+      socket.on 'commentText', (data) => @addOrUpdateCommentText(data.message)
+      socket.on 'fileAdded', (data) => room.canvas.handleUpload(data.message, false)
 
       socket.on 'eraseCanvas', =>
         room.canvas.erase()

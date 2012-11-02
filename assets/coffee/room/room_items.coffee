@@ -18,29 +18,39 @@ $ ->
       opts.tool.dashArray = if settings.dashArray then settings.dashArray else undefined
 
     removeSelected: ->
-      if opts.selectedTool
+      if @selected()
         # add new 'remove' item into history and link it to removed item.
-        room.history.add({type: "remove", tool: opts.selectedTool, eligible: true})
-        opts.selectedTool.opacity = 0
+        room.history.add({type: "remove", tool: @selected(), eligible: true})
+        @selected().opacity = 0
 
-        room.socket.emit("elementRemove", opts.selectedTool.elementId)
+        room.socket.emit("elementRemove", @selected().elementId)
 
         @unselect()
         room.redrawWithThumb()
 
     translateSelected: (deltaPoint) ->
-      if opts.selectedTool
-        opts.selectedTool.translate(deltaPoint)
-        opts.selectedTool.selectionRect.translate(deltaPoint) if opts.selectedTool.selectionRect
+      if @selected()
+        @selected().translate(deltaPoint)
+        @selected().selectionRect.translate(deltaPoint) if @selected().selectionRect
         room.redrawWithThumb()
 
     unselectIfSelected: (elementId) ->
-      if opts.selectedTool and opts.selectedTool.selectionRect and opts.selectedTool.elementId == elementId
+      if @selected() and @selected().selectionRect and @selected().elementId == elementId
         @unselect()
 
-    unselect: () ->
-      opts.selectedTool.selectionRect.remove() if opts.selectedTool and opts.selectedTool.selectionRect
-      opts.selectedTool = null;
+    unselect: ->
+      @selected().selectionRect.remove() if @selected() and @selected().selectionRect
+      @setSelected(null)
+
+    pan: (dx, dy) ->
+      for element in opts.historytools.allHistory
+        if element.commentMin
+          room.comments.translate(element.commentMin, dx, dy)
+        else if !element.type and element.translate
+          element.translate(new Point(dx, dy))
+
+    selected: -> opts.selectedTool
+    setSelected: (selectedTool)-> opts.selectedTool = selectedTool
 
     # ITEMS SELECT
 
@@ -48,56 +58,55 @@ $ ->
       selectTimeDelta = if opts.selectTime then new Date().getTime() - opts.selectTime else undefined
 
       opts.selectTime = new Date().getTime()
-      alreadySelected = opts.selectedTool and opts.selectedTool.selectionRect
+      alreadySelected = @selected() and @selected().selectionRect
       selected = false
 
       # Select scalers or remove buttton has highest priority.
       if alreadySelected
-        if room.helper.elementInArrayContainsPoint(opts.selectedTool.selectionRect.scalers, point) ||
-        (opts.selectedTool.selectionRect.removeButton && opts.selectedTool.selectionRect.removeButton.bounds.contains(point))
+        if room.helper.elementInArrayContainsPoint(@selected().selectionRect.scalers, point) ||
+        (@selected().selectionRect.removeButton && @selected().selectionRect.removeButton.bounds.contains(point))
           selected = true
 
       # Already selected item has next highest priority if time between selectes was big.
-      selected = true if selectTimeDelta > 750 and alreadySelected and opts.selectedTool.selectionRect.bounds.contains(point)
+      selected = true if selectTimeDelta > 750 and alreadySelected and @selected().selectionRect.bounds.contains(point)
 
       unless selected
-        previousSelectedTool = opts.selectedTool
+        previousSelectedTool = @selected()
         for element in room.history.getSelectableTools()
           continue if element.isImage or element.type
 
           if element.bounds.contains(point)
-            opts.selectedTool = element
+            @setSelected(element)
             selected = true
 
-          if selectTimeDelta < 750 and opts.selectedTool and previousSelectedTool
-              if opts.selectedTool.id == previousSelectedTool.id then continue else break
+          if selectTimeDelta < 750 and @selected() and previousSelectedTool
+            if @selected().id == previousSelectedTool.id then continue else break
 
-      opts.selectedTool = null unless selected
+      @setSelected(null) unless selected
 
     drawSelectRect: (point) ->
-      tool = opts.selectedTool
-      if tool
-        tool.selectionRect = @createSelectionRectangle(tool)
+      if @selected()
+        @selected().selectionRect = @createSelectionRectangle()
         $("#removeSelected").removeClass("disabled")
 
-        tool.scalersSelected = true
-        if tool.selectionRect.topLeftScaler.bounds.contains(point)
-          tool.scaleZone = {zx: -1, zy: -1, point: tool.bounds.bottomRight}
-        else if tool.selectionRect.bottomRightScaler.bounds.contains(point)
-          tool.scaleZone = {zx: 1, zy: 1, point: tool.bounds.topLeft}
-        else if tool.selectionRect.topRightScaler.bounds.contains(point)
-          tool.scaleZone = {zx: 1, zy: -1, point: tool.bounds.bottomLeft}
-        else if tool.selectionRect.bottomLeftScaler.bounds.contains(point)
-          tool.scaleZone = {zx: -1, zy: 1, point: tool.bounds.topRight}
+        @selected().scalersSelected = true
+        if @selected().selectionRect.topLeftScaler.bounds.contains(point)
+          @selected().scaleZone = {zx: -1, zy: -1, point: @selected().bounds.bottomRight}
+        else if @selected().selectionRect.bottomRightScaler.bounds.contains(point)
+          @selected().scaleZone = {zx: 1, zy: 1, point: @selected().bounds.topLeft}
+        else if @selected().selectionRect.topRightScaler.bounds.contains(point)
+          @selected().scaleZone = {zx: 1, zy: -1, point: @selected().bounds.bottomLeft}
+        else if @selected().selectionRect.bottomLeftScaler.bounds.contains(point)
+          @selected().scaleZone = {zx: -1, zy: 1, point: @selected().bounds.topRight}
         else
-          tool.scalersSelected = false
+          @selected().scalersSelected = false
 
-        if tool.selectionRect.removeButton and tool.selectionRect.removeButton.bounds.contains(point)
+        if @selected().selectionRect.removeButton and @selected().selectionRect.removeButton.bounds.contains(point)
           @removeSelected()
 
-    createSelectionRectangle: (selectedTool) ->
-      bounds = selectedTool.bounds
-      addBound = parseInt(selectedTool.strokeWidth / 2)
+    createSelectionRectangle: ->
+      bounds = @selected().bounds
+      addBound = parseInt(@selected().strokeWidth / 2)
 
       selectRect = new Path.Rectangle(bounds.x - addBound, bounds.y - addBound,
       bounds.width + (addBound * 2), bounds.height + (addBound * 2))
@@ -113,7 +122,7 @@ $ ->
       bottomLeftScaler = new Path.Oval(new Rectangle(bounds.x - addBound - halfWidth,
       bounds.y + bounds.height + addBound - halfWidth, width, width))
 
-      unless selectedTool.commentMin
+      unless @selected().commentMin
         removeButton = new Raster(@removeImg)
         removeButton.position = new Point(selectRect.bounds.x + selectRect.bounds.width + 12, selectRect.bounds.y - 12)
 
@@ -126,7 +135,7 @@ $ ->
       selectionRectGroup.bottomLeftScaler = bottomLeftScaler
       selectionRectGroup.scalers = [topLeftScaler, bottomRightScaler, topRightScaler, bottomLeftScaler]
 
-      unless selectedTool.commentMin
+      unless @selected().commentMin
         selectionRectGroup.removeButton = removeButton
         selectionRectGroup.addChild(removeButton)
 
@@ -137,23 +146,38 @@ $ ->
       @create(topRightScaler, {color: "#202020", width: 1, opacity: 1, fillColor: "white"})
       @create(bottomLeftScaler, {color: "#202020", width: 1, opacity: 1, fillColor: "white"})
 
-      @create(removeButton) unless selectedTool.commentMin
+      @create(removeButton) unless @selected().commentMin
 
       return selectionRectGroup
 
     # ITEMS SCALE
 
-    doScale: (tool, sx, sy, scalePoint) ->
+    sacleSelected: (event) ->
+      scaleZone = @getReflectZone(@selected(), event.point.x, event.point.y)
+      if scaleZone then @selected().scaleZone = scaleZone else scaleZone = @selected().scaleZone
+
+      zx = scaleZone.zx
+      zy = scaleZone.zy
+      scalePoint = scaleZone.point
+
+      scaleFactors = @getScaleFactors(@selected(), zx, zy, event.delta.x, event.delta.y)
+      sx = scaleFactors.sx
+      sy = scaleFactors.sy
+
       transformMatrix = new Matrix().scale(sx, sy, scalePoint)
       return if transformMatrix._d == 0 or transformMatrix._a == 0
 
-      if tool.tooltype == "arrow"
-        tool.arrow.scale(sx, sy, scalePoint)
-        tool.drawTriangle()
+      if @selected().arrow
+        @selected().arrow.scale(sx, sy, scalePoint)
+        @selected().drawTriangle()
       else
-        tool.transform(transformMatrix)
+        @selected().transform(transformMatrix)
 
-      tool.selectionRect.theRect.transform(transformMatrix)
+      @selected().selectionRect.theRect.transform(transformMatrix)
+
+      # redraw selection rect
+      @selected().selectionRect.remove()
+      @selected().selectionRect = @createSelectionRectangle()
 
     getScaleFactors: (item, zx, zy, dx, dy) ->
       item = if item.arrow then item.arrow else item

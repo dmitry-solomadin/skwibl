@@ -128,43 +128,42 @@ $ ->
       h2 = h / 2
 
       switch zone
-        when 1 then do =>
+        when 1
           x1 = c.xtl
           y1 = c.ytl + @CORNER_OFFSET
           x2 = c.xtl + @CORNER_OFFSET
           y2 = c.ytl
-        when 2 then do =>
+        when 2
           x2 = c.xtl + w2 + @SIDE_OFFSET
           y2 = c.ytl
           x1 = c.xtl + w2 - @SIDE_OFFSET
           y1 = c.ytl
-        when 3 then do =>
+        when 3
           x1 = c.xtr - @CORNER_OFFSET
           y1 = c.ytr
           x2 = c.xtr
           y2 = c.ytr + @CORNER_OFFSET
-        when 4 then do =>
+        when 4
           x1 = c.xtl
           y1 = c.ytl + h2 + @SIDE_OFFSET
           x2 = c.xtl
           y2 = c.ytl + h2 - @SIDE_OFFSET
-        when 5 then do =>
-        when 6 then do =>
+        when 6
           x1 = c.xtr
           y1 = c.ytr + h2 - @SIDE_OFFSET
           x2 = c.xtr
           y2 = c.ytr + h2 + @SIDE_OFFSET
-        when 7 then do =>
+        when 7
           x1 = c.xbl + @CORNER_OFFSET
           y1 = c.ybl
           x2 = c.xbl
           y2 = c.ybl - @CORNER_OFFSET
-        when 8 then do =>
+        when 8
           x1 = c.xbl + w2 + @SIDE_OFFSET
           y1 = c.ybl
           x2 = c.xbl + w2 - @SIDE_OFFSET
           y2 = c.ybl
-        when 9 then do =>
+        when 9
           x1 = c.xbr
           y1 = c.ybr - @CORNER_OFFSET
           x2 = c.xbr - @CORNER_OFFSET
@@ -251,6 +250,13 @@ $ ->
       arrow.segments[2].point.y = coords.y2 / opts.currentScale
 
       room.redrawWithThumb()
+
+    translate: (commentMin, dx, dy) ->
+      commentMin.css(top: commentMin.position().top + dy, left: commentMin.position().left + dx)
+      commentMin[0].arrow.translate(new Point(dx, dy))
+      maximized = commentMin[0].$maximized
+      maximized.css(top: maximized.position().top + dy, left: maximized.position().left + dx)
+      commentMin[0].rect.translate(new Point(dx, dy)) if commentMin[0].rect
 
     removeComment: ($commentmin) ->
       if confirm("Are you sure?")

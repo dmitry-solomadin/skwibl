@@ -95,12 +95,21 @@
         return this.setScale(opts.currentScale - 0.1);
       };
 
-      RoomCanvas.prototype.handleUpload = function(image) {
-        if (opts.image) {
-          this.addNewThumb();
-        }
-        this.addImage(image);
-        return this.updateSelectedThumb();
+      RoomCanvas.prototype.handleUpload = function(imagePath, emit) {
+        var image,
+          _this = this;
+        image = new Image();
+        image.src = imagePath;
+        return $(image).on("load", function() {
+          if (opts.image) {
+            _this.addNewThumb();
+          }
+          _this.addImage(image);
+          _this.updateSelectedThumb();
+          if (emit) {
+            return room.socket.emit("fileAdded", imagePath);
+          }
+        });
       };
 
       RoomCanvas.prototype.addImage = function(image) {
@@ -116,10 +125,15 @@
       };
 
       RoomCanvas.prototype.addNewThumb = function() {
+        return $("#canvasSelectDiv").append("<a href='#'><canvas width='80' height='60'></canvas></a>");
+      };
+
+      RoomCanvas.prototype.addNewThumbAndSelect = function() {
         this.erase();
         room.initOpts();
+        this.addNewThumb();
         $("#canvasSelectDiv a").removeClass("canvasSelected");
-        return $("#canvasSelectDiv").append("<a href='#' class='canvasSelected'><canvas width='80' height='60'></canvas></a>");
+        return $("#canvasSelectDiv a:last").addClass("canvasSelected");
       };
 
       RoomCanvas.prototype.updateSelectedThumb = function() {

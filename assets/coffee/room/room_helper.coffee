@@ -36,9 +36,8 @@ $ ->
         onComplete: (id, fileName, responseJSON) =>
           $(uploader._listElement).css('dispaly', 'none')
 
-          image = new Image()
-          image.src = "/images/avatar.png"
-          $(image).on "load", => room.canvas.handleUpload(image)
+          imagePath = "/images/avatar.png"
+          room.canvas.handleUpload(imagePath, true)
 
     reverseOpacity: (elem) -> if elem.opacity == 0 then elem.opacity = 1 else elem.opacity = 0
 

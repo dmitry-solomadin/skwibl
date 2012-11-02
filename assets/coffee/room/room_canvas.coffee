@@ -51,10 +51,16 @@ $ ->
 
     # CANVAS THUMBNAILS & IMAGE UPLOAD
 
-    handleUpload: (image) ->
-      @addNewThumb() if opts.image
-      @addImage(image)
-      @updateSelectedThumb()
+    handleUpload: (imagePath, emit) ->
+      image = new Image()
+      image.src = imagePath
+      $(image).on "load", =>
+        if opts.image
+          @addNewThumb()
+        @addImage(image)
+        @updateSelectedThumb()
+
+        room.socket.emit("fileAdded", imagePath) if emit
 
     addImage: (image) ->
       img = new Raster(image)
@@ -70,12 +76,16 @@ $ ->
       room.history.add(img)
 
     addNewThumb: ->
-      @erase()
+      $("#canvasSelectDiv").append("<a href='#'><canvas width='80' height='60'></canvas></a>")
 
+    addNewThumbAndSelect: ->
+      @erase()
       room.initOpts()
 
-      $("#canvasSelectDiv a").removeClass("canvasSelected");
-      $("#canvasSelectDiv").append("<a href='#' class='canvasSelected'><canvas width='80' height='60'></canvas></a>")
+      @addNewThumb()
+
+      $("#canvasSelectDiv a").removeClass("canvasSelected")
+      $("#canvasSelectDiv a:last").addClass("canvasSelected")
 
     updateSelectedThumb: ->
       selectedCanvas = $(".canvasSelected canvas")
@@ -85,7 +95,7 @@ $ ->
       cvh = $(canvas).height()
       scw = $(selectedCanvas).width()
       sch = $(selectedCanvas).height()
-      sy = sch / cvh;
+      sy = sch / cvh
 
       transformMatrix = new Matrix(sy / opts.currentScale, 0, 0, sy / opts.currentScale, 0, 0)
       paper.project.activeLayer.transform(transformMatrix)
@@ -93,7 +103,7 @@ $ ->
 
       shift = -((sy * cvw) - scw) / 2
 
-      selectedContext.clearRect(0, 0, scw, sch);
+      selectedContext.clearRect(0, 0, scw, sch)
       selectedContext.drawImage(canvas, shift, 0) for i in [0..5]
 
       transformMatrix = new Matrix(opts.currentScale / sy, 0, 0, opts.currentScale / sy, 0, 0)
@@ -105,16 +115,16 @@ $ ->
 
       $("#canvasSelectDiv a").removeClass("canvasSelected")
 
-      index = $(anchor).index();
+      index = $(anchor).index()
       canvasOpts = @findCanvasOptsByIndex(index)
 
       alert("No canvas opts by given index=" + index) unless canvasOpts
 
-      @erase();
+      @erase()
       room.setOpts(canvasOpts)
-      @restore();
+      @restore()
 
-      $(anchor).addClass("canvasSelected");
+      $(anchor).addClass("canvasSelected")
 
     findCanvasOptsByIndex: (index) ->
       for savedOpt, i in room.savedOpts

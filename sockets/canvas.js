@@ -65,6 +65,10 @@ exports.configure = function (sio) {
         socket.broadcast.to(socket.project).emit("eraseCanvas");
       });
 
+      socket.on('fileAdded', function (msg, cb) {
+        socket.broadcast.to(socket.project).emit("fileAdded", {id:id, message:msg});
+      });
+
       socket.on('nextId', function (msg, cb) {
         socket.broadcast.to(socket.project).emit("nextId");
       });

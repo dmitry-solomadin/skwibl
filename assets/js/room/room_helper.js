@@ -74,13 +74,10 @@
             return $(uploader._listElement).css('dispaly', 'none');
           },
           onComplete: function(id, fileName, responseJSON) {
-            var image;
+            var imagePath;
             $(uploader._listElement).css('dispaly', 'none');
-            image = new Image();
-            image.src = "/images/avatar.png";
-            return $(image).on("load", function() {
-              return room.canvas.handleUpload(image);
-            });
+            imagePath = "/images/avatar.png";
+            return room.canvas.handleUpload(imagePath, true);
           }
         });
       };

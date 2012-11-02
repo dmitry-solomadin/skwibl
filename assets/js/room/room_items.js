@@ -27,58 +27,83 @@
       };
 
       RoomItems.prototype.removeSelected = function() {
-        if (opts.selectedTool) {
+        if (this.selected()) {
           room.history.add({
             type: "remove",
-            tool: opts.selectedTool,
+            tool: this.selected(),
             eligible: true
           });
-          opts.selectedTool.opacity = 0;
-          room.socket.emit("elementRemove", opts.selectedTool.elementId);
+          this.selected().opacity = 0;
+          room.socket.emit("elementRemove", this.selected().elementId);
           this.unselect();
           return room.redrawWithThumb();
         }
       };
 
       RoomItems.prototype.translateSelected = function(deltaPoint) {
-        if (opts.selectedTool) {
-          opts.selectedTool.translate(deltaPoint);
-          if (opts.selectedTool.selectionRect) {
-            opts.selectedTool.selectionRect.translate(deltaPoint);
+        if (this.selected()) {
+          this.selected().translate(deltaPoint);
+          if (this.selected().selectionRect) {
+            this.selected().selectionRect.translate(deltaPoint);
           }
           return room.redrawWithThumb();
         }
       };
 
       RoomItems.prototype.unselectIfSelected = function(elementId) {
-        if (opts.selectedTool && opts.selectedTool.selectionRect && opts.selectedTool.elementId === elementId) {
+        if (this.selected() && this.selected().selectionRect && this.selected().elementId === elementId) {
           return this.unselect();
         }
       };
 
       RoomItems.prototype.unselect = function() {
-        if (opts.selectedTool && opts.selectedTool.selectionRect) {
-          opts.selectedTool.selectionRect.remove();
+        if (this.selected() && this.selected().selectionRect) {
+          this.selected().selectionRect.remove();
         }
-        return opts.selectedTool = null;
+        return this.setSelected(null);
+      };
+
+      RoomItems.prototype.pan = function(dx, dy) {
+        var element, _i, _len, _ref, _results;
+        _ref = opts.historytools.allHistory;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          element = _ref[_i];
+          if (element.commentMin) {
+            _results.push(room.comments.translate(element.commentMin, dx, dy));
+          } else if (!element.type && element.translate) {
+            _results.push(element.translate(new Point(dx, dy)));
+          } else {
+            _results.push(void 0);
+          }
+        }
+        return _results;
+      };
+
+      RoomItems.prototype.selected = function() {
+        return opts.selectedTool;
+      };
+
+      RoomItems.prototype.setSelected = function(selectedTool) {
+        return opts.selectedTool = selectedTool;
       };
 
       RoomItems.prototype.testSelect = function(point) {
         var alreadySelected, element, previousSelectedTool, selectTimeDelta, selected, _i, _len, _ref;
         selectTimeDelta = opts.selectTime ? new Date().getTime() - opts.selectTime : void 0;
         opts.selectTime = new Date().getTime();
-        alreadySelected = opts.selectedTool && opts.selectedTool.selectionRect;
+        alreadySelected = this.selected() && this.selected().selectionRect;
         selected = false;
         if (alreadySelected) {
-          if (room.helper.elementInArrayContainsPoint(opts.selectedTool.selectionRect.scalers, point) || (opts.selectedTool.selectionRect.removeButton && opts.selectedTool.selectionRect.removeButton.bounds.contains(point))) {
+          if (room.helper.elementInArrayContainsPoint(this.selected().selectionRect.scalers, point) || (this.selected().selectionRect.removeButton && this.selected().selectionRect.removeButton.bounds.contains(point))) {
             selected = true;
           }
         }
-        if (selectTimeDelta > 750 && alreadySelected && opts.selectedTool.selectionRect.bounds.contains(point)) {
+        if (selectTimeDelta > 750 && alreadySelected && this.selected().selectionRect.bounds.contains(point)) {
           selected = true;
         }
         if (!selected) {
-          previousSelectedTool = opts.selectedTool;
+          previousSelectedTool = this.selected();
           _ref = room.history.getSelectableTools();
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             element = _ref[_i];
@@ -86,11 +111,11 @@
               continue;
             }
             if (element.bounds.contains(point)) {
-              opts.selectedTool = element;
+              this.setSelected(element);
               selected = true;
             }
-            if (selectTimeDelta < 750 && opts.selectedTool && previousSelectedTool) {
-              if (opts.selectedTool.id === previousSelectedTool.id) {
+            if (selectTimeDelta < 750 && this.selected() && previousSelectedTool) {
+              if (this.selected().id === previousSelectedTool.id) {
                 continue;
               } else {
                 break;
@@ -99,54 +124,52 @@
           }
         }
         if (!selected) {
-          return opts.selectedTool = null;
+          return this.setSelected(null);
         }
       };
 
       RoomItems.prototype.drawSelectRect = function(point) {
-        var tool;
-        tool = opts.selectedTool;
-        if (tool) {
-          tool.selectionRect = this.createSelectionRectangle(tool);
+        if (this.selected()) {
+          this.selected().selectionRect = this.createSelectionRectangle();
           $("#removeSelected").removeClass("disabled");
-          tool.scalersSelected = true;
-          if (tool.selectionRect.topLeftScaler.bounds.contains(point)) {
-            tool.scaleZone = {
+          this.selected().scalersSelected = true;
+          if (this.selected().selectionRect.topLeftScaler.bounds.contains(point)) {
+            this.selected().scaleZone = {
               zx: -1,
               zy: -1,
-              point: tool.bounds.bottomRight
+              point: this.selected().bounds.bottomRight
             };
-          } else if (tool.selectionRect.bottomRightScaler.bounds.contains(point)) {
-            tool.scaleZone = {
+          } else if (this.selected().selectionRect.bottomRightScaler.bounds.contains(point)) {
+            this.selected().scaleZone = {
               zx: 1,
               zy: 1,
-              point: tool.bounds.topLeft
+              point: this.selected().bounds.topLeft
             };
-          } else if (tool.selectionRect.topRightScaler.bounds.contains(point)) {
-            tool.scaleZone = {
+          } else if (this.selected().selectionRect.topRightScaler.bounds.contains(point)) {
+            this.selected().scaleZone = {
               zx: 1,
               zy: -1,
-              point: tool.bounds.bottomLeft
+              point: this.selected().bounds.bottomLeft
             };
-          } else if (tool.selectionRect.bottomLeftScaler.bounds.contains(point)) {
-            tool.scaleZone = {
+          } else if (this.selected().selectionRect.bottomLeftScaler.bounds.contains(point)) {
+            this.selected().scaleZone = {
               zx: -1,
               zy: 1,
-              point: tool.bounds.topRight
+              point: this.selected().bounds.topRight
             };
           } else {
-            tool.scalersSelected = false;
+            this.selected().scalersSelected = false;
           }
-          if (tool.selectionRect.removeButton && tool.selectionRect.removeButton.bounds.contains(point)) {
+          if (this.selected().selectionRect.removeButton && this.selected().selectionRect.removeButton.bounds.contains(point)) {
             return this.removeSelected();
           }
         }
       };
 
-      RoomItems.prototype.createSelectionRectangle = function(selectedTool) {
+      RoomItems.prototype.createSelectionRectangle = function() {
         var addBound, bottomLeftScaler, bottomRightScaler, bounds, dashArray, halfWidth, removeButton, selectRect, selectionRectGroup, topLeftScaler, topRightScaler, width;
-        bounds = selectedTool.bounds;
-        addBound = parseInt(selectedTool.strokeWidth / 2);
+        bounds = this.selected().bounds;
+        addBound = parseInt(this.selected().strokeWidth / 2);
         selectRect = new Path.Rectangle(bounds.x - addBound, bounds.y - addBound, bounds.width + (addBound * 2), bounds.height + (addBound * 2));
         width = 8;
         halfWidth = width / 2;
@@ -154,7 +177,7 @@
         bottomRightScaler = new Path.Oval(new Rectangle(bounds.x + bounds.width + addBound - halfWidth, bounds.y + bounds.height + addBound - halfWidth, width, width));
         topRightScaler = new Path.Oval(new Rectangle(bounds.x + bounds.width + addBound - halfWidth, bounds.y - addBound - halfWidth, width, width));
         bottomLeftScaler = new Path.Oval(new Rectangle(bounds.x - addBound - halfWidth, bounds.y + bounds.height + addBound - halfWidth, width, width));
-        if (!selectedTool.commentMin) {
+        if (!this.selected().commentMin) {
           removeButton = new Raster(this.removeImg);
           removeButton.position = new Point(selectRect.bounds.x + selectRect.bounds.width + 12, selectRect.bounds.y - 12);
         }
@@ -165,7 +188,7 @@
         selectionRectGroup.topRightScaler = topRightScaler;
         selectionRectGroup.bottomLeftScaler = bottomLeftScaler;
         selectionRectGroup.scalers = [topLeftScaler, bottomRightScaler, topRightScaler, bottomLeftScaler];
-        if (!selectedTool.commentMin) {
+        if (!this.selected().commentMin) {
           selectionRectGroup.removeButton = removeButton;
           selectionRectGroup.addChild(removeButton);
         }
@@ -200,25 +223,39 @@
           opacity: 1,
           fillColor: "white"
         });
-        if (!selectedTool.commentMin) {
+        if (!this.selected().commentMin) {
           this.create(removeButton);
         }
         return selectionRectGroup;
       };
 
-      RoomItems.prototype.doScale = function(tool, sx, sy, scalePoint) {
-        var transformMatrix;
+      RoomItems.prototype.sacleSelected = function(event) {
+        var scaleFactors, scalePoint, scaleZone, sx, sy, transformMatrix, zx, zy;
+        scaleZone = this.getReflectZone(this.selected(), event.point.x, event.point.y);
+        if (scaleZone) {
+          this.selected().scaleZone = scaleZone;
+        } else {
+          scaleZone = this.selected().scaleZone;
+        }
+        zx = scaleZone.zx;
+        zy = scaleZone.zy;
+        scalePoint = scaleZone.point;
+        scaleFactors = this.getScaleFactors(this.selected(), zx, zy, event.delta.x, event.delta.y);
+        sx = scaleFactors.sx;
+        sy = scaleFactors.sy;
         transformMatrix = new Matrix().scale(sx, sy, scalePoint);
         if (transformMatrix._d === 0 || transformMatrix._a === 0) {
           return;
         }
-        if (tool.tooltype === "arrow") {
-          tool.arrow.scale(sx, sy, scalePoint);
-          tool.drawTriangle();
+        if (this.selected().arrow) {
+          this.selected().arrow.scale(sx, sy, scalePoint);
+          this.selected().drawTriangle();
         } else {
-          tool.transform(transformMatrix);
+          this.selected().transform(transformMatrix);
         }
-        return tool.selectionRect.theRect.transform(transformMatrix);
+        this.selected().selectionRect.theRect.transform(transformMatrix);
+        this.selected().selectionRect.remove();
+        return this.selected().selectionRect = this.createSelectionRectangle();
       };
 
       RoomItems.prototype.getScaleFactors = function(item, zx, zy, dx, dy) {

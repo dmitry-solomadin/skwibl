@@ -25,6 +25,9 @@
         socket.on('commentText', function(data) {
           return _this.addOrUpdateCommentText(data.message);
         });
+        socket.on('fileAdded', function(data) {
+          return room.canvas.handleUpload(data.message, false);
+        });
         socket.on('eraseCanvas', function() {
           room.canvas.erase();
           return room.redrawWithThumb();

@@ -63,11 +63,11 @@
 
       Room.prototype.onMouseMove = function(canvas, event) {
         var selectedTool;
-        event.point = event.point.transform(new Matrix(1 / this.opts.currentScale, 0, 0, 1 / this.opts.currentScale, 0, 0));
+        event.point = this.applyCurrentScale(event.point);
         $(canvas).css({
           cursor: "default"
         });
-        selectedTool = this.opts.selectedTool;
+        selectedTool = this.items.selected();
         if (selectedTool && selectedTool.selectionRect) {
           if (selectedTool.selectionRect.bottomRightScaler.bounds.contains(event.point)) {
             return $(canvas).css({
@@ -94,216 +94,181 @@
       };
 
       Room.prototype.onMouseDown = function(canvas, event) {
-        var arrow;
-        event.point = event.point.transform(new Matrix(1 / this.opts.currentScale, 0, 0, 1 / this.opts.currentScale, 0, 0));
+        var arrow, _i, _j, _results;
+        event.point = this.applyCurrentScale(event.point);
         $("#removeSelected").addClass("disabled");
-        if (this.opts.selectedTool && this.opts.selectedTool.selectionRect) {
-          this.opts.selectedTool.selectionRect.remove();
+        if (this.items.selected() && this.items.selected().selectionRect) {
+          this.items.selected().selectionRect.remove();
         }
-        this.opts.commentRect = null;
-        if (this.opts.tooltype === 'line') {
-          this.items.create(new Path());
-        } else if (this.opts.tooltype === 'highligher') {
-          this.items.create(new Path(), {
-            color: this.opts.color,
-            width: 15,
-            opacity: 0.7
-          });
-        } else if (this.opts.tooltype === 'straightline') {
-          this.items.create(new Path());
-          if (this.opts.tool.segments.length === 0) {
-            this.opts.tool.add(event.point);
-          }
-          this.opts.tool.add(event.point);
-        } else if (this.opts.tooltype === 'arrow') {
-          arrow = new Path();
-          arrow.arrow = arrow;
-          this.items.create(arrow);
-          if (this.opts.tool.segments.length === 0) {
-            this.opts.tool.add(event.point);
-          }
-          this.opts.tool.add(event.point);
-          this.opts.tool.lineStart = event.point;
-        } else if (this.opts.tooltype === "select") {
-          this.items.testSelect(event.point);
-          this.items.drawSelectRect(event.point);
-        }
-        if (this.opts.tooltype === 'line' || this.opts.tooltype === 'highligher') {
-          this.opts.tool.eligible = true;
-          return this.history.add();
+        this.opts.tool = null;
+        switch (this.opts.tooltype) {
+          case 'line':
+            return this.items.create(new Path());
+          case 'highligher':
+            return this.items.create(new Path(), {
+              color: this.opts.color,
+              width: 15,
+              opacity: 0.7
+            });
+          case 'straightline':
+            this.items.create(new Path());
+            _results = [];
+            for (_i = 0; _i <= 1; _i++) {
+              _results.push(this.opts.tool.add(event.point));
+            }
+            return _results;
+            break;
+          case 'arrow':
+            arrow = new Path();
+            arrow.arrow = arrow;
+            this.items.create(arrow);
+            for (_j = 0; _j <= 1; _j++) {
+              this.opts.tool.add(event.point);
+            }
+            return this.opts.tool.lineStart = event.point;
+          case "select":
+            this.items.testSelect(event.point);
+            return this.items.drawSelectRect(event.point);
         }
       };
 
       Room.prototype.onMouseDrag = function(canvas, event) {
-        var arrow, arrowGroup, commentRect, deltaPoint, dx, dy, element, h, rectangle, scaleFactors, scalePoint, scaleZone, sx, sy, tool, triangle, w, x, y, zx, zy, _i, _len, _ref, _results;
-        event.point = event.point.transform(new Matrix(1 / this.opts.currentScale, 0, 0, 1 / this.opts.currentScale, 0, 0));
+        var arrow, arrowGroup, deltaPoint, h, rectangle, scalersSelected, triangle, w, x, y;
+        event.point = this.applyCurrentScale(event.point);
         deltaPoint = event.downPoint.subtract(event.point);
-        if (this.opts.tooltype === 'line') {
-          this.opts.tool.add(event.point);
-          return this.opts.tool.smooth();
-        } else if (this.opts.tooltype === 'highligher') {
-          this.opts.tool.add(event.point);
-          return this.opts.tool.smooth();
-        } else if (this.opts.tooltype === 'circle') {
-          rectangle = new Rectangle(event.point.x, event.point.y, deltaPoint.x, deltaPoint.y);
-          this.items.create(new Path.Oval(rectangle));
-          return this.opts.tool.removeOnDrag();
-        } else if (this.opts.tooltype === 'rectangle') {
-          rectangle = new Rectangle(event.point.x, event.point.y, deltaPoint.x, deltaPoint.y);
-          this.items.create(new Path.Rectangle(rectangle));
-          return this.opts.tool.removeOnDrag();
-        } else if (this.opts.tooltype === 'comment') {
-          if (deltaPoint.x < 0 && deltaPoint.y < 0) {
-            x = event.downPoint.x;
-            y = event.downPoint.y;
-            w = Math.abs(deltaPoint.x);
-            h = Math.abs(deltaPoint.y);
-          } else {
-            x = event.point.x;
-            y = event.point.y;
-            w = deltaPoint.x;
-            h = deltaPoint.y;
-          }
-          rectangle = new Path.RoundRectangle(x, y, w, h, this.comments.COMMENT_RECTANGLE_ROUNDNESS, this.comments.COMMENT_RECTANGLE_ROUNDNESS);
-          this.opts.commentRect = rectangle;
-          this.items.create(rectangle, this.comments.COMMENT_STYLE);
-          return this.opts.tool.removeOnDrag();
-        } else if (this.opts.tooltype === 'straightline') {
-          return this.opts.tool.lastSegment.point = event.point;
-        } else if (this.opts.tooltype === 'arrow') {
-          arrow = this.opts.tool.arrow;
-          arrow.lastSegment.point = event.point;
-          arrowGroup = new Group([arrow]);
-          arrowGroup.arrow = arrow;
-          arrowGroup.drawTriangle = function() {
-            var triangle, vector;
-            vector = this.arrow.lastSegment.point - this.arrow.segments[0].point;
-            vector = vector.normalize(10);
-            if (this.triangle) {
-              this.triangle.segments[0].point = this.arrow.lastSegment.point + vector.rotate(135);
-              this.triangle.segments[1].point = this.arrow.lastSegment.point;
-              this.triangle.segments[2].point = this.arrow.lastSegment.point + vector.rotate(-135);
+        switch (this.opts.tooltype) {
+          case 'line':
+            this.opts.tool.add(event.point);
+            return this.opts.tool.smooth();
+          case 'highligher':
+            this.opts.tool.add(event.point);
+            return this.opts.tool.smooth();
+          case 'circle':
+            rectangle = new Rectangle(event.point.x, event.point.y, deltaPoint.x, deltaPoint.y);
+            this.items.create(new Path.Oval(rectangle));
+            return this.opts.tool.removeOnDrag();
+          case 'rectangle':
+            rectangle = new Rectangle(event.point.x, event.point.y, deltaPoint.x, deltaPoint.y);
+            this.items.create(new Path.Rectangle(rectangle));
+            return this.opts.tool.removeOnDrag();
+          case 'comment':
+            if (deltaPoint.x < 0 && deltaPoint.y < 0) {
+              x = event.downPoint.x;
+              y = event.downPoint.y;
+              w = Math.abs(deltaPoint.x);
+              h = Math.abs(deltaPoint.y);
             } else {
-              triangle = new Path([this.arrow.lastSegment.point + vector.rotate(135), this.arrow.lastSegment.point, this.arrow.lastSegment.point + vector.rotate(-135)]);
-              this.triangle = triangle;
-              this.addChild(triangle);
+              x = event.point.x;
+              y = event.point.y;
+              w = deltaPoint.x;
+              h = deltaPoint.y;
             }
-            return this.triangle;
-          };
-          triangle = arrowGroup.drawTriangle();
-          this.items.create(triangle);
-          this.opts.tool = arrowGroup;
-          return triangle.removeOnDrag();
-        } else if (this.opts.tooltype === 'pan') {
-          _ref = this.opts.historytools.allHistory;
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            element = _ref[_i];
-            if (element.commentMin) {
-              commentRect = element.type !== "comment";
-              dx = this.opts.currentScale * event.delta.x;
-              dy = this.opts.currentScale * event.delta.y;
-              element.commentMin.css({
-                top: element.commentMin.position().top + dy,
-                left: element.commentMin.position().left + dx
-              });
-              element.commentMin[0].arrow.translate(event.delta);
-              element.commentMin[0].$maximized.css({
-                top: element.commentMin[0].$maximized.position().top + dy,
-                left: element.commentMin[0].$maximized.position().left + dx
-              });
-              if (commentRect) {
-                _results.push(element.translate(event.delta));
+            rectangle = new Path.RoundRectangle(x, y, w, h, this.comments.COMMENT_RECTANGLE_ROUNDNESS, this.comments.COMMENT_RECTANGLE_ROUNDNESS);
+            rectangle.isCommentRect = true;
+            this.items.create(rectangle, this.comments.COMMENT_STYLE);
+            return this.opts.tool.removeOnDrag();
+          case 'straightline':
+            return this.opts.tool.lastSegment.point = event.point;
+          case 'arrow':
+            arrow = this.opts.tool.arrow;
+            arrow.lastSegment.point = event.point;
+            arrowGroup = new Group([arrow]);
+            arrowGroup.arrow = arrow;
+            arrowGroup.drawTriangle = function() {
+              var triangle, vector;
+              vector = this.arrow.lastSegment.point - this.arrow.segments[0].point;
+              vector = vector.normalize(10);
+              if (this.triangle) {
+                this.triangle.segments[0].point = this.arrow.lastSegment.point + vector.rotate(135);
+                this.triangle.segments[1].point = this.arrow.lastSegment.point;
+                this.triangle.segments[2].point = this.arrow.lastSegment.point + vector.rotate(-135);
               } else {
-                _results.push(void 0);
+                triangle = new Path([this.arrow.lastSegment.point + vector.rotate(135), this.arrow.lastSegment.point, this.arrow.lastSegment.point + vector.rotate(-135)]);
+                this.triangle = triangle;
+                this.addChild(triangle);
               }
-            } else if (!element.type && element.translate) {
-              _results.push(element.translate(event.delta));
+              return this.triangle;
+            };
+            triangle = arrowGroup.drawTriangle();
+            this.items.create(triangle);
+            this.opts.tool = arrowGroup;
+            return triangle.removeOnDrag();
+          case 'pan':
+            return this.items.pan(event.delta.x, event.delta.y);
+          case 'select':
+            scalersSelected = this.items.selected() && this.items.selected().scalersSelected;
+            if (scalersSelected) {
+              this.items.sacleSelected(event);
             } else {
-              _results.push(void 0);
+              this.items.translateSelected(event.delta);
             }
-          }
-          return _results;
-        } else if (this.opts.tooltype === 'select') {
-          if (this.opts.selectedTool && this.opts.selectedTool.scalersSelected) {
-            tool = this.opts.selectedTool;
-            scaleZone = this.items.getReflectZone(tool, event.point.x, event.point.y);
-            if (scaleZone) {
-              tool.scaleZone = scaleZone;
-            } else {
-              scaleZone = tool.scaleZone;
+            if (this.items.selected().commentMin) {
+              return this.comments.redrawArrow(this.items.selected().commentMin);
             }
-            zx = scaleZone.zx;
-            zy = scaleZone.zy;
-            scalePoint = scaleZone.point;
-            dx = event.delta.x;
-            dy = event.delta.y;
-            scaleFactors = this.items.getScaleFactors(tool, zx, zy, dx, dy);
-            sx = scaleFactors.sx;
-            sy = scaleFactors.sy;
-            this.items.doScale(tool, sx, sy, scalePoint);
-            tool.selectionRect.remove();
-            tool.selectionRect = this.items.createSelectionRectangle(tool);
-          } else {
-            this.items.translateSelected(event.delta);
-          }
-          if (this.opts.selectedTool.commentMin) {
-            return this.comments.redrawArrow(this.opts.selectedTool.commentMin);
-          }
         }
       };
 
       Room.prototype.onMouseUp = function(canvas, event) {
-        var commentMin;
-        event.point = event.point.transform(new Matrix(1 / this.opts.currentScale, 0, 0, 1 / this.opts.currentScale, 0, 0));
-        if (this.opts.tooltype === 'line') {
-          this.opts.tool.add(event.point);
-          this.opts.tool.simplify(10);
+        var commentMin, commentRect, tooltype;
+        event.point = this.applyCurrentScale(event.point);
+        tooltype = this.opts.tooltype;
+        switch (tooltype) {
+          case 'line':
+            this.opts.tool.add(event.point);
+            this.opts.tool.simplify(10);
+            break;
+          case 'highligher':
+            this.opts.tool.add(event.point);
+            this.opts.tool.simplify(10);
+            break;
+          case "comment":
+            commentRect = this.opts.tool && this.opts.tool.isCommentRect ? this.opts.tool : null;
+            commentMin = this.comments.create(event.point.x, event.point.y, commentRect);
+            if (commentRect) {
+              commentRect.commentMin = commentMin;
+            }
         }
-        if (this.opts.tooltype === 'highligher') {
-          this.opts.tool.add(event.point);
-          this.opts.tool.simplify(10);
-        }
-        if (this.opts.tooltype === "comment") {
-          commentMin = this.comments.create(event.point.x, event.point.y, this.opts.commentRect);
-          if (this.opts.commentRect) {
-            this.opts.commentRect.commentMin = commentMin;
-          }
-        }
-        if (this.opts.tool) {
-          this.opts.tool.tooltype = this.opts.tooltype;
-        }
-        if (this.opts.tooltype === 'straightline' || this.opts.tooltype === 'arrow' || this.opts.tooltype === 'circle' || this.opts.tooltype === 'rectangle') {
-          this.opts.tool.eligible = true;
-          this.history.add();
-        }
-        if (this.opts.tooltype === 'comment') {
-          if (this.opts.commentRect) {
+        switch (tooltype) {
+          case 'straightline':
+          case 'arrow':
+          case 'circle':
+          case 'rectangle':
+          case 'line':
+          case 'highligher':
             this.opts.tool.eligible = true;
             this.history.add();
-          } else {
-            this.history.add({
-              type: "comment",
-              commentMin: commentMin,
-              eligible: true
-            });
-          }
+            this.opts.tool.elementId = this.getNextIdAndIncrement();
+            this.socket.emit("elementUpdate", this.socketHelper.prepareElementToSend(this.opts.tool));
+            this.socket.emit("nextId");
+            break;
+          case "comment":
+            if (commentRect) {
+              this.opts.tool.eligible = true;
+              this.history.add();
+            } else {
+              this.history.add({
+                type: "comment",
+                commentMin: commentMin,
+                eligible: true
+              });
+            }
+            commentMin.elementId = this.getNextIdAndIncrement();
+            this.socket.emit("commentUpdate", this.socketHelper.prepareCommentToSend(commentMin));
+            this.socket.emit("nextId");
+            break;
+          case 'select':
+            if (this.items.selected()) {
+              this.socket.emit("elementUpdate", this.socketHelper.prepareElementToSend(this.items.selected()));
+            }
         }
-        if (this.opts.tooltype === 'straightline' || this.opts.tooltype === 'arrow' || this.opts.tooltype === 'circle' || this.opts.tooltype === 'rectangle' || this.opts.tooltype === 'line' || this.opts.tooltype === 'highligher') {
-          this.opts.tool.elementId = this.getNextIdAndIncrement();
-          this.socket.emit("elementUpdate", this.socketHelper.prepareElementToSend(this.opts.tool));
-          this.socket.emit("nextId");
-        } else if (this.opts.tooltype === "comment") {
-          commentMin.elementId = this.getNextIdAndIncrement();
-          this.socket.emit("commentUpdate", this.socketHelper.prepareCommentToSend(commentMin));
-          this.socket.emit("nextId");
-        } else if (this.opts.tooltype === 'select' && this.opts.selectedTool) {
-          this.socket.emit("elementUpdate", this.socketHelper.prepareElementToSend(this.opts.selectedTool));
-        }
-        if (this.opts.tooltype === 'comment') {
+        if (tooltype === 'comment') {
           this.opts.tooltype = "select";
         }
         return this.canvas.updateSelectedThumb();
+      };
+
+      Room.prototype.applyCurrentScale = function(point) {
+        return point.transform(new Matrix(1 / this.opts.currentScale, 0, 0, 1 / this.opts.currentScale, 0, 0));
       };
 
       Room.prototype.getNextIdAndIncrement = function() {
