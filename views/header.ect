@@ -10,7 +10,7 @@
           <a class="brand" href="/">Skwibl</a>
 
           <span class="skwibl-btn-group" style="float:right">
-            <a class="btn" href="#" onclick="window.chat.fold(this); return false;"><<</a>
+            <a class="btn" href="#" onclick="App.chat.fold(this); return false;"><<</a>
           </span>
         </div>
 
@@ -22,7 +22,7 @@
           <ul class="dropdown-menu activeMenu" id="toolSelect">
             <li data-tooltype="line">Pencil</li>
             <li data-tooltype="highligher">Highligher</li>
-            <li data-tooltype="comment" onclick="window.room.helper.notifyComment()">Comment</li>
+            <li data-tooltype="comment" onclick="App.room.helper.notifyComment()">Comment</li>
             <li data-tooltype="circle">Cirlce</li>
             <li data-tooltype="rectangle">Rectangle</li>
             <li data-tooltype="straightline">Line</li>
@@ -55,7 +55,7 @@
         </span>
         <span class="skwibl-btn-group">
           <select class="btn" style="width:75px;"
-                  onchange="window.room.setCanvasScale($(this).find(':selected').val())">
+                  onchange="App.room.canvas.setScale($(this).find(':selected').val())">
             <option value="0.5">50%</option>
             <option value="0.75">75%</option>
             <option value="1" selected="selected">100%</option>
@@ -63,8 +63,8 @@
             <option value="1.5">150%</option>
             <option value="2">200%</option>
           </select>
-          <a class="btn" href="#" onclick="window.room.addCanvasScale(); return false;">+</a>
-          <a class="btn" href="#" onclick="window.room.subtractCanvasScale(); return false;">-</a>
+          <a class="btn" href="#" onclick="App.room.canvas.addScale(); return false;">+</a>
+          <a class="btn" href="#" onclick="App.room.canvas.subtractScale(); return false;">-</a>
         </span>
         <span class="skwibl-btn-group">
           <a href="#" class="btn" data-toggle="dropdown">
@@ -72,11 +72,10 @@
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu activeMenu" id="actionSelect">
-            <li id="undoLink" onclick="window.room.prevhistory();return false;" class="disabled">Undo</li>
-            <li id="redoLink" onclick="window.room.nexthistory();return false;" class="disabled">Redo</li>
-            <li id="removeSelected" class="disabled" onclick="window.room.removeSelected(); return false;">Remove</li>
-            <li onclick="window.room.restoreState(window.room.saveState())">Save&Restore state</li>
-            <li onclick="window.room.clearCanvas(); return false;">Clear</li>
+            <li id="undoLink" onclick="App.room.history.prev();return false;" class="disabled">Undo</li>
+            <li id="redoLink" onclick="App.room.history.next();return false;" class="disabled">Redo</li>
+            <li id="removeSelected" class="disabled" onclick="App.room.items.removeSelected(); return false;">Remove</li>
+            <li onclick="App.room.canvas.clear(); return false;">Clear</li>
           </ul>
         </span>
       <% else : %>
@@ -96,7 +95,7 @@
         </ul>
         <% else : %>
         <a class="btn" href="/registration">Sign Up</a>
-        <a id="signInButton" class="btn" href="#" onclick="window.App.Home.showLogin();">
+        <a id="signInButton" class="btn" href="#" onclick="App.Home.showLogin();">
           Sign In
         </a>
         <% end %>
