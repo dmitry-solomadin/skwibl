@@ -7,9 +7,9 @@ var cookie = require('cookie')
   , io = require('socket.io')
   , redis = require('redis');
 
-var sockets = require('./sockets')
-  , cfg = require('./config')
-  , db = require('./db');
+var sockets = require('../sockets')
+  , cfg = require('../config')
+  , db = require('../db');
 
 exports.setUp = function(server) {
 

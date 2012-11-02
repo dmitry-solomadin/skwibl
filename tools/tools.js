@@ -84,6 +84,16 @@ exports.returnStatus = function(err, res) {
   res.send(false);
 };
 
+exports.getFileType = function(ext) {
+  var extension = ext.toLowerCase();
+  if(cfg.VIDEOS_EXT.indexOf(extension) !== -1) {
+    return 'videos';
+  } else if(cfg.IMAGES_EXT.indexOf(extension) !== -1) {
+    return 'images';
+  }
+  return null;
+};
+
 exports.include = function(dir, fn) {
   fs.readdirSync(dir).forEach(function(name){
     var len = name.length

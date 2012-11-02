@@ -9,7 +9,9 @@
 var fs = require('fs')
   , path = require('path');
 
-var cfg = require('../config');
+var db = require('../db')
+  , tools = require('../tools')
+  , cfg = require('../config');
 
 /*
  * GET
@@ -48,33 +50,42 @@ exports.update = function(req, res) {
  * Upload file
  */
 exports.upload = function(req, res, next) {
+  //TODO implement upload continue
   if(req.xhr){
-    var dirName = './uploads/' +  req.query.pid
-      , dir = fs.mkdir(dirName, cfg.DIRECTORY_PERMISION);
-    var fSize = req.header('x-file-size')
-      , fType = req.header('x-file-type')
-      , basename = path.basename
-      , fName = basename(req.header('x-file-name'));
-    var ws = fs.createWriteStream(dirName + '/' + fName);
+    var pid = req.query.pid
+      , dir = './uploads/' +  pid
+      , size = req.header('x-file-size')
+      , name = path.basename(req.header('x-file-name'))
+      , type = tools.getFileType(path.extname(name));
+    if(!type) {
+      return next(new Error('Unsopported file type'));
+    }
 
-    // TODO parse mime type
+    var ws = fs.createWriteStream(dir + '/' + type + '/' + name, {
+      mode: cfg.FILE_PERMISSION
+    });
 
-    req.on('data', function(chunk) { 
+    req.on('data', function(chunk) {
       ws.write(chunk);
     });
 
     req.on('end', function() {
-      return res.json({
-        success: true
-      , fileName: fName
+      return db.files.add(req.user.id, pid, name, function(err, file) {
+        return res.json({
+          success: true
+        , id: file.id
+        , name: name
+        });
       });
     });
 
     req.on('close', function() {
       return res.json({
         success: false
-      , fileName: fName
+      , name: name
       });
     });
+  } else {
+    return next(new Error('Can not upload file this way.'));
   }
 };
