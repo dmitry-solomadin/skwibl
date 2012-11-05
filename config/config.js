@@ -33,24 +33,22 @@ exports.SMTP_HOST = "smtp.gmail.com";
 exports.SMTP_SSL = true;
 exports.SMTP_NOREPLY = "noreply@skwibl.com";
 
-exports.VIDEOS_EXT = [
-  '.3g2'
-, '.3gp'
-, '.asf'
-, '.avi'
-, '.m4v'
-, '.mov'
-, '.mp4'
-, '.wmv'
-];
-exports.IMAGES_EXT = [
-  '.jpeg'
-, '.jpg'
-, '.gif'
-, '.png'
-, '.bmp'
-, '.svg'
-];
+exports.MIME = [{
+  '.jpeg': 'image/jpeg'
+, '.jpg': 'image/jpeg'
+, '.png': 'image/png'
+, '.bmp': 'image/bmp'
+, '.svg': 'image/svg+xml'
+}, {
+  '.3g2': 'video/3gpp2'
+, '.3gp': 'video/3gpp'
+, '.asf': 'video/x-ms-asf'
+, '.avi': 'video/x-msvideo'
+, '.m4v': 'video/mp4'
+, '.mp4': 'video/mp4'
+, '.mov': 'video/quicktime'
+, '.wmv': 'video/x-ms-wmv'
+}];
 
 exports.PASSWORD_LENGTH = 12;
 exports.PASSWORD_MIN_LENGTH = 6;
