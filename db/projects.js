@@ -71,8 +71,8 @@ exports.setUp = function(client, db) {
       if(!err) {
         var dir = './uploads/' + val;
         fs.mkdir(dir, cfg.DIRECTORY_PERMISSION, function(err) {
-          fs.mkdir(dir + '/videos', cfg.DIRECTORY_PERMISSION);
-          fs.mkdir(dir + '/images', cfg.DIRECTORY_PERMISSION);
+          fs.mkdir(dir + '/video', cfg.DIRECTORY_PERMISSION);
+          fs.mkdir(dir + '/image', cfg.DIRECTORY_PERMISSION);
         });
         var project = {};
         project.id = val;

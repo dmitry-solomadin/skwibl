@@ -31,6 +31,7 @@
     "passport-google-oauth": "*",
     "passport-facebook": "*",
     "passport-linkedin": "*",
+    "formidable": "*",
     "emailjs": "*",
     "password-generator": "*",
     "hiredis": "*",
