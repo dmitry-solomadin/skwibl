@@ -57,7 +57,7 @@ exports.upload = function(req, res, next) {
       , size = req.header('x-file-size')
       , name = path.basename(req.header('x-file-name'))
       , type = tools.getFileType(path.extname(name));
-    if(!type) {
+    if (!type) {
       return next(new Error('Unsopported file type'));
     }
 

@@ -11,11 +11,15 @@ $ ->
       settings = {} unless settings
       opts.tool = tool unless settings.justCreate
 
+      tool.strokeJoin = "round"
+
       opts.tool.strokeColor = if settings.color then settings.color else opts.color
       opts.tool.strokeWidth = if settings.width then settings.width else opts.defaultWidth
       opts.tool.fillColor = settings.fillColor if settings.fillColor
       opts.tool.opacity = if settings.opacity then settings.opacity else opts.opacity
       opts.tool.dashArray = if settings.dashArray then settings.dashArray else undefined
+
+      paper.project.activeLayer.addChild(tool)
 
     removeSelected: ->
       if @selected()
@@ -32,7 +36,7 @@ $ ->
       if @selected()
         @selected().translate(deltaPoint)
         @selected().selectionRect.translate(deltaPoint) if @selected().selectionRect
-        room.redrawWithThumb()
+        room.redraw()
 
     unselectIfSelected: (elementId) ->
       if @selected() and @selected().selectionRect and @selected().elementId == elementId

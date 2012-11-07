@@ -37,7 +37,7 @@ $ ->
           $(uploader._listElement).css('dispaly', 'none')
 
           imagePath = "/images/avatar.png"
-          room.canvas.handleUpload(imagePath, true)
+          room.canvas.handleUpload(imagePath, canvasId, true)
 
     reverseOpacity: (elem) -> if elem.opacity == 0 then elem.opacity = 1 else elem.opacity = 0
 

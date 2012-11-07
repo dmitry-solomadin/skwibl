@@ -8,11 +8,12 @@ $ ->
         color: '#404040'
         defaultWidth: 2
         currentScale: 1
-        nextId: 1
         opacity: 1
 
     init: ->
       @initOpts()
+
+      $(".canvasSelected").attr("canvasId", opts.canvasId)
 
       $("#toolSelect > li, #panTool, #selectTool").on "click", ->
         opts.tooltype = $(@).data("tooltype")
@@ -43,6 +44,7 @@ $ ->
       @opts.historytools =
         eligibleHistory: new Array
         allHistory: new Array
+      @opts.canvasId = @generateId()
       @savedOpts.push(@opts)
 
     setOpts: (opts) ->
@@ -54,20 +56,20 @@ $ ->
     onMouseMove: (canvas, event) ->
       event.point = @applyCurrentScale(event.point)
 
-      $(canvas).css({cursor: "default"})
+      canvas.css({cursor: "default"})
 
       selectedTool = @items.selected()
       if selectedTool && selectedTool.selectionRect
         if selectedTool.selectionRect.bottomRightScaler.bounds.contains(event.point)
-          $(canvas).css(cursor: "se-resize")
+          canvas.css(cursor: "se-resize")
         else if selectedTool.selectionRect.topLeftScaler.bounds.contains(event.point)
-          $(canvas).css(cursor: "nw-resize")
+          canvas.css(cursor: "nw-resize")
         else if selectedTool.selectionRect.topRightScaler.bounds.contains(event.point)
-          $(canvas).css(cursor: "ne-resize")
+          canvas.css(cursor: "ne-resize")
         else if selectedTool.selectionRect.bottomLeftScaler.bounds.contains(event.point)
-          $(canvas).css(cursor: "sw-resize")
+          canvas.css(cursor: "sw-resize")
         else if selectedTool.selectionRect.removeButton and selectedTool.selectionRect.removeButton.bounds.contains(event.point)
-          $(canvas).css(cursor: "pointer")
+          canvas.css(cursor: "pointer")
 
     onMouseDown: (canvas, event) ->
       event.point = @applyCurrentScale(event.point)
@@ -195,9 +197,8 @@ $ ->
           @opts.tool.eligible = true
           @history.add()
 
-          @opts.tool.elementId = @getNextIdAndIncrement()
+          @opts.tool.elementId = @generateId()
           @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@opts.tool))
-          @socket.emit("nextId")
         when "comment"
           if commentRect
             @opts.tool.eligible = true
@@ -205,9 +206,8 @@ $ ->
           else
             @history.add(type: "comment", commentMin: commentMin, eligible: true)
 
-          commentMin.elementId = @getNextIdAndIncrement()
+          commentMin.elementId = @generateId()
           @socket.emit("commentUpdate", @socketHelper.prepareCommentToSend(commentMin))
-          @socket.emit("nextId")
         when 'select'
           @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@items.selected())) if @items.selected()
 
@@ -220,15 +220,12 @@ $ ->
     applyCurrentScale: (point) ->
       point.transform(new Matrix(1 / @opts.currentScale, 0, 0, 1 / @opts.currentScale, 0, 0))
 
-    getNextIdAndIncrement: ->
-      prevId = @opts.nextId
-      @opts.nextId = @opts.nextId + 1
-      prevId
+    generateId: -> $("#uid").val() + new Date().getTime()
 
     redraw: ->
       paper.view.draw()
 
-    redrawWithThumb: ->
+    redrawWithThumb: (canvasId) ->
       @redraw()
       @canvas.updateSelectedThumb()
 
@@ -241,6 +238,8 @@ $ ->
   # paper.install(window) causes errors upon defining getters for 'project', so we use this code
   for key of paper
     window[key] = paper[key] if not /^(version|_id|load)/.test(key) and not window[key]?
+
+  window.paper = new window.paper.PaperScope()
 
   paper.setup($('#myCanvas')[0])
 

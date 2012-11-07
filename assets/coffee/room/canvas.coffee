@@ -20,7 +20,8 @@ $ ->
 
       room.redraw()
 
-    restore: ->
+    restore: (canvasId) ->
+      opts = if canvasId then @findCanvasOptsByCanvasId(canvasId) else opts
       for element in opts.historytools.allHistory
         paper.project.activeLayer.addChild(element) unless this.type
         room.comments.showComment(element.commentMin) if element.commentMin
@@ -76,7 +77,8 @@ $ ->
       room.history.add(img)
 
     addNewThumb: ->
-      $("#canvasSelectDiv").append("<a href='#'><canvas width='80' height='60'></canvas></a>")
+      thumb = $("<a href='#' canvasId=\"#{opts.canvasId}\"><canvas width='80' height='60'></canvas></a>")
+      $("#canvasSelectDiv").append(thumb)
 
     addNewThumbAndSelect: ->
       @erase()
@@ -87,28 +89,34 @@ $ ->
       $("#canvasSelectDiv a").removeClass("canvasSelected")
       $("#canvasSelectDiv a:last").addClass("canvasSelected")
 
-    updateSelectedThumb: ->
-      selectedCanvas = $(".canvasSelected canvas")
-      selectedContext = selectedCanvas[0].getContext('2d')
+    updateThumb: (canvasId) ->
+      thumb = $("#canvasSelectDiv a[canvasId=\"#{canvasId}\"] canvas")
+      thumbContext = thumb[0].getContext('2d')
+
       canvas = paper.project.view.element
+
       cvw = $(canvas).width()
       cvh = $(canvas).height()
-      scw = $(selectedCanvas).width()
-      sch = $(selectedCanvas).height()
-      sy = sch / cvh
+      tw = $(thumb).width()
+      th = $(thumb).height()
+      sy = th / cvh
 
       transformMatrix = new Matrix(sy / opts.currentScale, 0, 0, sy / opts.currentScale, 0, 0)
       paper.project.activeLayer.transform(transformMatrix)
       room.redraw()
 
-      shift = -((sy * cvw) - scw) / 2
+      shift = -((sy * cvw) - tw) / 2
 
-      selectedContext.clearRect(0, 0, scw, sch)
-      selectedContext.drawImage(canvas, shift, 0) for i in [0..5]
+      thumbContext.clearRect(0, 0, tw, th)
+      thumbContext.drawImage(canvas, shift, 0) for i in [0..5]
 
       transformMatrix = new Matrix(opts.currentScale / sy, 0, 0, opts.currentScale / sy, 0, 0)
       paper.project.activeLayer.transform(transformMatrix)
       room.redraw()
+
+    updateSelectedThumb: -> @updateThumb @selectedThumbCanvasId()
+
+    selectedThumbCanvasId: -> $(".canvasSelected").attr("canvasId")
 
     selectThumb: (anchor) ->
       return if $(anchor).hasClass("canvasSelected")
@@ -129,6 +137,11 @@ $ ->
     findCanvasOptsByIndex: (index) ->
       for savedOpt, i in room.savedOpts
         return savedOpt if index == i
+      return null
+
+    findCanvasOptsByCanvasId: (canvasId) ->
+      for savedOpt in room.savedOpts
+        return savedOpt if savedOpt.canvasId == canvasId
       return null
 
   App.room.canvas = new RoomCanvas

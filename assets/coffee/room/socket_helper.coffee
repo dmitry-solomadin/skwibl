@@ -16,8 +16,6 @@ $ ->
         room.canvas.erase()
         room.redrawWithThumb()
 
-      socket.on 'nextId', => opts.nextId = opts.nextId + 1
-
     addOrUpdateCommentText: (data) ->
       foundComment = room.helper.findByElementId data.elementId
       room.comments.addCommentText foundComment.commentMin, data.text, false
@@ -83,11 +81,10 @@ $ ->
         path.closed = fromElement.closed
         path.elementId = fromElement.elementId
 
-        room.items.create(path, {
-        color: fromElement.strokeColor,
-        width: fromElement.strokeWidth,
-        opacity: fromElement.opacity
-        })
+        room.items.create path,
+          color: fromElement.strokeColor
+          width: fromElement.strokeWidth
+          opacity: fromElement.opacity
 
         path.eligible = false
         room.history.add(path)
@@ -95,19 +92,20 @@ $ ->
       if initial
         $(data).each -> createNewElement(@)
       else
-        foundPath = room.helper.findByElementId(data.elementId)
+        element = data.element
+        foundPath = room.helper.findByElementId(element.elementId)
         if foundPath
           room.items.unselectIfSelected(foundPath.elementId)
           foundPath.removeSegments()
-          $(data.segments).each ->
+          $(element.segments).each ->
             foundPath.addSegment(createSegment(@.x, @.y, @.ix, @.iy, @.ox, @.oy))
 
           if foundPath.commentMin
             room.comments.redrawArrow(foundPath.commentMin)
         else
-          createNewElement(data)
+          createNewElement(element)
 
-      room.redrawWithThumb()
+      room.redrawWithThumb(data.canvasId)
 
     prepareElementToSend: (elementToSend) ->
       element =
@@ -127,7 +125,7 @@ $ ->
           ox: segment.handleOut.x
           oy: segment.handleOut.y
 
-      element
+      {element: element, canvasId: opts.canvasId}
 
     prepareCommentToSend: (commentMin) ->
       comment =
@@ -150,6 +148,6 @@ $ ->
           w: commentRect.bounds.width
           h: commentRect.bounds.height
 
-      return comment
+      {comment: comment, canvasId: opts.canvasId}
 
   App.room.socketHelper = new RoomSocketHelper
