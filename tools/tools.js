@@ -84,14 +84,21 @@ exports.returnStatus = function(err, res) {
   res.send(false);
 };
 
-exports.getFileType = function(ext) {
-  var extension = ext.toLowerCase();
-  if(cfg.VIDEOS_EXT.indexOf(extension) !== -1) {
-    return 'videos';
-  } else if(cfg.IMAGES_EXT.indexOf(extension) !== -1) {
-    return 'images';
+exports.getFileMime = function(ext) {
+  var extension = ext.toLowerCase()
+    , image = cfg.MIME[0][extension]
+    , video = cfg.MIME[1][extension];
+  if(image) {
+    return image;
   }
-  return null;
+  return video;
+};
+
+exports.getFileType = function(mime) {
+  if(!mime) {
+    return null;
+  }
+  return mime.split('/')[0];
 };
 
 exports.include = function(dir, fn) {

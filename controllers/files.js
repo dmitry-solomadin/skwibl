@@ -7,7 +7,8 @@
  */
 
 var fs = require('fs')
-  , path = require('path');
+  , path = require('path')
+  , formidable = require('formidable');
 
 var db = require('../db')
   , tools = require('../tools')
@@ -20,6 +21,34 @@ var db = require('../db')
 exports.get = function(req, res) {
   res.render('partials/files');
 };
+
+/*
+ * GET
+ * Project files
+ */
+exports.project = function(req, res) {
+  //TODO
+};
+
+/*
+ * GET
+ * The file from the project
+ */
+exports.file = function(req, res) {
+  var fid = req.params.fid;
+  db.files.file(fid, function(err, file) {
+    if(err) {
+      return res.send(err);
+    }
+    var type = tools.getFileType(file.mime);
+    res.writeHead(200, {
+      'Content-Type': file.mime
+    });
+
+    var rs = fs.createReadStream('./uploads/' + file.project + '/' + type + '/' + file.name);
+    rs.pipe(res);
+  });
+}
 
 /*
  * POST
@@ -56,21 +85,46 @@ exports.upload = function(req, res, next) {
       , dir = './uploads/' +  pid
       , size = req.header('x-file-size')
       , name = path.basename(req.header('x-file-name'))
-      , type = tools.getFileType(path.extname(name));
-    if (!type) {
-      return next(new Error('Unsopported file type'));
+      , mime = tools.getFileMime(path.extname(name))
+      , type = tools.getFileType(mime);
+    if(!mime) {
+      return res.json({
+        success: false
+      , name: name
+      , error: 'Unsupported file type'
+      });
     }
 
     var ws = fs.createWriteStream(dir + '/' + type + '/' + name, {
       mode: cfg.FILE_PERMISSION
+    , flags: 'w'
+    });
+
+    console.log('upload');
+
+    ws.on('error', function(err) {
+      console.log(err);
+    });
+
+    ws.on('drain', function() {
+      console.log('drain');
+      req.resume();
+    });
+
+    ws.on('close', function() {
+      console.log('close');
     });
 
     req.on('data', function(chunk) {
+      console.log('chunk');
       ws.write(chunk);
     });
 
     req.on('end', function() {
-      return db.files.add(req.user.id, pid, name, function(err, file) {
+      ws.destroySoon();
+      console.log('end');
+      return db.files.add(req.user.id, pid, name, mime, function(err, file) {
+        console.log('here');
         return res.json({
           success: true
         , id: file.id
@@ -80,12 +134,27 @@ exports.upload = function(req, res, next) {
     });
 
     req.on('close', function() {
+      ws.destroy();
       return res.json({
         success: false
       , name: name
       });
     });
+
+//     req.resume();
+
   } else {
-    return next(new Error('Can not upload file this way.'));
+    var form = new formidable.IncomingForm();
+    form.uploadDir = dir + '/' + type + '/';
+    form.keepExtensions = true;
+    form.parse(req, function(err, fields, files) {
+      return db.files.add(req.user.id, pid, name, mime, function(err, file) {
+        return res.json({
+          success: true
+        , id: file.id
+        , name: name
+        });
+      });
+    });
   }
 };

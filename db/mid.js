@@ -17,6 +17,10 @@ exports.setUp = function(client, db) {
     client.sismember('projects:' + pid + ':users', id, fn);
   };
 
+  mod.isFileInProject = function(fid, pid, fn) {
+    client.sismember('projects:' + pid + ':files', fid, fn);
+  };
+
   mod.isOwner = function(id, pid, fn) {
     client.hget('projects:' + pid, 'owner', function(err, val) {
       if(!err && val === id) {
