@@ -121,7 +121,7 @@ exports.upload = function(req, res, next) {
     });
 
     req.on('end', function() {
-      ws.destroySoon();
+//      ws.destroySoon();
       console.log('end');
       return db.files.add(req.user.id, pid, name, mime, function(err, file) {
         console.log('here');

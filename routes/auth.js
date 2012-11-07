@@ -19,7 +19,7 @@ exports.configure = function(app, passport) {
   /*
    * get registration page
    */
-  app.get('/register', ctrls.auth.regPage);
+  app.get('/registration', ctrls.auth.regPage);
 
   /*
    * post local registration info

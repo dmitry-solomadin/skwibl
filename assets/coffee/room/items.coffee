@@ -19,8 +19,6 @@ $ ->
       opts.tool.opacity = if settings.opacity then settings.opacity else opts.opacity
       opts.tool.dashArray = if settings.dashArray then settings.dashArray else undefined
 
-      paper.project.activeLayer.addChild(tool)
-
     removeSelected: ->
       if @selected()
         # add new 'remove' item into history and link it to removed item.
@@ -176,8 +174,6 @@ $ ->
         @selected().drawTriangle()
       else
         @selected().transform(transformMatrix)
-
-      @selected().selectionRect.theRect.transform(transformMatrix)
 
       # redraw selection rect
       @selected().selectionRect.remove()

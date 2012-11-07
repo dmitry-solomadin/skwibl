@@ -13,8 +13,6 @@ $ ->
     init: ->
       @initOpts()
 
-      $(".canvasSelected").attr("canvasId", opts.canvasId)
-
       $("#toolSelect > li, #panTool, #selectTool").on "click", ->
         opts.tooltype = $(@).data("tooltype")
 
@@ -24,7 +22,7 @@ $ ->
         $(@).addClass('activen')
 
       $(document).on "click", "#canvasSelectDiv a", ->
-        App.room.canvas.selectThumb(@)
+        App.room.canvas.selectThumb(@, true)
         false
 
       @helper.initUploader()
@@ -44,7 +42,6 @@ $ ->
       @opts.historytools =
         eligibleHistory: new Array
         allHistory: new Array
-      @opts.canvasId = @generateId()
       @savedOpts.push(@opts)
 
     setOpts: (opts) ->
@@ -225,7 +222,7 @@ $ ->
     redraw: ->
       paper.view.draw()
 
-    redrawWithThumb: (canvasId) ->
+    redrawWithThumb: ->
       @redraw()
       @canvas.updateSelectedThumb()
 
@@ -238,8 +235,6 @@ $ ->
   # paper.install(window) causes errors upon defining getters for 'project', so we use this code
   for key of paper
     window[key] = paper[key] if not /^(version|_id|load)/.test(key) and not window[key]?
-
-  window.paper = new window.paper.PaperScope()
 
   paper.setup($('#myCanvas')[0])
 

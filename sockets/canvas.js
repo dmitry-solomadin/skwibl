@@ -72,6 +72,10 @@ exports.configure = function (sio) {
       socket.on('nextId', function (msg, cb) {
         socket.broadcast.to(socket.project).emit("nextId");
       });
+
+      socket.on('switchCanvas', function (msg, cb) {
+        socket.broadcast.to(socket.project).emit("switchCanvas", {id:id, canvasIndex:msg});
+      });
     });
 
   });

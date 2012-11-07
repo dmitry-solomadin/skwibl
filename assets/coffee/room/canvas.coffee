@@ -20,8 +20,7 @@ $ ->
 
       room.redraw()
 
-    restore: (canvasId) ->
-      opts = if canvasId then @findCanvasOptsByCanvasId(canvasId) else opts
+    restore: ->
       for element in opts.historytools.allHistory
         paper.project.activeLayer.addChild(element) unless this.type
         room.comments.showComment(element.commentMin) if element.commentMin
@@ -57,7 +56,7 @@ $ ->
       image.src = imagePath
       $(image).on "load", =>
         if opts.image
-          @addNewThumb()
+          @addNewThumbAndSelect()
         @addImage(image)
         @updateSelectedThumb()
 
@@ -77,7 +76,7 @@ $ ->
       room.history.add(img)
 
     addNewThumb: ->
-      thumb = $("<a href='#' canvasId=\"#{opts.canvasId}\"><canvas width='80' height='60'></canvas></a>")
+      thumb = $("<a href='#'><canvas width='80' height='60'></canvas></a>")
       $("#canvasSelectDiv").append(thumb)
 
     addNewThumbAndSelect: ->
@@ -89,8 +88,8 @@ $ ->
       $("#canvasSelectDiv a").removeClass("canvasSelected")
       $("#canvasSelectDiv a:last").addClass("canvasSelected")
 
-    updateThumb: (canvasId) ->
-      thumb = $("#canvasSelectDiv a[canvasId=\"#{canvasId}\"] canvas")
+    updateThumb: (canvasIndex) ->
+      thumb = $("#canvasSelectDiv a:eq(#{canvasIndex}) canvas")
       thumbContext = thumb[0].getContext('2d')
 
       canvas = paper.project.view.element
@@ -114,11 +113,14 @@ $ ->
       paper.project.activeLayer.transform(transformMatrix)
       room.redraw()
 
-    updateSelectedThumb: -> @updateThumb @selectedThumbCanvasId()
+    updateSelectedThumb: -> @updateThumb @selectedThumbCanvasIndex()
 
-    selectedThumbCanvasId: -> $(".canvasSelected").attr("canvasId")
+    selectedThumbCanvasIndex: -> $(".canvasSelected").index()
 
-    selectThumb: (anchor) ->
+    selectThumbByCanvasIndex: (canvasIndex, emit) ->
+      @selectThumb($("#canvasSelectDiv a:eq(#{canvasIndex})"), emit)
+
+    selectThumb: (anchor, emit) ->
       return if $(anchor).hasClass("canvasSelected")
 
       $("#canvasSelectDiv a").removeClass("canvasSelected")
@@ -134,14 +136,12 @@ $ ->
 
       $(anchor).addClass("canvasSelected")
 
+      room.socket.emit("switchCanvas", $(anchor).index()) if emit
+      room.redraw()
+
     findCanvasOptsByIndex: (index) ->
       for savedOpt, i in room.savedOpts
         return savedOpt if index == i
-      return null
-
-    findCanvasOptsByCanvasId: (canvasId) ->
-      for savedOpt in room.savedOpts
-        return savedOpt if savedOpt.canvasId == canvasId
       return null
 
   App.room.canvas = new RoomCanvas

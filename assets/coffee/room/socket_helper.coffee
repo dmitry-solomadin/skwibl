@@ -11,6 +11,7 @@ $ ->
       socket.on 'commentRemove', (data) => @socketRemoveComment(data.message)
       socket.on 'commentText', (data) => @addOrUpdateCommentText(data.message)
       socket.on 'fileAdded', (data) => room.canvas.handleUpload(data.message, false)
+      socket.on 'switchCanvas', (data) => room.canvas.selectThumbByCanvasIndex(data.canvasIndex, false)
 
       socket.on 'eraseCanvas', =>
         room.canvas.erase()
@@ -92,7 +93,7 @@ $ ->
       if initial
         $(data).each -> createNewElement(@)
       else
-        element = data.element
+        element = data
         foundPath = room.helper.findByElementId(element.elementId)
         if foundPath
           room.items.unselectIfSelected(foundPath.elementId)
@@ -105,7 +106,7 @@ $ ->
         else
           createNewElement(element)
 
-      room.redrawWithThumb(data.canvasId)
+      room.redrawWithThumb()
 
     prepareElementToSend: (elementToSend) ->
       element =
@@ -125,7 +126,7 @@ $ ->
           ox: segment.handleOut.x
           oy: segment.handleOut.y
 
-      {element: element, canvasId: opts.canvasId}
+      element
 
     prepareCommentToSend: (commentMin) ->
       comment =
@@ -148,6 +149,6 @@ $ ->
           w: commentRect.bounds.width
           h: commentRect.bounds.height
 
-      {comment: comment, canvasId: opts.canvasId}
+      comment: comment
 
   App.room.socketHelper = new RoomSocketHelper
