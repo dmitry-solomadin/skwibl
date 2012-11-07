@@ -327,7 +327,7 @@
         arrow.segments[1].point.y = coords.y1 / opts.currentScale;
         arrow.segments[2].point.x = coords.x2 / opts.currentScale;
         arrow.segments[2].point.y = coords.y2 / opts.currentScale;
-        return room.redrawWithThumb();
+        return room.redraw();
       };
 
       RoomComments.prototype.translate = function(commentMin, dx, dy) {

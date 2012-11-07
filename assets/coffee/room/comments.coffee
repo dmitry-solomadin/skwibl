@@ -45,6 +45,7 @@ $ ->
           @redrawArrow(commentMin)
         onAfterDrag: =>
           room.socket.emit("commentUpdate", room.socketHelper.prepareCommentToSend(commentMin))
+          room.redrawWithThumb()
 
       commentMin.drags
         onDrag: (dx, dy) =>
@@ -52,6 +53,7 @@ $ ->
           @redrawArrow(commentMin)
         onAfterDrag: =>
           room.socket.emit("commentUpdate", room.socketHelper.prepareCommentToSend(commentMin))
+          room.redrawWithThumb()
 
       $(document).on "click", (evt) =>
         for commentSendButton in $(".comment-send:visible")
@@ -249,7 +251,7 @@ $ ->
       arrow.segments[2].point.x = coords.x2 / opts.currentScale
       arrow.segments[2].point.y = coords.y2 / opts.currentScale
 
-      room.redrawWithThumb()
+      room.redraw()
 
     translate: (commentMin, dx, dy) ->
       commentMin.css(top: commentMin.position().top + dy, left: commentMin.position().left + dx)
@@ -294,7 +296,7 @@ $ ->
       $commentmin[0].arrow.isHidden = true
       $commentmin.show()
 
-      room.redraw()
+      room.redrawWithThumb()
 
     unfoldComment: ($commentmin) ->
       $commentmin[0].$maximized.show()
@@ -306,7 +308,7 @@ $ ->
 
       $commentmin.hide() if $commentmin[0].rect
 
-      room.redraw()
+      room.redrawWithThumb()
 
     addCommentText: (commentMin, text, emit) ->
       commentContent = commentMin[0].$maximized.find(".comment-content")
