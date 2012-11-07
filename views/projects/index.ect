@@ -6,7 +6,7 @@
   <% if @projects.length : %>
   <form id="projects">
     <% for project in @projects : %>
-    <input type="radio" name="project" value="<%= project.id %>" onchange="switchProject()"/>
+    <input type="radio" name="project" value="<%= project.id %>" onchange="App.projects.switchProject()"/>
     <a href="/projects/<%= project.id %>"><%= project.name %></a><br>
     <% end %>
   </form>
@@ -18,7 +18,7 @@
   <input type="button" id="add" value="add"/>
   <hr>
   <b>Info</b>
-  <button name="delete" onclick="deleteProject()">delete</button>
+  <button name="delete" onclick="App.projects.deleteProject()">delete</button>
   <div>
     <ul id="info"></ul>
   </div>
@@ -28,13 +28,13 @@
   <b>Users</b>
   <div id="userManagement">
     <input type="textfield" name="userId" style="width:200px;"/>
-    <button name="invite" onclick="invite()">invite by id</button>
+    <button name="invite" onclick="App.projects.invite()">invite by id</button>
     <hr>
     <input type="textfield" name="email" style="width:200px;"/>
-    <button name="inviteEmail" onclick="inviteEmail()">by email</button>
+    <button name="inviteEmail" onclick="App.projects.inviteEmail()">by email</button>
     <hr>
-    <button name="inviteSocial" onclick="inviteSocial()">invite social</button>
-    <button name="delete" onclick="deleteUser()">delete</button>
+    <button name="inviteSocial" onclick="App.projects.inviteSocial()">invite social</button>
+    <button name="delete" onclick="App.projects.deleteUser()">delete</button>
   </div>
   <div>
     <form id="projectUsers"></form>
@@ -43,19 +43,15 @@
 
 <div style="float:left;width:150px;border-left:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
   <b>Activities</b><br>
-  <button name="accept" onclick="accept()">accept</button>
-  <button name="decline" onclick="decline()">decline</button>
+  <button name="accept" onclick="App.projects.accept()">accept</button>
+  <button name="decline" onclick="App.projects.decline()">decline</button>
   <hr>
   <% if @activities.length : %>
   <form id="activities">
     <% for activity in @activities : %>
-    <input type="radio" name="activity" value="<%= activity.id %>" onchange="switchActivity()"/>
+    <input type="radio" name="activity" value="<%= activity.id %>" onchange="App.projects.switchActivity()"/>
     <%= activity.id + " : " + activity.status%><br>
     <% end %>
   </form>
   <% end %>
 </div>
-
-<script type="text/javascript">
-  window.projects.init();
-</script>

@@ -20,9 +20,11 @@ exports.get = function(req, res, next) {
     if(!err) {
       return db.activities.get(req.user.id, function(err, activities) {
         if(!err) {
-          return res.render('projects/index', {
-              projects: projects
-            , activities: activities
+          return res.render('index', {
+            template: "projects/index",
+            user: req.user,
+            projects: projects,
+            activities: activities
           });
         }
         return next(err);

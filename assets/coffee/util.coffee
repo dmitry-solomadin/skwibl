@@ -24,6 +24,12 @@ $ ->
       settings.onTrigger()
     ).on('mouseleave', -> removeHoverCount())
 
+  $.fn.valc = ->
+    value = @val()
+    @val("")
+    value
+
+
   $.fn.drags = (opt) ->
     opt = $.extend({cursor:"move"}, opt)
 

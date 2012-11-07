@@ -59,7 +59,8 @@
             return _this.redrawArrow(commentMin);
           },
           onAfterDrag: function() {
-            return room.socket.emit("commentUpdate", room.socketHelper.prepareCommentToSend(commentMin));
+            room.socket.emit("commentUpdate", room.socketHelper.prepareCommentToSend(commentMin));
+            return room.redrawWithThumb();
           }
         });
         commentMin.drags({
@@ -71,7 +72,8 @@
             return _this.redrawArrow(commentMin);
           },
           onAfterDrag: function() {
-            return room.socket.emit("commentUpdate", room.socketHelper.prepareCommentToSend(commentMin));
+            room.socket.emit("commentUpdate", room.socketHelper.prepareCommentToSend(commentMin));
+            return room.redrawWithThumb();
           }
         });
         $(document).on("click", function(evt) {
@@ -403,7 +405,7 @@
         $commentmin[0].arrow.opacity = 0;
         $commentmin[0].arrow.isHidden = true;
         $commentmin.show();
-        return room.redraw();
+        return room.redrawWithThumb();
       };
 
       RoomComments.prototype.unfoldComment = function($commentmin) {
@@ -414,7 +416,7 @@
         if ($commentmin[0].rect) {
           $commentmin.hide();
         }
-        return room.redraw();
+        return room.redrawWithThumb();
       };
 
       RoomComments.prototype.addCommentText = function(commentMin, text, emit) {

@@ -43,6 +43,12 @@
         return removeHoverCount();
       });
     };
+    $.fn.valc = function() {
+      var value;
+      value = this.val();
+      this.val("");
+      return value;
+    };
     return $.fn.drags = function(opt) {
       var _this = this;
       opt = $.extend({
