@@ -20,13 +20,14 @@
       Room.prototype.init = function() {
         var canvas;
         this.initOpts();
-        $("#toolSelect > li, #panTool, #selectTool").on("click", function() {
+        $(".toolTypeChanger").on("click", function() {
           return opts.tooltype = $(this).data("tooltype");
         });
-        $('.color').click(function() {
-          $('.color').removeClass('activen');
+        $('#colorSelect .color').click(function() {
+          $('#colorSelect .color').removeClass('activen');
           opts.color = $(this).attr('data-color');
-          return $(this).addClass('activen');
+          $(this).addClass('activen');
+          return $(".colorSelected").css("background", opts.color);
         });
         $(document).on("click", "#canvasSelectDiv a", function() {
           App.room.canvas.selectThumb(this, true);

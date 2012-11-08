@@ -13,13 +13,15 @@ $ ->
     init: ->
       @initOpts()
 
-      $("#toolSelect > li, #panTool, #selectTool").on "click", ->
+      $(".toolTypeChanger").on "click", ->
         opts.tooltype = $(@).data("tooltype")
 
-      $('.color').click ->
-        $('.color').removeClass('activen')
+      $('#colorSelect .color').click ->
+        $('#colorSelect .color').removeClass('activen')
         opts.color = $(@).attr('data-color')
         $(@).addClass('activen')
+
+        $(".colorSelected").css("background", opts.color)
 
       $(document).on "click", "#canvasSelectDiv a", ->
         App.room.canvas.selectThumb(@, true)

@@ -18,6 +18,10 @@ body {
     float: left;
 }
 
+.ml25 {
+    margin-left: 25px !important;
+}
+
 /* MISC END */
 
 .jp-play-bar {
@@ -65,6 +69,17 @@ body {
     border: 1px solid #b2b2b2;
 }
 
+.colorSelected {
+    margin: 0;
+    height: 18px;
+    width: 18px;
+    vertical-align: top;
+}
+
+.colorDropdown {
+    padding: 3px !important;
+}
+
 .activen {
     border: 1px solid orange;
     box-shadow: orange 0 0 5px;
@@ -91,8 +106,26 @@ body {
 }
 
 .skwibl-btn-group {
-    float: left;
-    position: relative;
+    display: inline-block;
+}
+
+.skwibl-btn-group .btn:first-child {
+    margin-right: 0;
+}
+
+.skwibl-btn-group .btn:last-child {
+    margin-left: -4px;
+}
+
+.navbar .btn {
+    border-radius: 1px;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.skwibl_image_btn {
+    padding: 0 !important;
+    background: whiteSmoke;
 }
 
 #colorSelect {

@@ -6,83 +6,12 @@
   <div class="navbar-inner">
     <div class="container-fluid">
       <% if @room : %>
-        <div class="header-foldable" id="header-foldable">
-          <a class="brand" href="/">Skwibl</a>
-
-          <span class="skwibl-btn-group" style="float:right">
-            <a class="btn" href="#" onclick="App.chat.fold(this); return false;"><<</a>
-          </span>
-        </div>
-
-        <span class="skwibl-btn-group">
-          <a href="#" class="btn" data-toggle="dropdown">
-            Skwibl
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu activeMenu" id="toolSelect">
-            <li data-tooltype="line">Pencil</li>
-            <li data-tooltype="highligher">Highligher</li>
-            <li data-tooltype="comment" onclick="App.room.helper.notifyComment()">Comment</li>
-            <li data-tooltype="circle">Cirlce</li>
-            <li data-tooltype="rectangle">Rectangle</li>
-            <li data-tooltype="straightline">Line</li>
-            <li data-tooltype="arrow">Arrow</li>
-          </ul>
-        </span>
-        <span class="skwibl-btn-group">
-          <a href="#" class="btn" data-toggle="dropdown">
-            Color
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu" id="colorSelect">
-            <li>
-              <div class="color active" style="background-color:black;" data-color="black"></div>
-              <div class="color" style="background-color:red;" data-color="red"></div>
-              <div class="color" style="background-color:orange;" data-color="orange"></div>
-              <div class="color" style="background-color:yellow;" data-color="yellow"></div>
-              <div class="color" style="background-color:green;" data-color="green"></div>
-              <div class="color" style="background-color:#986536;" data-color="#986536"></div>
-              <div class="color" style="background-color:blue;" data-color="blue"></div>
-              <div class="color" style="background-color:#9aff99;" data-color="#9aff99"></div>
-            </li>
-          </ul>
-        </span>
-        <span class="skwibl-btn-group">
-          <a href="#" id="selectTool" class="btn" data-tooltype="select">Select</a>
-        </span>
-        <span class="skwibl-btn-group">
-          <a href="#" id="panTool" class="btn" data-tooltype="pan">Pan</a>
-        </span>
-        <span class="skwibl-btn-group">
-          <select class="btn" style="width:75px;"
-                  onchange="App.room.canvas.setScale($(this).find(':selected').val())">
-            <option value="0.5">50%</option>
-            <option value="0.75">75%</option>
-            <option value="1" selected="selected">100%</option>
-            <option value="1.25">125%</option>
-            <option value="1.5">150%</option>
-            <option value="2">200%</option>
-          </select>
-          <a class="btn" href="#" onclick="App.room.canvas.addScale(); return false;">+</a>
-          <a class="btn" href="#" onclick="App.room.canvas.subtractScale(); return false;">-</a>
-        </span>
-        <span class="skwibl-btn-group">
-          <a href="#" class="btn" data-toggle="dropdown">
-            Actions
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu activeMenu" id="actionSelect">
-            <li id="undoLink" onclick="App.room.history.prev();return false;" class="disabled">Undo</li>
-            <li id="redoLink" onclick="App.room.history.next();return false;" class="disabled">Redo</li>
-            <li id="removeSelected" class="disabled" onclick="App.room.items.removeSelected(); return false;">Remove</li>
-            <li onclick="App.room.canvas.clear(); return false;">Clear</li>
-          </ul>
-        </span>
+        <%- include './room_header.ect' %>
       <% else : %>
         <a class="brand" href="/">Skwibl</a>
       <% end %>
 
-      <div class="btn-group pull-right">
+      <span class="pull-right">
         <% if @user : %>
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
           <i class="icon-user"></i> <%= @user.displayName %>
@@ -99,7 +28,7 @@
           Sign In
         </a>
         <% end %>
-      </div>
+      </span>
 
       <% if @user and (!@room or !@template): %>
       <div class="nav-collapse">
