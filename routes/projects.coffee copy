@@ -1,6 +1,6 @@
-var ctrls = require('../controllers');
+ctrls = require('../controllers')
 
-exports.configure = function(app, passport) {
+exports.configure = (app, passport) ->
 
   app.get('/projects', ctrls.mid.isAuth, ctrls.projects.index);
 
@@ -22,13 +22,8 @@ exports.configure = function(app, passport) {
 
   app.post('/projects/inviteemail', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.projects.inviteEmail);
 
-//  /*
-//   * invite user to a project by link
-//   */
-//   app.post('/projects/invitelink', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.projects.inviteLink);
+  # app.post('/projects/invitelink', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.projects.inviteLink);
 
   app.post('/projects/confirm', ctrls.mid.isAuth, ctrls.mid.isInvited, ctrls.projects.confirm);
 
   app.post('/projects/remove', ctrls.mid.isAuth, ctrls.mid.isOwner, ctrls.projects.remove);
-
-};

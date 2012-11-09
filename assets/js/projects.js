@@ -6,22 +6,16 @@
     Projects = (function() {
 
       function Projects() {
+        var _this = this;
         this.uid = $("#uid").val();
-        $('#add').click(function() {
-          var projectName;
-          projectName = $('#projectName').valc();
-          if (projectName === '') {
-            return;
-          }
-          return $.post('/projects/add', {
-            name: projectName
-          }, function(data, status, xhr) {
-            if (status === 'success' && data) {
-              return $('#projects').append(("<input type='radio' name='project' value='" + data.id + "' onchange='App.projects.switchProject()'>") + ("<a href='/dev/projects/" + data.id + "'>" + data.name + "</a><br>"));
-            }
-          });
+        $("#showInviteParticipants").on("click", function() {
+          return _this.toogleParticipants();
         });
       }
+
+      Projects.prototype.toogleParticipants = function() {
+        return $("#inviteParticipants").toggle("slow");
+      };
 
       Projects.prototype.switchProject = function() {
         return $.post('/dev/projects/get', {
@@ -79,7 +73,7 @@
 
       Projects.prototype.inviteUser = function() {
         var uid;
-        uid = $("[name=userId]").valc();
+        uid = $("#userIdInput").valc();
         return $.post('/projects/invite', {
           uid: uid,
           pid: this.getSelectedProjectId()

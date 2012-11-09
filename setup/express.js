@@ -60,6 +60,11 @@ exports.setUp = function() {
     }));
     app.use(passport.initialize());
     app.use(passport.session());
+
+    app.use(function(req, res, next) {
+      res.locals.req = req;
+      next()
+    });
     app.use(flash());
     app.use(app.router);
     app.use(express.static(assetsDir));
@@ -68,9 +73,11 @@ exports.setUp = function() {
     //   app.use(ctrls.error);
   });
 
-//  app.locals = {
-//    current_user: helpers.application_helper.current_user
-//  };
+  app.locals = {};
+
+  for (method in helpers.application_helper) {
+    app.locals[method] = helpers.application_helper[method];
+  }
 
   routes.configure(app, passport);
 

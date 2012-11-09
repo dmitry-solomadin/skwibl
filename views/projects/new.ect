@@ -1,0 +1,17 @@
+<h2>Create new project</h2>
+
+<%- include './shared/errors.ect' %>
+
+<form action="/projects/add" method="POST">
+  <label for="projectName">Name:</label>
+  <input id="projectName" type="text" name="name" value="">
+
+  <div class="showInviteParticipantsDiv">
+    <a id="showInviteParticipants" href="#">Invite participants<span class="caret"></span></a>
+  </div>
+  <div id="inviteParticipants">
+    <label for="userIdInput">User id:</label>
+    <input type="text" id="userIdInput" value="">
+  </div>
+  <input type="submit" class="btn" value="Submit"/>
+</form>

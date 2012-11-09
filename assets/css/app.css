@@ -22,6 +22,14 @@ body {
     margin-left: 25px !important;
 }
 
+.alert ul {
+    margin-bottom: 0;
+}
+
+input.error {
+    border: 1px solid red;
+}
+
 /* MISC END */
 
 .jp-play-bar {
@@ -111,14 +119,17 @@ body {
 
 .skwibl-btn-group .btn:first-child {
     margin-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .skwibl-btn-group .btn:last-child {
     margin-left: -4px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 
 .navbar .btn {
-    border-radius: 1px;
     margin-left: 2px;
     margin-right: 2px;
 }
@@ -321,6 +332,24 @@ body.room {
 }
 
 /* ROOM STYLES END */
+
+/* PROJECT STYLES */
+#showInviteParticipants .caret {
+    vertical-align: middle;
+    margin-top: -1px;
+    margin-left: 5px;
+}
+
+#inviteParticipants {
+    margin-bottom: 10px;
+    display: none;
+}
+
+.showInviteParticipantsDiv {
+    margin-bottom: 5px;
+}
+
+/* PROJECT STYLES */
 
 .notification {
     opacity: 0;

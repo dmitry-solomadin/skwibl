@@ -74,7 +74,7 @@ function clean {
 ## build procedure
 function build {
   echo "building"
-  $COFFEE --compile --output $JS_OUTPUT_DIR $COFFEE_DIR
+  $COFFEE --watch --compile --output $JS_OUTPUT_DIR $COFFEE_DIR &
 }
 
 ## init procedure

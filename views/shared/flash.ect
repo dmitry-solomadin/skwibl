@@ -1,11 +1,11 @@
-<% if @message && @message.length != 0 : %>
-<div class="alert alert-info"><%= @message %></div>
+<% if @flashMessage() && @flashMessage().length != 0 : %>
+<div class="alert alert-info"><%= @flashMessage() %></div>
 <% end %>
 
-<% if @warning && @warning.length != 0 : %>
-<div class="alert alert-warning"><%= @warning %></div>
+<% if @flashWarning() && @flashWarning().length != 0 : %>
+<div class="alert alert-warning"><%= @flashWarning() %></div>
 <% end %>
 
-<% if @error && @error.length != 0 : %>
-<div class="alert alert-error"><%= @error %></div>
+<% if @flashError() && @flashError().length != 0 : %>
+<div class="alert alert-error"><%= @flashError() %></div>
 <% end %>

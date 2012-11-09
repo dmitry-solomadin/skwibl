@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -14,9 +13,9 @@ var cfg = require('../config');
 
 var numCPUs = os.cpus().length;
 
-exports.getUsers = function(clients) {
+exports.getUsers = function (clients) {
   var ids = [];
-  clients.forEach(function(client) {
+  clients.forEach(function (client) {
     var ssid = client.id
       , hsn = client.manager.handshaken
       , id = hsn[ssid].user.id;
@@ -25,88 +24,88 @@ exports.getUsers = function(clients) {
   return ids;
 };
 
-exports.emailType = function(x) {
+exports.emailType = function (x) {
   return 'emails:' + x + ':type';
 };
 
-exports.emailUid = function(x) {
+exports.emailUid = function (x) {
   return 'emails:' + x + ':uid';
 };
 
-exports.hash = function(email) {
+exports.hash = function (email) {
   var hash = crypto.createHash('md5');
   hash.update(new Date + email, 'ascii');
   return hash.digest('hex');
 };
 
-exports.genPass = function() {
+exports.genPass = function () {
   return generatePassword.call(null, cfg.PASSWORD_LENGTH, cfg.PASSWORD_EASYTOREMEMBER);
 };
 
-exports.purify = function(obj) {
-  if(!obj) {
+exports.purify = function (obj) {
+  if (!obj) {
     return null;
   }
-  for(var prop in obj) {
-    if(!obj[prop]) {
+  for (var prop in obj) {
+    if (!obj[prop]) {
       delete obj[prop];
     }
   }
-  if(_.isEmpty(obj)) {
+  if (_.isEmpty(obj)) {
     return null;
   }
   return obj;
 };
 
-exports.getName = function(user) {
-  if(user.name) {
+exports.getName = function (user) {
+  if (user.name) {
     var name = user.name;
-    if(name.givenName && name.familyName) {
+    if (name.givenName && name.familyName) {
       return name.givenName + ' ' + name.familyName;
     }
-    if(name.givenName) {
+    if (name.givenName) {
       return name.givenName;
     }
-    if(name.familyName) {
+    if (name.familyName) {
       return name.familyName;
     }
   }
-  if(user.displayName) {
+  if (user.displayName) {
     return user.displayName;
   }
   return user.emails[0].value;
 };
 
-exports.returnStatus = function(err, res) {
-  if(!err) {
+exports.returnStatus = function (err, res) {
+  if (!err) {
     return res.send(true);
   }
   res.send(false);
 };
 
-exports.getFileMime = function(ext) {
+exports.getFileMime = function (ext) {
   var extension = ext.toLowerCase()
     , image = cfg.MIME[0][extension]
     , video = cfg.MIME[1][extension];
-  if(image) {
+  if (image) {
     return image;
   }
   return video;
 };
 
-exports.getFileType = function(mime) {
-  if(!mime) {
+exports.getFileType = function (mime) {
+  if (!mime) {
     return null;
   }
   return mime.split('/')[0];
 };
 
-exports.include = function(dir, fn) {
-  fs.readdirSync(dir).forEach(function(name){
+exports.include = function (dir, fn) {
+  fs.readdirSync(dir).forEach(function (name) {
     var len = name.length
       , ext = name.substring(len - 3, len)
       , isModule = name !== 'index.js' && ext === '.js';
-    if(isModule) {
+    if (isModule) {
       var mod = require(dir + '/' + name)
         , shortName = name.substring(0, len - 3);
       fn(mod, shortName);
@@ -114,36 +113,36 @@ exports.include = function(dir, fn) {
   });
 };
 
-exports.async = function(fn) {
-  return process.nextTick(function() {
+exports.async = function (fn) {
+  return process.nextTick(function () {
     fn(err, val);
   });
 };
 
-exports.asyncOpt = function(fn, err, val) {
-  if(fn) {
-    return process.nextTick(function() {
+exports.asyncOpt = function (fn, err, val) {
+  if (fn) {
+    return process.nextTick(function () {
       fn(err, val);
     });
   }
 };
 
-exports.asyncOrdered = function(array, index, fn, done) {
+exports.asyncOrdered = function (array, index, fn, done) {
   index = index || 0;
-  if(index === array.length) {
+  if (index === array.length) {
     return done();
   }
   fn();
-  process.nextTick(function() {
+  process.nextTick(function () {
     tools.asyncOrdered(array, index++, fn, done);
   });
 };
 
-exports.asyncParallel = function(array, fn) {
+exports.asyncParallel = function (array, fn) {
   var left = array.length - 1;
-  for(var i = 0, len = array.length; i < len; i++) {
-    (function(val) {
-      process.nextTick(function() {
+  for (var i = 0, len = array.length; i < len; i++) {
+    (function (val) {
+      process.nextTick(function () {
         fn(left, val);
         --left;
       });
@@ -151,30 +150,41 @@ exports.asyncParallel = function(array, fn) {
   }
 };
 
-exports.asyncDone = function(left, fn) {
-  if(left === 0) {
+exports.asyncDone = function (left, fn) {
+  if (left === 0) {
     return process.nextTick(fn);
   }
 };
 
-exports.exitNotify = function(worker, code, signal) {
+exports.exitNotify = function (worker, code, signal) {
   console.log('Worker ' + worker.id + ' died: ' + worker.process.pid);
 };
 
-exports.startCluster = function(stop, start) {
+exports.startCluster = function (stop, start) {
   var t;
-  if(cluster.isMaster) {
-    for(var i = 0; i < numCPUs; i++) {
+  if (cluster.isMaster) {
+    for (var i = 0; i < numCPUs; i++) {
       cluster.fork();
     }
-    cluster.on('exit', function(worker, code, signal) {
+    cluster.on('exit', function (worker, code, signal) {
       clearInterval(t);
       stop(worker, code, signal);
     });
   } else {
-    t = setInterval(function() {
+    t = setInterval(function () {
       gc();
     }, cfg.GC_INTERVAL);
     start(cluster);
   }
+};
+
+exports.addError = function (req, text, id) {
+  errors = req.flash("objectErrors");
+
+  errors.push({
+    text:text,
+    id:id
+  });
+
+  req.flash("objectErrors", errors)
 };

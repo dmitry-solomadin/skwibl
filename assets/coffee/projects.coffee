@@ -3,17 +3,10 @@ $ ->
 
     constructor: ->
       @uid = $("#uid").val()
-      # when the client click add button
-      $('#add').click ->
-        projectName = $('#projectName').valc()
-        return if projectName == ''
 
-        $.post '/projects/add', {
-        name: projectName
-        }, (data, status, xhr) ->
-          if status == 'success' and data
-            $('#projects').append("<input type='radio' name='project' value='#{data.id}' onchange='App.projects.switchProject()'>" +
-            "<a href='/dev/projects/#{data.id}'>#{data.name}</a><br>")
+      $("#showInviteParticipants").on "click", => @toogleParticipants()
+
+    toogleParticipants: () -> $("#inviteParticipants").toggle("slow")
 
     switchProject: ->
       $.post '/dev/projects/get', {
@@ -44,7 +37,7 @@ $ ->
         {pid: @getSelectedProjectId(), id: @getSelectedUserId}
 
     inviteUser: ->
-      uid = $("[name=userId]").valc()
+      uid = $("#userIdInput").valc()
       $.post '/projects/invite', {
       uid: uid,
       pid: @getSelectedProjectId()

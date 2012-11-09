@@ -23,13 +23,11 @@ exports.mainPage = function(req, res) {
   if (req.user) {
     return res.render('index', {
       template:'partials/user'
-    , user:req.user
-    , error:req.flash('error')});
+    });
   }
 
   return res.render('index', {
     template:'partials/mainpage'
-  , error:req.flash('error')
   });
 };
 
@@ -40,7 +38,7 @@ exports.mainPage = function(req, res) {
 exports.regPage = function(req, res) {
   return res.render('index', {
     template:'partials/registration'
-    , error:req.flash('error')});
+    });
 };
 
 /*
@@ -70,8 +68,8 @@ exports.register = function(req, res, next) {
             return next(err);
           }
           if(!user) {
-            req.flash('error', 'Registration failed. Can not create user for email: ' + email);
-            return res.redirect('/');
+            tools.addError(req, 'Enter valid email.');
+            return res.redirect('/registration');
           }
           return smtp.regNotify(req, res, next, user, hash);
         });
@@ -84,12 +82,12 @@ exports.register = function(req, res, next) {
           return next(err);
         });
       }
-      req.flash('error', 'This mail is already in use: ' + email);
-      return res.redirect('/');
+      tools.addError(req, 'This mail is already in use: ' + email);
+      return res.redirect('/registration');
     });
   } else {
-    req.flash('error', 'Invalid user mail or password: ' + email);
-    return res.redirect('/');
+    tools.addError(req, 'Invalid user mail or password: ' + email);
+    return res.redirect('/registration');
   }
 };
 

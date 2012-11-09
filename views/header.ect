@@ -1,6 +1,6 @@
 <div class="navbar navbar-fixed-top" id="header">
-  <% if @user : %>
-  <input type="hidden" id="uid" value="<%= @user.id %>"/>
+  <% if @currentUser() : %>
+  <input type="hidden" id="uid" value="<%= @currentUser().id %>"/>
   <% end %>
 
   <div class="navbar-inner">
@@ -12,13 +12,13 @@
       <% end %>
 
       <span class="pull-right">
-        <% if @user : %>
+        <% if @currentUser() : %>
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-          <i class="icon-user"></i> <%= @user.displayName %>
+          <i class="icon-user"></i> <%= @currentUser().displayName %>
           <span class="caret"></span>
         </a>
         <ul class="dropdown-menu">
-          <li><a href="/users/<%= @user.id %>">Profile</a></li>
+          <li><a href="/users/<%= @currentUser().id %>">Profile</a></li>
           <li class="divider"></li>
           <li><a href="/logout">Sign Out</a></li>
         </ul>
@@ -30,7 +30,7 @@
         <% end %>
       </span>
 
-      <% if @user and (!@room or !@template): %>
+      <% if @currentUser() and (!@room or !@template): %>
       <div class="nav-collapse">
         <ul class="nav">
           <li><a href="#">Activities</a></li>
@@ -38,6 +38,8 @@
           <li><a href="#contact">Contacts</a></li>
           <li><a href="/files" data-remote="true">Files</a></li>
         </ul>
+
+        <a href="/projects/new"><button class="btn">Create a Project</button></a>
       </div>
       <% end %>
     </div>
