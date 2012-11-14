@@ -175,15 +175,17 @@
             arrowGroup = new Group([arrow]);
             arrowGroup.arrow = arrow;
             arrowGroup.drawTriangle = function() {
-              var triangle, vector;
-              vector = this.arrow.lastSegment.point - this.arrow.segments[0].point;
+              var triangle, vector, vrminus, vrplus;
+              vector = new Point(this.arrow.lastSegment.point.x - this.arrow.segments[0].point.x, this.arrow.lastSegment.point.y - this.arrow.segments[0].point.y);
               vector = vector.normalize(10);
+              vrplus = vector.rotate(135);
+              vrminus = vector.rotate(-135);
               if (this.triangle) {
-                this.triangle.segments[0].point = this.arrow.lastSegment.point + vector.rotate(135);
+                this.triangle.segments[0].point = new Point(this.arrow.lastSegment.point.x + vrplus.x, this.arrow.lastSegment.point.y + vrplus.y);
                 this.triangle.segments[1].point = this.arrow.lastSegment.point;
-                this.triangle.segments[2].point = this.arrow.lastSegment.point + vector.rotate(-135);
+                this.triangle.segments[2].point = new Point(this.arrow.lastSegment.point.x + vrminus.x, this.arrow.lastSegment.point.y + vrminus.y);
               } else {
-                triangle = new Path([this.arrow.lastSegment.point + vector.rotate(135), this.arrow.lastSegment.point, this.arrow.lastSegment.point + vector.rotate(-135)]);
+                triangle = new Path([new Point(this.arrow.lastSegment.point.x + vrplus.x, this.arrow.lastSegment.point.y + vrplus.y), this.arrow.lastSegment.point, new Point(this.arrow.lastSegment.point.x + vrminus.x, this.arrow.lastSegment.point.y + vrminus.y)]);
                 this.triangle = triangle;
                 this.addChild(triangle);
               }

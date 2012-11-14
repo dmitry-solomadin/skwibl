@@ -143,17 +143,19 @@ $ ->
           arrowGroup = new Group([arrow])
           arrowGroup.arrow = arrow
           arrowGroup.drawTriangle = ->
-            vector = @arrow.lastSegment.point - @arrow.segments[0].point
+            vector = new Point(@arrow.lastSegment.point.x - @arrow.segments[0].point.x, @arrow.lastSegment.point.y - @arrow.segments[0].point.y)
             vector = vector.normalize(10)
+            vrplus = vector.rotate(135)
+            vrminus = vector.rotate(-135)
             if @triangle
-              @triangle.segments[0].point = @arrow.lastSegment.point + vector.rotate(135)
+              @triangle.segments[0].point = new Point(@arrow.lastSegment.point.x + vrplus.x, @arrow.lastSegment.point.y + vrplus.y)
               @triangle.segments[1].point = @arrow.lastSegment.point
-              @triangle.segments[2].point = @arrow.lastSegment.point + vector.rotate(-135)
+              @triangle.segments[2].point = new Point(@arrow.lastSegment.point.x + vrminus.x, @arrow.lastSegment.point.y + vrminus.y)
             else
               triangle = new Path([
-                @arrow.lastSegment.point + vector.rotate(135)
+                new Point(@arrow.lastSegment.point.x + vrplus.x, @arrow.lastSegment.point.y + vrplus.y)
                 @arrow.lastSegment.point
-                @arrow.lastSegment.point + vector.rotate(-135)
+                new Point(@arrow.lastSegment.point.x + vrminus.x, @arrow.lastSegment.point.y + vrminus.y)
               ])
               @triangle = triangle
               @addChild(triangle)

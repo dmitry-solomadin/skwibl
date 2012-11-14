@@ -26,7 +26,7 @@ exports.setUp = function(client, db) {
         activity.status = 'new';
         activity.data = data;
         client.hmset('activities:' + val, activity);
-        client.rpush('users:' + owner + ':' + type, val);
+        client.rpush('users:' + owner + ':activities', val);
         return tools.asyncOpt(fn, null, activity);
       }
       return tools.asyncOpt(fn, err, null);

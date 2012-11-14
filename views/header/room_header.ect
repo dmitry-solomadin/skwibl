@@ -1,7 +1,8 @@
 <div class="header-foldable" id="header-foldable">
   <a class="brand" href="/">Skwibl</a>
 
-  <span class="skwibl-btn-group" style="float:right">
+  <span style="float:right">
+    <a class="btn" href="#inviteModal" data-toggle="modal">Invite</a>
     <a class="btn" href="#" onclick="App.chat.fold(this); return false;"><<</a>
   </span>
 </div>
@@ -16,19 +17,18 @@
    onclick="App.room.helper.notifyComment()">
   <img src="/images/room/comment.png">
 </a>
-
-<span class="dropdown">
-  <a href="#" class="btn" data-toggle="dropdown">
-    Skwibl
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu activeMenu" id="toolSelect">
-    <li class="toolTypeChanger" data-tooltype="circle">Cirlce</li>
-    <li class="toolTypeChanger" data-tooltype="rectangle">Rectangle</li>
-    <li class="toolTypeChanger" data-tooltype="straightline">Line</li>
-    <li class="toolTypeChanger" data-tooltype="arrow">Arrow</li>
-  </ul>
-</span>
+<a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="rectangle">
+  <img src="/images/room/rectangle.png">
+</a>
+<a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="circle">
+  <img src="/images/room/circle.png">
+</a>
+<a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="straightline">
+  <img src="/images/room/line.png">
+</a>
+<a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="arrow">
+  <img src="/images/room/arrow.png">
+</a>
 
 <span class="dropdown">
   <a href="#" class="btn colorDropdown" data-toggle="dropdown">
@@ -72,12 +72,15 @@
   </span>
 </span>
 
-<a href="#" id="undoLink" class="btn disabled" onclick="App.room.history.prev();return false;">
-  Undo
-</a>
-<a href="#" id="redoLink" class="btn disabled" onclick="App.room.history.next();return false;">
-  Redo
-</a>
+<span class="skwibl-btn-group">
+  <a href="#" id="undoLink" class="btn skwibl_image_btn disabled" onclick="App.room.history.prev();return false;">
+    <img src="/images/room/undo.png">
+  </a>
+  <a href="#" id="redoLink" class="btn skwibl_image_btn disabled" onclick="App.room.history.next();return false;">
+    <img src="/images/room/redo.png">
+  </a>
+</span>
+
 <a href="#" class="btn" onclick="App.room.history.clear();return false;">
   Clear
 </a>

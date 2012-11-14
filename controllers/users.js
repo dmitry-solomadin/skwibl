@@ -23,7 +23,9 @@ exports.profile = function(req, res) {
  * Edit personal profile
  */
 exports.edit = function(req, res) {
-  res.render('partials/edituser', { menu: 1});
+  res.render('index',
+    { template: "partials/edituser" }
+  );
 };
 
 /*
@@ -31,8 +33,21 @@ exports.edit = function(req, res) {
  * Update user profile info
  */
 exports.update = function(req, res) {
-  db.users.setProperties(req.user.id, req.body.properties, function(err) {
-    tools.returnStatus(err, res);
+  db.users.setProperties(req.params.id, req.body.user, function(err) {
+    if (err) {
+      req.flash('error', "Something wrong happened.");
+      res.redirect('/users/' + req.params.id + '/edit');
+    }
+
+    if (req._passport && req._passport.session.user) {
+      return db.users.findById(req.user.id, function (err, user) {
+        req._passport.session.user = user;
+        req.user = user;
+        res.redirect('/users/' + req.params.id + '/edit');
+      });
+    }
+
+    res.redirect('/users/' + req.params.id + '/edit');
   });
 };
 

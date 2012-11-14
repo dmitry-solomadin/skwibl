@@ -14,9 +14,8 @@ var db = require('../db')
  * Password recovery page
  */
 exports.forgotPassword = function(req, res) {
-  res.render('main', {
-    template: 'forgotpassword'
-  , message: req.flash('error')
+  res.render('index', {
+    template: 'users/forgot_password'
   });
 };
 
@@ -43,7 +42,7 @@ exports.passwordRecovery = function(req, res, next) {
  * Check mail page
  */
 exports.checkMail = function(req, res) {
-  res.render('checkmail', {
+  res.render('/users/check_mail', {
     message: req.flash('message')
   });
 };

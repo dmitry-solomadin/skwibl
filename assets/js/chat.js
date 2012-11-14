@@ -18,7 +18,7 @@
           left: -305
         });
         $("#header-foldable").animate({
-          width: 125
+          width: 200
         });
         $("#canvasFooter").animate({
           paddingLeft: 0

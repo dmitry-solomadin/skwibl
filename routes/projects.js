@@ -8,6 +8,8 @@ exports.configure = function(app, passport) {
 
   app.get('/projects/:pid', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.projects.show);
 
+  app.get('/projects/:pid/participants', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.projects.participants);
+
   app.post('/projects/add', ctrls.mid.isAuth, ctrls.projects.add);
 
   app.post('/projects/close', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.projects.close);

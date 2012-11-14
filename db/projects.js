@@ -134,8 +134,13 @@ exports.setUp = function(client, db) {
       if(!err && val) {
         client.sadd('projects:' + pid + ':unconfirmed', uid);
         //TODO Send invitation to user
-        db.activities.add(pid, uid, 'activities', id);
+        db.activities.add(pid, uid, 'projectInvite', id);
       }
+
+      if (!val) {
+        return tools.asyncOpt(fn, new Error('Record not found'));
+      }
+
       return tools.asyncOpt(fn, err);
     });
   };

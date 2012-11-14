@@ -26,6 +26,25 @@ exports.isAuth = function(req, res, next) {
 
 /*
  * ALL
+ * Check that user id in params matches authenticated user id.
+ */
+exports.isCurrentUser = function(req, res, next) {
+  if(req.user.id == req.params.id) {
+    return next();
+  }
+
+  if(req.method === 'GET') {
+    req.flash('error', "You can't view this page.");
+    return res.redirect('/');
+  }
+  return res.json({
+    success: false
+    , message: 'not authenticated'
+  });
+};
+
+/*
+ * ALL
  * Check if the user is the project member
  */
 exports.isMember = function(req, res, next) {

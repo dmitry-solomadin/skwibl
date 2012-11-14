@@ -1,0 +1,9 @@
+<% currentUserIsOwner = @project.owner == @currentUser().id %>
+<% isCurrentUser = @currentUser(@participant.id) %>
+<div id="participant<%= @participant.id%>" class="participant">
+  <span><%= @participant.displayName %><%= if isCurrentUser then " (you)" else ""%></span>
+  <% if currentUserIsOwner and not isCurrentUser : %>
+  <a class="btn btn-danger fr" href="#" onclick="App.projects.removeUserFromProject('<%= @participant.id %>');">Remove</a>
+  <% end %>
+  <div style="clear: both;"></div>
+</div>

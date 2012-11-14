@@ -19,12 +19,12 @@ exports.configure = function(app, passport) {
  /*
   * edit user personal information
   */
-  app.get('/users/:id/edit', ctrls.mid.isAuth, ctrls.users.edit);
+  app.get('/users/:id/edit', ctrls.mid.isAuth, ctrls.mid.isCurrentUser, ctrls.users.edit);
 
  /*
   * update user personal information
   */
-  app.post('/users/update', ctrls.mid.isAuth, ctrls.users.update);
+  app.post('/users/:id/update', ctrls.mid.isAuth, ctrls.mid.isCurrentUser, ctrls.users.update);
 
  /*
   * delete user

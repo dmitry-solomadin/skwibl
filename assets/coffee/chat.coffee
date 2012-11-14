@@ -8,7 +8,7 @@ $ ->
 
     fold: (link) ->
       $("#chat").animate(left: -305)
-      $("#header-foldable").animate(width: 125)
+      $("#header-foldable").animate(width: 200)
       $("#canvasFooter").animate(paddingLeft: 0)
       $(".canvasFooterInner").animate({width: $(window).width()}, -> $(".canvasFooterInner").css(width: "100%"))
 

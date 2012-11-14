@@ -10,14 +10,14 @@
 </head>
 <body <%= "class='room'" if @room %>>
 <input type="hidden" id="currentTemplate" value="<%= @template %>"/>
-<% include './header.ect' %>
+<% include './header/header.ect' %>
 
 <% if @room : %>
 <div id="room-content" class="room-content">
   <% include "./#{@template}.ect" %>
 </div>
 <% else : %>
-<div id="main-content" class="page tab-pane">
+<div id="main-content" class="container">
   <% include './shared/flash.ect' %>
 
   <% include "./#{@template}.ect" %>

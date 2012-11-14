@@ -8,65 +8,33 @@ $ ->
 
     toogleParticipants: () -> $("#inviteParticipants").toggle("slow")
 
-    switchProject: ->
-      $.post '/dev/projects/get', {
-      pid: @getSelectedProjectId()
-      }, (data, status, xhr) ->
-        info = $('#info')
-        users = $('#projectUsers')
-        info.empty()
-        users.empty()
-        if status == 'success' and data
-          for el in data
-            if el == 'users'
-              for user in data.users
-                if user.id != @uid
-                  users.append("<input type='radio' name='user' value='#{user.id}' onchange='App.projects.switchUser()'/>#{user.displayName}<br>")
-            else
-              info.append("<li>#{el} : #{data[el]}</li>")
+    deleteProject: (pid) ->
+      if confirm("Are you sure?")
+        $.post '/projects/delete', {pid: pid}, (data, status, xhr) ->
+          $("#project#{pid}").fadeOut()
 
-    deleteProject: ->
-      $.post '/projects/delete', {
-      pid: @getSelectedProjectId()
-      }, (data, status, xhr) ->
-        if status == 'success'
-          $("[name=project]:checked").remove()
+    showInviteModal: (pid) ->
+      $.get "/projects/#{pid}/participants", (data) ->
+        $('#inviteModal').find(".pid").val(pid)
+        console.log data
+        $('#inviteModal').find("#projectParticipants").html(data)
+        $('#inviteModal').modal('show')
 
-    deleteUser: ->
-      $.post '/projects/remove',
-        {pid: @getSelectedProjectId(), id: @getSelectedUserId}
+    inviteById: ->
+      $("#inviteError").html("")
+      uid = $("#inviteIdInput").valc()
+      pid = $("#inviteModal").find(".pid").val()
+      $.post '/projects/invite', {uid: uid, pid: pid}, (data, status, xhr) ->
+        if data
+          $("#inviteError")[0].className = "textSuccess"
+          $("#inviteError").html("Invitation has been sent.")
+        else
+          $("#inviteError")[0].className = "textError"
+          $("#inviteError").html("Unsuccessful")
 
-    inviteUser: ->
-      uid = $("#userIdInput").valc()
-      $.post '/projects/invite', {
-      uid: uid,
-      pid: @getSelectedProjectId()
-      }, (data, status, xhr) ->
-        if status == 'success'
-          console.log('invited')
-
-    accept: ->
-      console.log('accept invitation')
-      $.post '/projects/confirm', {
-      aid: @getSelectedActivityId(), answer: true
-      }, (data, status, xhr) ->
-        if status == 'success'
-          console.log('accepted')
-
-    decline: ->
-      console.log('decline invitation')
-      $.post '/projects/confirm', {
-      aid: @getSelectedActivityId(), answer: true
-      }, (data, status, xhr) ->
-        if status == 'success'
-          console.log('declined')
-
-
-    getSelectedUserId: -> $("[name=user]:checked").val()
-
-    getSelectedActivityId: -> $("[name=activity]:checked").val()
-
-    getSelectedProjectId: -> $("[name=project]:checked").val()
-
+    removeUserFromProject: (uid) ->
+      pid = $("#inviteModal").find(".pid").val()
+      $.post '/projects/remove', {pid: pid, id: uid}, (data, status, xhr) ->
+        $("#participant#{data.uid}").fadeOut() if data
 
   App.projects = new Projects

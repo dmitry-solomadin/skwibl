@@ -18,15 +18,9 @@ var tools = require('../tools');
 exports.index = function (req, res, next) {
   db.projects.get(req.user.id, function (err, projects) {
     if (!err) {
-      return db.activities.get(req.user.id, function (err, activities) {
-        if (!err) {
-          return res.render('index', {
-            template:"projects/index",
-            projects:projects,
-            activities:activities
-          });
-        }
-        return next(err);
+      return res.render('index', {
+        template:"projects/index",
+        projects:projects
       });
     }
     return next(err);
@@ -39,12 +33,12 @@ exports.index = function (req, res, next) {
  */
 exports.show = function (req, res, next) {
   db.projects.set(req.user.id, req.params.pid, function () {
-    db.projects.getData(req.params.pid, req.user.id, function (err, projects) {
+    db.projects.getData(req.params.pid, req.user.id, function (err, project) {
       if (!err) {
         return res.render('index', {
           template:"projects/show",
           pid:req.params.pid,
-          projects:projects
+          project:project
         });
       }
       return next(err);
@@ -132,7 +126,40 @@ exports.delete = function (req, res) {
 exports.invite = function (req, res) {
   var data = req.body;
   db.projects.invite(data.pid, req.user.id, data.uid, function (err) {
-    tools.returnStatus(err, res);
+    if (err) {
+      res.send(false);
+    }
+
+    return db.users.findById(data.uid, function(err, user) {
+      if(err) {
+        res.send(false);
+      }
+
+      return db.users.persist(user, function(){
+        db.projects.getData(data.pid, data.uid, function (err, project) {
+          if (!err) {
+            return res.send(true);
+          }
+          res.send(false);
+        });
+      });
+    });
+
+  });
+};
+
+/*
+ * GET
+ * show project participants
+ */
+exports.participants = function (req, res) {
+  db.projects.getData(req.params.pid, req.user.id, function (err, project) {
+    if (!err) {
+      return res.render("./projects/invite/participants.ect", {
+        project: project
+      })
+    }
+    res.send(false);
   });
 };
 
@@ -187,7 +214,11 @@ exports.remove = function (req, res) {
   var data = req.body;
   if (req.user.id !== data.id) {
     return db.projects.remove(data.pid, data.id, function (err) {
-      tools.returnStatus(err, res);
+      if (err){
+        return res.send(false);
+      }
+
+      return res.send({uid: data.id});
     });
   }
   return res.send(false);

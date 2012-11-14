@@ -1,0 +1,21 @@
+<div id="inviteModal" class="modal hide fade">
+  <input type="hidden" class="pid" value="<%= if @pid? then @pid else '' %>"/>
+
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Project participants</h3>
+  </div>
+  <div class="modal-body">
+    <div class="inviteNewDiv">
+      <div class="textError" id="inviteError"></div>
+      <input type="text" id="inviteIdInput">
+      <a class="btn" href="#" onclick="App.projects.inviteById()">Invite</a>
+    </div>
+    <div id="projectParticipants">
+      <%- include './projects/invite/participants.ect' %>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">Close</a>
+  </div>
+</div>

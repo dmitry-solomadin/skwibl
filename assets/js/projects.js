@@ -17,107 +17,55 @@
         return $("#inviteParticipants").toggle("slow");
       };
 
-      Projects.prototype.switchProject = function() {
-        return $.post('/dev/projects/get', {
-          pid: this.getSelectedProjectId()
-        }, function(data, status, xhr) {
-          var el, info, user, users, _i, _len, _results;
-          info = $('#info');
-          users = $('#projectUsers');
-          info.empty();
-          users.empty();
-          if (status === 'success' && data) {
-            _results = [];
-            for (_i = 0, _len = data.length; _i < _len; _i++) {
-              el = data[_i];
-              if (el === 'users') {
-                _results.push((function() {
-                  var _j, _len1, _ref, _results1;
-                  _ref = data.users;
-                  _results1 = [];
-                  for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-                    user = _ref[_j];
-                    if (user.id !== this.uid) {
-                      _results1.push(users.append("<input type='radio' name='user' value='" + user.id + "' onchange='App.projects.switchUser()'/>" + user.displayName + "<br>"));
-                    } else {
-                      _results1.push(void 0);
-                    }
-                  }
-                  return _results1;
-                }).call(this));
-              } else {
-                _results.push(info.append("<li>" + el + " : " + data[el] + "</li>"));
-              }
-            }
-            return _results;
-          }
+      Projects.prototype.deleteProject = function(pid) {
+        if (confirm("Are you sure?")) {
+          return $.post('/projects/delete', {
+            pid: pid
+          }, function(data, status, xhr) {
+            return $("#project" + pid).fadeOut();
+          });
+        }
+      };
+
+      Projects.prototype.showInviteModal = function(pid) {
+        return $.get("/projects/" + pid + "/participants", function(data) {
+          $('#inviteModal').find(".pid").val(pid);
+          console.log(data);
+          $('#inviteModal').find("#projectParticipants").html(data);
+          return $('#inviteModal').modal('show');
         });
       };
 
-      Projects.prototype.deleteProject = function() {
-        return $.post('/projects/delete', {
-          pid: this.getSelectedProjectId()
-        }, function(data, status, xhr) {
-          if (status === 'success') {
-            return $("[name=project]:checked").remove();
-          }
-        });
-      };
-
-      Projects.prototype.deleteUser = function() {
-        return $.post('/projects/remove', {
-          pid: this.getSelectedProjectId(),
-          id: this.getSelectedUserId
-        });
-      };
-
-      Projects.prototype.inviteUser = function() {
-        var uid;
-        uid = $("#userIdInput").valc();
+      Projects.prototype.inviteById = function() {
+        var pid, uid;
+        $("#inviteError").html("");
+        uid = $("#inviteIdInput").valc();
+        pid = $("#inviteModal").find(".pid").val();
         return $.post('/projects/invite', {
           uid: uid,
-          pid: this.getSelectedProjectId()
+          pid: pid
         }, function(data, status, xhr) {
-          if (status === 'success') {
-            return console.log('invited');
+          if (data) {
+            $("#inviteError")[0].className = "textSuccess";
+            return $("#inviteError").html("Invitation has been sent.");
+          } else {
+            $("#inviteError")[0].className = "textError";
+            return $("#inviteError").html("Unsuccessful");
           }
         });
       };
 
-      Projects.prototype.accept = function() {
-        console.log('accept invitation');
-        return $.post('/projects/confirm', {
-          aid: this.getSelectedActivityId(),
-          answer: true
+      Projects.prototype.removeUserFromProject = function(uid) {
+        var pid;
+        pid = $("#inviteModal").find(".pid").val();
+        return $.post('/projects/remove', {
+          pid: pid,
+          id: uid
         }, function(data, status, xhr) {
-          if (status === 'success') {
-            return console.log('accepted');
+          if (data) {
+            return $("#participant" + data.uid).fadeOut();
           }
         });
-      };
-
-      Projects.prototype.decline = function() {
-        console.log('decline invitation');
-        return $.post('/projects/confirm', {
-          aid: this.getSelectedActivityId(),
-          answer: true
-        }, function(data, status, xhr) {
-          if (status === 'success') {
-            return console.log('declined');
-          }
-        });
-      };
-
-      Projects.prototype.getSelectedUserId = function() {
-        return $("[name=user]:checked").val();
-      };
-
-      Projects.prototype.getSelectedActivityId = function() {
-        return $("[name=activity]:checked").val();
-      };
-
-      Projects.prototype.getSelectedProjectId = function() {
-        return $("[name=project]:checked").val();
       };
 
       return Projects;
