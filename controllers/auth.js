@@ -22,12 +22,12 @@ var db = require('../db')
 exports.mainPage = function(req, res) {
   if (req.user) {
     return res.render('index', {
-      template:'partials/user'
+      template:'users/show'
     });
   }
 
   return res.render('index', {
-    template:'partials/mainpage'
+    template:'./mainpage'
   });
 };
 
@@ -37,8 +37,8 @@ exports.mainPage = function(req, res) {
  */
 exports.regPage = function(req, res) {
   return res.render('index', {
-    template:'partials/registration'
-    });
+    template:'users/new'
+  });
 };
 
 /*
@@ -77,7 +77,15 @@ exports.register = function(req, res, next) {
       if(user.status === 'deleted') {
         return db.users.restore(user, function(err) {
           if(!err) {
-            return smtp.passwordSend(req, res, next, user);
+            return smtp.passwordSend(req, res, user, function (err, message){
+              if (err) {
+                req.flash('error', 'Unable send confirmation to ' + email);
+                return res.redirect('/');
+              } else {
+                req.flash('message', 'Password successfuly sent to email: ' + email);
+                return res.redirect('/checkmail');
+              }
+            });
           }
           return next(err);
         });

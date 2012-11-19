@@ -1,5 +1,12 @@
 $ ->
-  home =
+  class Home
+
+    constructor: ->
+      $("#forgotpasswordlink").click => @showForgotPassword()
+      $("#backToLogin").click => @hideForgotPassword()
+      $("#submitForgotPassword").click => @submitForgotPassword()
+      $("#loginForm").data "process-submit", (data) => @processLogin(data)
+
     showLogin: ->
       $("#loginBlock").css(
         position: 'absolute'
@@ -14,13 +21,28 @@ $ ->
 
       return false
 
-    initLogin: ->
-      $("#loginForm").data "process-submit", (data) -> home.processLogin(data)
+    showForgotPassword: ->
+      $(".loginBlockWrapper > form:first").animate(left: -300)
+      $(".loginBlockWrapper > form:last").animate(left: -300)
+
+    hideForgotPassword: ->
+      $(".loginBlockWrapper > form:first").animate(left: 0)
+      $(".loginBlockWrapper > form:last").animate(left: 0)
+
+    submitForgotPassword: ->
+      email = $("#forgotPasswordEmail").val()
+      $("#forgotPasswordError").html("")
+      $.post '/forgotpassword', {email: email}, (data, status, xhr) ->
+        if data
+          $("#forgotPasswordError")[0].className = "textSuccess"
+          $("#forgotPasswordError").html("New password has been sent to this email.")
+        else
+          $("#forgotPasswordError")[0].className = "textError"
+          $("#forgotPasswordError").html("We don't have this email.")
 
     processLogin: (data) ->
       if data == "OK" then window.location = "/" else $("#loginError").show().html(data.message)
 
-  home.initLogin()
-  App.Home = home
+  App.Home = new Home
 
 

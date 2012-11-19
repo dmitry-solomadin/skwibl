@@ -67,6 +67,15 @@ input.error {
     box-shadow: #404040 0 0 20px;
 }
 
+.forgotPasswordFields {
+    margin-bottom: 75px;
+}
+
+.forgotPasswordError {
+    height: 20px;
+    visibility: hidden;
+}
+
 .loginFields {
     margin-top: 10px;
 }
@@ -76,6 +85,30 @@ input.error {
     border: 1px solid gray;
     box-shadow: none;
     border-radius: 0;
+}
+
+.loginBlockWrapper {
+    width: 640px;
+}
+
+.loginBlockWrapper > form {
+    float: left;
+    position: relative;
+    left: 0;
+}
+
+.loginBlockWrapper > form:first-child {
+    margin-right: 20px;
+}
+
+.loginBlockWrapper > form:last-child {
+    width: 280px;
+}
+
+#loginBlock {
+    width: 280px;
+    height: 190px;
+    overflow: hidden;
 }
 
 /* ROOM STYLES START */

@@ -15,7 +15,7 @@ var tools = require('../tools');
  * Redirect to user profile
  */
 exports.profile = function(req, res) {
-  res.render('partials/user', { menu: 1 });
+  res.render('users/show');
 };
 
 /*
@@ -24,7 +24,7 @@ exports.profile = function(req, res) {
  */
 exports.edit = function(req, res) {
   res.render('index',
-    { template: "partials/edituser" }
+    { template: "users/edit" }
   );
 };
 

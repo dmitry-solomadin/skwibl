@@ -22,89 +22,57 @@
       <% end %>
 
       <% if @currentUser() : %>
-        <% if @room : %>
-            <ul class="nav pull-right">
-              <li class="dropdown ">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                  <i class="icon-user"></i> <%= @currentUser().displayName %>
-                  <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                  <li><a href="/users/<%= @currentUser().id %>/edit">Edit Profile</a></li>
-                  <li class="divider"></li>
-                  <li><a href="/logout">Sign Out</a></li>
-                </ul>
-              </li>
-            </ul>
-        <% else : %>
-          <div class="nav-collapse">
-            <ul class="nav">
-              <li><a href="/activities">Activities</a></li>
-              <li><a href="/projects">Projects</a></li>
-              <li><a href="#contact">Contacts</a></li>
-              <li><a href="/files" data-remote="true">Files</a></li>
-            </ul>
+      <% if @room : %>
+      <ul class="nav pull-right">
+        <li class="dropdown ">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-user"></i> <%= @currentUser().displayName %>
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="/users/<%= @currentUser().id %>/edit">Edit Profile</a></li>
+            <li class="divider"></li>
+            <li><a href="/logout">Sign Out</a></li>
+          </ul>
+        </li>
+      </ul>
+      <% else : %>
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li><a href="/activities">Activities</a></li>
+          <li><a href="/projects">Projects</a></li>
+          <li><a href="#contact">Contacts</a></li>
+          <li><a href="/files" data-remote="true">Files</a></li>
+        </ul>
 
-            <a href="/projects/new">
-              <button class="btn">Create a Project</button>
+        <a href="/projects/new">
+          <button class="btn">Create a Project</button>
+        </a>
+
+        <ul class="nav pull-right">
+          <li class="dropdown ">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+              <i class="icon-user"></i> <%= @currentUser().displayName %>
+              <span class="caret"></span>
             </a>
-
-            <ul class="nav pull-right">
-              <li class="dropdown ">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                  <i class="icon-user"></i> <%= @currentUser().displayName %>
-                  <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                  <li><a href="/users/<%= @currentUser().id %>/edit">Edit Profile</a></li>
-                  <li class="divider"></li>
-                  <li><a href="/logout">Sign Out</a></li>
-                </ul>
-              </li>
+            <ul class="dropdown-menu">
+              <li><a href="/users/<%= @currentUser().id %>/edit">Edit Profile</a></li>
+              <li class="divider"></li>
+              <li><a href="/logout">Sign Out</a></li>
             </ul>
-          </div>
-        <% end %>
+          </li>
+        </ul>
+      </div>
+      <% end %>
       <% end %>
     </div>
   </div>
 </div>
 
 <div id="loginBlock" class="loginBlock" style="display: none;">
-  <form id="loginForm" action="/login" method="post" class="form-horizontal" data-remote="true">
-    <div id="loginError" class="alert alert-error hide"></div>
-    <div>
-      Sign in with your social account:
-      <div style="clear: both;"></div>
-      <a class="fl" href="/auth/facebook">
-        <img src="/images/facebook_32.png">
-      </a>
-      <a class="fl" href="/auth/google">
-        <img src="/images/google_32.png">
-      </a>
-      <a class="fl" href="/auth/linkedin">
-        <img src="/images/linkedin_32.png">
-      </a>
-
-      <div style="clear: both;"></div>
-    </div>
-
-    <div class="loginFields">
-      <input type="text" class="input-xlarge" name="email"><br/>
-      <input type="password" class="input-xlarge" name="password" id="password">
-    </div>
-
-    <div class="fr" style="width:280px;">
-      <label class="checkbox fl">
-        <input type="checkbox"> Remember me
-      </label>
-
-      <a class="fr" href="/forgotpassword">Forgot password?</a>
-    </div>
-
-    <div class="clear_medium"></div>
-    <div class="fr">
-      <button class="btn btn-primary" type="submit">Login</button>
-    </div>
-  </form>
+  <div class="loginBlockWrapper">
+    <%- include './users/login_block.ect' %>
+    <%- include './users/forgot_password.ect' %>
+  </div>
 </div>
 

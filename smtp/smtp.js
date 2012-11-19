@@ -87,7 +87,7 @@ exports.regPropose = function(user, contact, link, fn) {
   });
 };
 
-exports.passwordSend = function(req, res, next, user) {
+exports.passwordSend = function(req, res, user, next) {
   var email = user.email
     , msg = '<html>Your registration info for <a href="' + cfg.DOMAIN + '">' + cfg.DOMAIN + '</a> is<br>login: ' +
   email +'<br>password: ' +
@@ -102,12 +102,6 @@ exports.passwordSend = function(req, res, next, user) {
       alternative:true
     }]
   }, function(err, message) {
-    if(err) {
-      req.flash('error', 'Can not send confirmation to ' + email);
-      return res.redirect('/forgotpassword');
-    } else {
-      req.flash('message', 'Password successfuly sent to email: ' + email);
-      return res.redirect('/checkmail');
-    }
+    next(err, message);
   });
 };

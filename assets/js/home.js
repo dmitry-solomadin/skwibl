@@ -2,9 +2,26 @@
 (function() {
 
   $(function() {
-    var home;
-    home = {
-      showLogin: function() {
+    var Home;
+    Home = (function() {
+
+      function Home() {
+        var _this = this;
+        $("#forgotpasswordlink").click(function() {
+          return _this.showForgotPassword();
+        });
+        $("#backToLogin").click(function() {
+          return _this.hideForgotPassword();
+        });
+        $("#submitForgotPassword").click(function() {
+          return _this.submitForgotPassword();
+        });
+        $("#loginForm").data("process-submit", function(data) {
+          return _this.processLogin(data);
+        });
+      }
+
+      Home.prototype.showLogin = function() {
         $("#loginBlock").css({
           position: 'absolute',
           top: $("#header").height() + 5,
@@ -19,22 +36,55 @@
           return $("#loginBlock").fadeOut();
         });
         return false;
-      },
-      initLogin: function() {
-        return $("#loginForm").data("process-submit", function(data) {
-          return home.processLogin(data);
+      };
+
+      Home.prototype.showForgotPassword = function() {
+        $(".loginBlockWrapper > form:first").animate({
+          left: -300
         });
-      },
-      processLogin: function(data) {
+        return $(".loginBlockWrapper > form:last").animate({
+          left: -300
+        });
+      };
+
+      Home.prototype.hideForgotPassword = function() {
+        $(".loginBlockWrapper > form:first").animate({
+          left: 0
+        });
+        return $(".loginBlockWrapper > form:last").animate({
+          left: 0
+        });
+      };
+
+      Home.prototype.submitForgotPassword = function() {
+        var email;
+        email = $("#forgotPasswordEmail").val();
+        $("#forgotPasswordError").html("");
+        return $.post('/forgotpassword', {
+          email: email
+        }, function(data, status, xhr) {
+          if (data) {
+            $("#forgotPasswordError")[0].className = "textSuccess";
+            return $("#forgotPasswordError").html("New password has been sent to this email.");
+          } else {
+            $("#forgotPasswordError")[0].className = "textError";
+            return $("#forgotPasswordError").html("We don't have this email.");
+          }
+        });
+      };
+
+      Home.prototype.processLogin = function(data) {
         if (data === "OK") {
           return window.location = "/";
         } else {
           return $("#loginError").show().html(data.message);
         }
-      }
-    };
-    home.initLogin();
-    return App.Home = home;
+      };
+
+      return Home;
+
+    })();
+    return App.Home = new Home;
   });
 
 }).call(this);

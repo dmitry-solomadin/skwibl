@@ -17,14 +17,9 @@ exports.configure = function(app, passport) {
   app.get('/tour/:chapter?', ctrls.tour);
 
  /*
-  * restore user password
-  */
-  app.get('/forgotpassword', ctrls.support.forgotPassword);
-
- /*
   * post mail for password recovery
   */
-  app.post('/forgotpassword', ctrls.support.recoverPassword);
+  app.post('/forgotpassword', ctrls.support.passwordRecovery);
 
  /*
   * check mail

@@ -30,7 +30,6 @@
       Projects.prototype.showInviteModal = function(pid) {
         return $.get("/projects/" + pid + "/participants", function(data) {
           $('#inviteModal').find(".pid").val(pid);
-          console.log(data);
           $('#inviteModal').find("#projectParticipants").html(data);
           return $('#inviteModal').modal('show');
         });

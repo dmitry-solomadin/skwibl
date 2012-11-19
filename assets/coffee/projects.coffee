@@ -16,7 +16,6 @@ $ ->
     showInviteModal: (pid) ->
       $.get "/projects/#{pid}/participants", (data) ->
         $('#inviteModal').find(".pid").val(pid)
-        console.log data
         $('#inviteModal').find("#projectParticipants").html(data)
         $('#inviteModal').modal('show')
 
