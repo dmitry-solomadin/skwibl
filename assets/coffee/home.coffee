@@ -31,7 +31,8 @@ $ ->
 
     submitForgotPassword: ->
       email = $("#forgotPasswordEmail").val()
-      $("#forgotPasswordError").html("")
+      $("#forgotPasswordError")[0].className = ""
+      $("#forgotPasswordError").html("Sending...")
       $.post '/forgotpassword', {email: email}, (data, status, xhr) ->
         if data
           $("#forgotPasswordError")[0].className = "textSuccess"
@@ -41,7 +42,12 @@ $ ->
           $("#forgotPasswordError").html("We don't have this email.")
 
     processLogin: (data) ->
-      if data == "OK" then window.location = "/" else $("#loginError").show().html(data.message)
+      $("#loginError").html("")
+      if data == "OK"
+        window.location = "/"
+      else
+        $("#loginError")[0].className = "textError"
+        $("#loginError").html(data.message)
 
   App.Home = new Home
 

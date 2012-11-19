@@ -29,7 +29,6 @@ $ ->
     @val("")
     value
 
-
   $.fn.drags = (opt) ->
     opt = $.extend({cursor:"move"}, opt)
 

@@ -59,7 +59,8 @@
       Home.prototype.submitForgotPassword = function() {
         var email;
         email = $("#forgotPasswordEmail").val();
-        $("#forgotPasswordError").html("");
+        $("#forgotPasswordError")[0].className = "";
+        $("#forgotPasswordError").html("Sending...");
         return $.post('/forgotpassword', {
           email: email
         }, function(data, status, xhr) {
@@ -74,10 +75,12 @@
       };
 
       Home.prototype.processLogin = function(data) {
+        $("#loginError").html("");
         if (data === "OK") {
           return window.location = "/";
         } else {
-          return $("#loginError").show().html(data.message);
+          $("#loginError")[0].className = "textError";
+          return $("#loginError").html(data.message);
         }
       };
 
