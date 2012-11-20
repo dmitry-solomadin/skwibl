@@ -35,21 +35,28 @@
         });
       };
 
-      Projects.prototype.inviteById = function() {
-        var pid, uid;
+      Projects.prototype.invite = function() {
+        var email, pid;
         $("#inviteError").html("");
-        uid = $("#inviteIdInput").valc();
+        email = $("#inviteEmailInput").valc();
         pid = $("#inviteModal").find(".pid").val();
         return $.post('/projects/invite', {
-          uid: uid,
+          email: email,
           pid: pid
         }, function(data, status, xhr) {
-          if (data) {
-            $("#inviteError")[0].className = "textSuccess";
-            return $("#inviteError").html("Invitation has been sent.");
-          } else {
+          if (!data || data.error) {
             $("#inviteError")[0].className = "textError";
-            return $("#inviteError").html("Unsuccessful");
+          } else {
+            $("#inviteError")[0].className = "textSuccess";
+          }
+          if (data) {
+            if (data.error) {
+              return $("#inviteError").html(data.msg);
+            } else {
+              return $("#inviteError").html("Invitation has been sent.");
+            }
+          } else {
+            return $("#inviteError").html("Unsuccessful.");
           }
         });
       };

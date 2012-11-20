@@ -125,16 +125,17 @@ exports.setUp = function(client, db) {
     return client.hmset('projects:' + pid, purifiedProp, fn);
   };
 
-  mod.invite = function(pid, id, uid, fn) {
-    if(uid === id) {
-      return tools.asyncOpt(fn, new Error('Can not invite yourself'));
+  mod.invite = function(pid, id, user, fn) {
+    if(user.id === id) {
+      return tools.asyncOptError(fn, 'Cannot invite yourself');
     }
     //Check if user exists
-    return client.exists('users:' + uid, function(err, val) {
+    return client.exists('users:' + user.id, function(err, val) {
       if(!err && val) {
-        client.sadd('projects:' + pid + ':unconfirmed', uid);
-        //TODO Send invitation to user
-        db.activities.add(pid, uid, 'projectInvite', id);
+        client.sadd('projects:' + pid + ':unconfirmed', user.id);
+        //TODO Send invitation to user. || sockets
+        db.activities.add(pid, user.id, 'projectInvite', id);
+        return tools.asyncOpt(fn, null, user);
       }
 
       if (!val) {
@@ -149,8 +150,18 @@ exports.setUp = function(client, db) {
     //TODO
   };
 
-  mod.inviteEmail = function(pid, email, fn) {
-    //TODO
+  mod.inviteEmail = function(pid, id, email, fn) {
+    db.users.findByEmail(email, function(err, user){
+      if (err) {
+        return tools.asyncOpt(fn, err);
+      }
+
+      if (!user){
+        return tools.asyncOptError(fn, "User with this email is not found");
+      }
+
+      return mod.invite(pid, id, user, fn);
+    })
   };
 
   mod.inviteLink = function(pid, fn) {

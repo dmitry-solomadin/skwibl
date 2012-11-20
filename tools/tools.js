@@ -127,6 +127,17 @@ exports.asyncOpt = function (fn, err, val) {
   }
 };
 
+exports.asyncOptError = function (fn, msg, val) {
+  if (fn) {
+    return process.nextTick(function () {
+      fn({
+        error: true,
+        msg: msg
+      }, val);
+    });
+  }
+};
+
 exports.asyncOrdered = function (array, index, fn, done) {
   index = index || 0;
   if (index === array.length) {
@@ -187,4 +198,14 @@ exports.addError = function (req, text, id) {
   });
 
   req.flash("objectErrors", errors)
+};
+
+exports.sendError = function (res, err) {
+  if (err) {
+    if (err.error) {
+      return res.send(err);
+    } else {
+      return res.send(false);
+    }
+  }
 };

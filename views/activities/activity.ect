@@ -1,5 +1,4 @@
 <% if @activity.type is 'projectInvite' : %>
-<% console.log @activity %>
 <div id="activity<%= @activity.id %>" class="activity">
   <h4>
     <span class="label <%- 'label-info' if @activity.status is 'new' %>"><%= @activity.status %></span>

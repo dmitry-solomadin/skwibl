@@ -68,18 +68,21 @@ exports.add = function (req, res) {
 
   db.projects.add(req.user.id, req.body.name, function (err, project) {
     if (!err) {
-      req.flash("message", "Project was created");
+      if (req.body.inviteeEmails) {
+        return db.projects.inviteEmail(project.id, req.user.id, req.body.inviteeEmails, function (err, user) {
+          if (err) {
+            req.flash("warning", "Project was created but there was some problems with sending invites.");
+          } else {
+            req.flash("message", "Project was created invites were sent.");
+          }
 
-      if (req.body.invteeId) {
-        db.projects.invite(project.id, req.user.id, req.body.invteeId, function (err) {
-          req.flash("message", "Project was created invites are sent.");
           return res.redirect("/projects");
         });
       }
 
+      req.flash("message", "Project was created");
       return res.redirect("/projects");
     }
-
 
     return res.redirect("/projects/new");
   });
@@ -125,26 +128,20 @@ exports.delete = function (req, res) {
  */
 exports.invite = function (req, res) {
   var data = req.body;
-  db.projects.invite(data.pid, req.user.id, data.uid, function (err) {
-    if (err) {
-      res.send(false);
+  db.projects.inviteEmail(data.pid, req.user.id, data.email, function (err, user) {
+    if (err || !user) {
+      return tools.sendError(res, err);
     }
 
-    return db.users.findById(data.uid, function(err, user) {
-      if(err) {
-        res.send(false);
-      }
+    return db.users.persist(user, function () {
+      db.projects.getData(data.pid, function (err, project) {
+        if (!err) {
+          return res.send(true);
+        }
 
-      return db.users.persist(user, function(){
-        db.projects.getData(data.pid, function (err, project) {
-          if (!err) {
-            return res.send(true);
-          }
-          res.send(false);
-        });
+        return res.send(false);
       });
     });
-
   });
 };
 
@@ -173,17 +170,6 @@ exports.inviteSocial = function (req, res) {
     tools.returnStatus(err, res);
   });
 };
-
-/*
- * POST
- * Invite user to project by email
- */
-exports.inviteEmail = function (req, res) {
-  var data = req.body;
-  db.projects.inviteEmail(data.pid, data.email, function (err) {
-    tools.returnStatus(err, res);
-  });
-}
 
 /*
  * POST

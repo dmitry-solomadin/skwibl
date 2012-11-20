@@ -19,17 +19,20 @@ $ ->
         $('#inviteModal').find("#projectParticipants").html(data)
         $('#inviteModal').modal('show')
 
-    inviteById: ->
+    invite: ->
       $("#inviteError").html("")
-      uid = $("#inviteIdInput").valc()
+      email = $("#inviteEmailInput").valc()
       pid = $("#inviteModal").find(".pid").val()
-      $.post '/projects/invite', {uid: uid, pid: pid}, (data, status, xhr) ->
+      $.post '/projects/invite', {email: email, pid: pid}, (data, status, xhr) ->
+        if not data or data.error then $("#inviteError")[0].className = "textError" else $("#inviteError")[0].className = "textSuccess"
+
         if data
-          $("#inviteError")[0].className = "textSuccess"
-          $("#inviteError").html("Invitation has been sent.")
+          if data.error
+            $("#inviteError").html(data.msg)
+          else
+            $("#inviteError").html("Invitation has been sent.")
         else
-          $("#inviteError")[0].className = "textError"
-          $("#inviteError").html("Unsuccessful")
+          $("#inviteError").html("Unsuccessful.")
 
     removeUserFromProject: (uid) ->
       pid = $("#inviteModal").find(".pid").val()

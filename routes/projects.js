@@ -22,8 +22,6 @@ exports.configure = function(app, passport) {
 
   app.post('/projects/invitesocial', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.projects.inviteSocial);
 
-  app.post('/projects/inviteemail', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.projects.inviteEmail);
-
 //  /*
 //   * invite user to a project by link
 //   */
