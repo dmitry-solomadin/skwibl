@@ -22,7 +22,7 @@ exports.setUp = function(client, db) {
       if(!err && array && array.length) {
         var projects = [];
         return tools.asyncParallel(array, function(left, pid) {
-          return db.projects.getData(pid, id, function(err, project) {
+          return db.projects.getData(pid, function(err, project) {
             if(!err && project) {
               projects.push(project);
               return tools.asyncDone(left, function() {
@@ -37,7 +37,7 @@ exports.setUp = function(client, db) {
     });
   };
 
-  mod.getData = function(pid, id, fn) {
+  mod.getData = function(pid, fn) {
     client.hgetall('projects:' + pid, function(err, project) {
       if(!err && project) {
         return db.projects.getUsers(pid, function(err, array) {

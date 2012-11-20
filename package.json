@@ -37,7 +37,8 @@
     "hiredis": "*",
     "redis": "0.7.2",
     "underscore": "*",
-    "coffee-script": "*"
+    "coffee-script": "*",
+    "moment": "*"
   },
   "devDependencies": {
     "node-inspector": "0.2.x"

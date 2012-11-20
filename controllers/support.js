@@ -38,7 +38,7 @@ exports.passwordRecovery = function(req, res) {
  * Check mail page
  */
 exports.checkMail = function(req, res) {
-  res.render('/users/check_mail', {
+  res.render('./users/check_mail', {
     message: req.flash('message')
   });
 };

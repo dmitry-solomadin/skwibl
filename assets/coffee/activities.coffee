@@ -5,20 +5,12 @@ $ ->
       @uid = $("#uid").val()
 
     accept: (aid) ->
-      console.log('accept invitation')
-      $.post '/projects/confirm', {
-      aid: aid, answer: true
-      }, (data, status, xhr) ->
-        if status == 'success'
-          console.log('accepted')
+      $.post '/projects/confirm', {aid: aid, answer: true}, (data, status, xhr) ->
+        $("#activity#{aid}").replaceWith(data) if data
 
     decline: (aid) ->
-      console.log('decline invitation')
-      $.post '/projects/confirm', {
-      aid: aid, answer: false
-      }, (data, status, xhr) ->
-        if status == 'success'
-          console.log('declined')
+      $.post '/projects/confirm', {aid: aid, answer: false}, (data, status, xhr) ->
+        $("#activity#{aid}").replaceWith(data) if data
 
   App.activities = new Activities
 

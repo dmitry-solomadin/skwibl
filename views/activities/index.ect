@@ -2,25 +2,8 @@
 
 <% if @activities.length : %>
   <div id="activities">
-    <% for activity in @activities : %>
-      <% if activity.type is 'projectInvite' : %>
-        <div class="activity">
-          <h4>
-            <span class="label <%- 'label-info' unless activity.status is 'accepted' %>"><%= activity.status %></span>
-            Invite to project
-            <span class="datetext">10/10/2012</span>
-          </h4>
-
-          <div class="activityText">
-          -somebody- invites you to the -project-
-          </div>
-
-          <% if activity.status != 'accepted' : %>
-            <button class="btn btn-small btn-success" name="accept" onclick="App.activities.accept('<%= activity.id %>')">Accept</button>
-            <button class="btn btn-small btn-danger" name="decline" onclick="App.activities.decline('<%= activity.id %>')">Decline</button>
-          <% end %>
-        </div>
-      <% end %>
+    <% for @activity in @activities : %>
+      <%- include './activities/activity.ect' %>
     <% end %>
   </div>
 <% else : %>

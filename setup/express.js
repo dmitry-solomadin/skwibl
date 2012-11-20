@@ -15,6 +15,7 @@ var routes = require('../routes')
   , cfg = require('../config');
 
 var passportUp = require('./passport');
+var moment = require('moment');
 
 exports.setUp = function() {
 
@@ -78,6 +79,8 @@ exports.setUp = function() {
   for (method in helpers.application_helper) {
     app.locals[method] = helpers.application_helper[method];
   }
+
+  app.locals.moment = moment;
 
   routes.configure(app, passport);
 

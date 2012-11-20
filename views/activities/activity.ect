@@ -1,0 +1,21 @@
+<% if @activity.type is 'projectInvite' : %>
+<% console.log @activity %>
+<div id="activity<%= @activity.id %>" class="activity">
+  <h4>
+    <span class="label <%- 'label-info' if @activity.status is 'new' %>"><%= @activity.status %></span>
+    Invite to project
+    <span class="datetext">
+      <%= @moment(parseFloat(@activity.time)).format("DD-MM-YYYY HH:mm") %>
+    </span>
+  </h4>
+
+  <div class="activityText">
+    <%= @activity.inviting.displayName %> invites you to the <b><%= @activity.project.name %></b>
+  </div>
+
+  <% if @activity.status is 'new' : %>
+  <button class="btn btn-small btn-success" name="accept" onclick="App.activities.accept('<%= @activity.id %>')">Accept</button>
+  <button class="btn btn-small btn-danger" name="decline" onclick="App.activities.decline('<%= @activity.id %>')">Decline</button>
+  <% end %>
+</div>
+<% end %>

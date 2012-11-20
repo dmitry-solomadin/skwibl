@@ -33,7 +33,7 @@ exports.index = function (req, res, next) {
  */
 exports.show = function (req, res, next) {
   db.projects.set(req.user.id, req.params.pid, function () {
-    db.projects.getData(req.params.pid, req.user.id, function (err, project) {
+    db.projects.getData(req.params.pid, function (err, project) {
       if (!err) {
         return res.render('index', {
           template:"projects/show",
@@ -136,7 +136,7 @@ exports.invite = function (req, res) {
       }
 
       return db.users.persist(user, function(){
-        db.projects.getData(data.pid, data.uid, function (err, project) {
+        db.projects.getData(data.pid, function (err, project) {
           if (!err) {
             return res.send(true);
           }
@@ -153,7 +153,7 @@ exports.invite = function (req, res) {
  * show project participants
  */
 exports.participants = function (req, res) {
-  db.projects.getData(req.params.pid, req.user.id, function (err, project) {
+  db.projects.getData(req.params.pid, function (err, project) {
     if (!err) {
       return res.render("./projects/invite/participants.ect", {
         project: project
@@ -201,8 +201,20 @@ exports.inviteLink = function (req, res) {
  */
 exports.confirm = function (req, res) {
   var data = req.body;
-  db.projects.confirm(data.aid, req.user.id, data.answer, function (err) {
-    tools.returnStatus(err, res);
+  return db.projects.confirm(data.aid, req.user.id, data.answer, function (err) {
+    if (err) {
+      return res.send(true)
+    }
+
+    return db.activities.getDataActivity(data.aid, function (err, activity) {
+      if (err) {
+        return res.send(true)
+      }
+
+      return res.render("./activities/activity", {
+        activity:activity
+      });
+    });
   });
 };
 
