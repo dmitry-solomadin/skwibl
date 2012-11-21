@@ -21,9 +21,7 @@ var db = require('../db')
  */
 exports.mainPage = function(req, res) {
   if (req.user) {
-    return res.render('index', {
-      template:'users/show'
-    });
+    return res.redirect("/projects")
   }
 
   return res.render('index', {

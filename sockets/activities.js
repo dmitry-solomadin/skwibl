@@ -1,27 +1,24 @@
-/******************************************
- *               ACTIVITIES               *
- ******************************************/
+var db = require('../db')
 
-
-/**
- * Module dependencies.
- */
-
-
-
-exports.configure = function(sio) {
+exports.configure = function (sio) {
 
   var activities = sio.of('/activities');
 
-  activities.on('connection', function(socket) {
+  activities.on('connection', function (socket) {
 
-    var hs = socket.handshake;
-    console.log('A socket with sessionId '+hs.sessionId+' connected.');
+    var hs = socket.handshake,
+      id = hs.user.id;
 
-    socket.on('disconnect', function(){
-      console.log('A socket with sessionId ' + hs.sessionId + ' disconnected.');
+    socket.join("activities" + id);
+
+    db.activities.getAllNew(id, function (err, activities) {
+      socket.emit("init", activities.length);
+    });
+
+    socket.on('disconnect', function () {
+
     });
 
   });
 
-}
+};

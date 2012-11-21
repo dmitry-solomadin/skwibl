@@ -8,7 +8,8 @@
  */
 
 var tools = require('../tools')
-  , cfg = require('../config');
+  , cfg = require('../config')
+  , announce = require('socket.io-announce')({ namespace: '/activities' });
 
 exports.setUp = function (client, db) {
 
@@ -27,13 +28,21 @@ exports.setUp = function (client, db) {
         activity.inviting = invitingUserId;
         client.hmset('activities:' + val, activity);
         client.rpush('users:' + owner + ':activities', val);
+
+        announce.in("activities" + owner).emit('new');
         return tools.asyncOpt(fn, null, activity);
       }
       return tools.asyncOpt(fn, err, null);
     });
   };
 
-  mod.get = function (id, fn) {
+  mod.getAllNew = function (id, fn) {
+    mod.get(id, fn, function (activity) {
+      return activity.status == "new";
+    })
+  };
+
+  mod.get = function (id, fn, filter) {
     client.lrange('users:' + id + ':activities', -cfg.ACTIONS_BUFFER_SIZE, -1, function (err, array) {
       if (!err && array && array.length) {
         var activities = [];
@@ -42,7 +51,15 @@ exports.setUp = function (client, db) {
             if (err) {
               return tools.asyncOpt(fn, err, []);
             }
-            activities.push(activity);
+
+            if (filter) {
+              if (filter(activity)) {
+                activities.push(activity);
+              }
+            } else {
+              activities.push(activity);
+            }
+
             return tools.asyncDone(left, function () {
               return tools.asyncOpt(fn, null, activities);
             });

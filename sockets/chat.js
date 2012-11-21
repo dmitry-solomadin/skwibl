@@ -38,7 +38,7 @@ exports.configure = function(sio) {
 
   chat.on('connection', function(socket) {
 
-    var hs = socket.handshake
+    var hs = socket.handshake,
         id = hs.user.id;
 
     db.projects.current(id, function(err, project) {

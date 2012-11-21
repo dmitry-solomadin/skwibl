@@ -38,7 +38,8 @@
     "redis": "0.7.2",
     "underscore": "*",
     "coffee-script": "*",
-    "moment": "*"
+    "moment": "*",
+    "socket.io-announce": "*"
   },
   "devDependencies": {
     "node-inspector": "0.2.x"
