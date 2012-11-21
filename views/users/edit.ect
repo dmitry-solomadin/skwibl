@@ -25,6 +25,16 @@
         <input type="password" class="input-xlarge" name="user[password]" id="registerpassword"
                placeholder="Change password" autocomplete="off">
       </div>
+
+      <label class="control-label" >Profile picture</label>
+
+      <div class="controls">
+        <% if user.picture: %>
+          <img src="<%= user.picture %>"/>
+        <% end %>
+        <a class="btn">Upload</a>
+        <a class="btn">Update from facebook</a>
+      </div>
     </div>
     <div class="control-group">
       <div class="controls">

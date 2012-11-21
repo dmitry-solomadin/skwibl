@@ -131,6 +131,24 @@ input.error {
     position: relative;
 }
 
+.userDropdown {
+    padding: 3px 0 !important;
+}
+
+.userDropdown img {
+    float:left;
+    width: 32px;
+    height: 32px;
+}
+
+.userDropdown div {
+    float: left;
+    vertical-align: top;
+    margin-left: 5px;
+    padding-top: 6px;
+    padding-bottom: 8px;
+}
+
 /* ROOM STYLES START */
 
 .color {

@@ -22,49 +22,25 @@
       <% end %>
 
       <% if @currentUser() : %>
-      <% if @room : %>
-      <ul class="nav pull-right">
-        <li class="dropdown ">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="icon-user"></i> <%= @currentUser().displayName %>
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu">
-            <li><a href="/users/<%= @currentUser().id %>/edit">Edit Profile</a></li>
-            <li class="divider"></li>
-            <li><a href="/logout">Sign Out</a></li>
+        <% if @room : %>
+          <%- include './header/user_dropdown.ect' %>
+        <% else : %>
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li class="activityLi"><a href="/activities">Activities</a></li>
+            <li class="activity-badge-wrapper"><span id="activityBadge" class="badge activity-badge">0</span></li>
+            <li><a href="/projects">Projects</a></li>
+            <li><a href="#contact">Contacts</a></li>
+            <li><a href="/files" data-remote="true">Files</a></li>
           </ul>
-        </li>
-      </ul>
-      <% else : %>
-      <div class="nav-collapse">
-        <ul class="nav">
-          <li class="activityLi"><a href="/activities">Activities</a></li>
-          <li class="activity-badge-wrapper"><span id="activityBadge" class="badge activity-badge">0</span></li>
-          <li><a href="/projects">Projects</a></li>
-          <li><a href="#contact">Contacts</a></li>
-          <li><a href="/files" data-remote="true">Files</a></li>
-        </ul>
 
-        <a href="/projects/new">
-          <button class="btn">Create a Project</button>
-        </a>
+          <a href="/projects/new">
+            <button class="btn">Create a Project</button>
+          </a>
 
-        <ul class="nav pull-right">
-          <li class="dropdown ">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-              <i class="icon-user"></i> <%= @currentUser().displayName %>
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li><a href="/users/<%= @currentUser().id %>/edit">Edit Profile</a></li>
-              <li class="divider"></li>
-              <li><a href="/logout">Sign Out</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-      <% end %>
+          <%- include './header/user_dropdown.ect' %>
+        </div>
+        <% end %>
       <% end %>
     </div>
   </div>

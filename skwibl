@@ -56,7 +56,7 @@ USAGE="Usage: $0 -b -c -d -e -i -p -r -s -u -h \n\n
 ## patch procedure
 function patch {
   echo "patching"
-  cp -Rfu $PATCHES_DIR/* $MODULES_DIR
+  cp -Rf $PATCHES_DIR/* $MODULES_DIR
 }
 
 ## check if coffee is installed
