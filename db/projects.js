@@ -11,7 +11,9 @@ var fs = require('fs')
   , _ = require('underscore');
 
 var tools = require('../tools')
-    cfg = require('../config');
+  , cfg = require('../config');
+
+var smtp = require('../smtp');
 
 exports.setUp = function(client, db) {
 
@@ -133,7 +135,6 @@ exports.setUp = function(client, db) {
     return client.exists('users:' + user.id, function(err, val) {
       if(!err && val) {
         client.sadd('projects:' + pid + ':unconfirmed', user.id);
-        //TODO Send invitation to user. || sockets
         db.activities.add(pid, user.id, 'projectInvite', id);
         return tools.asyncOpt(fn, null, user);
       }
@@ -157,7 +158,35 @@ exports.setUp = function(client, db) {
       }
 
       if (!user){
-        return tools.asyncOptError(fn, "User with this email is not found");
+        var hash = tools.hash(email)
+          , password = tools.genPass();
+        return db.users.add({
+          hash:hash,
+          password:password,
+          status:'unconfirmed',
+          provider:'local'
+        }, null, [
+          {
+            value:email,
+            type:'main'
+          }
+        ], function (err, contact) {
+          if (err) {
+            return process.nextTick(function () {
+              fn(err);
+            });
+          }
+          if (!contact) {
+            return process.nextTick(function () {
+              fn(new Error('Can not create user.'));
+            });
+          }
+          client.sadd('users:' + id + ':unconfirmed', contact.id);
+          client.sadd('users:' + contact.id + ':requests', id);
+          return db.users.findById(id, function (err, user) {
+            return smtp.regPropose(user, contact, hash, fn);
+          });
+        });
       }
 
       return mod.invite(pid, id, user, fn);

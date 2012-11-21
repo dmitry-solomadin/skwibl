@@ -30,7 +30,7 @@ $ ->
           if data.error
             $("#inviteError").html(data.msg)
           else
-            $("#inviteError").html("Invitation has been sent.")
+            $("#inviteError").html(data.msg)
         else
           $("#inviteError").html("Unsuccessful.")
 

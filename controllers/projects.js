@@ -129,14 +129,18 @@ exports.delete = function (req, res) {
 exports.invite = function (req, res) {
   var data = req.body;
   db.projects.inviteEmail(data.pid, req.user.id, data.email, function (err, user) {
-    if (err || !user) {
+    if (err) {
       return tools.sendError(res, err);
+    }
+
+    if (!user) {
+      return res.send({msg: "We have not found the user in our database, but the invitation was sent to his email."})
     }
 
     return db.users.persist(user, function () {
       db.projects.getData(data.pid, function (err, project) {
         if (!err) {
-          return res.send(true);
+          return res.send({msg: "Invitation has been sent."});
         }
 
         return res.send(false);
