@@ -73,7 +73,7 @@ exports.setUp = function(client, db) {
     // Get contacts list
     client.smembers('users:' + id + ':contacts', function(err, array) {
       if(!err) {
-        val.forEach(function(cid) {
+        array.forEach(function(cid) {
           // Add user from contacts' lists
           client.sadd('users:' + cid + ':contacts');
         });
@@ -82,7 +82,7 @@ exports.setUp = function(client, db) {
     // Get unconfirmed contacts list
     client.smembers('users:' + id + 'unconfirmed', function(err, array) {
       if(!err) {
-        val.forEach(function(cid) {
+        array.forEach(function(cid) {
           // Add user from contacts' requests
           client.sadd('users:' + cid + ':requests');
         });
@@ -148,7 +148,7 @@ exports.setUp = function(client, db) {
   mod.findByEmail = function(email, fn) {
     client.get('emails:' + email + ':uid', function(err, val) {
       if(err) {
-        return tools.asyncOpt(fn, null, null);
+        return tools.asyncOpt(fn, err, null);
       }
       return db.users.findById(val, fn);
     });
@@ -160,11 +160,11 @@ exports.setUp = function(client, db) {
         for(var i = 0, len = array.length; i < len; i++) {
           var id = array[i];
           if(id) {
-            return db.users.findById(id, fn)
+            return db.users.findById(id, fn);
           }
         }
       }
-      return tools.asyncOpt(fn, null, null);
+      return tools.asyncOpt(fn, err, null);
     });
   };
 

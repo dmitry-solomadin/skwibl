@@ -15,20 +15,48 @@ exports.setUp = function(client, db) {
 
   var mod = {};
 
-  mod.add = function(owner, pid, name, mime, fn) {
+  mod.add = function(owner, cid, pid, name, mime, fn) {
     return client.incr('files:next', function(err, val) {
       if(!err) {
-        var file = {
-          id: val + ''
-        , name: name
-        , mime: mime
-        , owner: owner
-        , project: pid
+        if(cid) {
+          var file = {
+            elementId: val
+          , name: name
+          , mime: mime
+          , owner: owner
+          };
+          client.hmset('files:' + val, file);
+          db.canvases.setProperties('canvases:' + cid, {
+            file: val
+          });
+          client.sadd('projects:' + pid + ':files', val);
+          return tools.asyncOpt(fn, null, {
+            canvasId: cid
+          , element: file
+          });
         }
-
-        client.hmset('files:' + val, file);
-        client.sadd('projects:' + pid + ':files', val);
-        return tools.asyncOpt(fn, null, file);
+        client.incr('canvases:next', function(err, cid) {
+          if(!err) {
+            var file = {
+              elementId: val
+            , name: name
+            , mime: mime
+            , owner: owner
+            };
+            client.hmset('files:' + val, file);
+            client.sadd('projects:' + pid + ':files', val);
+            var time;
+            if(tools.getFileType(mime) === 'video') {
+              time = 0;//file beginning
+            }
+            db.canvases.add(pid, val, time);
+            return tools.asyncOpt(fn, null, {
+              canvasId: cid
+            , element: file
+            });
+          }
+          return tools.asyncOpt(fn, err, null);
+        });
       }
       return tools.asyncOpt(fn, err, null);
     });

@@ -123,12 +123,12 @@ exports.upload = function(req, res, next) {
     req.on('end', function() {
 //      ws.destroySoon();
       console.log('end');
-      return db.files.add(req.user.id, pid, name, mime, function(err, file) {
+      return db.files.add(req.user.id, pid, name, mime, function(err, data) {
         console.log('here');
         return res.json({
           success: true
-        , id: file.id
-        , name: name
+        , canvasId: data.canvasId
+        , element: data.element
         });
       });
     });

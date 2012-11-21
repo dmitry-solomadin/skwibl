@@ -32,7 +32,12 @@ exports.emailUid = function (x) {
   return 'emails:' + x + ':uid';
 };
 
-exports.hash = function (email) {
+
+exports.commentText = function(x) {
+  return "texts:" + x;
+};
+
+exports.hash = function(email) {
   var hash = crypto.createHash('md5');
   hash.update(new Date + email, 'ascii');
   return hash.digest('hex');

@@ -64,6 +64,10 @@ exports.setUp = function(server) {
 
   sockets.configure(sio);
 
+  process.on('uncaughtException', function(err) {
+    console.log(err);
+  });
+
 };
 
 exports.start = function(){
