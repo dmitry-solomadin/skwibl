@@ -53,7 +53,7 @@
             if (data.error) {
               return $("#inviteError").html(data.msg);
             } else {
-              return $("#inviteError").html("Invitation has been sent.");
+              return $("#inviteError").html(data.msg);
             }
           } else {
             return $("#inviteError").html("Unsuccessful.");
