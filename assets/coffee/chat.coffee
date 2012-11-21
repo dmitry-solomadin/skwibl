@@ -12,7 +12,7 @@ $ ->
       $("#canvasFooter").animate(paddingLeft: 0)
       $(".canvasFooterInner").animate({width: $(window).width()}, -> $(".canvasFooterInner").css(width: "100%"))
 
-      $(link).attr("onclick", "App.chat.unfold(this); return false;").html(">>")
+      $(link).attr("onclick", "App.chat.unfold(this); return false;").find("img").attr("src", "/images/room/unfold.png")
 
     unfold: (link) ->
       $("#chat").animate(left: 0)
@@ -21,7 +21,7 @@ $ ->
       $("#canvasFooter").animate(paddingLeft: 300)
       $(".canvasFooterInner").animate({width: $(window).width() - 300}, -> $(".canvasFooterInner").css(width: "100%"))
 
-      $(link).attr("onclick", "App.chat.fold(this); return false;").html("<<")
+      $(link).attr("onclick", "App.chat.fold(this); return false;").find("img").attr("src", "/images/room/fold.png")
 
     getUserById: (id) ->
       for user in @users

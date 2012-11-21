@@ -30,7 +30,7 @@
             width: "100%"
           });
         });
-        return $(link).attr("onclick", "App.chat.unfold(this); return false;").html(">>");
+        return $(link).attr("onclick", "App.chat.unfold(this); return false;").find("img").attr("src", "/images/room/unfold.png");
       };
 
       Chat.prototype.unfold = function(link) {
@@ -51,7 +51,7 @@
             width: "100%"
           });
         });
-        return $(link).attr("onclick", "App.chat.fold(this); return false;").html("<<");
+        return $(link).attr("onclick", "App.chat.fold(this); return false;").find("img").attr("src", "/images/room/fold.png");
       };
 
       Chat.prototype.getUserById = function(id) {
