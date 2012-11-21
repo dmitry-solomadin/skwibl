@@ -3,7 +3,7 @@ tools = require '../tools'
 
 exports.setUp = (client, db) ->
 
-  var mod = {};
+  mod = {}
 
   mod.isMember = (id, pid, fn) ->
     client.sismember "projects:#{pid}:users", id, fn
@@ -23,4 +23,4 @@ exports.setUp = (client, db) ->
         return tools.asyncOpt fn, null, yes
       return tools.asyncOpt fn, err, no
 
-  return mod;
+  return mod

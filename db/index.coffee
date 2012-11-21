@@ -2,7 +2,6 @@ redis = require 'redis'
 
 tools = require '../tools'
 
-module
 client = redis.createClient()
 
 client.on "error", (err) ->
