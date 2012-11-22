@@ -2,10 +2,10 @@
 
 
 ## dynamic server
-DYN='app.js'
+DYN='app.coffee'
 
 ## socket server
-SOC='server.js'
+SOC='server.coffee'
 
 ## coffee executable
 COFFEE='node_modules/coffee-script/bin/coffee'
@@ -34,6 +34,9 @@ TMP_TEMPLATE='~'
 ## node execution command
 NODE_CMD='node --nouse-idle-notification --expose-gc'
 
+## coffee execution command
+COFFEE_OPT='--nodejs "--nouse-idle-notification --expose-gc"'
+
 ## node debug command for dynamic server
 DEBUG_CMD='node --debug $DYN & node-inspector &'
 
@@ -41,7 +44,8 @@ DEBUG_CMD='node --debug $DYN & node-inspector &'
 FLUSH_REDIS_CMD='redis-cli flushall'
 
 ## usage string
-USAGE="Usage: $0 -b -c -d -e -i -p -r -s -u -h \n\n
+USAGE="Usage: $0 -a -b -c -d -e -i -p -r -s -u -h \n\n
+      -a Start dynamic server \n
       -b Build the project \n
       -c Clean the project auxiliary files \n
       -d Deploy the project \n
@@ -49,7 +53,7 @@ USAGE="Usage: $0 -b -c -d -e -i -p -r -s -u -h \n\n
       -i Init the project \n
       -p Run skwibl in production mode \n
       -r Reset the project \n
-      -s Start skwibl \n
+      -s Start socket server \n
       -u Update project dependencies \n\n
       -h This prompt \n"
 
@@ -97,10 +101,16 @@ function reset {
   patch
 }
 
-## start procedure
-function start {
-  echo "starting"
-  eval "$NODE_CMD $DYN & $NODE_CMD $SOC"
+## start dynamic server
+function startDyn {
+  echo "starting dynamic"
+  eval "$COFFEE $DYN $COFFEE_OPT"
+}
+
+## start socket server
+function startSocket {
+  echo "starting sockets"
+  eval "$COFFEE $SOC $COFFEE_OPT"
 }
 
 ## run in production procedure
@@ -137,8 +147,12 @@ function update {
 }
 
 ## options check and parse
-while getopts ":bcdeiprsuh" opt; do
+while getopts ":abcdeiprsuh" opt; do
   case "$opt" in
+    "a")
+      init
+      build
+      startDyn;;
     "b")
       build
       exit 0;;
@@ -169,9 +183,7 @@ while getopts ":bcdeiprsuh" opt; do
       fi
       exit 0;;
     "s")
-      init
-      build
-      start;;
+      startSocket;;
     "u")
       update
       exit 0;;

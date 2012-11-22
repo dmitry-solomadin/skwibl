@@ -57,8 +57,20 @@ exports.setUp = (client, db) ->
               return tools.asyncOpt fn, err, []
             if action.comment
               #TODO get comment texts
+              console.log 'TODO'
             actions.push action
             return tools.asyncDone left, ->
               return tools.asyncOpt fn, null, actions
+
+  mod.getComments = (eid, fn) ->
+    client.lrange "comments:#{eid}:texts", 0, -1, (err, array) ->
+      if not err and array and array.length
+        comments = []
+        return client.mget array.map(tools.commentText), fn
+
+  mod.updateComment = (data, fn) ->
+    client.set "texts:#{data.elementId}", data.text
+    client.rpush "comments:#{data.commentId}:texts", data.elementId
+    return tools.asyncOpt fn, null, data
 
   return mod
