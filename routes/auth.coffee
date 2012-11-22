@@ -14,7 +14,7 @@ exports.configure = (app, passport) ->
 
   app.get '/auth/google', ctrls.auth.google passport, ctrls.aux.empty
 
-  app.get '/auth/google/callback', ctrls.auth.googleCb passport, ctrls.auth.logIn
+  app.get '/auth/google/callback', ctrls.auth.googleCb(passport), ctrls.auth.logIn
 
   app.get '/connect/google', ctrls.auth.connectGoogle
 
@@ -22,7 +22,7 @@ exports.configure = (app, passport) ->
 
   app.get '/auth/facebook', ctrls.auth.facebook passport, ctrls.aux.empty
 
-  app.get '/auth/facebook/callback', ctrls.auth.facebookCb passport, ctrls.auth.logIn
+  app.get '/auth/facebook/callback', ctrls.auth.facebookCb(passport), ctrls.auth.logIn
 
   app.get '/connect/facebook', ctrls.auth.connectFacebook
 
@@ -30,7 +30,7 @@ exports.configure = (app, passport) ->
 
   app.get '/auth/linkedin', ctrls.auth.linkedin passport
 
-  app.get '/auth/linkedin/callback', ctrls.auth.linkedinCb passport, ctrls.auth.logIn
+  app.get '/auth/linkedin/callback', ctrls.auth.linkedinCb(passport), ctrls.auth.logIn
 
   app.get '/connect/linkedin', ctrls.auth.connectLinkedin
 

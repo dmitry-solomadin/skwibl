@@ -15,4 +15,4 @@ exports.configure = (app, passport) ->
   app.post '/files/update', ctrls.mid.isAuth, ctrls.files.update
 
   #TODO change to work with mid.isMember (be ready to listen req.data event understand how to use req.pause() properly)
-  app.post '/file/upload', ctrls.mid.isAuth, /*ctrls.mid.isMember,*/ ctrls.files.upload
+  app.post '/file/upload', ctrls.mid.isAuth, ctrls.files.upload
