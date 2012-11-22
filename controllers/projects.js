@@ -35,10 +35,16 @@ exports.show = function (req, res, next) {
   db.projects.set(req.user.id, req.params.pid, function () {
     db.projects.getData(req.params.pid, function (err, project) {
       if (!err) {
-        return res.render('index', {
-          template:"projects/show",
-          pid:req.params.pid,
-          project:project
+        return db.canvases.index(req.params.pid, function (canvases) {
+          if (!err) {
+            return res.render('index', {
+              template:"projects/show",
+              pid:req.params.pid,
+              canvases:canvases,
+              project:project
+            });
+          }
+          return next(err);
         });
       }
       return next(err);
@@ -134,13 +140,13 @@ exports.invite = function (req, res) {
     }
 
     if (!user) {
-      return res.send({msg: "We have not found the user in our database, but the invitation was sent to his email."})
+      return res.send({msg:"We have not found the user in our database, but the invitation was sent to his email."})
     }
 
     return db.users.persist(user, function () {
       db.projects.getData(data.pid, function (err, project) {
         if (!err) {
-          return res.send({msg: "Invitation has been sent."});
+          return res.send({msg:"Invitation has been sent."});
         }
 
         return res.send(false);
@@ -157,7 +163,7 @@ exports.participants = function (req, res) {
   db.projects.getData(req.params.pid, function (err, project) {
     if (!err) {
       return res.render("./projects/invite/participants.ect", {
-        project: project
+        project:project
       })
     }
     res.send(false);
@@ -216,11 +222,11 @@ exports.remove = function (req, res) {
   var data = req.body;
   if (req.user.id !== data.id) {
     return db.projects.remove(data.pid, data.id, function (err) {
-      if (err){
+      if (err) {
         return res.send(false);
       }
 
-      return res.send({uid: data.id});
+      return res.send({uid:data.id});
     });
   }
   return res.send(false);

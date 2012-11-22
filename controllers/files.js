@@ -82,6 +82,7 @@ exports.upload = function(req, res, next) {
   //TODO implement upload continue
   if(req.xhr){
     var pid = req.query.pid
+      , cid = req.query.cid
       , dir = './uploads/' +  pid
       , size = req.header('x-file-size')
       , name = path.basename(req.header('x-file-name'))
@@ -123,7 +124,7 @@ exports.upload = function(req, res, next) {
     req.on('end', function() {
 //      ws.destroySoon();
       console.log('end');
-      return db.files.add(req.user.id, pid, name, mime, function(err, data) {
+      return db.files.add(req.user.id, cid, pid, name, mime, function(err, data) {
         console.log('here');
         return res.json({
           success: true
@@ -148,7 +149,7 @@ exports.upload = function(req, res, next) {
     form.uploadDir = dir + '/' + type + '/';
     form.keepExtensions = true;
     form.parse(req, function(err, fields, files) {
-      return db.files.add(req.user.id, pid, name, mime, function(err, file) {
+      return db.files.add(req.user.id, cid, pid, name, mime, function(err, file) {
         return res.json({
           success: true
         , id: file.id

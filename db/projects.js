@@ -85,7 +85,12 @@ exports.setUp = function(client, db) {
         client.hmset('projects:' + val, project);
         client.sadd('projects:' + val + ':users', uid);
         client.sadd('users:' + uid + ':projects', val);
-        return tools.asyncOpt(fn, null, project);
+
+        return db.canvases.add(val, null, null, function () {
+          if (!err) {
+            return tools.asyncOpt(fn, null, project);
+          }
+        })
       }
       return tools.asyncOpt(fn, err, null);
     });
@@ -116,9 +121,14 @@ exports.setUp = function(client, db) {
     });
   };
 
+  mod.deleteCanvases = function(pid, fn) {
+    // todo TBD
+  };
+
   mod.delete = function(pid, fn) {
     db.projects.deleteUsers(pid);
     db.projects.deleteActions(pid, 'chat');
+    db.projects.deleteCanvases(pid);
     client.del('projects:' + pid, fn);
   };
 

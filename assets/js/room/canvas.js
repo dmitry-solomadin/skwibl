@@ -166,7 +166,11 @@
       };
 
       RoomCanvas.prototype.selectedThumbCanvasIndex = function() {
-        return $(".canvasSelected").index();
+        return this.getSelected.index();
+      };
+
+      RoomCanvas.prototype.getSelected = function() {
+        return $(".canvasSelected");
       };
 
       RoomCanvas.prototype.selectThumbByCanvasIndex = function(canvasIndex, emit) {

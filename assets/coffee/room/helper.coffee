@@ -21,6 +21,14 @@ $ ->
       $(document).bind 'keydown.shift_down', => room.items.translateSelected(new Point(0, 1))
 
     initUploader: ->
+      params =
+        pid: $("#pid").val()
+
+      # we only add cid for the first canvas.
+      params.cid = room.cavnas.getSelected().data("cid") unless opts.image
+
+      console.log params
+
       uploader = new qq.FileUploader
         element: $('#file-uploader')[0]
         action: '/file/upload'
@@ -29,8 +37,7 @@ $ ->
         multiple: true
         cancel: 'Cancel'
         debug: false
-        params:
-          pid: $("#pid").val()
+        params: params
         onSubmit: (id, fileName) =>
           $(uploader._listElement).css('dispaly', 'none')
         onComplete: (id, fileName, responseJSON) =>

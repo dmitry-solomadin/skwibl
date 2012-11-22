@@ -57,8 +57,15 @@
       };
 
       RoomHelper.prototype.initUploader = function() {
-        var uploader,
+        var params, uploader,
           _this = this;
+        params = {
+          pid: $("#pid").val()
+        };
+        if (!opts.image) {
+          params.cid = room.cavnas.getSelected().data("cid");
+        }
+        console.log(params);
         return uploader = new qq.FileUploader({
           element: $('#file-uploader')[0],
           action: '/file/upload',
@@ -67,9 +74,7 @@
           multiple: true,
           cancel: 'Cancel',
           debug: false,
-          params: {
-            pid: $("#pid").val()
-          },
+          params: params,
           onSubmit: function(id, fileName) {
             return $(uploader._listElement).css('dispaly', 'none');
           },

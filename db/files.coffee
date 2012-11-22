@@ -11,12 +11,12 @@ exports.setUp = (client, db) ->
     return client.incr 'files:next', (err, val) ->
       if not err
         if cid
-          file = {
+          file =
             elementId: val
             name: name
             mime: mime
             owner: owner
-          }
+
           client.hmset "files:#{val}", file
           db.canvases.setProperties "canvases:#{cid}", {
             file: val
@@ -26,6 +26,7 @@ exports.setUp = (client, db) ->
             canvasId: cid
             element: file
           }
+
         client.incr 'canvases:next', (err, cid) ->
           if not err
             file = {
@@ -36,9 +37,9 @@ exports.setUp = (client, db) ->
             }
             client.hmset "files:#{val}", file
             client.sadd "projects:#{pid}:files", val
-            time;
-            if tools.getFileType mime is 'video'
-              time = 0; # file beginning
+
+            time = 0 if tools.getFileType(mime) is 'video'
+
             db.canvases.add pid, val, time
             return tools.asyncOpt fn, null, {
               canvasId: cid

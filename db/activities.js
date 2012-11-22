@@ -26,7 +26,12 @@ exports.setUp = function (client, db) {
         activity.time = new Date().getTime();
         activity.status = 'new';
         activity.inviting = invitingUserId;
+
         client.hmset('activities:' + val, activity);
+
+        // for #103 and #99
+        // cliend.sadd("project:pid:invitedUsers", owner);
+
         client.rpush('users:' + owner + ':activities', val);
 
         announce.in("activities" + owner).emit('new');

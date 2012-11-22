@@ -115,7 +115,9 @@ $ ->
 
     updateSelectedThumb: -> @updateThumb @selectedThumbCanvasIndex()
 
-    selectedThumbCanvasIndex: -> $(".canvasSelected").index()
+    selectedThumbCanvasIndex: -> @getSelected.index()
+
+    getSelected: -> $(".canvasSelected")
 
     selectThumbByCanvasIndex: (canvasIndex, emit) ->
       @selectThumb($("#canvasSelectDiv a:eq(#{canvasIndex})"), emit)

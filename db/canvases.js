@@ -73,4 +73,6 @@ exports.setUp = function(client, db) {
     client.hmset('canvases:' + cid, properties, fn);
   };
 
+  return mod;
+
 }
