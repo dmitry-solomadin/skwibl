@@ -84,12 +84,12 @@ exports.setUp = (client, db) ->
 
   mod.findById = (id, fn) ->
     client.hgetall "users:#{id}", (err, user) ->
-      if err or not !user
+      if err or not user
         return tools.asyncOpt fn, err, null
       client.smembers "users:#{id}:emails",  (err, emails) ->
         if err
           return tools.asyncOpt fn, new Error "User #{id} have no emails"
-        client.mget emails.map tools.emailType , (err, array) ->
+        client.mget emails.map(tools.emailType), (err, array) ->
           types = array if array and array.length
           client.hgetall "users:#{id}:name", (err, name) ->
             umails = []
@@ -104,9 +104,8 @@ exports.setUp = (client, db) ->
 
   mod.findByEmail = (email, fn) ->
     client.get "emails:#{email}:uid", (err, val) ->
-      if not err
-        return db.users.findById val, fn
-      return tools.asyncOpt fn, err, null
+      return tools.asyncOpt(fn, err, null) if err or not val
+      return db.users.findById val, fn
 
   mod.findByEmails = (emails, fn) ->
     client.mget _.pluck(emails, 'value').map(tools.emailUid), (err, array) ->

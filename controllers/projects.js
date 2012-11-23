@@ -35,7 +35,7 @@ exports.show = function (req, res, next) {
   db.projects.set(req.user.id, req.params.pid, function () {
     db.projects.getData(req.params.pid, function (err, project) {
       if (!err) {
-        return db.canvases.index(req.params.pid, function (canvases) {
+        return db.canvases.index(req.params.pid, function (err, canvases) {
           if (!err) {
             return res.render('index', {
               template:"projects/show",

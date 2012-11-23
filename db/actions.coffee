@@ -15,9 +15,10 @@ exports.setUp = (client, db) ->
     action.canvas = canvasId if data.element.canvasId
     actions.comment = true if data.comment
     action.time = new Date
-    action.data = data.element
+    console.log(data.element)
+    action.data = JSON.stringify(data.element)
     client.hmset "actions:#{aid}", action
-    client.rpush "projects:#{project}:#{type}", val
+    client.rpush "projects:#{project}:#{type}", aid
     return tools.asyncOpt fn, null, action
 
   mod.delete = (aid, fn) ->
@@ -49,7 +50,9 @@ exports.setUp = (client, db) ->
 
   mod.getElements = (cid, fn) ->
     client.lrange "projects:#{cid}:elements", 0, -1, (err, array) ->
-      if not err and array and array.length
+      return tools.asyncOpt fn, null, [] if not array or not array.length
+
+      if not err
         actions = []
         return tools.asyncParallel array, (left, aid) ->
           client.hgetall "actions:#{aid}", (err, action) ->
@@ -61,6 +64,8 @@ exports.setUp = (client, db) ->
             actions.push action
             return tools.asyncDone left, ->
               return tools.asyncOpt fn, null, actions
+
+      return tools.asyncOpt fn, err, []
 
   mod.getComments = (eid, fn) ->
     client.lrange "comments:#{eid}:texts", 0, -1, (err, array) ->

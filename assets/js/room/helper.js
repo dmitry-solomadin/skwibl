@@ -57,16 +57,8 @@
       };
 
       RoomHelper.prototype.initUploader = function() {
-        var params, uploader,
-          _this = this;
-        params = {
-          pid: $("#pid").val()
-        };
-        if (!opts.image) {
-          params.cid = room.cavnas.getSelected().data("cid");
-        }
-        console.log(params);
-        return uploader = new qq.FileUploader({
+        var _this = this;
+        return App.room.uploader = new qq.FileUploader({
           element: $('#file-uploader')[0],
           action: '/file/upload',
           title_uploader: 'Upload',
@@ -74,15 +66,23 @@
           multiple: true,
           cancel: 'Cancel',
           debug: false,
-          params: params,
+          params: {
+            pid: $("#pid").val()
+          },
           onSubmit: function(id, fileName) {
-            return $(uploader._listElement).css('dispaly', 'none');
+            var params;
+            params = {
+              pid: $("#pid").val()
+            };
+            if (!opts.fileId) {
+              params.cid = App.room.canvas.getSelected().data("cid");
+            }
+            room.uploader.setParams(params);
+            return $(room.uploader._listElement).css('dispaly', 'none');
           },
           onComplete: function(id, fileName, responseJSON) {
-            var imagePath;
-            $(uploader._listElement).css('dispaly', 'none');
-            imagePath = "/images/avatar.png";
-            return room.canvas.handleUpload(imagePath, true);
+            $(room.uploader._listElement).css('dispaly', 'none');
+            return room.canvas.handleUpload(responseJSON.canvasId, responseJSON.fileId, true);
           }
         });
       };

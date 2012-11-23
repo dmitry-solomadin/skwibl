@@ -6,7 +6,6 @@
   </div>
   <div class="conversation-controls">
     <div id="participants" class="participants">
-
     </div>
     <div>
       <textarea class="chattext" id="chattext"></textarea>
@@ -16,6 +15,7 @@
 </div>
 
 <canvas id="myCanvas" resize="true"></canvas>
+<canvas id="copyCanvas" resize="true" style="display: none;"></canvas>
 
 <div id="canvasFooter" class="canvasFooter">
   <div class="canvasFooterInner">
@@ -24,9 +24,11 @@
     </div>
     <div class="canvasFooterBottom">
       <div id="canvasSelectDiv" class="canvasSelectDiv">
-        <a href="#" class="canvasSelected" data-cid="<%= @canvases[0].id %>">
-          <canvas width="80" height="60"></canvas>
-        </a>
+        <% for canvas, i in @canvases : %>
+          <a href="#" class="<%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.canvasId %>" <%- "data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
+            <canvas width="80" height="60"></canvas>
+          </a>
+        <% end %>
       </div>
     </div>
   </div>

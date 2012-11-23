@@ -1,6 +1,31 @@
 $ ->
   class RoomCanvas
 
+    init: ->
+      selectedCid = @getSelectedCanvasId()
+      for thumb in @getThumbs()
+        callback = (canvasId) =>
+          if selectedCid == canvasId
+            paper.projects[1].activate()
+          else
+            room.initOpts(canvasId)
+            paper.projects[0].activate()
+          @updateThumb canvasId
+          @clearCopyCanvas()
+          paper.projects[1].activate()
+
+        cid = $(thumb).data("cid")
+        if selectedCid == cid
+          paper.projects[1].activate()
+        else
+          paper.projects[0].activate()
+        @addImage $(thumb).data("fid"), ((canvasId)->
+          -> callback(canvasId)
+        )(cid)
+        paper.projects[1].activate()
+      initialOpts = @findCanvasOptsById(selectedCid)
+      room.setOpts(initialOpts)
+
     clear: ->
       room.history.add
         type: "clear", tools: room.history.getSelectableTools(), eligible: true
@@ -19,6 +44,9 @@ $ ->
         room.comments.hideComment(element.commentMin) if element.commentMin
 
       room.redraw()
+
+    clearCopyCanvas: ->
+      child.remove() for child in paper.projects[0].activeLayer.children
 
     restore: ->
       for element in opts.historytools.allHistory
@@ -51,45 +79,49 @@ $ ->
 
     # CANVAS THUMBNAILS & IMAGE UPLOAD
 
-    handleUpload: (imagePath, emit) ->
-      image = new Image()
-      image.src = imagePath
-      $(image).on "load", =>
-        if opts.image
-          @addNewThumbAndSelect()
-        @addImage(image)
+    handleUpload: (canvasId, fileId, emit) ->
+      @addNewThumbAndSelect(canvasId) if opts.fileId
+      @addImage fileId, =>
         @updateSelectedThumb()
-
         room.socket.emit("fileAdded", imagePath) if emit
 
-    addImage: (image) ->
-      img = new Raster(image)
-      img.isImage = true
-      paper.project.activeLayer.insertChild(0, img)
+    addImage: (fileId, callback) ->
+      image = new Image()
+      image.src = "/files/#{$("#pid").val()}/#{fileId}"
 
-      img.size.width = image.width
-      img.size.height = image.height
-      img.position = paper.view.center
+      activeProject = paper.project
 
-      opts.image = image
+      $(image).on "load", ->
+        img = new Raster(image)
+        img.isImage = true
+        activeProject.activeLayer.insertChild(0, img)
 
-      room.history.add(img)
+        img.size.width = image.width
+        img.size.height = image.height
+        img.position = paper.view.center
 
-    addNewThumb: ->
-      thumb = $("<a href='#'><canvas width='80' height='60'></canvas></a>")
+        callback() if callback?
+
+        opts.fileId = fileId
+        opts.image = img
+
+        room.history.add(img)
+
+    addNewThumb: (canvasId) ->
+      thumb = $("<a href='#' data-cid='#{canvasId}'><canvas width='80' height='60'></canvas></a>")
       $("#canvasSelectDiv").append(thumb)
 
-    addNewThumbAndSelect: ->
+    addNewThumbAndSelect: (canvasId) ->
       @erase()
-      room.initOpts()
+      room.initOpts(canvasId)
 
-      @addNewThumb()
+      @addNewThumb(canvasId)
 
       $("#canvasSelectDiv a").removeClass("canvasSelected")
       $("#canvasSelectDiv a:last").addClass("canvasSelected")
 
-    updateThumb: (canvasIndex) ->
-      thumb = $("#canvasSelectDiv a:eq(#{canvasIndex}) canvas")
+    updateThumb: (canvasId) ->
+      thumb = $("#canvasSelectDiv a[data-cid='#{canvasId}'] canvas")
       thumbContext = thumb[0].getContext('2d')
 
       canvas = paper.project.view.element
@@ -113,24 +145,23 @@ $ ->
       paper.project.activeLayer.transform(transformMatrix)
       room.redraw()
 
-    updateSelectedThumb: -> @updateThumb @selectedThumbCanvasIndex()
+    updateSelectedThumb: -> @updateThumb @getSelectedCanvasId()
 
-    selectedThumbCanvasIndex: -> @getSelected.index()
+    getSelectedCanvasId: -> @getSelected().data("cid")
 
     getSelected: -> $(".canvasSelected")
 
-    selectThumbByCanvasIndex: (canvasIndex, emit) ->
-      @selectThumb($("#canvasSelectDiv a:eq(#{canvasIndex})"), emit)
+    getThumbs: -> $("#canvasSelectDiv a")
 
     selectThumb: (anchor, emit) ->
       return if $(anchor).hasClass("canvasSelected")
 
       $("#canvasSelectDiv a").removeClass("canvasSelected")
 
-      index = $(anchor).index()
-      canvasOpts = @findCanvasOptsByIndex(index)
+      cid = $(anchor).data("cid")
+      canvasOpts = @findCanvasOptsById(cid)
 
-      alert("No canvas opts by given index=" + index) unless canvasOpts
+      alert("No canvas opts by given canvasId=" + cid) unless canvasOpts
 
       @erase()
       room.setOpts(canvasOpts)
@@ -138,12 +169,13 @@ $ ->
 
       $(anchor).addClass("canvasSelected")
 
-      room.socket.emit("switchCanvas", $(anchor).index()) if emit
+      room.socket.emit("switchCanvas", cid) if emit
       room.redraw()
 
-    findCanvasOptsByIndex: (index) ->
-      for savedOpt, i in room.savedOpts
-        return savedOpt if index == i
+    findCanvasOptsById: (canvasId) ->
+      console.log room.savedOpts
+      for savedOpt in room.savedOpts
+        return savedOpt if savedOpt.canvasId is canvasId
       return null
 
   App.room.canvas = new RoomCanvas

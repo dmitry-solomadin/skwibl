@@ -36,7 +36,7 @@ exports.project = function(req, res) {
  */
 exports.file = function(req, res) {
   var fid = req.params.fid;
-  db.files.file(fid, function(err, file) {
+  db.files.findById(fid, function(err, file) {
     if(err) {
       return res.send(err);
     }
@@ -45,7 +45,9 @@ exports.file = function(req, res) {
       'Content-Type': file.mime
     });
 
-    var rs = fs.createReadStream('./uploads/' + file.project + '/' + type + '/' + file.name);
+    console.log(file)
+
+    var rs = fs.createReadStream('./uploads/' + req.params.pid + '/' + type + '/' + file.name);
     rs.pipe(res);
   });
 }
@@ -129,7 +131,7 @@ exports.upload = function(req, res, next) {
         return res.json({
           success: true
         , canvasId: data.canvasId
-        , element: data.element
+        , fileId: data.element.id
         });
       });
     });

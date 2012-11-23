@@ -7,6 +7,41 @@
 
       function RoomCanvas() {}
 
+      RoomCanvas.prototype.init = function() {
+        var callback, cid, initialOpts, selectedCid, thumb, _i, _len, _ref,
+          _this = this;
+        selectedCid = this.getSelectedCanvasId();
+        _ref = this.getThumbs();
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          thumb = _ref[_i];
+          callback = function(canvasId) {
+            if (selectedCid === canvasId) {
+              paper.projects[1].activate();
+            } else {
+              room.initOpts(canvasId);
+              paper.projects[0].activate();
+            }
+            _this.updateThumb(canvasId);
+            _this.clearCopyCanvas();
+            return paper.projects[1].activate();
+          };
+          cid = $(thumb).data("cid");
+          if (selectedCid === cid) {
+            paper.projects[1].activate();
+          } else {
+            paper.projects[0].activate();
+          }
+          this.addImage($(thumb).data("fid"), (function(canvasId) {
+            return function() {
+              return callback(canvasId);
+            };
+          })(cid));
+          paper.projects[1].activate();
+        }
+        initialOpts = this.findCanvasOptsById(selectedCid);
+        return room.setOpts(initialOpts);
+      };
+
       RoomCanvas.prototype.clear = function() {
         var element, _i, _len, _ref;
         room.history.add({
@@ -42,6 +77,17 @@
           }
         }
         return room.redraw();
+      };
+
+      RoomCanvas.prototype.clearCopyCanvas = function() {
+        var child, _i, _len, _ref, _results;
+        _ref = paper.projects[0].activeLayer.children;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          child = _ref[_i];
+          _results.push(child.remove());
+        }
+        return _results;
       };
 
       RoomCanvas.prototype.restore = function() {
@@ -95,16 +141,12 @@
         return this.setScale(opts.currentScale - 0.1);
       };
 
-      RoomCanvas.prototype.handleUpload = function(imagePath, emit) {
-        var image,
-          _this = this;
-        image = new Image();
-        image.src = imagePath;
-        return $(image).on("load", function() {
-          if (opts.image) {
-            _this.addNewThumbAndSelect();
-          }
-          _this.addImage(image);
+      RoomCanvas.prototype.handleUpload = function(canvasId, fileId, emit) {
+        var _this = this;
+        if (opts.fileId) {
+          this.addNewThumbAndSelect(canvasId);
+        }
+        return this.addImage(fileId, function() {
           _this.updateSelectedThumb();
           if (emit) {
             return room.socket.emit("fileAdded", imagePath);
@@ -112,35 +154,45 @@
         });
       };
 
-      RoomCanvas.prototype.addImage = function(image) {
-        var img;
-        img = new Raster(image);
-        img.isImage = true;
-        paper.project.activeLayer.insertChild(0, img);
-        img.size.width = image.width;
-        img.size.height = image.height;
-        img.position = paper.view.center;
-        opts.image = image;
-        return room.history.add(img);
+      RoomCanvas.prototype.addImage = function(fileId, callback) {
+        var activeProject, image;
+        image = new Image();
+        image.src = "/files/" + ($("#pid").val()) + "/" + fileId;
+        activeProject = paper.project;
+        return $(image).on("load", function() {
+          var img;
+          img = new Raster(image);
+          img.isImage = true;
+          activeProject.activeLayer.insertChild(0, img);
+          img.size.width = image.width;
+          img.size.height = image.height;
+          img.position = paper.view.center;
+          if (callback != null) {
+            callback();
+          }
+          opts.fileId = fileId;
+          opts.image = img;
+          return room.history.add(img);
+        });
       };
 
-      RoomCanvas.prototype.addNewThumb = function() {
+      RoomCanvas.prototype.addNewThumb = function(canvasId) {
         var thumb;
-        thumb = $("<a href='#'><canvas width='80' height='60'></canvas></a>");
+        thumb = $("<a href='#' data-cid='" + canvasId + "'><canvas width='80' height='60'></canvas></a>");
         return $("#canvasSelectDiv").append(thumb);
       };
 
-      RoomCanvas.prototype.addNewThumbAndSelect = function() {
+      RoomCanvas.prototype.addNewThumbAndSelect = function(canvasId) {
         this.erase();
-        room.initOpts();
-        this.addNewThumb();
+        room.initOpts(canvasId);
+        this.addNewThumb(canvasId);
         $("#canvasSelectDiv a").removeClass("canvasSelected");
         return $("#canvasSelectDiv a:last").addClass("canvasSelected");
       };
 
-      RoomCanvas.prototype.updateThumb = function(canvasIndex) {
+      RoomCanvas.prototype.updateThumb = function(canvasId) {
         var canvas, cvh, cvw, i, shift, sy, th, thumb, thumbContext, transformMatrix, tw, _i;
-        thumb = $("#canvasSelectDiv a:eq(" + canvasIndex + ") canvas");
+        thumb = $("#canvasSelectDiv a[data-cid='" + canvasId + "'] canvas");
         thumbContext = thumb[0].getContext('2d');
         canvas = paper.project.view.element;
         cvw = $(canvas).width();
@@ -162,48 +214,49 @@
       };
 
       RoomCanvas.prototype.updateSelectedThumb = function() {
-        return this.updateThumb(this.selectedThumbCanvasIndex());
+        return this.updateThumb(this.getSelectedCanvasId());
       };
 
-      RoomCanvas.prototype.selectedThumbCanvasIndex = function() {
-        return this.getSelected.index();
+      RoomCanvas.prototype.getSelectedCanvasId = function() {
+        return this.getSelected().data("cid");
       };
 
       RoomCanvas.prototype.getSelected = function() {
         return $(".canvasSelected");
       };
 
-      RoomCanvas.prototype.selectThumbByCanvasIndex = function(canvasIndex, emit) {
-        return this.selectThumb($("#canvasSelectDiv a:eq(" + canvasIndex + ")"), emit);
+      RoomCanvas.prototype.getThumbs = function() {
+        return $("#canvasSelectDiv a");
       };
 
       RoomCanvas.prototype.selectThumb = function(anchor, emit) {
-        var canvasOpts, index;
+        var canvasOpts, cid;
         if ($(anchor).hasClass("canvasSelected")) {
           return;
         }
         $("#canvasSelectDiv a").removeClass("canvasSelected");
-        index = $(anchor).index();
-        canvasOpts = this.findCanvasOptsByIndex(index);
+        cid = $(anchor).data("cid");
+        canvasOpts = this.findCanvasOptsById(cid);
         if (!canvasOpts) {
-          alert("No canvas opts by given index=" + index);
+          alert("No canvas opts by given canvasId=" + cid);
         }
         this.erase();
         room.setOpts(canvasOpts);
         this.restore();
         $(anchor).addClass("canvasSelected");
         if (emit) {
-          room.socket.emit("switchCanvas", $(anchor).index());
+          room.socket.emit("switchCanvas", cid);
         }
         return room.redraw();
       };
 
-      RoomCanvas.prototype.findCanvasOptsByIndex = function(index) {
-        var i, savedOpt, _i, _len, _ref;
+      RoomCanvas.prototype.findCanvasOptsById = function(canvasId) {
+        var savedOpt, _i, _len, _ref;
+        console.log(room.savedOpts);
         _ref = room.savedOpts;
-        for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
-          savedOpt = _ref[i];
-          if (index === i) {
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          savedOpt = _ref[_i];
+          if (savedOpt.canvasId === canvasId) {
             return savedOpt;
           }
         }

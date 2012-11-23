@@ -10,8 +10,8 @@ $ ->
         currentScale: 1
         opacity: 1
 
-    init: ->
-      @initOpts()
+    init: (canvasId) ->
+      @initOpts(canvasId)
 
       $(".toolTypeChanger").on "click", ->
         opts.tooltype = $(@).data("tooltype")
@@ -29,6 +29,7 @@ $ ->
 
       @helper.initUploader()
       @helper.initHotkeys()
+      @canvas.init()
 
       # disable canvas text selection for cursor change
       canvas = $("#myCanvas")[0]
@@ -37,13 +38,14 @@ $ ->
 
       false
 
-    initOpts: ->
+    initOpts: (canvasId) ->
       @opts = {}
       window.opts = @opts
       $.extend(@opts, @defaultOpts)
       @opts.historytools =
         eligibleHistory: new Array
         allHistory: new Array
+      @opts.canvasId = canvasId
       @savedOpts.push(@opts)
 
     setOpts: (opts) ->
@@ -240,7 +242,8 @@ $ ->
   for key of paper
     window[key] = paper[key] if not /^(version|_id|load)/.test(key) and not window[key]?
 
-  paper.setup($('#myCanvas')[0])
+  paper.setup($('#copyCanvas')[0]);
+  paper.setup($('#myCanvas')[0]);
 
   # initilazing events
   tool = new paper.Tool()
@@ -249,10 +252,10 @@ $ ->
   tool.onMouseUp = (event) -> App.room.onMouseUp($("#myCanvas"), event)
   tool.onMouseMove = (event) -> App.room.onMouseMove($("#myCanvas"), event)
 
-  App.room.init()
-
   window.room = App.room
   window.opts = App.room.opts
+
+  App.room.init(App.room.canvas.getSelectedCanvasId())
 
   # resizing canvas
   paper.view.setViewSize(Rectangle.create(0, 0, $("body").width(), $("body").height()).getSize())

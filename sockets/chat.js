@@ -29,7 +29,7 @@ exports.configure = function(sio) {
 
     db.actions.get(project, 'chat', function(err, actions) {
       if(actions.length !== 0) {
-        socket.json.emit('messages', actions);
+        socket.emit('messages', actions);
       }
     });
   };
@@ -61,11 +61,11 @@ exports.configure = function(sio) {
       });
 
       socket.on('message', function(msg, cb) {
-        socket.broadcast.to(socket.project).json.send({
+        socket.broadcast.to(socket.project).emit("message", {
           id: id
         , message: msg
         });
-        db.actions.add(socket.project, id, 'chat', msg);
+        db.actions.update(socket.project, id, 'chat', msg);
       });
 
       /*

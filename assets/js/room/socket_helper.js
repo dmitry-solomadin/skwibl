@@ -29,7 +29,7 @@
           return room.canvas.handleUpload(data.message, false);
         });
         socket.on('switchCanvas', function(data) {
-          return room.canvas.selectThumbByCanvasIndex(data.canvasIndex, false);
+          return room.canvas.selectThumb(data.canvasId, false);
         });
         socket.on('eraseCanvas', function() {
           room.canvas.erase();

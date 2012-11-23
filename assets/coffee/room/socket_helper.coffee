@@ -11,7 +11,7 @@ $ ->
       socket.on 'commentRemove', (data) => @socketRemoveComment(data.message)
       socket.on 'commentText', (data) => @addOrUpdateCommentText(data.message)
       socket.on 'fileAdded', (data) => room.canvas.handleUpload(data.message, false)
-      socket.on 'switchCanvas', (data) => room.canvas.selectThumbByCanvasIndex(data.canvasIndex, false)
+      socket.on 'switchCanvas', (data) => room.canvas.selectThumb(data.canvasId, false)
 
       socket.on 'eraseCanvas', =>
         room.canvas.erase()

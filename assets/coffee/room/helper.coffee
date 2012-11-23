@@ -21,15 +21,7 @@ $ ->
       $(document).bind 'keydown.shift_down', => room.items.translateSelected(new Point(0, 1))
 
     initUploader: ->
-      params =
-        pid: $("#pid").val()
-
-      # we only add cid for the first canvas.
-      params.cid = room.cavnas.getSelected().data("cid") unless opts.image
-
-      console.log params
-
-      uploader = new qq.FileUploader
+      App.room.uploader = new qq.FileUploader
         element: $('#file-uploader')[0]
         action: '/file/upload'
         title_uploader: 'Upload'
@@ -37,14 +29,21 @@ $ ->
         multiple: true
         cancel: 'Cancel'
         debug: false
-        params: params
+        params:
+          pid: $("#pid").val()
         onSubmit: (id, fileName) =>
-          $(uploader._listElement).css('dispaly', 'none')
-        onComplete: (id, fileName, responseJSON) =>
-          $(uploader._listElement).css('dispaly', 'none')
+          params =
+            pid: $("#pid").val()
+          # we only add cid for the first canvas.
+          params.cid = App.room.canvas.getSelected().data("cid") unless opts.fileId
 
-          imagePath = "/images/avatar.png"
-          room.canvas.handleUpload(imagePath, true)
+          room.uploader.setParams params
+
+          $(room.uploader._listElement).css('dispaly', 'none')
+        onComplete: (id, fileName, responseJSON) =>
+          $(room.uploader._listElement).css('dispaly', 'none')
+
+          room.canvas.handleUpload(responseJSON.canvasId, responseJSON.fileId, true)
 
     reverseOpacity: (elem) -> if elem.opacity == 0 then elem.opacity = 1 else elem.opacity = 0
 

@@ -108,7 +108,7 @@
           return console.log('error');
         });
         this.chatIO.on('message', function(data, cb) {
-          return $('#conversation-inner').append("<b>" + data.id + ":</b> " + data.message + "<br>");
+          return $('#conversation-inner').append("<b>" + data.id + ":</b> " + data.message.element.msg + "<br>");
         });
         this.chatIO.on('enter', function(id, cb) {
           var user;
@@ -134,7 +134,7 @@
           _results = [];
           for (_i = 0, _len = data.length; _i < _len; _i++) {
             val = data[_i];
-            _results.push(_this.addMessage(val.owner, val.data));
+            _results.push(_this.addMessage(val.owner, JSON.parse(val.data).msg));
           }
           return _results;
         });
@@ -144,13 +144,17 @@
 
     })();
     $('#chatsend').click(function() {
-      var message;
-      message = $('#chattext').val();
+      var chatMessage;
+      chatMessage = {
+        element: {
+          msg: $('#chattext').val(),
+          elementId: App.room.generateId()
+        }
+      };
       $('#chattext').val('').focus();
-      if (message !== '') {
-        console.log(App.chat);
-        App.chat.addMessage($("#uid")[0].value, message);
-        return App.chat.chatIO.send(message);
+      if (chatMessage.element.msg !== '') {
+        App.chat.addMessage($("#uid")[0].value, chatMessage.element.msg);
+        return App.chat.chatIO.emit("message", chatMessage);
       }
     });
     $('#chattext').keypress(function(e) {

@@ -30,19 +30,18 @@ exports.setUp = (client, db) ->
         return tools.asyncParallel array, (left, cid) ->
           db.canvases.get cid, (err, canvas) ->
             if not err and canvas
-              db.files.file canvas.file, (err, file) ->
+              db.files.findById canvas.file, (err, file) ->
                 db.actions.getElements cid, (err, elements) ->
-                  if not err
-                    canvases.push {
+                  unless err
+                    canvases.push
                       canvasId: cid
                       file: file
                       elements: elements
-                    }
                   return tools.asyncDone left, ->
                     return tools.asyncOpt fn, null, canvases
       return tools.asyncOpt fn, err, []
 
-  mod.setProperties = (cid, properties, fn) ->
-    client.hmset "canvases:#{cid}", properties, fn
+  mod.setProperties = (cid, properties) ->
+    client.hmset "canvases:#{cid}", properties
 
   return mod

@@ -50,7 +50,7 @@ $ ->
       @chatIO.on 'error', -> console.log('error')
 
       @chatIO.on 'message', (data, cb) ->
-        $('#conversation-inner').append("<b>#{data.id}:</b> #{data.message}<br>")
+        $('#conversation-inner').append("<b>#{data.id}:</b> #{data.message.element.msg}<br>")
 
       @chatIO.on 'enter', (id, cb) =>
         user = @getUserById(id)
@@ -70,16 +70,19 @@ $ ->
 
       @chatIO.on 'messages', (data) =>
         $('#conversation-inner').empty()
-        @addMessage(val.owner, val.data) for val in data
+        @addMessage(val.owner, JSON.parse(val.data).msg) for val in data
 
   # when the client clicks SEND
   $('#chatsend').click ->
-    message = $('#chattext').val()
+    chatMessage =
+      element:
+        msg: $('#chattext').val()
+        elementId: App.room.generateId()
+
     $('#chattext').val('').focus()
-    if message != ''
-      console.log(App.chat)
-      App.chat.addMessage($("#uid")[0].value, message)
-      App.chat.chatIO.send(message)
+    unless chatMessage.element.msg is ''
+      App.chat.addMessage($("#uid")[0].value, chatMessage.element.msg)
+      App.chat.chatIO.emit("message", chatMessage)
 
   # when the client hits ENTER on the keyboard
   $('#chattext').keypress (e) ->

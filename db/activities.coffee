@@ -46,42 +46,36 @@ exports.setUp = (client, db) ->
               return tools.asyncOpt fn, null, activities
       return tools.asyncOpt fn, err, []
 
-  mod.getDataActivity = (aid, done) ->
+  mod.getDataActivity = (aid, fn) ->
     return client.hgetall "activities:#{aid}",  (err, activity) ->
-      if err
-        return tools.asyncOpt done, err, []
+      return tools.asyncOpt fn, err, [] if err
       activities = []
       activities.push activity
-      mod.getDataActivities activities, (err) ->
-        done err, activity
+      mod.getDataActivities activities, (err) -> fn err, activity
 
-  mod.getDataActivities = (activities, done) ->
+  mod.getDataActivities = (activities, fn) ->
     return mod.getProjectForActivities activities, (err) ->
-      if not err
+      unless err
         return mod.getUserForActivities activities, (err) ->
-          done err
-      return done err
+          fn err
+      return fn err
 
-  mod.getProjectForActivities = (activities, done) ->
+  mod.getProjectForActivities = (activities, fn) ->
     return tools.asyncParallel activities,  (left, activity) ->
       return db.projects.getData activity.project, (err, project) ->
         if not err and project
           activity.project = project
-          fn = -> done()
           return tools.asyncDone left, ->
             return tools.asyncOpt fn, null, null
-        gn = -> done(err)
-        return tools.asyncOpt gn, err, []
+        return tools.asyncOpt fn, err, []
 
-  mod.getUserForActivities = (activities, done) ->
+  mod.getUserForActivities = (activities, fn) ->
     return tools.asyncParallel activities, (left, activity) ->
       return db.users.findById activity.inviting, (err, user) ->
         if not err and user
           activity.inviting = user
-          fn = -> done()
           return tools.asyncDone left, ->
             return tools.asyncOpt fn, null, null
-        gn = -> done(err)
-        return tools.asyncOpt gn, err, []
+        return tools.asyncOpt fn, err, []
 
   return mod
