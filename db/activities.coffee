@@ -51,7 +51,8 @@ exports.setUp = (client, db) ->
       return tools.asyncOpt fn, err, [] if err
       activities = []
       activities.push activity
-      mod.getDataActivities activities, (err) -> fn err, activity
+      return mod.getDataActivities activities, (err) ->
+        return tools.asyncOpt fn, err, activity
 
   mod.getDataActivities = (activities, fn) ->
     return mod.getProjectForActivities activities, (err) ->

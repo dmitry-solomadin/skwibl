@@ -47,7 +47,7 @@ exports.isFileInProject = (req, res, next) ->
   pid = req.params.pid or req.body.pid
   fid = req.params.fid or req.body.fid
   db.mid.isFileInProject fid, pid, (err, val) ->
-    return next if val
+    return next() if val
     if req.method is 'GET'
       return res.redirect 'back'
     return res.json
@@ -71,7 +71,7 @@ exports.isOwner = (req, res, next) ->
 #
 exports.isInvited = (req, res, next) ->
   db.mid.isInvited req.user.id, req.body.aid, (err, val) ->
-    return next if val
+    return next() if val
     return res.json
       success: no
       message: 'not invited'
