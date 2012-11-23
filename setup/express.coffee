@@ -68,8 +68,8 @@ exports.setUp = ->
 
   app.locals = {}
 
-  for method of helpers.application_helper
-    app.locals[method] = helpers.application_helper[method]
+  for method of helpers
+    app.locals[method] = helpers[method]
 
   app.locals.moment = moment
 
