@@ -79,6 +79,16 @@
         return room.redraw();
       };
 
+      RoomCanvas.prototype.eraseCompletely = function() {
+        var child, _i, _len, _ref;
+        _ref = paper.project.activeLayer.children;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          child = _ref[_i];
+          child.remove();
+        }
+        return room.redraw();
+      };
+
       RoomCanvas.prototype.clearCopyCanvas = function() {
         var child, _i, _len, _ref, _results;
         _ref = paper.projects[0].activeLayer.children;
@@ -149,7 +159,10 @@
         return this.addImage(fileId, function() {
           _this.updateSelectedThumb();
           if (emit) {
-            return room.socket.emit("fileAdded", imagePath);
+            return room.socket.emit("fileAdded", {
+              canvasId: canvasId,
+              fileId: fileId
+            });
           }
         });
       };
@@ -183,7 +196,7 @@
       };
 
       RoomCanvas.prototype.addNewThumbAndSelect = function(canvasId) {
-        this.erase();
+        this.eraseCompletely();
         room.initOpts(canvasId);
         this.addNewThumb(canvasId);
         $("#canvasSelectDiv a").removeClass("canvasSelected");

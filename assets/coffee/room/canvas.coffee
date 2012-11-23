@@ -38,11 +38,16 @@ $ ->
 
       room.socket.emit("eraseCanvas")
 
+    # used upon eraseCanvas event
     erase: ->
       for element in opts.historytools.allHistory
         element.remove() unless element.type
         room.comments.hideComment(element.commentMin) if element.commentMin
 
+      room.redraw()
+
+    eraseCompletely: ->
+      child.remove() for child in paper.project.activeLayer.children
       room.redraw()
 
     clearCopyCanvas: ->
@@ -83,7 +88,7 @@ $ ->
       @addNewThumbAndSelect(canvasId) if opts.fileId
       @addImage fileId, =>
         @updateSelectedThumb()
-        room.socket.emit("fileAdded", imagePath) if emit
+        room.socket.emit("fileAdded", {canvasId: canvasId, fileId: fileId}) if emit
 
     addImage: (fileId, callback) ->
       image = new Image()
@@ -112,7 +117,7 @@ $ ->
       $("#canvasSelectDiv").append(thumb)
 
     addNewThumbAndSelect: (canvasId) ->
-      @erase()
+      @eraseCompletely()
       room.initOpts(canvasId)
 
       @addNewThumb(canvasId)

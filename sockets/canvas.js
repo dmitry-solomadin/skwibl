@@ -104,14 +104,11 @@ exports.configure = function(sio) {
         });
       });
 
-      socket.on('canvasAdded', function(data, cb) {
-        console.log('canvasadd');
-        console.log(data);
-        //TODO move to socket anounce
+      socket.on('fileAdded', function(data, cb) {
         socket.broadcast.to(socket.project).emit("fileAdded", {
           id: id
         , canvasId: data.canvasId
-        , element: data.element
+        , fileId: data.fileId
         });
       });
 

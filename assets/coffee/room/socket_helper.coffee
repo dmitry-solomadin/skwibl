@@ -10,7 +10,7 @@ $ ->
       socket.on 'commentUpdate', (data) => @addOrUpdateComment(data.message, false)
       socket.on 'commentRemove', (data) => @socketRemoveComment(data.message)
       socket.on 'commentText', (data) => @addOrUpdateCommentText(data.message)
-      socket.on 'fileAdded', (data) => room.canvas.handleUpload(data.message, false)
+      socket.on 'fileAdded', (data) => room.canvas.handleUpload(data.canvasId, data.fileId, false)
       socket.on 'switchCanvas', (data) => room.canvas.selectThumb(data.canvasId, false)
 
       socket.on 'eraseCanvas', =>

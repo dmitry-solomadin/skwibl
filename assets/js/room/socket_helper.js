@@ -26,7 +26,7 @@
           return _this.addOrUpdateCommentText(data.message);
         });
         socket.on('fileAdded', function(data) {
-          return room.canvas.handleUpload(data.message, false);
+          return room.canvas.handleUpload(data.canvasId, data.fileId, false);
         });
         socket.on('switchCanvas', function(data) {
           return room.canvas.selectThumb(data.canvasId, false);
