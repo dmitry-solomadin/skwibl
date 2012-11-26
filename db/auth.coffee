@@ -6,7 +6,7 @@ tools = require '../tools'
 
 exports.setUp = (client, db) ->
 
-  mod = {};
+  mod = {}
 
   mod.findOrCreate = (profile, token, fn) ->
     emails = profile.emails
@@ -14,23 +14,21 @@ exports.setUp = (client, db) ->
       if not user
         email = emails[0].value
         password = tools.genPass()
-        return db.users.add {
+        return db.users.add
           displayName: profile.displayName
           providerId: profile.id
           password: password
           picture: profile._json.picture
           status: 'registred'
           provider: profile.provider
-        }, profile.name, emails, (err, user) ->
+        , profile.name, emails, (err, user) ->
           if user
             db.auth.connect user.id, user.provider, token
             return smtp.sendRegMail user, fn
           return tools.asyncOpt fn, err, user
       if not user.picture
         user.picture = profile._json.picture;
-        db.users.setProperties user.id, {
-          picture: user.picture
-        }
+        db.users.setProperties user.id, picture: user.picture
       purifiedName = tools.purify profile.name
       if not _.isEqual user.name, purifiedName
         user.name = _.extend purifiedName, user.name
@@ -55,4 +53,4 @@ exports.setUp = (client, db) ->
   mod.disconnect = (id, provider, fn) ->
     client.hdel "users:#{id}:connections", provider, fn
 
-  return mod;
+  return mod

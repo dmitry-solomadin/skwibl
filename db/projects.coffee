@@ -66,7 +66,14 @@ exports.setUp = (client, db) ->
       return tools.asyncOpt fn, err, null
 
   mod.deleteCanvases = (pid, fn) ->
-    # todo TBD
+    client.smembers "projects:#{pid}:canvases", (err, array) ->
+      client.del "projects:#{pid}:canvases"
+      if not err and array and array.length
+        return tools.asyncParallel array, (left, cid) ->
+          client.del "canvases:#{cid}"
+          return tools.asyncDone left, ->
+            return tools.asyncOpt fn, null, pid
+      return tools.asyncOpt fn, err, pid
 
   mod.deleteUsers = (pid, fn) ->
     client.smembers "projects:#{pid}:users", (err, array) ->
@@ -76,13 +83,13 @@ exports.setUp = (client, db) ->
       return tools.asyncOpt fn, err, pid
 
   mod.deleteActions = (pid, type, fn) ->
-    client.lrange "projects:#{pid}:#{type}", (err, array) ->
+    client.lrange "projects:#{pid}:#{type}", 0, -1, (err, array) ->
+      client.del "projects:#{pid}:#{type}"
       if not err and array and array.length
         return tools.asyncParallel array, (left, aid) ->
-          client.del "actions:#{aid}", pid
+          client.del "actions:#{aid}"
           return tools.asyncDone left, ->
             return tools.asyncOpt fn, null, pid
-      client.del "projects:#{pid}:#{type}"
       return tools.asyncOpt fn, err, pid
 
   mod.delete = (pid, fn) ->
