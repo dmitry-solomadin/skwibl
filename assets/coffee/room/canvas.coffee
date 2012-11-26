@@ -5,10 +5,12 @@ $ ->
       selectedCid = @getSelectedCanvasId()
       for thumb in @getThumbs()
         callback = (canvasId) =>
+          opts = @findCanvasOptsById(canvasId)
+          if opts then room.setOpts(opts) else room.initOpts(canvasId)
+
           if selectedCid == canvasId
             paper.projects[1].activate()
           else
-            room.initOpts(canvasId)
             paper.projects[0].activate()
           @updateThumb canvasId
           @clearCopyCanvas()
@@ -38,11 +40,17 @@ $ ->
 
       room.socket.emit("eraseCanvas")
 
+    # used upon eraseCanvas event
     erase: ->
       for element in opts.historytools.allHistory
         element.remove() unless element.type
         room.comments.hideComment(element.commentMin) if element.commentMin
 
+      room.redraw()
+
+    eraseCompletely: ->
+      for child in paper.project.activeLayer.children
+        child.remove() if child
       room.redraw()
 
     clearCopyCanvas: ->
@@ -83,7 +91,7 @@ $ ->
       @addNewThumbAndSelect(canvasId) if opts.fileId
       @addImage fileId, =>
         @updateSelectedThumb()
-        room.socket.emit("fileAdded", imagePath) if emit
+        room.socket.emit("fileAdded", {canvasId: canvasId, fileId: fileId}) if emit
 
     addImage: (fileId, callback) ->
       image = new Image()
@@ -112,7 +120,7 @@ $ ->
       $("#canvasSelectDiv").append(thumb)
 
     addNewThumbAndSelect: (canvasId) ->
-      @erase()
+      @eraseCompletely()
       room.initOpts(canvasId)
 
       @addNewThumb(canvasId)
@@ -121,7 +129,7 @@ $ ->
       $("#canvasSelectDiv a:last").addClass("canvasSelected")
 
     updateThumb: (canvasId) ->
-      thumb = $("#canvasSelectDiv a[data-cid='#{canvasId}'] canvas")
+      thumb = @findThumbByCanvasId(canvasId).find("canvas")
       thumbContext = thumb[0].getContext('2d')
 
       canvas = paper.project.view.element
@@ -153,6 +161,8 @@ $ ->
 
     getThumbs: -> $("#canvasSelectDiv a")
 
+    findThumbByCanvasId: (canvasId) -> $("#canvasSelectDiv a[data-cid='#{canvasId}']")
+
     selectThumb: (anchor, emit) ->
       return if $(anchor).hasClass("canvasSelected")
 
@@ -163,7 +173,7 @@ $ ->
 
       alert("No canvas opts by given canvasId=" + cid) unless canvasOpts
 
-      @erase()
+      @eraseCompletely()
       room.setOpts(canvasOpts)
       @restore()
 
@@ -173,7 +183,6 @@ $ ->
       room.redraw()
 
     findCanvasOptsById: (canvasId) ->
-      console.log room.savedOpts
       for savedOpt in room.savedOpts
         return savedOpt if savedOpt.canvasId is canvasId
       return null

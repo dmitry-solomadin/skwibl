@@ -62,7 +62,7 @@ exports.configure = (sio) ->
         console.log data
         socket.broadcast.to(socket.project).emit 'commentRemove',
           id: id
-          cancasId: data.cancasId
+          canvasId: data.canvasId
           elementId: data.elementId
         db.actions.remove data.elementId
 
@@ -82,14 +82,11 @@ exports.configure = (sio) ->
           id: id
           canvasId: data.cancasId
 
-      socket.on 'canvasAdded', (data, cb) ->
-        console.log 'canvasadd'
-        console.log data
-        #TODO move to socket anounce
-        socket.broadcast.to(socket.project).emit 'fileAdded',
+      socket.on 'fileAdded', (data, cb) ->
+        socket.broadcast.to(socket.project).emit "fileAdded",
           id: id
           canvasId: data.canvasId
-          element: data.element
+          fileId: data.fileId
 
       socket.on 'switchCanvas', (msg, cb) ->
         socket.broadcast.to(socket.project).emit 'switchCanvas',

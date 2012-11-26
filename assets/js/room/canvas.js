@@ -15,10 +15,16 @@
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           thumb = _ref[_i];
           callback = function(canvasId) {
+            var opts;
+            opts = _this.findCanvasOptsById(canvasId);
+            if (opts) {
+              room.setOpts(opts);
+            } else {
+              room.initOpts(canvasId);
+            }
             if (selectedCid === canvasId) {
               paper.projects[1].activate();
             } else {
-              room.initOpts(canvasId);
               paper.projects[0].activate();
             }
             _this.updateThumb(canvasId);
@@ -74,6 +80,18 @@
           }
           if (element.commentMin) {
             room.comments.hideComment(element.commentMin);
+          }
+        }
+        return room.redraw();
+      };
+
+      RoomCanvas.prototype.eraseCompletely = function() {
+        var child, _i, _len, _ref;
+        _ref = paper.project.activeLayer.children;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          child = _ref[_i];
+          if (child) {
+            child.remove();
           }
         }
         return room.redraw();
@@ -149,7 +167,10 @@
         return this.addImage(fileId, function() {
           _this.updateSelectedThumb();
           if (emit) {
-            return room.socket.emit("fileAdded", imagePath);
+            return room.socket.emit("fileAdded", {
+              canvasId: canvasId,
+              fileId: fileId
+            });
           }
         });
       };
@@ -183,7 +204,7 @@
       };
 
       RoomCanvas.prototype.addNewThumbAndSelect = function(canvasId) {
-        this.erase();
+        this.eraseCompletely();
         room.initOpts(canvasId);
         this.addNewThumb(canvasId);
         $("#canvasSelectDiv a").removeClass("canvasSelected");
@@ -192,7 +213,7 @@
 
       RoomCanvas.prototype.updateThumb = function(canvasId) {
         var canvas, cvh, cvw, i, shift, sy, th, thumb, thumbContext, transformMatrix, tw, _i;
-        thumb = $("#canvasSelectDiv a[data-cid='" + canvasId + "'] canvas");
+        thumb = this.findThumbByCanvasId(canvasId).find("canvas");
         thumbContext = thumb[0].getContext('2d');
         canvas = paper.project.view.element;
         cvw = $(canvas).width();
@@ -229,6 +250,10 @@
         return $("#canvasSelectDiv a");
       };
 
+      RoomCanvas.prototype.findThumbByCanvasId = function(canvasId) {
+        return $("#canvasSelectDiv a[data-cid='" + canvasId + "']");
+      };
+
       RoomCanvas.prototype.selectThumb = function(anchor, emit) {
         var canvasOpts, cid;
         if ($(anchor).hasClass("canvasSelected")) {
@@ -240,7 +265,7 @@
         if (!canvasOpts) {
           alert("No canvas opts by given canvasId=" + cid);
         }
-        this.erase();
+        this.eraseCompletely();
         room.setOpts(canvasOpts);
         this.restore();
         $(anchor).addClass("canvasSelected");
@@ -252,7 +277,6 @@
 
       RoomCanvas.prototype.findCanvasOptsById = function(canvasId) {
         var savedOpt, _i, _len, _ref;
-        console.log(room.savedOpts);
         _ref = room.savedOpts;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           savedOpt = _ref[_i];
