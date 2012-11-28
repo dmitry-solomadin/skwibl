@@ -66,7 +66,14 @@ exports.setUp = (client, db) ->
       return tools.asyncOpt fn, err, null
 
   mod.deleteCanvases = (pid, fn) ->
-    # todo TBD
+    client.smembers "projects:#{pid}:canvases", (err, array) ->
+      client.del "projects:#{pid}:canvases"
+      if not err and array and array.length
+        return tools.asyncParallel array, (left, cid) ->
+          client.del "canvases:#{cid}"
+          return tools.asyncDone left, ->
+            return tools.asyncOpt fn, null, pid
+      return tools.asyncOpt fn, err, pid
 
   mod.deleteUsers = (pid, fn) ->
     client.smembers "projects:#{pid}:users", (err, array) ->
@@ -76,13 +83,13 @@ exports.setUp = (client, db) ->
       return tools.asyncOpt fn, err, pid
 
   mod.deleteActions = (pid, type, fn) ->
-    client.lrange "projects:#{pid}:#{type}", (err, array) ->
+    client.lrange "projects:#{pid}:#{type}", 0, -1, (err, array) ->
+      client.del "projects:#{pid}:#{type}"
       if not err and array and array.length
-        return tools.asyncParallel array, (aid) ->
-          client.del "actions:#{aid}", pid
+        return tools.asyncParallel array, (left, aid) ->
+          client.del "actions:#{aid}"
           return tools.asyncDone array, ->
             return tools.asyncOpt fn, null, pid
-      client.del "projects:#{pid}:#{type}"
       return tools.asyncOpt fn, err, pid
 
   mod.delete = (pid, fn) ->
@@ -150,12 +157,12 @@ exports.setUp = (client, db) ->
     # Get project members
     client.smembers "projects:#{pid}:users", (err, array) ->
       if not err and array
-        return tools.asyncParallel array, (cid) ->
+        return tools.asyncParallel array, (left, cid) ->
           # Add the user as a contact to all project members
           client.sadd "users:#{cid}:contacts", id
           # And vise-versa
           client.sadd "users:#{id}:contacts", cid
-          return tools.asyncDone array, ->
+          return tools.asyncDone left, ->
             # Add the user to the project
             client.smove "projects:#{pid}:unconfirmed", "projects:#{pid}:users", id
             # Add the project to the user
@@ -173,10 +180,10 @@ exports.setUp = (client, db) ->
     client.smembers "projects:#{pid}:users", (err, array) ->
       if not err and array and array.length
         db.contacts.recalculate id, array, pid
-        return tools.asyncParallel array, (cid) ->
+        return tools.asyncParallel array, (left, cid) ->
           # Recalculate member contacts
           db.contacts.recalculate cid, [id], pid
-          return tools.asyncDone array, ->
+          return tools.asyncDone left, ->
             # Remove user from project members
             client.srem "projects:#{pid}:users", id
             return tools.asyncOpt fn, null
