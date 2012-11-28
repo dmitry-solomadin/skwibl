@@ -28,6 +28,9 @@
           <% for element in canvas.elements : %>
             <input class="canvasElement<%= canvas.canvasId %>" type="hidden" value="<%= element %>"/>
           <% end %>
+          <% for comment in canvas.comments : %>
+          <input class="canvasComment<%= canvas.canvasId %>" type="hidden" value="<%= comment %>"/>
+          <% end %>
           <a href="#" class="<%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.canvasId %>" <%- "data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
             <canvas width="80" height="60"></canvas>
           </a>

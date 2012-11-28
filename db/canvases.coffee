@@ -31,14 +31,16 @@ exports.setUp = (client, db) ->
           db.canvases.get cid, (err, canvas) ->
             if not err and canvas
               db.files.findById canvas.file, (err, file) ->
-                db.actions.getElements cid, (err, elements) ->
-                  unless err
-                    canvases.push
-                      canvasId: cid
-                      file: file
-                      elements: elements
-                  return tools.asyncDone array, ->
-                    return tools.asyncOpt fn, null, canvases
+                db.actions.getElements cid, "element", (err, elements) ->
+                  db.actions.getElements cid, "comment", (err, comments) ->
+                    unless err
+                      canvases.push
+                        canvasId: cid
+                        file: file
+                        elements: elements
+                        comments: comments
+                    return tools.asyncDone array, ->
+                      return tools.asyncOpt fn, null, canvases
       return tools.asyncOpt fn, err, []
 
   mod.setProperties = (cid, properties) ->

@@ -17,7 +17,7 @@
           return _this.socketRemoveElement(data.message);
         });
         socket.on('commentUpdate', function(data) {
-          return _this.addOrUpdateComment(data.message, false);
+          return _this.addOrUpdateComment(data.element);
         });
         socket.on('commentRemove', function(data) {
           return _this.socketRemoveComment(data.message);
@@ -43,8 +43,8 @@
         return room.comments.addCommentText(foundComment.commentMin, data.text, false);
       };
 
-      RoomSocketHelper.prototype.addOrUpdateComment = function(data, initial) {
-        var createNewComment, foundComment, updateComment,
+      RoomSocketHelper.prototype.addOrUpdateComment = function(data) {
+        var foundComment, updateComment,
           _this = this;
         updateComment = function(comment, updatedComment) {
           comment.commentMin.css({
@@ -57,39 +57,35 @@
           });
           return room.comments.redrawArrow(comment.commentMin);
         };
-        createNewComment = function(comment) {
-          var commentMin, rect;
-          if (comment.rect) {
-            rect = new Path.RoundRectangle(comment.rect.x, comment.rect.y, comment.rect.w, comment.rect.h, 8, 8);
-            room.items.create(rect, room.comments.COMMENT_STYLE);
-          }
-          commentMin = room.comments.create(comment.min.x, comment.min.y, rect, comment.max);
-          commentMin.elementId = comment.elementId;
-          if (rect) {
-            rect.commentMin = commentMin;
-            rect.eligible = false;
-            return room.history.add(rect);
-          } else {
-            return room.history.add({
-              type: "comment",
-              commentMin: commentMin,
-              eligible: false
-            });
-          }
-        };
-        if (initial) {
-          $(data).each(function() {
-            return createNewComment(this);
-          });
+        foundComment = room.helper.findByElementId(data.elementId);
+        if (foundComment) {
+          updateComment(foundComment, data);
         } else {
-          foundComment = room.helper.findByElementId(data.elementId);
-          if (foundComment) {
-            updateComment(foundComment, data);
-          } else {
-            createNewComment(data);
-          }
+          this.createCommentFromData(data);
         }
         return room.redrawWithThumb();
+      };
+
+      RoomSocketHelper.prototype.createCommentFromData = function(comment) {
+        var commentMin, rect;
+        if (comment.rect) {
+          rect = new Path.RoundRectangle(comment.rect.x, comment.rect.y, comment.rect.w, comment.rect.h, 8, 8);
+          room.items.create(rect, room.comments.COMMENT_STYLE);
+        }
+        commentMin = room.comments.create(comment.min.x, comment.min.y, rect, comment.max);
+        commentMin.elementId = comment.elementId;
+        if (rect) {
+          rect.commentMin = commentMin;
+          rect.eligible = false;
+          room.history.add(rect);
+        } else {
+          room.history.add({
+            type: "comment",
+            commentMin: commentMin,
+            eligible: false
+          });
+        }
+        return commentMin;
       };
 
       RoomSocketHelper.prototype.socketRemoveElement = function(data) {
@@ -185,33 +181,34 @@
       };
 
       RoomSocketHelper.prototype.prepareCommentToSend = function(commentMin) {
-        var comment, commentMax, commentRect;
-        comment = {
-          min: {
-            x: commentMin.position().left,
-            y: commentMin.position().top
-          },
-          elementId: commentMin.elementId
+        var commentMax, commentRect, data;
+        data = {
+          canvasId: room.canvas.getSelectedCanvasId(),
+          element: {
+            elementId: commentMin.elementId,
+            min: {
+              x: commentMin.position().left,
+              y: commentMin.position().top
+            }
+          }
         };
         commentMax = commentMin[0].$maximized[0];
         if (commentMax) {
-          comment.max = {
+          data.element.max = {
             x: $(commentMax).position().left,
             y: $(commentMax).position().top
           };
         }
         commentRect = commentMin[0].rect;
         if (commentRect) {
-          comment.rect = {
+          data.element.rect = {
             x: commentRect.bounds.x,
             y: commentRect.bounds.y,
             w: commentRect.bounds.width,
             h: commentRect.bounds.height
           };
         }
-        return {
-          comment: comment
-        };
+        return data;
       };
 
       return RoomSocketHelper;

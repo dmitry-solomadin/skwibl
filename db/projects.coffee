@@ -69,9 +69,9 @@ exports.setUp = (client, db) ->
     client.smembers "projects:#{pid}:canvases", (err, array) ->
       client.del "projects:#{pid}:canvases"
       if not err and array and array.length
-        return tools.asyncParallel array, (left, cid) ->
+        return tools.asyncParallel array, (cid) ->
           client.del "canvases:#{cid}"
-          return tools.asyncDone left, ->
+          return tools.asyncDone array, ->
             return tools.asyncOpt fn, null, pid
       return tools.asyncOpt fn, err, pid
 
@@ -86,7 +86,7 @@ exports.setUp = (client, db) ->
     client.lrange "projects:#{pid}:#{type}", 0, -1, (err, array) ->
       client.del "projects:#{pid}:#{type}"
       if not err and array and array.length
-        return tools.asyncParallel array, (left, aid) ->
+        return tools.asyncParallel array, (aid) ->
           client.del "actions:#{aid}"
           return tools.asyncDone array, ->
             return tools.asyncOpt fn, null, pid
@@ -156,13 +156,13 @@ exports.setUp = (client, db) ->
   mod.accept = (pid, id, fn) ->
     # Get project members
     client.smembers "projects:#{pid}:users", (err, array) ->
-      if not err and array
-        return tools.asyncParallel array, (left, cid) ->
+      if not err and array and array.length
+        return tools.asyncParallel array, (cid) ->
           # Add the user as a contact to all project members
           client.sadd "users:#{cid}:contacts", id
           # And vise-versa
           client.sadd "users:#{id}:contacts", cid
-          return tools.asyncDone left, ->
+          return tools.asyncDone array, ->
             # Add the user to the project
             client.smove "projects:#{pid}:unconfirmed", "projects:#{pid}:users", id
             # Add the project to the user
@@ -183,7 +183,7 @@ exports.setUp = (client, db) ->
         return tools.asyncParallel array, (left, cid) ->
           # Recalculate member contacts
           db.contacts.recalculate cid, [id], pid
-          return tools.asyncDone left, ->
+          return tools.asyncDone array, ->
             # Remove user from project members
             client.srem "projects:#{pid}:users", id
             return tools.asyncOpt fn, null

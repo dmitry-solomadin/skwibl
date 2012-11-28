@@ -5,26 +5,20 @@ $ ->
 
     init: ->
       @initElements()
+      @initComments()
       @initThumbnails()
 
     initElements: ->
       removeElementById = (id) ->
-        for element in paper.project.activeLayer.children
+        for element in paper.project.activeLayer.children # todo maybe should be changed to opts.historytools.allhistory
           element.remove() if element.id == id
 
       selectedCid = @getSelectedCanvasId()
+      @forEachThumbInContext (cid) ->
+        canvasElements = []
+        canvasElements.push(JSON.parse($(rawElement).val())) for rawElement in $(".canvasElement#{cid}")
 
-      for thumb in @getThumbs()
-        cid = $(thumb).data("cid")
-
-        opts = @findCanvasOptsById(cid)
-        if opts then room.setOpts(opts) else room.initOpts(cid)
-
-        #initialize elements
-        savedElements = []
-        savedElements.push(JSON.parse($(rawElement).val())) for rawElement in $(".canvasElement#{cid}")
-
-        for element in savedElements
+        for element in canvasElements
           path = room.socketHelper.createElementFromData(element)
 
           removeElementById(path.id) unless cid is selectedCid
@@ -36,8 +30,15 @@ $ ->
           path.eligible = false
           room.history.add(path)
 
-      selectedOpts = @findCanvasOptsById(selectedCid)
-      room.setOpts(selectedOpts)
+    initComments: ->
+      selectedCid = @getSelectedCanvasId()
+      @forEachThumbInContext (cid) ->
+        canvasComments = []
+        canvasComments.push(JSON.parse($(rawComment).val())) for rawComment in $(".canvasComment#{cid}")
+
+        for comment in canvasComments
+          createdComment = room.socketHelper.createCommentFromData(comment)
+          room.comments.hideComment(createdComment) unless cid is selectedCid
 
     # todo we should rewrite this part if possible, I don't like the idea of callbacks here
     initThumbnails: ->
@@ -69,6 +70,20 @@ $ ->
         )(cid)
         paper.projects[1].activate()
 
+
+    # executes function for each cavnvas in context of opts of this canvas
+    forEachThumbInContext: (fn) ->
+      selectedCid = @getSelectedCanvasId()
+      for thumb in @getThumbs()
+        cid = $(thumb).data("cid")
+        opts = @findCanvasOptsById(cid)
+        if opts then room.setOpts(opts) else room.initOpts(cid)
+
+        fn(cid)
+
+      selectedOpts = @findCanvasOptsById(selectedCid)
+      room.setOpts(selectedOpts)
+
     # INITIALIZATION END
 
     clear: ->
@@ -86,17 +101,9 @@ $ ->
     # used upon eraseCanvas event
     erase: ->
       for element in opts.historytools.allHistory
+        console.log element
         element.remove() unless element.type
         room.comments.hideComment(element.commentMin) if element.commentMin
-
-      room.redraw()
-
-    eraseCompletely: ->
-      itemsToRemove = []
-      for child in paper.project.activeLayer.children
-        itemsToRemove.push child
-
-      item.remove() for item in itemsToRemove
 
       room.redraw()
 
@@ -174,7 +181,7 @@ $ ->
       $("#canvasSelectDiv").append(thumb)
 
     addNewThumbAndSelect: (canvasId) ->
-      @eraseCompletely()
+      @erase()
       room.initOpts(canvasId)
 
       @addNewThumb(canvasId)
@@ -227,7 +234,7 @@ $ ->
 
       alert("No canvas opts by given canvasId=" + cid) unless canvasOpts
 
-      @eraseCompletely()
+      @erase()
       room.setOpts(canvasOpts)
       @restore()
 

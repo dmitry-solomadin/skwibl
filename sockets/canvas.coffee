@@ -46,14 +46,12 @@ exports.configure = (sio) ->
         db.actions.remove data.elementId
 
       socket.on 'commentUpdate', (data, cb) ->
-        console.log 'coupdate'
-        console.log data
         data.comment = true
         socket.broadcast.to(socket.project).emit 'commentUpdate',
           id: id
           canvasId: data.canvasId
           element: data.element
-        db.actions.update socket.project, id, 'element', data
+        db.actions.update socket.project, id, 'comment', data
 
       socket.on 'commentRemove', (data, cb) ->
         console.log 'cormove'

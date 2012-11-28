@@ -13,7 +13,6 @@ exports.setUp = (client, db) ->
     action.owner = owner
     action.type = type
     action.canvasId = data.canvasId if data.canvasId
-    actions.comment = true if data.comment
     action.time = new Date
     action.data = JSON.stringify(data.element)
 
@@ -52,8 +51,8 @@ exports.setUp = (client, db) ->
             return tools.asyncDone array, ->
               return tools.asyncOpt fn, null, actions
 
-  mod.getElements = (cid, fn) ->
-    client.lrange "canvases:#{cid}:element", 0, -1, (err, actions) ->
+  mod.getElements = (cid, type, fn) ->
+    client.lrange "canvases:#{cid}:#{type}", 0, -1, (err, actions) ->
       return tools.asyncOpt fn, null, [] if not actions or not actions.length
 
       if not err

@@ -7,7 +7,7 @@ $ ->
 
       socket.on 'elementUpdate', (data) => @addOrUpdateElement(data.element)
       socket.on 'elementRemove', (data) => @socketRemoveElement(data.message)
-      socket.on 'commentUpdate', (data) => @addOrUpdateComment(data.message, false)
+      socket.on 'commentUpdate', (data) => @addOrUpdateComment(data.element)
       socket.on 'commentRemove', (data) => @socketRemoveComment(data.message)
       socket.on 'commentText', (data) => @addOrUpdateCommentText(data.message)
       socket.on 'fileAdded', (data) => room.canvas.handleUpload(data.canvasId, data.fileId, false)
@@ -22,34 +22,33 @@ $ ->
       foundComment = room.helper.findByElementId data.elementId
       room.comments.addCommentText foundComment.commentMin, data.text, false
 
-    addOrUpdateComment: (data, initial) ->
+    addOrUpdateComment: (data) ->
       updateComment = (comment, updatedComment) =>
         comment.commentMin.css(left: updatedComment.min.x, top: updatedComment.min.y)
         comment.commentMin[0].$maximized.css(left: updatedComment.max.x, top: updatedComment.max.y)
         room.comments.redrawArrow(comment.commentMin)
 
-      createNewComment = (comment) =>
-        if comment.rect
-          rect = new Path.RoundRectangle(comment.rect.x, comment.rect.y, comment.rect.w, comment.rect.h, 8, 8)
-          room.items.create(rect, room.comments.COMMENT_STYLE)
-
-        commentMin = room.comments.create(comment.min.x, comment.min.y, rect, comment.max)
-        commentMin.elementId = comment.elementId
-
-        if rect
-          rect.commentMin = commentMin
-          rect.eligible = false
-          room.history.add(rect)
-        else
-          room.history.add({type: "comment", commentMin: commentMin, eligible: false})
-
-      if initial
-        $(data).each -> createNewComment(@)
-      else
-        foundComment = room.helper.findByElementId(data.elementId)
-        if foundComment then updateComment(foundComment, data) else createNewComment(data)
+      foundComment = room.helper.findByElementId(data.elementId)
+      if foundComment then updateComment(foundComment, data) else @createCommentFromData(data)
 
       room.redrawWithThumb()
+
+    createCommentFromData: (comment) ->
+      if comment.rect
+        rect = new Path.RoundRectangle(comment.rect.x, comment.rect.y, comment.rect.w, comment.rect.h, 8, 8)
+        room.items.create(rect, room.comments.COMMENT_STYLE)
+
+      commentMin = room.comments.create(comment.min.x, comment.min.y, rect, comment.max)
+      commentMin.elementId = comment.elementId
+
+      if rect
+        rect.commentMin = commentMin
+        rect.eligible = false
+        room.history.add(rect)
+      else
+        room.history.add({type: "comment", commentMin: commentMin, eligible: false})
+
+      commentMin
 
     socketRemoveElement: (data) ->
       room.helper.findByElementId(data).remove()
@@ -131,26 +130,28 @@ $ ->
       data
 
     prepareCommentToSend: (commentMin) ->
-      comment =
-        min:
-          x: commentMin.position().left
-          y: commentMin.position().top
-        elementId: commentMin.elementId
+      data =
+        canvasId: room.canvas.getSelectedCanvasId()
+        element:
+          elementId: commentMin.elementId
+          min:
+            x: commentMin.position().left
+            y: commentMin.position().top
 
       commentMax = commentMin[0].$maximized[0]
       if commentMax
-        comment.max =
+        data.element.max =
           x: $(commentMax).position().left
           y: $(commentMax).position().top
 
       commentRect = commentMin[0].rect
       if commentRect
-        comment.rect =
+        data.element.rect =
           x: commentRect.bounds.x
           y: commentRect.bounds.y
           w: commentRect.bounds.width
           h: commentRect.bounds.height
 
-      comment: comment
+      data
 
   App.room.socketHelper = new RoomSocketHelper
