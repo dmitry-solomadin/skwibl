@@ -59,7 +59,7 @@
         var selectedCid;
         selectedCid = this.getSelectedCanvasId();
         return this.forEachThumbInContext(function(cid) {
-          var canvasComments, comment, createdComment, rawComment, _i, _j, _len, _len1, _ref, _results;
+          var canvasComments, comment, createdComment, rawComment, text, texts, _i, _j, _len, _len1, _ref, _results;
           canvasComments = [];
           _ref = $(".canvasComment" + cid);
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -69,12 +69,20 @@
           _results = [];
           for (_j = 0, _len1 = canvasComments.length; _j < _len1; _j++) {
             comment = canvasComments[_j];
+            texts = JSON.parse($("#commentTexts" + comment.elementId).val());
             createdComment = room.socketHelper.createCommentFromData(comment);
             if (cid !== selectedCid) {
-              _results.push(room.comments.hideComment(createdComment));
-            } else {
-              _results.push(void 0);
+              room.comments.hideComment(createdComment);
             }
+            _results.push((function() {
+              var _k, _len2, _results1;
+              _results1 = [];
+              for (_k = 0, _len2 = texts.length; _k < _len2; _k++) {
+                text = texts[_k];
+                _results1.push(room.comments.addCommentText(createdComment, text.text, text.elementId));
+              }
+              return _results1;
+            })());
           }
           return _results;
         });

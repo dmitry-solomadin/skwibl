@@ -64,7 +64,7 @@ $ ->
 
       $(commentMax).find(".comment-send").on "click", =>
         commentTextarea = commentMax.find(".comment-reply")
-        @addCommentText(commentMin, commentTextarea.val(), true)
+        @addCommentText(commentMin, commentTextarea.val())
         commentTextarea.val("")
 
       commentMin[0].$maximized = commentMax
@@ -310,10 +310,16 @@ $ ->
 
       room.redrawWithThumb()
 
-    addCommentText: (commentMin, text, emit) ->
+    addCommentText: (commentMin, text, elementId) ->
+      emit = if elementId then false else true
+      elementId = elementId or room.generateId()
       commentContent = commentMin[0].$maximized.find(".comment-content")
-      commentContent.prepend("<div class='comment-text'>#{text}</div>")
+      commentContent.prepend("<div id='commentText#{elementId}' class='comment-text'>#{text}</div>")
 
-      room.socket.emit("commentText", {elementId: commentMin.elementId, text: text}) if emit
+      if emit
+        room.socket.emit "commentText",
+          elementId: elementId
+          commentId: commentMin.elementId
+          text: text
 
   App.room.comments = new RoomComments

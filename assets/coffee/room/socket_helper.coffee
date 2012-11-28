@@ -9,7 +9,7 @@ $ ->
       socket.on 'elementRemove', (data) => @socketRemoveElement(data.message)
       socket.on 'commentUpdate', (data) => @addOrUpdateComment(data.element)
       socket.on 'commentRemove', (data) => @socketRemoveComment(data.message)
-      socket.on 'commentText', (data) => @addOrUpdateCommentText(data.message)
+      socket.on 'commentText', (data) => @addOrUpdateCommentText(data.element)
       socket.on 'fileAdded', (data) => room.canvas.handleUpload(data.canvasId, data.fileId, false)
       socket.on 'switchCanvas', (data) =>
         room.canvas.selectThumb(room.canvas.findThumbByCanvasId(data.canvasId), false)
@@ -18,9 +18,9 @@ $ ->
         room.canvas.erase()
         room.redrawWithThumb()
 
-    addOrUpdateCommentText: (data) ->
-      foundComment = room.helper.findByElementId data.elementId
-      room.comments.addCommentText foundComment.commentMin, data.text, false
+    addOrUpdateCommentText: (element) ->
+      foundComment = room.helper.findByElementId element.commentId
+      room.comments.addCommentText foundComment.commentMin, element.text, element.elementId
 
     addOrUpdateComment: (data) ->
       updateComment = (comment, updatedComment) =>
@@ -73,7 +73,7 @@ $ ->
         room.items.unselectIfSelected(foundPath.elementId)
         foundPath.removeSegments()
         $(element.segments).each ->
-          foundPath.addSegment(createSegment(@.x, @.y, @.ix, @.iy, @.ox, @.oy))
+          foundPath.addSegment(room.socketHelper.createSegment(@.x, @.y, @.ix, @.iy, @.ox, @.oy))
 
         if foundPath.commentMin
           room.comments.redrawArrow(foundPath.commentMin)
@@ -90,17 +90,17 @@ $ ->
 
       room.redrawWithThumb()
 
+    createSegment: (x, y, ix, iy, ox, oy) ->
+      handleIn = new Point(ix, iy)
+      handleOut = new Point(ox, oy)
+      firstPoint = new Point(x, y)
+
+      return new Segment(firstPoint, handleIn, handleOut)
+
     createElementFromData: (data) ->
-      createSegment = (x, y, ix, iy, ox, oy) ->
-        handleIn = new Point(ix, iy)
-        handleOut = new Point(ox, oy)
-        firstPoint = new Point(x, y)
-
-        return new Segment(firstPoint, handleIn, handleOut)
-
       path = new Path()
       $(data.segments).each ->
-        path.addSegment(createSegment(@.x, @.y, @.ix, @.iy, @.ox, @.oy))
+        path.addSegment(room.socketHelper.createSegment(@.x, @.y, @.ix, @.iy, @.ox, @.oy))
       path.closed = data.closed
       path.elementId = data.elementId
 

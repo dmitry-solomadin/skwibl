@@ -91,7 +91,7 @@
         $(commentMax).find(".comment-send").on("click", function() {
           var commentTextarea;
           commentTextarea = commentMax.find(".comment-reply");
-          _this.addCommentText(commentMin, commentTextarea.val(), true);
+          _this.addCommentText(commentMin, commentTextarea.val());
           return commentTextarea.val("");
         });
         commentMin[0].$maximized = commentMax;
@@ -419,13 +419,16 @@
         return room.redrawWithThumb();
       };
 
-      RoomComments.prototype.addCommentText = function(commentMin, text, emit) {
-        var commentContent;
+      RoomComments.prototype.addCommentText = function(commentMin, text, elementId) {
+        var commentContent, emit;
+        emit = elementId ? false : true;
+        elementId = elementId || room.generateId();
         commentContent = commentMin[0].$maximized.find(".comment-content");
-        commentContent.prepend("<div class='comment-text'>" + text + "</div>");
+        commentContent.prepend("<div id='commentText" + elementId + "' class='comment-text'>" + text + "</div>");
         if (emit) {
           return room.socket.emit("commentText", {
-            elementId: commentMin.elementId,
+            elementId: elementId,
+            commentId: commentMin.elementId,
             text: text
           });
         }

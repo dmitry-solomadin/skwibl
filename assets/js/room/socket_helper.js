@@ -23,7 +23,7 @@
           return _this.socketRemoveComment(data.message);
         });
         socket.on('commentText', function(data) {
-          return _this.addOrUpdateCommentText(data.message);
+          return _this.addOrUpdateCommentText(data.element);
         });
         socket.on('fileAdded', function(data) {
           return room.canvas.handleUpload(data.canvasId, data.fileId, false);
@@ -37,10 +37,10 @@
         });
       }
 
-      RoomSocketHelper.prototype.addOrUpdateCommentText = function(data) {
+      RoomSocketHelper.prototype.addOrUpdateCommentText = function(element) {
         var foundComment;
-        foundComment = room.helper.findByElementId(data.elementId);
-        return room.comments.addCommentText(foundComment.commentMin, data.text, false);
+        foundComment = room.helper.findByElementId(element.commentId);
+        return room.comments.addCommentText(foundComment.commentMin, element.text, element.elementId);
       };
 
       RoomSocketHelper.prototype.addOrUpdateComment = function(data) {
@@ -115,7 +115,7 @@
           room.items.unselectIfSelected(foundPath.elementId);
           foundPath.removeSegments();
           $(element.segments).each(function() {
-            return foundPath.addSegment(createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
+            return foundPath.addSegment(room.socketHelper.createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
           });
           if (foundPath.commentMin) {
             room.comments.redrawArrow(foundPath.commentMin);
@@ -133,18 +133,19 @@
         return room.redrawWithThumb();
       };
 
+      RoomSocketHelper.prototype.createSegment = function(x, y, ix, iy, ox, oy) {
+        var firstPoint, handleIn, handleOut;
+        handleIn = new Point(ix, iy);
+        handleOut = new Point(ox, oy);
+        firstPoint = new Point(x, y);
+        return new Segment(firstPoint, handleIn, handleOut);
+      };
+
       RoomSocketHelper.prototype.createElementFromData = function(data) {
-        var createSegment, path;
-        createSegment = function(x, y, ix, iy, ox, oy) {
-          var firstPoint, handleIn, handleOut;
-          handleIn = new Point(ix, iy);
-          handleOut = new Point(ox, oy);
-          firstPoint = new Point(x, y);
-          return new Segment(firstPoint, handleIn, handleOut);
-        };
+        var path;
         path = new Path();
         $(data.segments).each(function() {
-          return path.addSegment(createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
+          return path.addSegment(room.socketHelper.createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
         });
         path.closed = data.closed;
         path.elementId = data.elementId;

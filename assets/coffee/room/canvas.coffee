@@ -37,8 +37,13 @@ $ ->
         canvasComments.push(JSON.parse($(rawComment).val())) for rawComment in $(".canvasComment#{cid}")
 
         for comment in canvasComments
+          texts = JSON.parse($("#commentTexts#{comment.elementId}").val())
+
           createdComment = room.socketHelper.createCommentFromData(comment)
           room.comments.hideComment(createdComment) unless cid is selectedCid
+
+          for text in texts
+            room.comments.addCommentText createdComment, text.text, text.elementId
 
     # todo we should rewrite this part if possible, I don't like the idea of callbacks here
     initThumbnails: ->

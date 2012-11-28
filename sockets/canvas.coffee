@@ -4,10 +4,6 @@ tools = require '../tools'
 
 exports.configure = (sio) ->
 
-  sendInitData = (project, socket) ->
-    # get canvas saved elements
-    console.log 'TODO'
-
   canvas = sio.of '/canvas'
 
   canvas.on 'connection', (socket) ->
@@ -22,8 +18,6 @@ exports.configure = (sio) ->
 
       socket.join project
       socket.project = project
-
-      sendInitData project, socket
 
       socket.on 'disconnect', ->
         console.log "A socket with sessionId #{hs.sessionId} disconnected."
@@ -63,12 +57,9 @@ exports.configure = (sio) ->
         db.actions.remove data.elementId
 
       socket.on 'commentText', (data, cb) ->
-        console.log 'cotext'
-        console.log data
         socket.broadcast.to(socket.project).emit 'commentText',
           id: id
-          canvasId: data.canvasId
-          element: data.element
+          element: data
         db.actions.updateComment data
 
       socket.on 'eraseCanvas', (data, cb) ->
