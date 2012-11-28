@@ -5,7 +5,7 @@ $ ->
       socket = io.connect('/canvas', window.copt)
       App.room.socket = socket
 
-      socket.on 'elementUpdate', (data) => @addOrUpdateElement(data.message, false)
+      socket.on 'elementUpdate', (data) => @addOrUpdateElement(data.element)
       socket.on 'elementRemove', (data) => @socketRemoveElement(data.message)
       socket.on 'commentUpdate', (data) => @addOrUpdateComment(data.message, false)
       socket.on 'commentRemove', (data) => @socketRemoveComment(data.message)
@@ -68,7 +68,30 @@ $ ->
       room.items.unselectIfSelected(data)
       room.redrawWithThumb()
 
-    addOrUpdateElement: (data, initial) ->
+    addOrUpdateElement: (element) ->
+      foundPath = room.helper.findByElementId(element.elementId)
+      if foundPath
+        room.items.unselectIfSelected(foundPath.elementId)
+        foundPath.removeSegments()
+        $(element.segments).each ->
+          foundPath.addSegment(createSegment(@.x, @.y, @.ix, @.iy, @.ox, @.oy))
+
+        if foundPath.commentMin
+          room.comments.redrawArrow(foundPath.commentMin)
+      else
+        path = @createElementFromData(element)
+
+        room.items.create path,
+          color: element.strokeColor
+          width: element.strokeWidth
+          opacity: element.opacity
+
+        path.eligible = false
+        room.history.add(path)
+
+      room.redrawWithThumb()
+
+    createElementFromData: (data) ->
       createSegment = (x, y, ix, iy, ox, oy) ->
         handleIn = new Point(ix, iy)
         handleOut = new Point(ox, oy)
@@ -76,50 +99,28 @@ $ ->
 
         return new Segment(firstPoint, handleIn, handleOut)
 
-      createNewElement = (fromElement) =>
-        path = new Path()
-        $(fromElement.segments).each ->
-          path.addSegment(createSegment(@.x, @.y, @.ix, @.iy, @.ox, @.oy))
-        path.closed = fromElement.closed
-        path.elementId = fromElement.elementId
+      path = new Path()
+      $(data.segments).each ->
+        path.addSegment(createSegment(@.x, @.y, @.ix, @.iy, @.ox, @.oy))
+      path.closed = data.closed
+      path.elementId = data.elementId
 
-        room.items.create path,
-          color: fromElement.strokeColor
-          width: fromElement.strokeWidth
-          opacity: fromElement.opacity
-
-        path.eligible = false
-        room.history.add(path)
-
-      if initial
-        $(data).each -> createNewElement(@)
-      else
-        element = data
-        foundPath = room.helper.findByElementId(element.elementId)
-        if foundPath
-          room.items.unselectIfSelected(foundPath.elementId)
-          foundPath.removeSegments()
-          $(element.segments).each ->
-            foundPath.addSegment(createSegment(@.x, @.y, @.ix, @.iy, @.ox, @.oy))
-
-          if foundPath.commentMin
-            room.comments.redrawArrow(foundPath.commentMin)
-        else
-          createNewElement(element)
-
-      room.redrawWithThumb()
+      path
 
     prepareElementToSend: (elementToSend) ->
-      element =
-        segments: []
-        elementId: if elementToSend.commentMin then elementToSend.commentMin.elementId else elementToSend.elementId
-        closed: elementToSend.closed
-        strokeColor: elementToSend.strokeColor.toCssString()
-        strokeWidth: elementToSend.strokeWidth
-        opacity: elementToSend.opacity
+      data =
+        canvasId: room.canvas.getSelectedCanvasId()
+        element:
+          elementId: if elementToSend.commentMin then elementToSend.commentMin.elementId else elementToSend.elementId
+          canvasId: room.canvas.getSelectedCanvasId()
+          segments: []
+          closed: elementToSend.closed
+          strokeColor: elementToSend.strokeColor.toCssString()
+          strokeWidth: elementToSend.strokeWidth
+          opacity: elementToSend.opacity
 
       for segment in elementToSend.segments
-        element.segments.push
+        data.element.segments.push
           x: segment.point.x
           y: segment.point.y
           ix: segment.handleIn.x
@@ -127,7 +128,7 @@ $ ->
           ox: segment.handleOut.x
           oy: segment.handleOut.y
 
-      element
+      data
 
     prepareCommentToSend: (commentMin) ->
       comment =

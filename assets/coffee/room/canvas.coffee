@@ -1,32 +1,75 @@
 $ ->
   class RoomCanvas
 
+    # INITIALIZATION START
+
     init: ->
+      @initElements()
+      @initThumbnails()
+
+    initElements: ->
+      removeElementById = (id) ->
+        for element in paper.project.activeLayer.children
+          element.remove() if element.id == id
+
       selectedCid = @getSelectedCanvasId()
+
       for thumb in @getThumbs()
-        callback = (canvasId) =>
-          opts = @findCanvasOptsById(canvasId)
-          if opts then room.setOpts(opts) else room.initOpts(canvasId)
+        cid = $(thumb).data("cid")
 
-          if selectedCid == canvasId
-            paper.projects[1].activate()
-          else
-            paper.projects[0].activate()
-          @updateThumb canvasId
-          @clearCopyCanvas()
+        opts = @findCanvasOptsById(cid)
+        if opts then room.setOpts(opts) else room.initOpts(cid)
+
+        #initialize elements
+        savedElements = []
+        savedElements.push(JSON.parse($(rawElement).val())) for rawElement in $(".canvasElement#{cid}")
+
+        for element in savedElements
+          path = room.socketHelper.createElementFromData(element)
+
+          removeElementById(path.id) unless cid is selectedCid
+
+          path.strokeColor = element.strokeColor
+          path.strokeWidth = element.strokeWidth
+          path.opacity = element.opacity
+
+          path.eligible = false
+          room.history.add(path)
+
+      selectedOpts = @findCanvasOptsById(selectedCid)
+      room.setOpts(selectedOpts)
+
+    # todo we should rewrite this part if possible, I don't like the idea of callbacks here
+    initThumbnails: ->
+      selectedCid = @getSelectedCanvasId()
+      callback = (img, canvasId) =>
+        prevOpts = room.getOpts()
+        room.setOpts(@findCanvasOptsById(canvasId))
+
+        #initialize thumbnails
+        if selectedCid == canvasId
           paper.projects[1].activate()
+        else
+          paper.projects[0].activate()
+        @updateThumb canvasId
+        @clearCopyCanvas()
+        @setImage(img)
+        paper.projects[1].activate()
 
+        room.setOpts(prevOpts)
+
+      for thumb in @getThumbs()
         cid = $(thumb).data("cid")
         if selectedCid == cid
           paper.projects[1].activate()
         else
           paper.projects[0].activate()
         @addImage $(thumb).data("fid"), ((canvasId)->
-          -> callback(canvasId)
+          (img) -> callback(img, canvasId)
         )(cid)
         paper.projects[1].activate()
-      initialOpts = @findCanvasOptsById(selectedCid)
-      room.setOpts(initialOpts)
+
+    # INITIALIZATION END
 
     clear: ->
       room.history.add
@@ -49,8 +92,12 @@ $ ->
       room.redraw()
 
     eraseCompletely: ->
+      itemsToRemove = []
       for child in paper.project.activeLayer.children
-        child.remove() if child
+        itemsToRemove.push child
+
+      item.remove() for item in itemsToRemove
+
       room.redraw()
 
     clearCopyCanvas: ->
@@ -58,7 +105,12 @@ $ ->
 
     restore: ->
       for element in opts.historytools.allHistory
-        paper.project.activeLayer.addChild(element) unless this.type
+        unless element.type
+          if element.isImage
+            paper.project.activeLayer.insertChild(0, element)
+          else
+            paper.project.activeLayer.addChild(element)
+
         room.comments.showComment(element.commentMin) if element.commentMin
 
     setScale: (scale) ->
@@ -88,8 +140,9 @@ $ ->
     # CANVAS THUMBNAILS & IMAGE UPLOAD
 
     handleUpload: (canvasId, fileId, emit) ->
-      @addNewThumbAndSelect(canvasId) if opts.fileId
-      @addImage fileId, =>
+      @addNewThumbAndSelect(canvasId) if opts.image
+      @addImage fileId, (img) =>
+        @setImage(img)
         @updateSelectedThumb()
         room.socket.emit("fileAdded", {canvasId: canvasId, fileId: fileId}) if emit
 
@@ -107,13 +160,14 @@ $ ->
         img.size.width = image.width
         img.size.height = image.height
         img.position = paper.view.center
+        img.fileId = fileId
 
-        callback() if callback?
+        callback(img) if callback?
 
-        opts.fileId = fileId
-        opts.image = img
+    setImage: (img) ->
+      opts.image = img
 
-        room.history.add(img)
+      room.history.add(img)
 
     addNewThumb: (canvasId) ->
       thumb = $("<a href='#' data-cid='#{canvasId}'><canvas width='80' height='60'></canvas></a>")

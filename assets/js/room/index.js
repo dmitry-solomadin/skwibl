@@ -63,6 +63,10 @@
         return window.opts = opts;
       };
 
+      Room.prototype.getOpts = function() {
+        return this.opts;
+      };
+
       Room.prototype.onMouseMove = function(canvas, event) {
         var selectedTool;
         event.point = this.applyCurrentScale(event.point);

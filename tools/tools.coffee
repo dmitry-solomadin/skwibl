@@ -99,21 +99,21 @@ exports.asyncOptError = (fn, msg, val) ->
 exports.asyncOrdered = (array, index, fn, done) ->
   index = index or 0
   return done() if index is array.length
-  fn()
+  fn(array[index])
   process.nextTick ->
-    tools.asyncOrdered array, index++, fn, done
+    exports.asyncOrdered array, index++, fn, done
 
 exports.asyncParallel = (array, fn) ->
-  left = array.length - 1
+  array.left = array.length
   for el in array
     ((val) ->
       process.nextTick ->
-        fn left, val
-        --left
+        fn val
     )(el)
 
-exports.asyncDone = (left, fn) ->
-  process.nextTick(fn) if left is 0
+exports.asyncDone = (array, fn) ->
+  --array.left
+  process.nextTick(fn) if array.left is 0
 
 exports.exitNotify = (worker, code, signal) ->
   console.log "Worker #{worker.id} died: #{worker.process.pid}"

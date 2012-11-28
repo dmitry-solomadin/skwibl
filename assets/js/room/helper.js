@@ -74,7 +74,7 @@
             params = {
               pid: $("#pid").val()
             };
-            if (!opts.fileId) {
+            if (!opts.image) {
               params.cid = App.room.canvas.getSelected().data("cid");
             }
             room.uploader.setParams(params);

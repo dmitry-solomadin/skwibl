@@ -27,7 +27,7 @@ exports.setUp = (client, db) ->
     client.smembers "projects:#{pid}:canvases", (err, array) ->
       if not err and array and array.length
         canvases = []
-        return tools.asyncParallel array, (left, cid) ->
+        return tools.asyncParallel array, (cid) ->
           db.canvases.get cid, (err, canvas) ->
             if not err and canvas
               db.files.findById canvas.file, (err, file) ->
@@ -37,7 +37,7 @@ exports.setUp = (client, db) ->
                       canvasId: cid
                       file: file
                       elements: elements
-                  return tools.asyncDone left, ->
+                  return tools.asyncDone array, ->
                     return tools.asyncOpt fn, null, canvases
       return tools.asyncOpt fn, err, []
 

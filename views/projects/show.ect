@@ -25,6 +25,9 @@
     <div class="canvasFooterBottom">
       <div id="canvasSelectDiv" class="canvasSelectDiv">
         <% for canvas, i in @canvases : %>
+          <% for element in canvas.elements : %>
+            <input class="canvasElement<%= canvas.canvasId %>" type="hidden" value="<%= element %>"/>
+          <% end %>
           <a href="#" class="<%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.canvasId %>" <%- "data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
             <canvas width="80" height="60"></canvas>
           </a>

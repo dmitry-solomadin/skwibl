@@ -11,7 +11,7 @@
         socket = io.connect('/canvas', window.copt);
         App.room.socket = socket;
         socket.on('elementUpdate', function(data) {
-          return _this.addOrUpdateElement(data.message, false);
+          return _this.addOrUpdateElement(data.element);
         });
         socket.on('elementRemove', function(data) {
           return _this.socketRemoveElement(data.message);
@@ -112,9 +112,33 @@
         return room.redrawWithThumb();
       };
 
-      RoomSocketHelper.prototype.addOrUpdateElement = function(data, initial) {
-        var createNewElement, createSegment, element, foundPath,
-          _this = this;
+      RoomSocketHelper.prototype.addOrUpdateElement = function(element) {
+        var foundPath, path;
+        foundPath = room.helper.findByElementId(element.elementId);
+        if (foundPath) {
+          room.items.unselectIfSelected(foundPath.elementId);
+          foundPath.removeSegments();
+          $(element.segments).each(function() {
+            return foundPath.addSegment(createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
+          });
+          if (foundPath.commentMin) {
+            room.comments.redrawArrow(foundPath.commentMin);
+          }
+        } else {
+          path = this.createElementFromData(element);
+          room.items.create(path, {
+            color: element.strokeColor,
+            width: element.strokeWidth,
+            opacity: element.opacity
+          });
+          path.eligible = false;
+          room.history.add(path);
+        }
+        return room.redrawWithThumb();
+      };
+
+      RoomSocketHelper.prototype.createElementFromData = function(data) {
+        var createSegment, path;
         createSegment = function(x, y, ix, iy, ox, oy) {
           var firstPoint, handleIn, handleOut;
           handleIn = new Point(ix, iy);
@@ -122,59 +146,33 @@
           firstPoint = new Point(x, y);
           return new Segment(firstPoint, handleIn, handleOut);
         };
-        createNewElement = function(fromElement) {
-          var path;
-          path = new Path();
-          $(fromElement.segments).each(function() {
-            return path.addSegment(createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
-          });
-          path.closed = fromElement.closed;
-          path.elementId = fromElement.elementId;
-          room.items.create(path, {
-            color: fromElement.strokeColor,
-            width: fromElement.strokeWidth,
-            opacity: fromElement.opacity
-          });
-          path.eligible = false;
-          return room.history.add(path);
-        };
-        if (initial) {
-          $(data).each(function() {
-            return createNewElement(this);
-          });
-        } else {
-          element = data;
-          foundPath = room.helper.findByElementId(element.elementId);
-          if (foundPath) {
-            room.items.unselectIfSelected(foundPath.elementId);
-            foundPath.removeSegments();
-            $(element.segments).each(function() {
-              return foundPath.addSegment(createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
-            });
-            if (foundPath.commentMin) {
-              room.comments.redrawArrow(foundPath.commentMin);
-            }
-          } else {
-            createNewElement(element);
-          }
-        }
-        return room.redrawWithThumb();
+        path = new Path();
+        $(data.segments).each(function() {
+          return path.addSegment(createSegment(this.x, this.y, this.ix, this.iy, this.ox, this.oy));
+        });
+        path.closed = data.closed;
+        path.elementId = data.elementId;
+        return path;
       };
 
       RoomSocketHelper.prototype.prepareElementToSend = function(elementToSend) {
-        var element, segment, _i, _len, _ref;
-        element = {
-          segments: [],
-          elementId: elementToSend.commentMin ? elementToSend.commentMin.elementId : elementToSend.elementId,
-          closed: elementToSend.closed,
-          strokeColor: elementToSend.strokeColor.toCssString(),
-          strokeWidth: elementToSend.strokeWidth,
-          opacity: elementToSend.opacity
+        var data, segment, _i, _len, _ref;
+        data = {
+          canvasId: room.canvas.getSelectedCanvasId(),
+          element: {
+            elementId: elementToSend.commentMin ? elementToSend.commentMin.elementId : elementToSend.elementId,
+            canvasId: room.canvas.getSelectedCanvasId(),
+            segments: [],
+            closed: elementToSend.closed,
+            strokeColor: elementToSend.strokeColor.toCssString(),
+            strokeWidth: elementToSend.strokeWidth,
+            opacity: elementToSend.opacity
+          }
         };
         _ref = elementToSend.segments;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           segment = _ref[_i];
-          element.segments.push({
+          data.element.segments.push({
             x: segment.point.x,
             y: segment.point.y,
             ix: segment.handleIn.x,
@@ -183,7 +181,7 @@
             oy: segment.handleOut.y
           });
         }
-        return element;
+        return data;
       };
 
       RoomSocketHelper.prototype.prepareCommentToSend = function(commentMin) {

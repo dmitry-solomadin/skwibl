@@ -66,6 +66,7 @@
 
       RoomItems.prototype.pan = function(dx, dy) {
         var element, _i, _len, _ref, _results;
+        console.log(opts.historytools.allHistory);
         _ref = opts.historytools.allHistory;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {

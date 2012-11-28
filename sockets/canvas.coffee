@@ -30,8 +30,6 @@ exports.configure = (sio) ->
         socket.leave socket.project
 
       socket.on 'elementUpdate', (data, cb) ->
-        console.log 'elupdate'
-        console.log data
         socket.broadcast.to(socket.project).emit 'elementUpdate',
           id: id
           canvasId: data.canvasId

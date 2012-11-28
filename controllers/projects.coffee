@@ -22,12 +22,14 @@ exports.show = (req, res, next) ->
   db.projects.set req.user.id, req.params.pid, ->
     db.projects.getData req.params.pid, (err, project) ->
       return next(err) if err
+
       return db.canvases.index req.params.pid, (err, canvases) ->
         return next(err) if err
+
         return res.render 'index',
           template: 'projects/show'
           pid: req.params.pid
-          canvases:canvases,
+          canvases: canvases,
           project: project
 
 #
@@ -35,7 +37,7 @@ exports.show = (req, res, next) ->
 # Show new project page.
 #
 exports.new = (req, res) ->
-  return res.render 'index',    template: 'projects/new'
+  return res.render 'index', template: 'projects/new'
 
 #
 # POST
@@ -64,8 +66,8 @@ exports.add = (req, res) ->
 #
 exports.close = (req, res) ->
   db.projects.setProperties req.body.pid,
-    status:'closed'
-    end:new Date
+    status: 'closed'
+    end: new Date
   , (err) ->
     tools.returnStatus err, res
 
@@ -75,7 +77,7 @@ exports.close = (req, res) ->
 #
 exports.reopen = (req, res) ->
   db.projects.setProperties req.body.pid,
-    status:'reopened'
+    status: 'reopened'
   , (err) ->
     tools.returnStatus err, res
 
@@ -98,8 +100,8 @@ exports.invite = (req, res) ->
     unless user
       return res.send
         msg: "We have not found the user in our
-        database, but the invitation was sent to
-        his email."
+                database, but the invitation was sent to
+                his email."
     return db.users.persist user, ->
       db.projects.getData data.pid, (err, project) ->
         unless err
@@ -146,7 +148,7 @@ exports.confirm = (req, res) ->
     return db.activities.getDataActivity data.aid, (err, activity) ->
       return res.send yes if err
       return res.render './activities/activity',
-        activity:activity
+        activity: activity
 
 #
 # POST
