@@ -96,6 +96,8 @@ exports.setUp = (client, db) ->
     db.projects.deleteCanvases pid
     db.projects.deleteUsers pid
     db.projects.deleteActions pid, 'chat'
+    db.projects.deleteActions pid, 'element'
+    db.projects.deleteActions pid, 'comment'
     client.del "projects:#{pid}", fn
 
   mod.setProperties = (pid, properties, fn) ->
