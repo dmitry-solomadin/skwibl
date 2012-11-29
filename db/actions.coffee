@@ -37,18 +37,7 @@ exports.setUp = (client, db) ->
             actions.push action
             return tools.asyncDone array, ->
               return tools.asyncOpt fn, null, actions
-
-  mod.getCanvas = (pid, type, fn) ->
-    client.lrange "projects:#{pid}:#{type}", 0, -1, (err, array) ->
-      if not err and array and array.length
-        actions = []
-        return tools.asyncParallel array, (aid) ->
-          client.hgetall "actions:#{aid}", (err, action) ->
-            if err
-              return tools.asyncOpt fn, err, []
-            actions.push action
-            return tools.asyncDone array, ->
-              return tools.asyncOpt fn, null, actions
+      return tools.asyncOpt fn, err, []
 
   mod.getElements = (cid, type, fn) ->
     client.lrange "canvases:#{cid}:#{type}", 0, -1, (err, actions) ->

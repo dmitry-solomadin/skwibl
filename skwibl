@@ -38,7 +38,7 @@ PASSWORD='fuThoh5eipe8'
 TMP_TEMPLATE='~'
 
 ## node execution command
-NODE_CMD='node --nouse-idle-notification --expose-gc'
+NODE_CMD='node u-nouse-idle-notification --expose-gc'
 
 ## coffee execution command
 COFFEE_OPT='--nodejs "--nouse-idle-notification --expose-gc"'
@@ -119,9 +119,9 @@ function reset {
   sudo nginx -s stop
   mkdir -p /etc/haproxy
   sudo update-rc.d haproxy remove
-  sudo cp -fu $EXTERNAL/nginx.conf /etc/nginx/
-  sudo cp -fu $EXTERNAL/haproxy.cfg /etc/haproxy/
-  sudo cp -fu $EXTERNAL/haproxy /etc/init.d/
+  sudo cp -f $EXTERNAL/nginx.conf /etc/nginx/
+  sudo cp -f $EXTERNAL/haproxy.cfg /etc/haproxy/
+  sudo cp -f $EXTERNAL/haproxy /etc/init.d/
   sudo update-rc.d haproxy defaults
   sudo nginx
   sudo service haproxy restart
@@ -170,13 +170,13 @@ function update {
 }
 
 ## options check and parse
-if ! options=$(getopt -o abcdeiprsuh: -l dynamic,build,clean,deploy,debug,init,product,reset,socket,update,help -- "$@"); then
-  exit 1
-fi
+##if ! options=$(getopt -o abcdeiprsuh: -l dynamic,build,clean,deploy,debug,init,product,reset,socket,update,help -- "$@"); then
+##  exit 1
+##fi
 
-set -- $options
+##set -- $options
 
-while [ $# -gt 0 ]; do
+##while [ $# -gt 0 ]; do
   case "$1" in
     -a|--dynamic)
       init
@@ -229,4 +229,4 @@ while [ $# -gt 0 ]; do
       echo "Unknown error while processing options"
       exit 1;;
   esac
-done
+##done
