@@ -62,4 +62,8 @@ $ ->
         return element if element.elementId == id
       return null
 
+    findById: (id) ->
+      for element in paper.project.activeLayer.children
+        return element if element.id is id
+
   App.room.helper = new RoomHelper

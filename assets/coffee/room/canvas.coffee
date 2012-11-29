@@ -9,10 +9,6 @@ $ ->
       @initThumbnails()
 
     initElements: ->
-      removeElementById = (id) ->
-        for element in paper.project.activeLayer.children # todo maybe should be changed to opts.historytools.allhistory
-          element.remove() if element.id == id
-
       selectedCid = @getSelectedCanvasId()
       @forEachThumbInContext (cid) ->
         canvasElements = []
@@ -21,7 +17,7 @@ $ ->
         for element in canvasElements
           path = room.socketHelper.createElementFromData(element)
 
-          removeElementById(path.id) unless cid is selectedCid
+          room.helper.findById(path.id).remove() unless cid is selectedCid
 
           path.strokeColor = element.strokeColor
           path.strokeWidth = element.strokeWidth
@@ -40,51 +36,39 @@ $ ->
           texts = JSON.parse($("#commentTexts#{comment.elementId}").val())
 
           createdComment = room.socketHelper.createCommentFromData(comment)
-          room.comments.hideComment(createdComment) unless cid is selectedCid
+          console.log "current cid", cid
+          console.log "selected cid", selectedCid
+          console.log "comments", canvasComments
+          console.log " "
+          unless cid is selectedCid
+            console.log "hiding created coment"
+            room.comments.hideComment(createdComment)
 
           for text in texts
             room.comments.addCommentText createdComment, text.text, text.elementId
 
-    # todo we should rewrite this part if possible, I don't like the idea of callbacks here
     initThumbnails: ->
       selectedCid = @getSelectedCanvasId()
-      callback = (img, canvasId) =>
-        prevOpts = room.getOpts()
-        room.setOpts(@findCanvasOptsById(canvasId))
 
-        #initialize thumbnails
-        if selectedCid == canvasId
-          paper.projects[1].activate()
-        else
-          paper.projects[0].activate()
-        @updateThumb canvasId
-        @clearCopyCanvas()
-        @setImage(img)
-        paper.projects[1].activate()
+      @forEachThumbInContext (cid, fid) =>
+        @addImage fid, (raster,executeLoadImage) =>
+          executeLoadImage()
 
-        room.setOpts(prevOpts)
+          if cid isnt selectedCid and opts.image.id isnt raster.id
+            room.helper.findById(raster.id).remove()
 
-      for thumb in @getThumbs()
-        cid = $(thumb).data("cid")
-        if selectedCid == cid
-          paper.projects[1].activate()
-        else
-          paper.projects[0].activate()
-        @addImage $(thumb).data("fid"), ((canvasId)->
-          (img) -> callback(img, canvasId)
-        )(cid)
-        paper.projects[1].activate()
-
+          @updateThumb(cid)
 
     # executes function for each cavnvas in context of opts of this canvas
     forEachThumbInContext: (fn) ->
       selectedCid = @getSelectedCanvasId()
       for thumb in @getThumbs()
         cid = $(thumb).data("cid")
+        fid = $(thumb).data("fid")
         opts = @findCanvasOptsById(cid)
         if opts then room.setOpts(opts) else room.initOpts(cid)
 
-        fn(cid)
+        fn(cid, fid)
 
       selectedOpts = @findCanvasOptsById(selectedCid)
       room.setOpts(selectedOpts)
@@ -106,16 +90,21 @@ $ ->
     # used upon eraseCanvas event
     erase: ->
       for element in opts.historytools.allHistory
-        console.log element
         element.remove() unless element.type
         room.comments.hideComment(element.commentMin) if element.commentMin
 
       room.redraw()
 
     clearCopyCanvas: ->
-      child.remove() for child in paper.projects[0].activeLayer.children
+      itemsToRemove = []
+      itemsToRemove.push(child) for child in paper.projects[0].activeLayer.children
+      item.remove() for item in itemsToRemove
 
-    restore: ->
+    activateCopyCanvas: -> paper.projects[0].activate()
+
+    activateNormalCanvas: -> paper.projects[1].activate()
+
+    restore: (withComments)->
       for element in opts.historytools.allHistory
         unless element.type
           if element.isImage
@@ -123,7 +112,7 @@ $ ->
           else
             paper.project.activeLayer.addChild(element)
 
-        room.comments.showComment(element.commentMin) if element.commentMin
+        room.comments.showComment(element.commentMin) if element.commentMin and withComments
 
     setScale: (scale) ->
       finalScale = scale / opts.currentScale
@@ -153,33 +142,32 @@ $ ->
 
     handleUpload: (canvasId, fileId, emit) ->
       @addNewThumbAndSelect(canvasId) if opts.image
-      @addImage fileId, (img) =>
-        @setImage(img)
-        @updateSelectedThumb()
-        room.socket.emit("fileAdded", {canvasId: canvasId, fileId: fileId}) if emit
+      img = @addImage fileId
+      @setImage(img)
+      @updateSelectedThumb()
+      room.socket.emit("fileAdded", {canvasId: canvasId, fileId: fileId}) if emit
 
-    addImage: (fileId, callback) ->
-      image = new Image()
-      image.src = "/files/#{$("#pid").val()}/#{fileId}"
+    addImage: (fileId, loadWrap) ->
+      src = "/files/#{$("#pid").val()}/#{fileId}"
+      image = $("<img class='hide' src='#{src}'>")
+      $("body").append(image)
 
-      activeProject = paper.project
-
-      $(image).on "load", ->
-        img = new Raster(image)
-        img.isImage = true
-        activeProject.activeLayer.insertChild(0, img)
-
-        img.size.width = image.width
-        img.size.height = image.height
-        img.position = paper.view.center
-        img.fileId = fileId
-
-        callback(img) if callback?
-
-    setImage: (img) ->
+      img = new Raster(new Image())
+      img.isImage = true
+      paper.project.activeLayer.insertChild(0, img)
+      img.fileId = fileId
       opts.image = img
-
       room.history.add(img)
+
+      onload = ->
+        img.size.width = image.width()
+        img.size.height = image.height()
+        img.position = paper.view.center
+        img.setImage(image[0])
+
+      $(image).on "load", -> if loadWrap then loadWrap(img, -> onload()) else onload()
+
+      img
 
     addNewThumb: (canvasId) ->
       thumb = $("<a href='#' data-cid='#{canvasId}'><canvas width='80' height='60'></canvas></a>")
@@ -195,6 +183,15 @@ $ ->
       $("#canvasSelectDiv a:last").addClass("canvasSelected")
 
     updateThumb: (canvasId) ->
+      selectedCanvasId = @getSelectedCanvasId()
+
+      if selectedCanvasId isnt canvasId
+        @activateCopyCanvas()
+        prevOpts = room.getOpts()
+        room.setOpts(@findCanvasOptsById(canvasId))
+        @clearCopyCanvas()
+        @restore(false)
+
       thumb = @findThumbByCanvasId(canvasId).find("canvas")
       thumbContext = thumb[0].getContext('2d')
 
@@ -219,6 +216,10 @@ $ ->
       paper.project.activeLayer.transform(transformMatrix)
       room.redraw()
 
+      if prevOpts
+        @activateNormalCanvas()
+        room.setOpts(prevOpts)
+
     updateSelectedThumb: -> @updateThumb @getSelectedCanvasId()
 
     getSelectedCanvasId: -> @getSelected().data("cid")
@@ -241,7 +242,7 @@ $ ->
 
       @erase()
       room.setOpts(canvasOpts)
-      @restore()
+      @restore(true)
 
       $(anchor).addClass("canvasSelected")
 

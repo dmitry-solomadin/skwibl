@@ -128,6 +128,17 @@
         return null;
       };
 
+      RoomHelper.prototype.findById = function(id) {
+        var element, _i, _len, _ref;
+        _ref = paper.project.activeLayer.children;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          element = _ref[_i];
+          if (element.id === id) {
+            return element;
+          }
+        }
+      };
+
       return RoomHelper;
 
     })();

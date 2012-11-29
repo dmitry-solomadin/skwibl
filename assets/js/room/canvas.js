@@ -14,21 +14,7 @@
       };
 
       RoomCanvas.prototype.initElements = function() {
-        var removeElementById, selectedCid;
-        removeElementById = function(id) {
-          var element, _i, _len, _ref, _results;
-          _ref = paper.project.activeLayer.children;
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            element = _ref[_i];
-            if (element.id === id) {
-              _results.push(element.remove());
-            } else {
-              _results.push(void 0);
-            }
-          }
-          return _results;
-        };
+        var selectedCid;
         selectedCid = this.getSelectedCanvasId();
         return this.forEachThumbInContext(function(cid) {
           var canvasElements, element, path, rawElement, _i, _j, _len, _len1, _ref, _results;
@@ -43,7 +29,7 @@
             element = canvasElements[_j];
             path = room.socketHelper.createElementFromData(element);
             if (cid !== selectedCid) {
-              removeElementById(path.id);
+              room.helper.findById(path.id).remove();
             }
             path.strokeColor = element.strokeColor;
             path.strokeWidth = element.strokeWidth;
@@ -71,7 +57,12 @@
             comment = canvasComments[_j];
             texts = JSON.parse($("#commentTexts" + comment.elementId).val());
             createdComment = room.socketHelper.createCommentFromData(comment);
+            console.log("current cid", cid);
+            console.log("selected cid", selectedCid);
+            console.log("comments", canvasComments);
+            console.log(" ");
             if (cid !== selectedCid) {
+              console.log("hiding created coment");
               room.comments.hideComment(createdComment);
             }
             _results.push((function() {
@@ -89,58 +80,35 @@
       };
 
       RoomCanvas.prototype.initThumbnails = function() {
-        var callback, cid, selectedCid, thumb, _i, _len, _ref, _results,
+        var selectedCid,
           _this = this;
         selectedCid = this.getSelectedCanvasId();
-        callback = function(img, canvasId) {
-          var prevOpts;
-          prevOpts = room.getOpts();
-          room.setOpts(_this.findCanvasOptsById(canvasId));
-          if (selectedCid === canvasId) {
-            paper.projects[1].activate();
-          } else {
-            paper.projects[0].activate();
-          }
-          _this.updateThumb(canvasId);
-          _this.clearCopyCanvas();
-          _this.setImage(img);
-          paper.projects[1].activate();
-          return room.setOpts(prevOpts);
-        };
-        _ref = this.getThumbs();
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          thumb = _ref[_i];
-          cid = $(thumb).data("cid");
-          if (selectedCid === cid) {
-            paper.projects[1].activate();
-          } else {
-            paper.projects[0].activate();
-          }
-          this.addImage($(thumb).data("fid"), (function(canvasId) {
-            return function(img) {
-              return callback(img, canvasId);
-            };
-          })(cid));
-          _results.push(paper.projects[1].activate());
-        }
-        return _results;
+        return this.forEachThumbInContext(function(cid, fid) {
+          return _this.addImage(fid, function(raster, executeLoadImage) {
+            executeLoadImage();
+            if (cid !== selectedCid && opts.image.id !== raster.id) {
+              room.helper.findById(raster.id).remove();
+            }
+            return _this.updateThumb(cid);
+          });
+        });
       };
 
       RoomCanvas.prototype.forEachThumbInContext = function(fn) {
-        var cid, opts, selectedCid, selectedOpts, thumb, _i, _len, _ref;
+        var cid, fid, opts, selectedCid, selectedOpts, thumb, _i, _len, _ref;
         selectedCid = this.getSelectedCanvasId();
         _ref = this.getThumbs();
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           thumb = _ref[_i];
           cid = $(thumb).data("cid");
+          fid = $(thumb).data("fid");
           opts = this.findCanvasOptsById(cid);
           if (opts) {
             room.setOpts(opts);
           } else {
             room.initOpts(cid);
           }
-          fn(cid);
+          fn(cid, fid);
         }
         selectedOpts = this.findCanvasOptsById(selectedCid);
         return room.setOpts(selectedOpts);
@@ -173,7 +141,6 @@
         _ref = opts.historytools.allHistory;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           element = _ref[_i];
-          console.log(element);
           if (!element.type) {
             element.remove();
           }
@@ -185,17 +152,30 @@
       };
 
       RoomCanvas.prototype.clearCopyCanvas = function() {
-        var child, _i, _len, _ref, _results;
+        var child, item, itemsToRemove, _i, _j, _len, _len1, _ref, _results;
+        itemsToRemove = [];
         _ref = paper.projects[0].activeLayer.children;
-        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           child = _ref[_i];
-          _results.push(child.remove());
+          itemsToRemove.push(child);
+        }
+        _results = [];
+        for (_j = 0, _len1 = itemsToRemove.length; _j < _len1; _j++) {
+          item = itemsToRemove[_j];
+          _results.push(item.remove());
         }
         return _results;
       };
 
-      RoomCanvas.prototype.restore = function() {
+      RoomCanvas.prototype.activateCopyCanvas = function() {
+        return paper.projects[0].activate();
+      };
+
+      RoomCanvas.prototype.activateNormalCanvas = function() {
+        return paper.projects[1].activate();
+      };
+
+      RoomCanvas.prototype.restore = function(withComments) {
         var element, _i, _len, _ref, _results;
         _ref = opts.historytools.allHistory;
         _results = [];
@@ -208,7 +188,7 @@
               paper.project.activeLayer.addChild(element);
             }
           }
-          if (element.commentMin) {
+          if (element.commentMin && withComments) {
             _results.push(room.comments.showComment(element.commentMin));
           } else {
             _results.push(void 0);
@@ -251,45 +231,48 @@
       };
 
       RoomCanvas.prototype.handleUpload = function(canvasId, fileId, emit) {
-        var _this = this;
+        var img;
         if (opts.image) {
           this.addNewThumbAndSelect(canvasId);
         }
-        return this.addImage(fileId, function(img) {
-          _this.setImage(img);
-          _this.updateSelectedThumb();
-          if (emit) {
-            return room.socket.emit("fileAdded", {
-              canvasId: canvasId,
-              fileId: fileId
-            });
-          }
-        });
+        img = this.addImage(fileId);
+        this.setImage(img);
+        this.updateSelectedThumb();
+        if (emit) {
+          return room.socket.emit("fileAdded", {
+            canvasId: canvasId,
+            fileId: fileId
+          });
+        }
       };
 
-      RoomCanvas.prototype.addImage = function(fileId, callback) {
-        var activeProject, image;
-        image = new Image();
-        image.src = "/files/" + ($("#pid").val()) + "/" + fileId;
-        activeProject = paper.project;
-        return $(image).on("load", function() {
-          var img;
-          img = new Raster(image);
-          img.isImage = true;
-          activeProject.activeLayer.insertChild(0, img);
-          img.size.width = image.width;
-          img.size.height = image.height;
-          img.position = paper.view.center;
-          img.fileId = fileId;
-          if (callback != null) {
-            return callback(img);
-          }
-        });
-      };
-
-      RoomCanvas.prototype.setImage = function(img) {
+      RoomCanvas.prototype.addImage = function(fileId, loadWrap) {
+        var image, img, onload, src;
+        src = "/files/" + ($("#pid").val()) + "/" + fileId;
+        image = $("<img class='hide' src='" + src + "'>");
+        $("body").append(image);
+        img = new Raster(new Image());
+        img.isImage = true;
+        paper.project.activeLayer.insertChild(0, img);
+        img.fileId = fileId;
         opts.image = img;
-        return room.history.add(img);
+        room.history.add(img);
+        onload = function() {
+          img.size.width = image.width();
+          img.size.height = image.height();
+          img.position = paper.view.center;
+          return img.setImage(image[0]);
+        };
+        $(image).on("load", function() {
+          if (loadWrap) {
+            return loadWrap(img, function() {
+              return onload();
+            });
+          } else {
+            return onload();
+          }
+        });
+        return img;
       };
 
       RoomCanvas.prototype.addNewThumb = function(canvasId) {
@@ -307,7 +290,15 @@
       };
 
       RoomCanvas.prototype.updateThumb = function(canvasId) {
-        var canvas, cvh, cvw, i, shift, sy, th, thumb, thumbContext, transformMatrix, tw, _i;
+        var canvas, cvh, cvw, i, prevOpts, selectedCanvasId, shift, sy, th, thumb, thumbContext, transformMatrix, tw, _i;
+        selectedCanvasId = this.getSelectedCanvasId();
+        if (selectedCanvasId !== canvasId) {
+          this.activateCopyCanvas();
+          prevOpts = room.getOpts();
+          room.setOpts(this.findCanvasOptsById(canvasId));
+          this.clearCopyCanvas();
+          this.restore(false);
+        }
         thumb = this.findThumbByCanvasId(canvasId).find("canvas");
         thumbContext = thumb[0].getContext('2d');
         canvas = paper.project.view.element;
@@ -326,7 +317,11 @@
         }
         transformMatrix = new Matrix(opts.currentScale / sy, 0, 0, opts.currentScale / sy, 0, 0);
         paper.project.activeLayer.transform(transformMatrix);
-        return room.redraw();
+        room.redraw();
+        if (prevOpts) {
+          this.activateNormalCanvas();
+          return room.setOpts(prevOpts);
+        }
       };
 
       RoomCanvas.prototype.updateSelectedThumb = function() {
@@ -362,7 +357,7 @@
         }
         this.erase();
         room.setOpts(canvasOpts);
-        this.restore();
+        this.restore(true);
         $(anchor).addClass("canvasSelected");
         if (emit) {
           room.socket.emit("switchCanvas", cid);
