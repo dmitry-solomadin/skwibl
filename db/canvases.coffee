@@ -1,4 +1,3 @@
-_ = require 'underscore'
 
 tools = require '../tools'
 

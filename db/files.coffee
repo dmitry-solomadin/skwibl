@@ -1,6 +1,4 @@
 
-_ = require 'underscore'
-
 tools = require '../tools'
 
 exports.setUp = (client, db) ->

@@ -1,5 +1,5 @@
 
-_ = require 'underscore'
+_ = require 'lodash'
 
 tools = require '../tools'
 
@@ -130,7 +130,7 @@ exports.setUp = (client, db) ->
     return client.hmset "users:#{id}:name", purifiedName, fn
 
   mod.addEmails = (id, emails, fn) ->
-    values = _.pluck(emails, 'value')
+    values = _.pluck emails, 'value'
     client.sadd "users:#{id}:emails" , values
     for value, index in values
       client.mset "emails:#{value}:uid", id, "emails:#{value}:type", emails[index].type

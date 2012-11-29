@@ -4,7 +4,7 @@ os = require 'os'
 fs = require 'fs'
 crypto = require 'crypto'
 generatePassword = require 'password-generator'
-_ = require 'underscore'
+_ = require 'lodash'
 
 cfg = require '../config'
 

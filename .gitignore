@@ -6,6 +6,7 @@ npm-debug.log
 .DS_STORE
 .directory
 .idea/
+pass.rsync
 /docs
 /uploads
-/assets/js
+/assets/js/*

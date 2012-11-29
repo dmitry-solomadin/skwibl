@@ -1,5 +1,4 @@
 fs = require 'fs'
-_ = require 'underscore'
 
 tools = require '../tools'
 cfg = require '../config'

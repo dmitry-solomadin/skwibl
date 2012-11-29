@@ -1,5 +1,5 @@
 
-_ = require 'underscore'
+_ = require 'lodash'
 
 smtp = require '../smtp'
 tools = require '../tools'

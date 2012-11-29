@@ -28,6 +28,12 @@ MODULES_DIR='node_modules'
 ## external server configurations dir
 EXTERNAL='external'
 
+## hertzner IP
+IP='88.198.192.88'
+
+## hertzner password
+PASSWORD='fuThoh5eipe8'
+
 ## temporary file template
 TMP_TEMPLATE='~'
 
@@ -45,17 +51,17 @@ FLUSH_REDIS_CMD='redis-cli flushall'
 
 ## usage string
 USAGE="Usage: $0 -a -b -c -d -e -i -p -r -s -u -h \n\n
-      -a Start dynamic server \n
-      -b Build the project \n
-      -c Clean the project auxiliary files \n
-      -d Deploy the project \n
-      -e Run skwibl in debug mode \n
-      -i Init the project \n
-      -p Run skwibl in production mode \n
-      -r Reset the project \n
-      -s Start socket server \n
-      -u Update project dependencies \n\n
-      -h This prompt \n"
+      -a --dynamic Start dynamic server \n
+      -b --build Build the project \n
+      -c --clean Clean the project auxiliary files \n
+      -d --deploy Deploy the project \n
+      -e --debug Run skwibl in debug mode \n
+      -i --init Init the project \n
+      -p --product Run skwibl in production mode \n
+      -r --reset Reset the project \n
+      -s --socket Start socket server \n
+      -u --update Update project dependencies \n\n
+      -h --help This prompt \n"
 
 ## patch procedure
 function patch {
@@ -73,6 +79,17 @@ fi
 function clean {
   echo "cleaning"
   find ./ -name \*$TMP_TEMPLATE -delete
+  rm -f *.js
+  find ./assets -name "*.js" -delete
+  find ./config -name "*.js" -delete
+  find ./controllers -name "*.js" -delete
+  find ./db -name "*.js" -delete
+  find ./helpers -name "*.js" -delete
+  find ./routes -name "*.js" -delete
+  find ./setup -name "*.js" -delete
+  find ./smtp -name "*.js" -delete
+  find ./sockets -name "*.js" -delete
+  find ./tools -name "*.js" -delete
 }
 
 ## build procedure
@@ -99,6 +116,15 @@ function reset {
   eval $FLUSH_REDIS_CMD
   npm install -d
   patch
+  sudo nginx -s stop
+  mkdir -p /etc/haproxy
+  sudo update-rc.d haproxy remove
+  sudo cp -fu $EXTERNAL/nginx.conf /etc/nginx/
+  sudo cp -fu $EXTERNAL/haproxy.cfg /etc/haproxy/
+  sudo cp -fu $EXTERNAL/haproxy /etc/init.d/
+  sudo update-rc.d haproxy defaults
+  sudo nginx
+  sudo service haproxy restart
 }
 
 ## start dynamic server
@@ -122,14 +148,11 @@ function product {
 ## deploy procedure
 function deploy {
   echo "deploing"
-  sudo nginx -s stop
-  sudo update-rc.d haproxy remove
-  sudo cp -fu $EXTERNAL/nginx.conf /etc/nginx/
-  sudo cp -fu $EXTERNAL/haproxy.cfg /etc/haproxy/
-  sudo cp -fu $EXTERNAL/haproxy /etc/init.d/
-  sudo update-rc.d haproxy defaults
-  sudo nginx
-  sudo service haproxy restart
+  $COFFEE --compile --output $JS_OUTPUT_DIR $COFFEE_DIR &
+  find ./ -name "*.coffee" -exec $COFFEE -cb {} \;
+  find ./assets/coffee -name "*.js" -delete
+  update
+  sshpass -p $PASSWORD rsync ./pass.rsync -rvuz ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee"
 }
 
 ## debug procedure
@@ -147,47 +170,54 @@ function update {
 }
 
 ## options check and parse
-while getopts ":abcdeiprsuh" opt; do
-  case "$opt" in
-    "a")
+if ! options=$(getopt -o abcdeiprsuh: -l dynamic,build,clean,deploy,debug,init,product,reset,socket,update,help -- "$@"); then
+  exit 1
+fi
+
+set -- $options
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -a|--dynamic)
       init
       build
       startDyn;;
-    "b")
+    -b|--build)
       build
       exit 0;;
-    "c")
+    -c|--clean)
       clean
       exit 0;;
-    "d")
+    -d|--deploy)
+      clean
       init
       build
       deploy
       exit 0;;
-    "e")
+    -e|--debug)
       init
       build
       debug;;
-    "i")
+    -i|--init)
       init
       exit 0;;
-    "p")
+    -p|--product)
       init
       build
       product;;
-    "r")
+    -r|--reset)
       read -p "You are going to reset project files and flush db. Do you want to continue (y/n)?" REPLY
       if [ $REPLY == 'y' ]; then
         clean
         reset
       fi
       exit 0;;
-    "s")
+    -s|--socket)
       startSocket;;
-    "u")
+    -u|--update)
       update
       exit 0;;
-    "h")
+    -h|--help)
       echo -e $USAGE
       exit 0;;
     "?")

@@ -36,7 +36,7 @@
     "password-generator": "*",
     "hiredis": "*",
     "redis": "0.7.2",
-    "underscore": "*",
+    "lodash": "*",
     "coffee-script": "*",
     "moment": "*",
     "socket.io-announce": "*"
