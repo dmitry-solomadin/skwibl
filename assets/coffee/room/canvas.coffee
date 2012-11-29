@@ -182,7 +182,7 @@ $ ->
       $("#canvasSelectDiv a").removeClass("canvasSelected")
       $("#canvasSelectDiv a:last").addClass("canvasSelected")
 
-    updateThumb: (canvasId) ->
+    updateThumb: (canvasId)  ->
       selectedCanvasId = @getSelectedCanvasId()
 
       if selectedCanvasId isnt canvasId
