@@ -4,10 +4,6 @@ tools = require '../tools'
 
 exports.configure = (sio) ->
 
-  sendInitData = (project, socket) ->
-    # get canvas saved elements
-    console.log 'TODO'
-
   canvas = sio.of '/canvas'
 
   canvas.on 'connection', (socket) ->
@@ -23,15 +19,11 @@ exports.configure = (sio) ->
       socket.join project
       socket.project = project
 
-      sendInitData project, socket
-
       socket.on 'disconnect', ->
         console.log "A socket with sessionId #{hs.sessionId} disconnected."
         socket.leave socket.project
 
       socket.on 'elementUpdate', (data, cb) ->
-        console.log 'elupdate'
-        console.log data
         socket.broadcast.to(socket.project).emit 'elementUpdate',
           id: id
           canvasId: data.canvasId
@@ -48,14 +40,12 @@ exports.configure = (sio) ->
         db.actions.remove data.elementId
 
       socket.on 'commentUpdate', (data, cb) ->
-        console.log 'coupdate'
-        console.log data
         data.comment = true
         socket.broadcast.to(socket.project).emit 'commentUpdate',
           id: id
           canvasId: data.canvasId
           element: data.element
-        db.actions.update socket.project, id, 'element', data
+        db.actions.update socket.project, id, 'comment', data
 
       socket.on 'commentRemove', (data, cb) ->
         console.log 'cormove'
@@ -67,12 +57,9 @@ exports.configure = (sio) ->
         db.actions.remove data.elementId
 
       socket.on 'commentText', (data, cb) ->
-        console.log 'cotext'
-        console.log data
         socket.broadcast.to(socket.project).emit 'commentText',
           id: id
-          canvasId: data.canvasId
-          element: data.element
+          element: data
         db.actions.updateComment data
 
       socket.on 'eraseCanvas', (data, cb) ->

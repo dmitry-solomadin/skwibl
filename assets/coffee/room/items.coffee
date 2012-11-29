@@ -45,6 +45,7 @@ $ ->
       @setSelected(null)
 
     pan: (dx, dy) ->
+      console.log opts.historytools.allHistory
       for element in opts.historytools.allHistory
         if element.commentMin
           room.comments.translate(element.commentMin, dx, dy)

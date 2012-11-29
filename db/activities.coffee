@@ -33,7 +33,7 @@ exports.setUp = (client, db) ->
     client.lrange "users:#{id}:activities", -cfg.ACTIONS_BUFFER_SIZE, -1, (err, array) ->
       if not err and array and array.length
         activities = []
-        return tools.asyncParallel array, (left, aid) ->
+        return tools.asyncParallel array, (aid) ->
           return client.hgetall "activities:#{aid}", (err, activity) ->
             if err
               return tools.asyncOpt fn, err, []
@@ -42,7 +42,7 @@ exports.setUp = (client, db) ->
                 activities.push activity
             else
               activities.push activity
-            return tools.asyncDone left, ->
+            return tools.asyncDone array, ->
               return tools.asyncOpt fn, null, activities
       return tools.asyncOpt fn, err, []
 
@@ -62,20 +62,20 @@ exports.setUp = (client, db) ->
       return fn err
 
   mod.getProjectForActivities = (activities, fn) ->
-    return tools.asyncParallel activities,  (left, activity) ->
+    return tools.asyncParallel activities, (activity) ->
       return db.projects.getData activity.project, (err, project) ->
         if not err and project
           activity.project = project
-          return tools.asyncDone left, ->
+          return tools.asyncDone activities, ->
             return tools.asyncOpt fn, null, null
         return tools.asyncOpt fn, err, []
 
   mod.getUserForActivities = (activities, fn) ->
-    return tools.asyncParallel activities, (left, activity) ->
+    return tools.asyncParallel activities, (activity) ->
       return db.users.findById activity.inviting, (err, user) ->
         if not err and user
           activity.inviting = user
-          return tools.asyncDone left, ->
+          return tools.asyncDone activities, ->
             return tools.asyncOpt fn, null, null
         return tools.asyncOpt fn, err, []
 

@@ -52,6 +52,8 @@ $ ->
       @opts = opts
       window.opts = opts
 
+    getOpts: -> @opts
+
     # Mouse events handling
 
     onMouseMove: (canvas, event) ->

@@ -24,10 +24,10 @@ exports.setUp = (client, db) ->
     client.smembers "users:#{id + field}", (err, array) ->
       if not err and array and array.length
         contacts = []
-        return tools.asyncParallel array, (left, cid) ->
+        return tools.asyncParallel array, (cid) ->
           db.contacts.getInfo cid, (err, contact) ->
             contacts.push contact
-            return tools.asyncDone left, ->
+            return tools.asyncDone array, ->
               return tools.asyncOpt fn, null, contacts
       return tools.asyncOpt fn, err, []
 
@@ -39,13 +39,13 @@ exports.setUp = (client, db) ->
     #Get user projects
     client.smembers "users:#{id}:projects", (err, array) ->
       if not err and array and array.length
-        return tools.asyncParallel array, (left, project) ->
+        return tools.asyncParallel array, (project) ->
           if project isnt pid
             #Check if client belongs to another project
             client.sismember "projects:#{project}:users", (err, val) ->
               if not err and val
                 return tools.asyncOpt fn, null, true
-              return tools.asyncDone left, ->
+              return tools.asyncDone array, ->
                 return tools.asyncOpt fn, null, no
       return tools.asyncOpt fn, null, no
 

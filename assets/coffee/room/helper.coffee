@@ -35,7 +35,7 @@ $ ->
           params =
             pid: $("#pid").val()
           # we only add cid for the first canvas.
-          params.cid = App.room.canvas.getSelected().data("cid") unless opts.fileId
+          params.cid = App.room.canvas.getSelected().data("cid") unless opts.image
 
           room.uploader.setParams params
 
@@ -61,5 +61,9 @@ $ ->
         return element if element.commentMin and element.commentMin.elementId == id
         return element if element.elementId == id
       return null
+
+    findById: (id) ->
+      for element in paper.project.activeLayer.children
+        return element if element.id is id
 
   App.room.helper = new RoomHelper

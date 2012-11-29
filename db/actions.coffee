@@ -1,77 +1,94 @@
-
 tools = require '../tools'
 cfg = require '../config'
 
 exports.setUp = (client, db) ->
-
   mod = {}
 
-  mod.update = (project, owner, type, data, fn) ->
+  mod.update = (pid, owner, type, data, fn) ->
     aid = data.element.elementId
     action = {}
-    action.project = project
+    action.project = pid
     action.owner = owner
     action.type = type
-    action.canvas = canvasId if data.element.canvasId
-    actions.comment = true if data.comment
+    action.canvasId = data.canvasId if data.canvasId
     action.time = new Date
-    console.log(data.element)
     action.data = JSON.stringify(data.element)
-    client.hmset "actions:#{aid}", action
-    client.rpush "projects:#{project}:#{type}", aid
-    return tools.asyncOpt fn, null, action
+
+    client.exists "actions:#{aid}", (err, val) ->
+      client.hmset "actions:#{aid}", action
+      if not err and not val
+        client.rpush "projects:#{pid}:#{type}", aid
+        client.rpush "canvases:#{data.canvasId}:#{type}", aid if data.canvasId
+
+      tools.asyncOpt fn, null, action
 
   mod.delete = (aid, fn) ->
     client.del "actions:#{aid}", fn
 
-  mod.get = (project, type, fn) ->
-    client.lrange "projects:#{project}:#{type}", -cfg.ACTIONS_BUFFER_SIZE, -1, (err, array) ->
+  mod.get = (pid, type, fn) ->
+    negativeActionsBufferSize = -cfg.ACTIONS_BUFFER_SIZE
+    client.lrange "projects:#{pid}:#{type}", negativeActionsBufferSize, -1, (err, array) ->
       if not err and array and array.length
         actions = []
-        return tools.asyncParallel array, (left, aid) ->
+        return tools.asyncParallel array, (aid) ->
           client.hgetall "actions:#{aid}", (err, action) ->
             if err
               return tools.asyncOpt fn, err, []
             actions.push action
-            return tools.asyncDone left, ->
+            return tools.asyncDone array, ->
               return tools.asyncOpt fn, null, actions
 
-  mod.getCanvas = (cid, type, fn) ->
-    client.lrange "projects:#{cid}:#{type}", 0, -1, (err, array) ->
-      if not err and  array and array.length
+  mod.getCanvas = (pid, type, fn) ->
+    client.lrange "projects:#{pid}:#{type}", 0, -1, (err, array) ->
+      if not err and array and array.length
         actions = []
-        return tools.asyncParallel array, (left, aid) ->
+        return tools.asyncParallel array, (aid) ->
           client.hgetall "actions:#{aid}", (err, action) ->
             if err
               return tools.asyncOpt fn, err, []
             actions.push action
-            return tools.asyncDone left, ->
+            return tools.asyncDone array, ->
               return tools.asyncOpt fn, null, actions
 
-  mod.getElements = (cid, fn) ->
-    client.lrange "projects:#{cid}:elements", 0, -1, (err, array) ->
-      return tools.asyncOpt fn, null, [] if not array or not array.length
+  mod.getElements = (cid, type, fn) ->
+    client.lrange "canvases:#{cid}:#{type}", 0, -1, (err, actions) ->
+      return tools.asyncOpt fn, null, [] if not actions or not actions.length
 
       if not err
-        actions = []
-        return tools.asyncParallel array, (left, aid) ->
+        fetchedActions = []
+
+        return tools.asyncParallel actions, (aid) ->
           client.hgetall "actions:#{aid}", (err, action) ->
-            if err
-              return tools.asyncOpt fn, err, []
-            if action.comment
-              #TODO get comment texts
-              console.log 'TODO'
-            actions.push action
-            return tools.asyncDone left, ->
-              return tools.asyncOpt fn, null, actions
+            fetchedAction = JSON.parse(action.data)
+            return tools.asyncOpt fn, err, [] if err
+
+            if type is 'comment'
+              return db.actions.getCommentTexts fetchedAction.elementId, (err, texts, elementIds) ->
+                rarray = []
+                for text, index in texts
+                  rarray.push
+                    text: text
+                    elementId: elementIds[index]
+
+                console.log rarray
+
+                fetchedAction.texts = rarray
+                fetchedActions.push fetchedAction
+                tools.asyncDone actions, ->
+                  tools.asyncOpt fn, null, fetchedActions
+            else
+              fetchedActions.push fetchedAction
+              tools.asyncDone actions, ->
+                tools.asyncOpt fn, null, fetchedActions
 
       return tools.asyncOpt fn, err, []
 
-  mod.getComments = (eid, fn) ->
-    client.lrange "comments:#{eid}:texts", 0, -1, (err, array) ->
-      if not err and array and array.length
+  mod.getCommentTexts = (eid, fn) ->
+    client.lrange "comments:#{eid}:texts", 0, -1, (err, elementIds) ->
+      if not err and elementIds and elementIds.length
         comments = []
-        return client.mget array.map(tools.commentText), fn
+        return client.mget elementIds.map(tools.commentText), (err, texts) -> fn(err, texts, elementIds)
+      return tools.asyncOpt fn, err, []
 
   mod.updateComment = (data, fn) ->
     client.set "texts:#{data.elementId}", data.text
