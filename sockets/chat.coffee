@@ -7,17 +7,14 @@ exports.configure = (sio) ->
   sendInitData = (pid, socket) ->
     clients = sio.sockets.clients "chat/#{pid}"
 
-    db.projects.getUsers pid, (err, users) ->
-      if not err and users
-        loggedIn = tools.getUsers clients, pid
-        for user in users
-          if loggedIn.indexOf user.id isnt -1
-            user.status = 'online'
-        socket.json.emit 'users', users
+    onlineUsers = []
+    for client in clients
+      ssid = client.id
+      hsn = client.manager.handshaken
+      id = hsn[ssid].user.id
+      onlineUsers.push id
 
-    db.actions.get pid, 'chat', (err, actions) ->
-      if actions.length isnt 0
-        socket.emit 'messages', actions
+    socket.json.emit 'onlineUsers', onlineUsers
 
   chat = sio.of '/chat'
 
@@ -48,14 +45,3 @@ exports.configure = (sio) ->
           id: id
           message: msg
         db.actions.update socket.project, id, 'chat', msg
-
-#       socket.on 'switch', (project) ->
-#         # assume that project is valid user project
-#         socket.leave socket.project
-#         socket.broadcast.to(socket.project).emit 'exit', id
-#         socket.project = project
-#         socket.join project
-#         db.projects.set id, project
-#         console.log 'switch', project
-#         socket.broadcast.to(project).emit 'enter', id
-#         sendInitData project, socket
