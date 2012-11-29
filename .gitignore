@@ -10,3 +10,4 @@ pass.rsync
 /docs
 /uploads
 /assets/js/*
+*.kate-swp

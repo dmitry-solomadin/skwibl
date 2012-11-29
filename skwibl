@@ -181,7 +181,8 @@ while [ $# -gt 0 ]; do
     -a|--dynamic)
       init
       build
-      startDyn;;
+      startDyn
+      exit 0;;
     -b|--build)
       build
       exit 0;;
@@ -213,7 +214,8 @@ while [ $# -gt 0 ]; do
       fi
       exit 0;;
     -s|--socket)
-      startSocket;;
+      startSocket
+      exit 0;;
     -u|--update)
       update
       exit 0;;
