@@ -10,15 +10,6 @@ cfg = require '../config'
 
 numCPUs = os.cpus().length
 
-exports.getUsers = (clients) ->
-  ids = []
-  for client in clients
-    ssid = client.id
-    hsn = client.manager.handshaken
-    id = hsn[ssid].user.id
-    ids.push id
-  return ids
-
 exports.emailType = (x) ->
   return "emails:#{x}:type"
 

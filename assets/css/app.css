@@ -150,7 +150,6 @@ input.error {
 }
 
 /* ROOM STYLES START */
-
 .color {
     cursor: pointer;
     display: inline-block;
@@ -382,10 +381,10 @@ body.room {
 
 .chat .conversation {
     height: 100%;
-    margin-bottom: -300px;
+    margin-bottom: -270px;
     position: relative;
     z-index: 1;
-    padding-bottom: 310px;
+    padding-bottom: 280px;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
@@ -411,7 +410,37 @@ body.room {
     padding: 5px;
     border: 1px solid #e1e1e1;
     margin-bottom: 5px;
-    height: 80px;
+    height: 48px;
+}
+
+.chatUserStatus {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    position: absolute;
+    background-color: gray;
+    left: 52px;
+    top: 42px;
+    border: 1px solid #404040;
+}
+
+.chatUser {
+    position: relative;
+    float:left;
+}
+
+.chatUserOffline {
+    background-color: red;
+}
+
+.chatUserOnline {
+    background-color: green;
+}
+
+.participants .userAvatar {
+    display: inline-block;
+    margin-left: 10px;
 }
 
 /* ROOM STYLES END */

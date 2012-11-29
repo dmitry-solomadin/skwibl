@@ -36,12 +36,7 @@ $ ->
           texts = JSON.parse($("#commentTexts#{comment.elementId}").val())
 
           createdComment = room.socketHelper.createCommentFromData(comment)
-          console.log "current cid", cid
-          console.log "selected cid", selectedCid
-          console.log "comments", canvasComments
-          console.log " "
           unless cid is selectedCid
-            console.log "hiding created coment"
             room.comments.hideComment(createdComment)
 
           for text in texts
@@ -152,7 +147,10 @@ $ ->
       image = $("<img class='hide' src='#{src}'>")
       $("body").append(image)
 
-      img = new Raster(new Image())
+      fakeImage = new Image()
+      fakeImage.src = "/images/blank.jpg"
+
+      img = new Raster(fakeImage)
       img.isImage = true
       paper.project.activeLayer.insertChild(0, img)
       img.fileId = fileId

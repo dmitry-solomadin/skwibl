@@ -54,87 +54,59 @@
         return $(link).attr("onclick", "App.chat.fold(this); return false;").find("img").attr("src", "/images/room/fold.png");
       };
 
-      Chat.prototype.getUserById = function(id) {
-        var user, _i, _len, _ref;
-        _ref = this.users;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          user = _ref[_i];
-          if (user.id === id) {
-            return user;
-          }
+      Chat.prototype.getUserById = function(uid) {
+        var user;
+        user = $("#chatUser" + uid);
+        return {
+          id: uid,
+          displayName: user.data("display-name")
+        };
+      };
+
+      Chat.prototype.addMessage = function(uid, message) {
+        var user;
+        user = this.getUserById(uid);
+        return $('#conversation-inner').append("<div><b>" + user.displayName + ":</b> " + message + "</div>");
+      };
+
+      Chat.prototype.addTechMessage = function(message) {
+        return $('#conversation-inner').append("<div>" + message + "</div>");
+      };
+
+      Chat.prototype.changeUserStatus = function(uid, online) {
+        var chatStatus;
+        chatStatus = $("#chatUser" + uid).find(".chatUserStatus");
+        if (online) {
+          return chatStatus.addClass("chatUserOnline").removeClass("chatUserOffline");
+        } else {
+          return chatStatus.addClass("chatUserOffline").removeClass("chatUserOnline");
         }
-      };
-
-      Chat.prototype.updateUsers = function() {
-        $('#participants').empty();
-        return $.each(this.users, function(key, val) {
-          if (val.status === 'online') {
-            return $('#participants').append("<div>" + val.id + " : " + val.displayName + " online</div>");
-          } else {
-            return $('#participants').append("<div>" + val.id + " : " + val.displayName + " offline</div>");
-          }
-        });
-      };
-
-      Chat.prototype.addMessage = function(id, message) {
-        return $('#conversation-inner').append("<b>" + id + ":</b> " + message + "<br>");
       };
 
       Chat.prototype.initSockets = function() {
         var _this = this;
         this.chatIO = io.connect('/chat', window.copt);
-        this.chatIO.on('connect', function() {
-          return console.log('connect');
-        });
-        this.chatIO.on('connecting', function() {
-          return console.log('connecting');
-        });
-        this.chatIO.on('connect_failed', function() {
-          return console.log('connect_failed');
-        });
-        this.chatIO.on('disconnect', function() {
-          return console.log('disconnect');
-        });
-        this.chatIO.on('reconnect', function() {
-          return console.log('reconnect');
-        });
-        this.chatIO.on('reconnecting', function() {
-          return console.log('reconnecting');
-        });
-        this.chatIO.on('reconnect_failed', function() {
-          return console.log('reconnect_failed');
-        });
-        this.chatIO.on('error', function() {
-          return console.log('error');
-        });
         this.chatIO.on('message', function(data, cb) {
-          return $('#conversation-inner').append("<b>" + data.id + ":</b> " + data.message.element.msg + "<br>");
+          return _this.addMessage(data.id, data.message.element.msg);
         });
-        this.chatIO.on('enter', function(id, cb) {
+        this.chatIO.on('enter', function(uid, cb) {
           var user;
-          user = _this.getUserById(id);
-          user.status = 'online';
-          _this.updateUsers();
-          return _this.addMessage(id, "<i>User " + id + " : " + user.displayName + " entered the project</i>");
+          _this.changeUserStatus(uid, true);
+          user = _this.getUserById(uid);
+          return _this.addTechMessage("<i>" + user.displayName + " entered the project</i>");
         });
-        this.chatIO.on('exit', function(id, cb) {
+        this.chatIO.on('exit', function(uid, cb) {
           var user;
-          user = _this.getUserById(id);
-          delete user.status;
-          _this.updateUsers();
-          return _this.addMessage(id, "<i>User " + id + " : " + user.displayName + " leave the project</i>");
+          _this.changeUserStatus(uid, false);
+          user = _this.getUserById(uid);
+          return _this.addTechMessage("<i>" + user.displayName + " leaved the project</i>");
         });
-        this.chatIO.on('users', function(data) {
-          _this.users = data;
-          return _this.updateUsers();
-        });
-        return this.chatIO.on('messages', function(data) {
-          var val, _i, _len, _results;
-          $('#conversation-inner').empty();
+        return this.chatIO.on('onlineUsers', function(uids) {
+          var uid, _i, _len, _results;
           _results = [];
-          for (_i = 0, _len = data.length; _i < _len; _i++) {
-            val = data[_i];
-            _results.push(_this.addMessage(val.owner, JSON.parse(val.data).msg));
+          for (_i = 0, _len = uids.length; _i < _len; _i++) {
+            uid = uids[_i];
+            _results.push(_this.changeUserStatus(uid, true));
           }
           return _results;
         });

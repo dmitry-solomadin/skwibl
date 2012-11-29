@@ -23,54 +23,40 @@ $ ->
 
       $(link).attr("onclick", "App.chat.fold(this); return false;").find("img").attr("src", "/images/room/fold.png")
 
-    getUserById: (id) ->
-      for user in @users
-        return user if user.id == id
+    getUserById: (uid) ->
+      user = $("#chatUser#{uid}")
+      id: uid, displayName: user.data("display-name")
 
-    updateUsers: ->
-      $('#participants').empty()
-      $.each @users, (key, val) ->
-        if val.status == 'online'
-          $('#participants').append("<div>#{val.id} : #{val.displayName} online</div>")
-        else
-          $('#participants').append("<div>#{val.id} : #{val.displayName} offline</div>")
+    addMessage: (uid, message) ->
+      user = @getUserById(uid)
+      $('#conversation-inner').append("<div><b>#{user.displayName}:</b> #{message}</div>")
 
-    addMessage: (id, message) ->
-      $('#conversation-inner').append("<b>#{id}:</b> #{message}<br>")
+    addTechMessage: (message) ->
+      $('#conversation-inner').append("<div>#{message}</div>")
+
+    changeUserStatus: (uid, online) ->
+      chatStatus = $("#chatUser#{uid}").find(".chatUserStatus")
+      if online
+        chatStatus.addClass("chatUserOnline").removeClass("chatUserOffline")
+      else
+        chatStatus.addClass("chatUserOffline").removeClass("chatUserOnline")
 
     initSockets: ->
       @chatIO = io.connect('/chat', window.copt)
-      @chatIO.on 'connect', -> console.log('connect')
-      @chatIO.on 'connecting', -> console.log('connecting')
-      @chatIO.on 'connect_failed', -> console.log('connect_failed')
-      @chatIO.on 'disconnect', -> console.log('disconnect')
-      @chatIO.on 'reconnect', -> console.log('reconnect')
-      @chatIO.on 'reconnecting', -> console.log('reconnecting')
-      @chatIO.on 'reconnect_failed', -> console.log('reconnect_failed')
-      @chatIO.on 'error', -> console.log('error')
 
-      @chatIO.on 'message', (data, cb) ->
-        $('#conversation-inner').append("<b>#{data.id}:</b> #{data.message.element.msg}<br>")
+      @chatIO.on 'message', (data, cb) => @addMessage(data.id, data.message.element.msg)
 
-      @chatIO.on 'enter', (id, cb) =>
-        user = @getUserById(id)
-        user.status = 'online'
-        @updateUsers()
-        @addMessage(id, "<i>User #{id} : #{user.displayName} entered the project</i>")
+      @chatIO.on 'enter', (uid, cb) =>
+        @changeUserStatus uid, true
+        user = @getUserById uid
+        @addTechMessage("<i>#{user.displayName} entered the project</i>")
 
-      @chatIO.on 'exit', (id, cb) =>
-        user = @getUserById(id)
-        delete user.status
-        @updateUsers()
-        @addMessage(id, "<i>User #{id} : #{user.displayName} leave the project</i>")
+      @chatIO.on 'exit', (uid, cb) =>
+        @changeUserStatus uid, false
+        user = @getUserById uid
+        @addTechMessage("<i>#{user.displayName} leaved the project</i>")
 
-      @chatIO.on 'users', (data) =>
-        @users = data
-        @updateUsers()
-
-      @chatIO.on 'messages', (data) =>
-        $('#conversation-inner').empty()
-        @addMessage(val.owner, JSON.parse(val.data).msg) for val in data
+      @chatIO.on 'onlineUsers', (uids) => @changeUserStatus(uid, true) for uid in uids
 
   # when the client clicks SEND
   $('#chatsend').click ->
