@@ -28,7 +28,7 @@ MODULES_DIR='node_modules'
 ## external server configurations dir
 EXTERNAL='external'
 
-## hertzner IP
+## hetzner IP
 IP='88.198.192.88'
 
 ## hertzner password

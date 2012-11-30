@@ -22,7 +22,7 @@ $ ->
     removeSelected: ->
       if @selected()
         # add new 'remove' item into history and link it to removed item.
-        room.history.add({type: "remove", tool: @selected(), eligible: true})
+        room.history.add({actionType: "remove", tool: @selected(), eligible: true})
         @selected().opacity = 0
 
         room.socket.emit("elementRemove", @selected().elementId)
@@ -49,7 +49,7 @@ $ ->
       for element in opts.historytools.allHistory
         if element.commentMin
           room.comments.translate(element.commentMin, dx, dy)
-        else if !element.type and element.translate
+        else if not element.actionType and element.translate
           element.translate(new Point(dx, dy))
 
     selected: -> opts.selectedTool
@@ -76,7 +76,7 @@ $ ->
       unless selected
         previousSelectedTool = @selected()
         for element in room.history.getSelectableTools()
-          continue if element.isImage or element.type
+          continue if element.isImage or element.actionType
 
           if element.bounds.contains(point)
             @setSelected(element)

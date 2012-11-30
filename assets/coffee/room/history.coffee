@@ -5,9 +5,9 @@ $ ->
       return if room.opts.historyCounter == 0
 
       executePrevHistory = (item, reverse) =>
-        if item.type == "remove"
+        if item.actionType == "remove"
           executePrevHistory(item.tool, true)
-        if item.type == "clear"
+        if item.actionType == "clear"
           $(item.tools).each -> executePrevHistory(@, true)
         else if item.commentMin
           if reverse
@@ -32,9 +32,9 @@ $ ->
       return if opts.historyCounter == opts.historytools.eligibleHistory.length
 
       executeNextHistory = (item, reverse) =>
-        if item.type == "remove"
+        if item.actionType == "remove"
           executeNextHistory(item.tool, true)
-        else if item.type == "clear"
+        else if item.actionType == "clear"
           $(item.tools).each -> executeNextHistory(@, true)
         else if item.commentMin
           if reverse

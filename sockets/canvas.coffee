@@ -30,14 +30,11 @@ exports.configure = (sio) ->
           element: data.element
         db.actions.update socket.project, id, 'element', data
 
-      socket.on 'elementRemove', (data, cb) ->
-        console.log 'elremove'
-        console.log data
+      socket.on 'elementRemove', (elementId, cb) ->
         socket.broadcast.to(socket.project).emit 'elementRemove',
           id: id
-          canvasId: data.canvasId
-          elementId: data.elementId
-        db.actions.remove data.elementId
+          elementId: elementId
+        db.actions.delete elementId
 
       socket.on 'commentUpdate', (data, cb) ->
         data.comment = true
@@ -47,14 +44,11 @@ exports.configure = (sio) ->
           element: data.element
         db.actions.update socket.project, id, 'comment', data
 
-      socket.on 'commentRemove', (data, cb) ->
-        console.log 'cormove'
-        console.log data
+      socket.on 'commentRemove', (elementId, cb) ->
         socket.broadcast.to(socket.project).emit 'commentRemove',
           id: id
-          canvasId: data.canvasId
-          elementId: data.elementId
-        db.actions.remove data.elementId
+          elementId: elementId
+        db.actions.delete elementId
 
       socket.on 'commentText', (data, cb) ->
         socket.broadcast.to(socket.project).emit 'commentText',

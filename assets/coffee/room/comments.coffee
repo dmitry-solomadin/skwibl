@@ -268,10 +268,10 @@ $ ->
         $commentmin.hide()
 
         if $commentmin[0].rect
-          room.history.add(type: "remove", tool: $commentmin[0].rect, eligible: true)
+          room.history.add(actionType: "remove", tool: $commentmin[0].rect, eligible: true)
         else
-          tool = {type: "comment", commentMin: $commentmin}
-          room.history.add({type: "remove", tool: tool, eligible: true})
+          tool = {actionType: "comment", commentMin: $commentmin}
+          room.history.add({actionType: "remove", tool: tool, eligible: true})
 
         room.socket.emit("commentRemove", $commentmin.elementId)
         room.redraw()
