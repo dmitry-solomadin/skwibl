@@ -28,7 +28,7 @@ MODULES_DIR='node_modules'
 ## external server configurations dir
 EXTERNAL='external'
 
-## hertzner IP
+## hetzner IP
 IP='88.198.192.88'
 
 ## hertzner password
@@ -38,7 +38,7 @@ PASSWORD='fuThoh5eipe8'
 TMP_TEMPLATE='~'
 
 ## node execution command
-NODE_CMD='node u-nouse-idle-notification --expose-gc'
+NODE_CMD='node --nouse-idle-notification --expose-gc'
 
 ## coffee execution command
 COFFEE_OPT='--nodejs "--nouse-idle-notification --expose-gc"'
@@ -169,64 +169,57 @@ function update {
   patch
 }
 
-## options check and parse
-##if ! options=$(getopt -o abcdeiprsuh: -l dynamic,build,clean,deploy,debug,init,product,reset,socket,update,help -- "$@"); then
-##  exit 1
-##fi
 
-##set -- $options
-
-##while [ $# -gt 0 ]; do
-  case "$1" in
-    -a|--dynamic)
-      init
-      build
-      startDyn
-      exit 0;;
-    -b|--build)
-      build
-      exit 0;;
-    -c|--clean)
-      clean
-      exit 0;;
-    -d|--deploy)
-      clean
-      init
-      build
-      deploy
-      exit 0;;
-    -e|--debug)
-      init
-      build
-      debug;;
-    -i|--init)
-      init
-      exit 0;;
-    -p|--product)
-      init
-      build
-      product;;
-    -r|--reset)
-      read -p "You are going to reset project files and flush db. Do you want to continue (y/n)?" REPLY
-      if [ $REPLY == 'y' ]; then
-        clean
-        reset
-      fi
-      exit 0;;
-    -s|--socket)
-      startSocket
-      exit 0;;
-    -u|--update)
-      update
-      exit 0;;
-    -h|--help)
-      echo -e $USAGE
-      exit 0;;
-    "?")
-      echo "Invalid option $OPTARG. Try $0 -h for help"
-      exit 1;;
-    *)
-      echo "Unknown error while processing options"
-      exit 1;;
-  esac
-##done
+case "$1" in
+-a|--dynamic)
+  init
+  build
+  startDyn
+  exit 0;;
+-b|--build)
+  build
+  exit 0;;
+-c|--clean)
+  clean
+  exit 0;;
+-d|--deploy)
+  clean
+  init
+  build
+  deploy
+  clean
+  exit 0;;
+-e|--debug)
+  init
+  build
+  debug;;
+-i|--init)
+  init
+  exit 0;;
+-p|--product)
+  init
+  build
+  product;;
+-r|--reset)
+  read -p "You are going to reset project files and flush db. Do you want to continue (y/n)?" REPLY
+  if [ $REPLY == 'y' ]; then
+    clean
+    reset
+  fi
+  exit 0;;
+-s|--socket)
+  startSocket
+  exit 0;;
+-u|--update)
+  update
+  exit 0;;
+-h|--help)
+  echo -e $USAGE
+  exit 0;;
+"?")
+  echo "Invalid option $OPTARG. Try $0 -h for help"
+  exit 1;;
+*)
+  echo "Unknown error while processing options"
+  exit 1;;
+esac

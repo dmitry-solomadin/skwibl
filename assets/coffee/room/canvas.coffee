@@ -46,12 +46,15 @@ $ ->
       selectedCid = @getSelectedCanvasId()
 
       @forEachThumbInContext (cid, fid) =>
-        @addImage fid, (raster,executeLoadImage) =>
-          executeLoadImage()
+        if fid
+          @addImage fid, (raster, executeLoadImage) =>
+            executeLoadImage()
 
-          if cid isnt selectedCid and opts.image.id isnt raster.id
-            room.helper.findById(raster.id).remove()
+            if cid isnt selectedCid and opts.image.id isnt raster.id
+              room.helper.findById(raster.id).remove()
 
+            @updateThumb(cid)
+        else
           @updateThumb(cid)
 
     # executes function for each cavnvas in context of opts of this canvas
@@ -74,7 +77,7 @@ $ ->
       room.history.add
         type: "clear", tools: room.history.getSelectableTools(), eligible: true
       for element in opts.historytools.allHistory
-        element.opacity = 0 unless element.type
+        element.opacity = 0 unless element.actionType
         room.comments.hideComment(element.commentMin) if element.commentMin
 
       room.items.unselect()
@@ -85,7 +88,7 @@ $ ->
     # used upon eraseCanvas event
     erase: ->
       for element in opts.historytools.allHistory
-        element.remove() unless element.type
+        element.remove() unless element.actionType
         room.comments.hideComment(element.commentMin) if element.commentMin
 
       room.redraw()
@@ -101,7 +104,7 @@ $ ->
 
     restore: (withComments)->
       for element in opts.historytools.allHistory
-        unless element.type
+        unless element.actionType
           if element.isImage
             paper.project.activeLayer.insertChild(0, element)
           else
