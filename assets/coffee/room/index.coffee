@@ -209,7 +209,7 @@ $ ->
             @opts.tool.eligible = true
             @history.add()
           else
-            @history.add(type: "comment", commentMin: commentMin, eligible: true)
+            @history.add(actionType: "comment", commentMin: commentMin, eligible: true)
 
           commentMin.elementId = @generateId()
           @socket.emit("commentUpdate", @socketHelper.prepareCommentToSend(commentMin))

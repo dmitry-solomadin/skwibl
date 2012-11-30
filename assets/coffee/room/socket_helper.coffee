@@ -6,9 +6,9 @@ $ ->
       App.room.socket = socket
 
       socket.on 'elementUpdate', (data) => @addOrUpdateElement(data.element)
-      socket.on 'elementRemove', (data) => @socketRemoveElement(data.message)
+      socket.on 'elementRemove', (elementId) => @socketRemoveElement(elementId)
       socket.on 'commentUpdate', (data) => @addOrUpdateComment(data.element)
-      socket.on 'commentRemove', (data) => @socketRemoveComment(data.message)
+      socket.on 'commentRemove', (elementId) => @socketRemoveComment(elementId)
       socket.on 'commentText', (data) => @addOrUpdateCommentText(data.element)
       socket.on 'fileAdded', (data) => room.canvas.handleUpload(data.canvasId, data.fileId, false)
       socket.on 'switchCanvas', (data) =>
@@ -46,17 +46,17 @@ $ ->
         rect.eligible = false
         room.history.add(rect)
       else
-        room.history.add({type: "comment", commentMin: commentMin, eligible: false})
+        room.history.add({actionType: "comment", commentMin: commentMin, eligible: false})
 
       commentMin
 
-    socketRemoveElement: (data) ->
-      room.helper.findByElementId(data).remove()
-      room.items.unselectIfSelected(data)
+    socketRemoveElement: (elementId) ->
+      room.helper.findByElementId(elementId).remove()
+      room.items.unselectIfSelected(elementId)
       room.redrawWithThumb()
 
-    socketRemoveComment: (data) ->
-      element = room.helper.findByElementId(data)
+    socketRemoveComment: (elementId) ->
+      element = room.helper.findByElementId(elementId)
 
       commentMin = element.commentMin
       commentMin[0].$maximized.remove()
@@ -64,7 +64,7 @@ $ ->
       commentMin[0].rect.remove() if commentMin[0].rect
       commentMin.remove()
 
-      room.items.unselectIfSelected(data)
+      room.items.unselectIfSelected(elementId)
       room.redrawWithThumb()
 
     addOrUpdateElement: (element) ->

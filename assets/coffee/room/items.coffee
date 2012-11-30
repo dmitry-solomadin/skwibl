@@ -22,7 +22,7 @@ $ ->
     removeSelected: ->
       if @selected()
         # add new 'remove' item into history and link it to removed item.
-        room.history.add({type: "remove", tool: @selected(), eligible: true})
+        room.history.add({actionType: "remove", tool: @selected(), eligible: true})
         @selected().opacity = 0
 
         room.socket.emit("elementRemove", @selected().elementId)

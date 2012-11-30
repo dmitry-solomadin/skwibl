@@ -75,7 +75,7 @@ $ ->
 
     clear: ->
       room.history.add
-        type: "clear", tools: room.history.getSelectableTools(), eligible: true
+        actionType: "clear", tools: room.history.getSelectableTools(), eligible: true
       for element in opts.historytools.allHistory
         element.opacity = 0 unless element.actionType
         room.comments.hideComment(element.commentMin) if element.commentMin

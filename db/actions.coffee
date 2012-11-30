@@ -23,7 +23,15 @@ exports.setUp = (client, db) ->
       tools.asyncOpt fn, null, action
 
   mod.delete = (aid, fn) ->
-    client.del "actions:#{aid}", fn
+    db.actions.findById aid, (err, action) ->
+      return tools.asyncOpt fn, err, null if err or not action
+
+      client.lrem "projects:#{action.project}:#{action.type}", 0, aid
+      client.lrem "canvases:#{action.canvasId}:#{action.type}", 0, aid if action.canvasId
+      client.del "actions:#{aid}", fn
+
+  mod.findById = (aid, fn) ->
+    client.hgetall "actions:#{aid}", fn
 
   mod.get = (pid, type, fn) ->
     negativeActionsBufferSize = -cfg.ACTIONS_BUFFER_SIZE
