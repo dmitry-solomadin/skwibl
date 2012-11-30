@@ -148,10 +148,15 @@ function product {
 ## deploy procedure
 function deploy {
   echo "deploing"
+  TOOLS_FILE="./tools/tools.coffee"
+  mv $TOOLS_FILE $TOOLS_FILE.save
+  sed -r 's/#  / /g' $TOOLS_FILE.save  > $TOOLS_FILE
   $COFFEE --compile --output $JS_OUTPUT_DIR $COFFEE_DIR &
   find ./ -name "*.coffee" -exec $COFFEE -cb {} \;
   find ./assets/coffee -name "*.js" -delete
   update
+  rm -f $TOOLS_FILE
+  mv $TOOLS_FILE.save $TOOLS_FILE
   sshpass -p $PASSWORD rsync ./pass.rsync -rvuz ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee"
 }
 
@@ -186,6 +191,7 @@ case "$1" in
     init
     build
     deploy
+    clean
     exit 0;;
   -e|--debug)
     init
