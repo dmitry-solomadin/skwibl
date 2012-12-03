@@ -19,13 +19,12 @@ body {
 }
 
 .btn {
-    font-family: 'MyriadPro-Bold';
     margin-left: 3px;
     color: #484e58;
-    font-size: 17px;
-    line-height: 17px;
-    padding-top: 10px !important;
-    padding-bottom: 10px !important;
+    font: 17px/19px 'MyriadPro-Bold';
+    vertical-align: bottom;
+    padding-top: 8px !important;
+    padding-bottom: 7px !important;
     border-color: #c5c6c6 #838484 #777777 #bababa;
     box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.3), inset -1px -1px 0 rgba(0, 0, 0, 0.1);
 }
@@ -56,8 +55,6 @@ body {
     background-image: linear-gradient(to bottom, #cbed9c, #88c433);
     background-repeat: repeat-x;
     border-color: #bbbbbb #878585 #6a6c65 #a9a8a8;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ffcbed9c', endColorstr = '#ff88c433', GradientType = 0);
-    filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
 
 .btn.btn-success:hover,

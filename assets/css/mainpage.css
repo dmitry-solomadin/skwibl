@@ -11,8 +11,8 @@
 
 @font-face {
     font-family: 'MyriadPro-Bold';
-    src: url('myriadpro-bold.eot');
-    src: url('myriadpro-bold.eot?#iefix') format('embedded-opentype'), url('myriadpro-bold.woff') format('woff'), url('myriadpro-bold.ttf') format('truetype'), url('myriadpro-bold.svg#myriadpro-bold') format('svg');
+    src: url('/css/fonts/myriadpro-bold.eot');
+    src: url('/css/fonts/myriadpro-bold.eot?#iefix') format('embedded-opentype'), url('/css/fonts/myriadpro-bold.woff') format('woff'), url('/css/fonts/myriadpro-bold.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -55,6 +55,8 @@ body.mainpage {
     width: 113px;
     padding-left: 0 !important;
     padding-right: 0 !important;
+    padding-top: 11px !important;
+    padding-bottom: 9px !important;
 }
 
 .banner_bg {

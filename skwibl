@@ -95,7 +95,7 @@ function clean {
 ## build procedure
 function build {
   echo "building"
-  $COFFEE -c -o $JS_OUTPUT_DIR $COFFEE_DIR
+  $COFFEE -w -o $JS_OUTPUT_DIR $COFFEE_DIR &
 }
 
 ## init procedure

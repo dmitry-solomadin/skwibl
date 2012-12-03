@@ -11,10 +11,10 @@ $ ->
       $("#loginBlock").css(
         position: 'absolute'
         top: $("#header").height() + 5
-        left: $("#signInButton").offset().left - $("#loginBlock").width() + 40
+        left: $("#signInButton").offset().left - $("#loginBlock").width() + 95
       ).fadeIn()
 
-      $(document).on "click.login", ->
+      $(document).on "click.login", (event) ->
         target = event.target
         return if target.id == "loginBlock" or target.id == "signInButton" or $(target).closest("#loginBlock")[0]
         $("#loginBlock").fadeOut()
