@@ -33,8 +33,6 @@ exports.setUp = ->
     app.use express.errorHandler()
 
   app.configure ->
-    app.set 'port', cfg.PORT
-    app.set 'host', cfg.HOST
     app.set 'views', viewsDir
     app.engine 'ect', ect({
       cache: true
@@ -77,7 +75,7 @@ exports.setUp = ->
 
   return app
 
-exports.start = (app) ->
+exports.start = ->
   console.log "Express server listening on
-  #{app.get('host')}:#{app.get('port')} in
-  #{app.settings.env} mode"
+  #{cfg.HOST}:#{cfg.PORT} in
+  #{cfg.ENVIRONMENT} mode"

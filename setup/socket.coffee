@@ -51,9 +51,6 @@ exports.setUp = (server) ->
 
   sockets.configure sio
 
-  process.on 'uncaughtException', (err) ->
-    console.log err
-
 exports.start = ->
   console.log "socket.io serer is started on
   #{cfg.HOST}:#{cfg.SOCKET_PORT} in

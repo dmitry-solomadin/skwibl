@@ -1,0 +1,69 @@
+#!/bin/sh
+
+####################################
+#       /etc/init.d/skwibl        #
+####################################
+
+### BEGIN INIT INFO
+# Provides:	  skwibl
+# Required-Start:    $local_fs $remote_fs $network $syslog $named
+# Required-Stop:     $local_fs $remote_fs $network $syslog $named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts the skwibl web server
+# Description:       starts start using start-stop-daemon
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+SERVER_HOME=/var/www/skwibl
+DAEMON="./skwibl -p &"
+NAME=skwibl
+DESC=skwibl
+
+set -e
+
+. /lib/lsb/init-functions
+
+start() {
+  cd $SERVER_HOME
+  $DAEMON
+}
+
+stop() {
+  PIDS=`ps aux | grep 'node' | grep -v 'grep' | awk '{print $2}'`
+  for PID in $PIDS
+  do
+    kill -9 $PID
+  done
+}
+
+restart() {
+		stop
+		start
+}
+
+case "$1" in
+	start)
+		echo -n "Starting $DESC: "
+		start
+		echo "$NAME."
+		;;
+
+	stop)
+		echo -n "Stopping $DESC: "
+		stop
+		echo "$NAME."
+		;;
+
+	restart|force-reload)
+		echo -n "Restarting $DESC: "
+		restart
+		;;
+
+	*)
+		echo "Usage: $NAME {start|stop|restart|force-reload|testconfig|configtest}" >&2
+		exit 1
+		;;
+esac
+
+exit 0
