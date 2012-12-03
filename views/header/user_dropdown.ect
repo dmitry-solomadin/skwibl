@@ -1,9 +1,7 @@
 <ul class="nav pull-right">
   <li class="dropdown ">
     <a class="dropdown-toggle userDropdown" data-toggle="dropdown" href="#">
-      <% if @currentUser().picture : %>
-        <img width="32" src="<%= @currentUser().picture %>">
-      <% end %>
+      <img width="32" src="<%= if @currentUser().picture then @currentUser().picture else '/images/avatar.png' %>">
       <div>
         <%= @currentUser().displayName %>
         <span class="caret"></span>

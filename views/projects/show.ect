@@ -16,12 +16,10 @@
   <div class="conversation-controls">
     <div id="participants" class="participants">
       <% for user in @users : %>
-        <div class="chatUser" id="chatUser<%= user.id %>" data-uid="<%= user.id %>" data-display-name="<%= user.displayName %>">
-          <% if user.picture : %>
-            <img class="userAvatar" src="<%= user.picture %>" width="48"/>
-          <% else : %>
-            <img class="userAvatar" src="/images/avatar.png" width="48"/>
-          <% end %>
+        <% picture = if user.picture then user.picture else '/images/avatar.png' %>
+        <div class="chatUser" id="chatUser<%= user.id %>" data-uid="<%= user.id %>" data-display-name="<%= user.displayName %>"
+            data-picture="<%= picture %>">
+          <img class="userAvatar" src="<%= picture %>" width="48"/>
           <span class="chatUserStatus"></span>
         </div>
       <% end %>

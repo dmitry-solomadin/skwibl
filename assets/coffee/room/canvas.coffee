@@ -33,7 +33,6 @@ $ ->
         canvasComments.push(JSON.parse($(rawComment).val())) for rawComment in $(".canvasComment#{cid}")
 
         for comment in canvasComments
-          console.log comment
           texts = []
           texts.push(JSON.parse($(rawText).val())) for rawText in $(".commentTexts#{comment.elementId}")
 
@@ -42,7 +41,7 @@ $ ->
             room.comments.hideComment(createdComment)
 
           for text in texts
-            room.comments.addCommentText createdComment, text.text, text.elementId
+            room.comments.addCommentText createdComment, text
 
     initThumbnails: ->
       selectedCid = @getSelectedCanvasId()

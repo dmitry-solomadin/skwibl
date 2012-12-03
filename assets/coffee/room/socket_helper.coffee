@@ -20,7 +20,7 @@ $ ->
 
     addOrUpdateCommentText: (element) ->
       foundComment = room.helper.findByElementId element.commentId
-      room.comments.addCommentText foundComment.commentMin, element.text, element.elementId
+      room.comments.addCommentText foundComment.commentMin, element
 
     addOrUpdateComment: (data) ->
       updateComment = (comment, updatedComment) =>

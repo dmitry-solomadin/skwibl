@@ -155,7 +155,7 @@ function deploy {
   echo "deploing"
   TOOLS_FILE="./tools/tools.coffee"
   mv $TOOLS_FILE $TOOLS_FILE.save
-  sed -r 's/#  / /g' $TOOLS_FILE.save  > $TOOLS_FILE
+  sed 's/#  / /g' $TOOLS_FILE.save  > $TOOLS_FILE
   $COFFEE --compile --output $JS_OUTPUT_DIR $COFFEE_DIR &
   find ./ -name "*.coffee" -exec $COFFEE -cb {} \;
   find ./assets/coffee -name "*.js" -delete

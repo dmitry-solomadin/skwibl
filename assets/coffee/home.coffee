@@ -8,16 +8,19 @@ $ ->
       $("#loginForm").data "process-submit", (data) => @processLogin(data)
 
     showLogin: ->
-      $("#loginBlock").css(
+      $("#loginBlock").show().css(
         position: 'absolute'
-        top: $("#header").height() + 5
+        top: $("#header").height() - 500
         left: $("#signInButton").offset().left - $("#loginBlock").width() + 95
-      ).fadeIn()
+      ).animate(
+        top: $("#header").height() - 5
+      , 400)
 
       $(document).on "click.login", (event) ->
         target = event.target
         return if target.id == "loginBlock" or target.id == "signInButton" or $(target).closest("#loginBlock")[0]
-        $("#loginBlock").fadeOut()
+        $("#loginBlock").animate
+          top: $("#header").height() - 500, 400
 
       return false
 

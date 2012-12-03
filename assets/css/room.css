@@ -148,9 +148,9 @@ body.room {
 
 .comment-maximized {
     position: absolute;
-    width: 190px;
+    width: 250px;
     box-shadow: #e3e3e3 0 0 3px;
-    background: #fcfcfc;
+    background: #fefefe;
     border: 1px solid #c2e1f5;
     border-radius: 3px;
     z-index: 2;
@@ -187,6 +187,15 @@ body.room {
     height: 0;
 }
 
+.comment-heading {
+    padding-bottom: 2px;
+}
+
+.comment-avatar {
+    float:left;
+    margin-right: 5px;
+}
+
 .comment-header {
     height: 20px;
     border-bottom: 2px solid #e3e3e3;
@@ -196,13 +205,35 @@ body.room {
     padding: 10px;
 }
 
-.comment-content .comment-text:last-child {
-    margin-bottom: 5px;
+.comment-text {
+    border-bottom: 1px solid #e3e3e3;
+    color: #202020;
+    font-size: 11px;
+    padding-bottom: 3px;
+    margin-bottom: 8px;
+}
+
+.the-comment-text {
+    line-height: 14px;
+}
+
+.comment-author {
+    font-size: 11px;
+    font-weight: bold;
+    color: #505050;
+}
+
+.comment-time {
+    font-size: 10px;
+    color: gray;
+    margin-top: -5px;
 }
 
 .comment-reply {
-    width: 160px;
+    margin-top: 10px;
+    width: 220px;
     height: 40px;
+    font-size: 11px;
 }
 
 .comment-send {
@@ -233,7 +264,7 @@ body.room {
     padding: 10px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
-    z-index: 9999;
+    z-index: 1031;
 }
 
 .chat .conversation-controls {

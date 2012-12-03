@@ -10,11 +10,11 @@ $ ->
       @show()
 
     show: ->
-      @notification.css({right: 50, top: 30})
+      @notification.css({right: 50, top: 60})
       @notification.show()
       @notification.animate
         opacity: 1
-        top: 60, ->
+        top: 80, ->
           callback = -> App.notificator.hide()
           window.setTimeout(callback, 2000)
 

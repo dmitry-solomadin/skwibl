@@ -44,7 +44,12 @@ body.mainpage {
     height: 55px;
     font-size: 0;
     line-height: 55px;
-    margin-top: 3px;
+    margin-top: 5px;
+    vertical-align: top;
+}
+
+.logo img {
+    vertical-align: top;
 }
 
 .header_btns {

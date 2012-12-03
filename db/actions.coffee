@@ -86,14 +86,10 @@ exports.setUp = (client, db) ->
 
       return tools.asyncOpt fn, err, []
 
-  mod.updateComment = (data, fn) ->
-    commentText =
-      id: data.elementId
-      text: data.text
-      time: new Date().getTime()
-
-    client.hmset "texts:#{data.elementId}", commentText
-    client.rpush "comments:#{data.commentId}:texts", data.elementId
-    return tools.asyncOpt fn, null, data
+  mod.updateComment = (element, fn) ->
+    element.time = new Date().getTime()
+    client.hmset "texts:#{element.elementId}", element
+    client.rpush "comments:#{element.commentId}:texts", element.elementId
+    return tools.asyncOpt fn, null, element
 
   return mod

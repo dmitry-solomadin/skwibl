@@ -4,6 +4,12 @@ $ ->
   class Chat
     constructor: ->
       @users = []
+      for chatUser in $(".chatUser")
+        @users.push
+          id: $(chatUser).data("uid")
+          displayName: $(chatUser).data("display-name")
+          picture: $(chatUser).data("picture")
+
       @initSockets()
 
     fold: (link) ->
@@ -24,8 +30,8 @@ $ ->
       $(link).attr("onclick", "App.chat.fold(this); return false;").find("img").attr("src", "/images/room/fold.png")
 
     getUserById: (uid) ->
-      user = $("#chatUser#{uid}")
-      id: uid, displayName: user.data("display-name")
+      for user in @users
+        return user if `user.id == uid`
 
     addMessage: (uid, message) ->
       user = @getUserById(uid)

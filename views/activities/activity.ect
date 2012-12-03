@@ -13,8 +13,8 @@
   </div>
 
   <% if @activity.status is 'new' : %>
-  <button class="btn btn-small btn-success" name="accept" onclick="App.activities.accept('<%= @activity.id %>')">Accept</button>
-  <button class="btn btn-small btn-danger" name="decline" onclick="App.activities.decline('<%= @activity.id %>')">Decline</button>
+  <button class="btn btn-success small-btn" name="accept" onclick="App.activities.accept('<%= @activity.id %>')">Accept</button>
+  <button class="btn btn-danger small-btn" name="decline" onclick="App.activities.decline('<%= @activity.id %>')">Decline</button>
   <% end %>
 </div>
 <% end %>

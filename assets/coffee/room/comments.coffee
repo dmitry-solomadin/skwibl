@@ -34,7 +34,7 @@ $ ->
       commentMax.append(commentHeader)
       commentContent = $("<div class='comment-content'>" +
       "<textarea class='comment-reply' placeholder='Type a comment...'></textarea>" +
-      "<input type='button' class='btn fr comment-send hide' value='Send'>" +
+      "<input type='button' class='btn small-btn fr comment-send hide' value='Send'>" +
       "</div>")
       commentMax.append(commentContent)
 
@@ -64,7 +64,7 @@ $ ->
 
       $(commentMax).find(".comment-send").on "click", =>
         commentTextarea = commentMax.find(".comment-reply")
-        @addCommentText(commentMin, commentTextarea.val())
+        @addCommentText commentMin, text: commentTextarea.val()
         commentTextarea.val("")
 
       commentMin[0].$maximized = commentMax
@@ -310,16 +310,30 @@ $ ->
 
       room.redrawWithThumb()
 
-    addCommentText: (commentMin, text, elementId) ->
-      emit = if elementId then false else true
-      elementId = elementId or room.generateId()
+    addCommentText: (commentMin, commentText) ->
+      emit = if commentText.elementId then false else true
+      elementId = commentText.elementId or room.generateId()
+      owner = commentText.owner or $("#uid").val()
+      time = commentText.time or new Date().getTime()
       commentContent = commentMin[0].$maximized.find(".comment-content")
-      commentContent.prepend("<div id='commentText#{elementId}' class='comment-text'>#{text}</div>")
+
+      user = App.chat.getUserById owner
+
+      commentContent.prepend(
+        "<div id='commentText#{elementId}' class='comment-text'>
+             <div class='comment-avatar'><img src='#{user.picture}' width='32'/></div>
+             <div class='comment-heading'>
+                 <div class='comment-author'>#{user.displayName}</div>
+                 <div class='comment-time'>at #{moment(parseFloat(time)).format("DD.MM.YYYY HH:mm")}</div>
+             </div>
+             <div class='the-comment-text'>#{commentText.text}</div>
+         </div>")
 
       if emit
         room.socket.emit "commentText",
           elementId: elementId
           commentId: commentMin.elementId
-          text: text
+          owner: owner
+          text: commentText.text
 
   App.room.comments = new RoomComments
