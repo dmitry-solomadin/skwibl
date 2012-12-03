@@ -3,6 +3,7 @@
 
 .navbar-inner {
     background: #F6F1ED !important;
+    filter: none;
 }
 
 .navbar-inner .container {

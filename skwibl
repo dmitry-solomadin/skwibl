@@ -98,6 +98,11 @@ function build {
   $COFFEE -w -o $JS_OUTPUT_DIR $COFFEE_DIR &
 }
 
+function build_deploy {
+  echo "building"
+  $COFFEE -c -o $JS_OUTPUT_DIR $COFFEE_DIR &
+}
+
 ## init procedure
 function init {
   echo "init project directories"
@@ -154,7 +159,6 @@ function deploy {
   $COFFEE --compile --output $JS_OUTPUT_DIR $COFFEE_DIR &
   find ./ -name "*.coffee" -exec $COFFEE -cb {} \;
   find ./assets/coffee -name "*.js" -delete
-  update
   rm -f $TOOLS_FILE
   mv $TOOLS_FILE.save $TOOLS_FILE
   sshpass -p $PASSWORD rsync ./pass.rsync -rvuz ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee"
@@ -189,7 +193,7 @@ case "$1" in
   -d|--deploy)
     clean
     init
-    build
+    build_deploy
     deploy
     clean
     exit 0;;

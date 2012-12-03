@@ -53,6 +53,7 @@ body {
     background-image: -webkit-linear-gradient(top, #cbed9c, #88c433);
     background-image: -o-linear-gradient(top, #cbed9c, #88c433);
     background-image: linear-gradient(to bottom, #cbed9c, #88c433);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#82c9ef', endColorstr='#59ACD9', GradientType=0 );
     background-repeat: repeat-x;
     border-color: #bbbbbb #878585 #6a6c65 #a9a8a8;
 }
