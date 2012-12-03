@@ -33,7 +33,9 @@ $ ->
         canvasComments.push(JSON.parse($(rawComment).val())) for rawComment in $(".canvasComment#{cid}")
 
         for comment in canvasComments
-          texts = JSON.parse($("#commentTexts#{comment.elementId}").val())
+          console.log comment
+          texts = []
+          texts.push(JSON.parse($(rawText).val())) for rawText in $(".commentTexts#{comment.elementId}")
 
           createdComment = room.socketHelper.createCommentFromData(comment)
           unless cid is selectedCid

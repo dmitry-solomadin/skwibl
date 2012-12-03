@@ -60,16 +60,8 @@ exports.setUp = (client, db) ->
             return tools.asyncOpt fn, err, [] if err
 
             if type is 'comment'
-              return db.actions.getCommentTexts fetchedAction.elementId, (err, texts, elementIds) ->
-                rarray = []
-                for text, index in texts
-                  rarray.push
-                    text: text
-                    elementId: elementIds[index]
-
-                console.log rarray
-
-                fetchedAction.texts = rarray
+              return db.actions.getCommentTexts fetchedAction.elementId, (err, texts) ->
+                fetchedAction.texts = texts
                 fetchedActions.push fetchedAction
                 tools.asyncDone actions, ->
                   tools.asyncOpt fn, null, fetchedActions
@@ -83,12 +75,24 @@ exports.setUp = (client, db) ->
   mod.getCommentTexts = (eid, fn) ->
     client.lrange "comments:#{eid}:texts", 0, -1, (err, elementIds) ->
       if not err and elementIds and elementIds.length
-        comments = []
-        return client.mget elementIds.map(tools.commentText), (err, texts) -> fn(err, texts, elementIds)
+        texts = []
+
+        return tools.asyncParallel elementIds, (elementId) ->
+          client.hgetall "texts:#{elementId}", (err, text) ->
+            texts.push text
+
+            tools.asyncDone elementIds, ->
+              tools.asyncOpt fn, null, texts
+
       return tools.asyncOpt fn, err, []
 
   mod.updateComment = (data, fn) ->
-    client.set "texts:#{data.elementId}", data.text
+    commentText =
+      id: data.elementId
+      text: data.text
+      time: new Date().getTime()
+
+    client.hmset "texts:#{data.elementId}", commentText
     client.rpush "comments:#{data.commentId}:texts", data.elementId
     return tools.asyncOpt fn, null, data
 

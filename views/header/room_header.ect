@@ -11,80 +11,83 @@
   </span>
 </div>
 
-<a href="#" class="btn toolTypeChanger skwibl_image_btn ml25" data-tooltype="line">
-  <img src="/images/room/pencil.png">
-</a>
-<a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="highligher">
-  <img src="/images/room/highlighter.png">
-</a>
-<a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="comment"
-   onclick="App.room.helper.notifyComment()">
-  <img src="/images/room/comment.png">
-</a>
-<a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="rectangle">
-  <img src="/images/room/rectangle.png">
-</a>
-<a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="circle">
-  <img src="/images/room/circle.png">
-</a>
-<a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="straightline">
-  <img src="/images/room/line.png">
-</a>
-<a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="arrow">
-  <img src="/images/room/arrow.png">
-</a>
-
-<span class="dropdown">
-  <a href="#" class="btn colorDropdown" data-toggle="dropdown">
-    <div class="color colorSelected active" style="background-color:black;" data-color="black"></div>
-    <span class="caret"></span>
+<div id="room-controls">
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn ml25" data-tooltype="line">
+    <img src="/images/room/pencil.png">
   </a>
-  <ul class="dropdown-menu" id="colorSelect">
-    <li>
-      <div class="color active" style="background-color:black;" data-color="black"></div>
-      <div class="color" style="background-color:red;" data-color="red"></div>
-      <div class="color" style="background-color:orange;" data-color="orange"></div>
-      <div class="color" style="background-color:yellow;" data-color="yellow"></div>
-      <div class="color" style="background-color:green;" data-color="green"></div>
-      <div class="color" style="background-color:#986536;" data-color="#986536"></div>
-      <div class="color" style="background-color:blue;" data-color="blue"></div>
-      <div class="color" style="background-color:#9aff99;" data-color="#9aff99"></div>
-    </li>
-  </ul>
-</span>
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="highligher">
+    <img src="/images/room/highlighter.png">
+  </a>
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="comment"
+     onclick="App.room.helper.notifyComment()">
+    <img src="/images/room/comment.png">
+  </a>
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="rectangle">
+    <img src="/images/room/rectangle.png">
+  </a>
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="circle">
+    <img src="/images/room/circle.png">
+  </a>
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="straightline">
+    <img src="/images/room/line.png">
+  </a>
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="arrow">
+    <img src="/images/room/arrow.png">
+  </a>
 
-<a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="select">
-  <img src="/images/room/select.png">
-</a>
-<a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="pan">
-  <img src="/images/room/pan.png">
-</a>
-
-<span>
-  <select class="btn" style="width:75px;"
-          onchange="App.room.canvas.setScale($(this).find(':selected').val())">
-    <option value="0.5">50%</option>
-    <option value="0.75">75%</option>
-    <option value="1" selected="selected">100%</option>
-    <option value="1.25">125%</option>
-    <option value="1.5">150%</option>
-    <option value="2">200%</option>
-  </select>
-  <span class="skwibl-btn-group">
-    <a class="btn" href="#" onclick="App.room.canvas.addScale(); return false;">+</a>
-    <a class="btn" href="#" onclick="App.room.canvas.subtractScale(); return false;">-</a>
+  <span class="dropdown">
+    <a href="#" class="btn colorDropdown" data-toggle="dropdown">
+      <div class="color colorSelected active" style="background-color:black;" data-color="black"></div>
+      <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu" id="colorSelect">
+      <li>
+        <div class="color active" style="background-color:black;" data-color="black"></div>
+        <div class="color" style="background-color:red;" data-color="red"></div>
+        <div class="color" style="background-color:orange;" data-color="orange"></div>
+        <div class="color" style="background-color:yellow;" data-color="yellow"></div>
+        <div class="color" style="background-color:green;" data-color="green"></div>
+        <div class="color" style="background-color:#986536;" data-color="#986536"></div>
+        <div class="color" style="background-color:blue;" data-color="blue"></div>
+        <div class="color" style="background-color:#9aff99;" data-color="#9aff99"></div>
+      </li>
+    </ul>
   </span>
-</span>
 
-<span class="skwibl-btn-group">
-  <a href="#" id="undoLink" class="btn skwibl_image_btn disabled" onclick="App.room.history.prev();return false;">
-    <img src="/images/room/undo.png">
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="select">
+    <img src="/images/room/select.png">
   </a>
-  <a href="#" id="redoLink" class="btn skwibl_image_btn disabled" onclick="App.room.history.next();return false;">
-    <img src="/images/room/redo.png">
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="pan">
+    <img src="/images/room/pan.png">
   </a>
-</span>
 
-<a href="#" class="btn" onclick="App.room.history.clear();return false;">
-  Clear
-</a>
+  <span>
+    <select class="btn" style="width:75px;"
+            onchange="App.room.canvas.setScale($(this).find(':selected').val())">
+      <option value="0.5">50%</option>
+      <option value="0.75">75%</option>
+      <option value="1" selected="selected">100%</option>
+      <option value="1.25">125%</option>
+      <option value="1.5">150%</option>
+      <option value="2">200%</option>
+    </select>
+    <span class="skwibl-btn-group">
+      <a class="btn small-btn" href="#" onclick="App.room.canvas.addScale(); return false;">+</a>
+      <a class="btn small-btn" href="#" onclick="App.room.canvas.subtractScale(); return false;">-</a>
+    </span>
+  </span>
+
+  <span class="skwibl-btn-group">
+    <a href="#" id="undoLink" class="btn skwibl_image_btn disabled" onclick="App.room.history.prev();return false;">
+      <img src="/images/room/undo.png">
+    </a>
+    <a href="#" id="redoLink" class="btn skwibl_image_btn disabled" onclick="App.room.history.next();return false;">
+      <img src="/images/room/redo.png">
+    </a>
+  </span>
+
+  <a href="#" class="btn small-btn" onclick="App.room.history.clear();return false;">
+    Clear
+  </a>
+
+</div>

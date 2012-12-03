@@ -49,7 +49,9 @@
           <% end %>
           <% for comment in canvas.comments : %>
             <input class="canvasComment<%= canvas.canvasId %>" type="hidden" value="<%= JSON.stringify(comment) %>"/>
-            <input id="commentTexts<%= comment.elementId %>" type="hidden" value="<%= JSON.stringify(comment.texts) %>"/>
+            <% for text in comment.texts : %>
+              <input class="commentTexts<%= comment.elementId %>" type="hidden" value="<%= JSON.stringify(text) %>"/>
+            <% end %>
           <% end %>
           <a href="#" class="<%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.canvasId %>" <%- "data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
             <canvas width="80" height="60"></canvas>

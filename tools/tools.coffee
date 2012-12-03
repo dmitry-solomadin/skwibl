@@ -16,9 +16,6 @@ exports.emailType = (x) ->
 exports.emailUid = (x) ->
   return "emails:#{x}:uid"
 
-exports.commentText = (x) ->
-  return "texts:#{x}"
-
 exports.hash = (email) ->
   hash = crypto.createHash 'md5'
   hash.update new Date + email, 'ascii'

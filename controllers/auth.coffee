@@ -12,7 +12,8 @@ cfg = require '../config'
 #
 exports.mainPage = (req, res) ->
   return res.redirect '/projects' if req.user
-  return res.render 'index', template: './mainpage'
+
+  res.render 'mainpage'
 
 #
 # GET

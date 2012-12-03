@@ -186,6 +186,7 @@ case "$1" in
     init
     build
     deploy
+    clean
     exit 0;;
   -e|--debug)
     init

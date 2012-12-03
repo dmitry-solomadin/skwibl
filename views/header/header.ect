@@ -4,17 +4,17 @@
   <input type="hidden" id="uid" value="<%= @currentUser().id %>"/>
   <% end %>
 
-  <div class="navbar-inner">
+  <div class="navbar-inner header">
     <div class="<%= if @room then 'container-fluid' else 'container' %>">
       <% if @room : %>
       <%- include './header/room_header.ect' %>
       <% else : %>
-      <a class="brand" href="/">Skwibl</a>
+      <div class="logo"><a href="#" title="Skwibl"><img src="/images/mainpage/logo.png" alt="Skwibl"></a></div>
       <% end %>
 
       <% unless @currentUser() : %>
-      <span class="pull-right">
-        <a class="btn" href="/registration">Sign Up</a>
+      <span class="pull-right header_btns">
+        <a class="btn btn-success" href="/registration">Join Skwibl</a>
         <a id="signInButton" class="btn" href="#" onclick="App.Home.showLogin();">
           Sign In
         </a>
@@ -26,7 +26,7 @@
           <%- include './header/user_dropdown.ect' %>
         <% else : %>
         <div class="nav-collapse">
-          <ul class="nav">
+          <ul id="topLinks" class="nav">
             <li class="activityLi"><a href="/activities">Activities</a></li>
             <li class="activity-badge-wrapper"><span id="activityBadge" class="badge activity-badge">0</span></li>
             <li><a href="/projects">Projects</a></li>
@@ -34,8 +34,8 @@
             <li><a href="/files" data-remote="true">Files</a></li>
           </ul>
 
-          <a href="/projects/new">
-            <button class="btn">Create a Project</button>
+          <a id="createNewProject" href="/projects/new">
+            <button class="btn btn-success">Create a Project</button>
           </a>
 
           <%- include './header/user_dropdown.ect' %>
