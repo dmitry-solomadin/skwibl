@@ -8,10 +8,10 @@ exports.player = (req, res) ->
     template: 'player'
     user: req.user
 
-exports.connections = (req, res, next) ->
+exports.conns = (req, res, next) ->
   user = req.user
   name = tools.getName user
-  db.auth.connections user.id, (err, obj) ->
+  db.auth.connections user.id, (err, connections) ->
     unless err
       conns =
         facebook: off
@@ -19,10 +19,9 @@ exports.connections = (req, res, next) ->
         linkedin: off
         dropbox: off
         yahoo: off
-      if obj
-        for el in conns
-          if obj[el]
-            conns[el] = on
+      if connections
+        for el in connections
+          conns[el] = on
       return res.render 'dev/index',
         template: 'profile'
         user: user
@@ -30,3 +29,7 @@ exports.connections = (req, res, next) ->
         name: name
         connections: conns
     return next err
+
+exports.integration = (req, res) ->
+  service = req.body.service
+  return res.send true

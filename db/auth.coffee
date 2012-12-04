@@ -8,7 +8,7 @@ exports.setUp = (client, db) ->
 
   mod = {}
 
-  mod.findOrCreate = (profile, token, fn) ->
+  mod.findOrCreate = (profile, token, secret, fn) ->
     emails = profile.emails
     return db.users.findByEmails emails, (err, user) ->
       if not user
@@ -23,7 +23,10 @@ exports.setUp = (client, db) ->
           provider: profile.provider
         , profile.name, emails, (err, user) ->
           if user
-            db.auth.connect user.id, user.provider, token
+            db.auth.connect user.id, user.provider,
+              token: token
+              secret: secret
+            , tools.logError
             return smtp.sendRegMail user, fn
           return tools.asyncOpt fn, err, user
       if not user.picture
@@ -37,7 +40,10 @@ exports.setUp = (client, db) ->
       if diff.length
         user.emails.concat diff
         db.users.addEmails user.id, user.emails
-      db.auth.connect user.id, profile.provider, token
+      db.auth.connect user.id, profile.provider,
+        token: token
+        secret: secret
+      , tools.logError
       if user.status is 'unconfirmed'
         return db.users.persist user, fn
       if user.status is 'deleted'
@@ -45,12 +51,20 @@ exports.setUp = (client, db) ->
       return tools.asyncOpt fn, err, user
 
   mod.connections = (id, fn) ->
-    client.hgetall "users:#{id}:connections", fn
+    client.smembers "users:#{id}:connections", fn
 
-  mod.connect = (id, provider, token, fn) ->
-    client.hset "users:#{id}:connections", provider, token, fn
+  mod.getConnection = (id, provider, fn) ->
+    client.hgetall "users:#{id}:#{provider}", fn
+
+  mod.connect = (id, provider, connection, fn) ->
+    client.sadd "users:#{id}:connections", provider
+    client.hmset "users:#{id}:#{provider}", connection, fn
+
+  mod.setConnection = (id, provider, connection, fn) ->
+    client.hmset "users:#{id}:#{provider}", connection, fn
 
   mod.disconnect = (id, provider, fn) ->
-    client.hdel "users:#{id}:connections", provider, fn
+    client.srem "users:#{id}:connections", provider
+    client.del "users:#{id}:#{provider}", fn
 
   return mod

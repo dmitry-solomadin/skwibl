@@ -1,3 +1,4 @@
+request = require 'request'
 fs = require 'fs'
 path = require 'path'
 formidable = require 'formidable'
@@ -40,24 +41,18 @@ exports.file = (req, res) ->
 # Add file from cloud source
 #
 exports.add = (req, res) ->
-  #TODO
-  console.log 'TODO'
 
 #
 # POST
 # delete file
 #
 exports.delete = (req, res) ->
-  #TODO
-  console.log 'TODO'
 
 #
 # POST
 # Update file
 #
 exports.update = (req, res) ->
-  #TODO
-  console.log 'TODO'
 
 #
 # POST
@@ -123,3 +118,24 @@ exports.upload = (req, res, next) ->
           success: true
           id: file.id
           name: name
+
+#
+# GET
+# Dropbox files
+#
+exports.dropbox = (req, res) ->
+  db.auth.getConnection req.user.id, 'dropbox', (err, connection) ->
+    if not err and connection
+      oauth =
+        consumer_key: cfg.DROPBOX_APP_KEY
+        consumer_secret: cfg.DROPBOX_APP_SECRET
+        token: connection.oauth_token
+        token_secret: connection.oauth_token_secret
+      console.log oauth
+      path = req.query.path or ''
+      console.log path
+      url = "https://api.dropbox.com/1/metadata/dropbox/#{path}"
+      return request url: url, oauth: oauth, (err, response, body) ->
+        console.log response.statusCode, body
+        return res.send body
+    return res.send no
