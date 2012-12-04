@@ -73,7 +73,8 @@ exports.setUp = (client, db) ->
       return tools.asyncOpt fn, err, []
 
   mod.getCommentTexts = (eid, fn) ->
-    client.lrange "comments:#{eid}:texts", 0, -1, (err, elementIds) ->
+    client.sort "comments:#{eid}:texts", "by", "texts:*->time", (err, elementIds) ->
+      console.log err, elementIds
       if not err and elementIds and elementIds.length
         texts = []
 

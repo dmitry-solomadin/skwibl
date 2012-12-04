@@ -32,7 +32,7 @@ $ ->
       commentMin.on "mousedown", => @unfoldComment(commentMin)
 
       commentMax.append(commentHeader)
-      commentContent = $("<div class='comment-content'>" +
+      commentContent = $("<div class='comment-content'><div class='comment-content-inner'></div>" +
       "<textarea class='comment-reply' placeholder='Type a comment...'></textarea>" +
       "<input type='button' class='btn small-btn fr comment-send hide' value='Send'>" +
       "</div>")
@@ -315,11 +315,37 @@ $ ->
       elementId = commentText.elementId or room.generateId()
       owner = commentText.owner or $("#uid").val()
       time = commentText.time or new Date().getTime()
-      commentContent = commentMin[0].$maximized.find(".comment-content")
+      commentContent = commentMin[0].$maximized.find(".comment-content-inner")
 
       user = App.chat.getUserById owner
 
-      commentContent.prepend(
+      commentsCount = commentContent.children().length
+
+      hiddenCommentsCount = commentsCount - 2
+      showCommentsText = "Show #{commentsCount - 2} previous #{if hiddenCommentsCount == 1 then 'comment' else 'comments'}"
+      if commentsCount == 3
+        commentContent.parent().prepend "<div class='comment-show-comments'>#{showCommentsText}</div>"
+
+        showComments = ->
+          $(commentContent).parent().find(".comment-show-comments").html("Hide comments")
+          commentContent.children().slideDown("fast")
+          $(commentContent).parent().find(".comment-show-comments").off("click.comments").on "click.comments", -> hideComments()
+
+        hideComments = ->
+          commentsCount = commentContent.children().length
+          hiddenCommentsCount = commentsCount - 3
+          showCommentsText = "Show #{commentsCount - 3} previous #{if hiddenCommentsCount == 1 then 'comment' else 'comments'}"
+          $(commentContent).parent().find(".comment-show-comments").html(showCommentsText)
+          for comment, index in commentContent.children()
+            $(comment).slideUp("fast") if commentsCount - index > 3
+          $(commentContent).parent().find(".comment-show-comments").off("click.comments").on "click.comments", -> showComments()
+
+        $(commentContent).parent().find(".comment-show-comments").click -> showComments()
+
+      showCommentsDiv = $(commentContent).parent().find(".comment-show-comments")
+      showCommentsDiv.html(showCommentsText) if showCommentsDiv[0]
+
+      commentContent.append(
         "<div id='commentText#{elementId}' class='comment-text'>
              <div class='comment-avatar'><img src='#{user.picture}' width='32'/></div>
              <div class='comment-heading'>
@@ -328,6 +354,9 @@ $ ->
              </div>
              <div class='the-comment-text'>#{commentText.text}</div>
          </div>")
+
+      for comment, index in commentContent.children()
+        $(comment).hide() if commentsCount - index > 2
 
       if emit
         room.socket.emit "commentText",

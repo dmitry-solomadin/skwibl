@@ -191,6 +191,25 @@ body.room {
     padding-bottom: 2px;
 }
 
+.comment-show-comments {
+    width: 100%;
+    padding: 10px 0;
+    cursor: pointer;
+    margin-bottom: 10px;
+    text-align: center;
+    background: rgba(194, 225, 245, 0.5);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.comment-show-comments:hover {
+    background: rgba(194, 225, 245, 1);
+}
+
 .comment-avatar {
     float:left;
     margin-right: 5px;
@@ -203,6 +222,11 @@ body.room {
 
 .comment-content {
     padding: 10px;
+}
+
+.comment-content-inner {
+    max-height: 320px;
+    overflow: auto;
 }
 
 .comment-text {
