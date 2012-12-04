@@ -54,7 +54,14 @@ exports.configure = (sio) ->
         socket.broadcast.to(socket.project).emit 'commentText',
           id: id
           element: data
-        db.actions.updateComment data
+        db.actions.addCommentText data
+
+      socket.on 'updateCommentText', (data, cb) ->
+        socket.broadcast.to(socket.project).emit 'updateCommentText',
+          id: id
+          elementId: data.elementId
+          text: data.text
+        db.actions.updateCommentText data.elementId, data.text
 
       socket.on 'eraseCanvas', (data, cb) ->
         console.log 'erasecanv'
@@ -73,3 +80,9 @@ exports.configure = (sio) ->
         socket.broadcast.to(socket.project).emit 'switchCanvas',
           id: id
           canvasId: msg
+
+      socket.on 'removeCommentText', (elementId, cb) ->
+        socket.broadcast.to(socket.project).emit 'removeCommentText',
+          id: id
+          elementId: elementId
+        db.actions.removeCommentText elementId

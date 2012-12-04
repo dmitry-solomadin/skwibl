@@ -87,10 +87,23 @@ exports.setUp = (client, db) ->
 
       return tools.asyncOpt fn, err, []
 
-  mod.updateComment = (element, fn) ->
+  mod.addCommentText = (element, fn) ->
     element.time = new Date().getTime()
     client.hmset "texts:#{element.elementId}", element
     client.rpush "comments:#{element.commentId}:texts", element.elementId
     return tools.asyncOpt fn, null, element
+
+  mod.updateCommentText = (elementId, text, fn) ->
+    client.hset "texts:#{elementId}", "text", text
+
+  mod.findCommentTextById = (elementId, fn) ->
+    client.hgetall "texts:#{elementId}", fn
+
+  mod.removeCommentText = (elementId, fn) ->
+    db.actions.findCommentTextById elementId, (err, commentText) ->
+      return tools.asyncOpt fn, err, null if err or not commentText
+
+      client.lrem "comments:#{commentText.commentId}:texts", 0, elementId
+      client.del "texts:#{elementId}", fn
 
   return mod

@@ -6,11 +6,13 @@ $ ->
       App.room.socket = socket
 
       socket.on 'elementUpdate', (data) => @addOrUpdateElement(data.element)
-      socket.on 'elementRemove', (elementId) => @socketRemoveElement(elementId)
+      socket.on 'elementRemove', (data) => @socketRemoveElement(data.elementId)
       socket.on 'commentUpdate', (data) => @addOrUpdateComment(data.element)
-      socket.on 'commentRemove', (elementId) => @socketRemoveComment(elementId)
-      socket.on 'commentText', (data) => @addOrUpdateCommentText(data.element)
+      socket.on 'commentRemove', (data) => @socketRemoveComment(data.elementId)
+      socket.on 'commentText', (data) => @addCommentText(data.element)
       socket.on 'fileAdded', (data) => room.canvas.handleUpload(data.canvasId, data.fileId, false)
+      socket.on 'removeCommentText', (data) => room.comments.removeText(data.elementId, false)
+      socket.on 'updateCommentText', (data) => room.comments.doEditText(data.elementId, data.text, false)
       socket.on 'switchCanvas', (data) =>
         room.canvas.selectThumb(room.canvas.findThumbByCanvasId(data.canvasId), false)
 
@@ -18,7 +20,7 @@ $ ->
         room.canvas.erase()
         room.redrawWithThumb()
 
-    addOrUpdateCommentText: (element) ->
+    addCommentText: (element) ->
       foundComment = room.helper.findByElementId element.commentId
       room.comments.addCommentText foundComment.commentMin, element
 

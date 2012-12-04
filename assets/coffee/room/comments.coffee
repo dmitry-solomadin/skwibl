@@ -35,7 +35,9 @@ $ ->
       commentContent = $("<div class='comment-content'><div class='comment-content-inner'></div>" +
       "<textarea class='comment-reply' placeholder='Type a comment...'></textarea>" +
       "<input type='button' class='btn small-btn fr comment-send hide' value='Send'>" +
+      "<input type='button' class='btn small-btn fr edit-cancel hide' value='Cancel edit'>" +
       "</div>")
+      $(commentContent).data("hidden", "false")
       commentMax.append(commentContent)
 
       commentHeader[0].commentMin = commentMin
@@ -55,17 +57,29 @@ $ ->
           room.socket.emit("commentUpdate", room.socketHelper.prepareCommentToSend(commentMin))
           room.redrawWithThumb()
 
-      $(document).on "click", (evt) =>
+      $(document).off("click.toggleCommentButtons").on "click.toggleCommentButtons", (evt) =>
         for commentSendButton in $(".comment-send:visible")
-          $(commentSendButton).hide()
-          @redrawArrow(commentMin)
+          # do not make send button invisible if comment in editing mode.
+          unless $(commentSendButton).parent().find(".edit-cancel:visible")[0]
+            $(commentSendButton).hide()
+            @redrawArrow(commentMin)
 
         $(evt.target).parent(".comment-content").find(".comment-send").show() if evt.target
 
       $(commentMax).find(".comment-send").on "click", =>
-        commentTextarea = commentMax.find(".comment-reply")
-        @addCommentText commentMin, text: commentTextarea.val()
-        commentTextarea.val("")
+        editCancelButton = commentMax.find(".edit-cancel:visible")[0]
+        if editCancelButton
+          commentTextarea = commentMax.find(".comment-reply")
+          @doEditText $(editCancelButton).data("edited-comment-text-id"), commentTextarea.val(), true
+          commentMax.find(".edit-cancel").click()
+        else
+          commentTextarea = commentMax.find(".comment-reply")
+          @addCommentText commentMin, text: commentTextarea.val()
+          commentTextarea.val("")
+
+      $(commentMax).find(".edit-cancel").on "click", =>
+        commentMax.find(".comment-reply").val("")
+        $(commentMax).find(".edit-cancel").hide()
 
       commentMin[0].$maximized = commentMax
       commentMin[0].rect = rect
@@ -324,20 +338,18 @@ $ ->
       hiddenCommentsCount = commentsCount - 2
       showCommentsText = "Show #{commentsCount - 2} previous #{if hiddenCommentsCount == 1 then 'comment' else 'comments'}"
       if commentsCount == 3
+        $(commentContent).parent().data("hidden", "true")
         commentContent.parent().prepend "<div class='comment-show-comments'>#{showCommentsText}</div>"
 
         showComments = ->
+          $(commentContent).parent().data("hidden", "false")
           $(commentContent).parent().find(".comment-show-comments").html("Hide comments")
           commentContent.children().slideDown("fast")
           $(commentContent).parent().find(".comment-show-comments").off("click.comments").on "click.comments", -> hideComments()
 
-        hideComments = ->
-          commentsCount = commentContent.children().length
-          hiddenCommentsCount = commentsCount - 3
-          showCommentsText = "Show #{commentsCount - 3} previous #{if hiddenCommentsCount == 1 then 'comment' else 'comments'}"
-          $(commentContent).parent().find(".comment-show-comments").html(showCommentsText)
-          for comment, index in commentContent.children()
-            $(comment).slideUp("fast") if commentsCount - index > 3
+        hideComments = =>
+          $(commentContent).parent().data("hidden", "true")
+          @initHideCommentsBlock(commentContent)
           $(commentContent).parent().find(".comment-show-comments").off("click.comments").on "click.comments", -> showComments()
 
         $(commentContent).parent().find(".comment-show-comments").click -> showComments()
@@ -353,6 +365,10 @@ $ ->
                  <div class='comment-time'>at #{moment(parseFloat(time)).format("DD.MM.YYYY HH:mm")}</div>
              </div>
              <div class='the-comment-text'>#{commentText.text}</div>
+             <div class='comment-actions'>
+                 <a href='#' onclick='App.room.comments.editText(#{elementId}); return false;'>edit</a>
+                 <a href='#' onclick='App.room.comments.removeText(#{elementId}, true); return false;'>remove</a>
+             </div>
          </div>")
 
       for comment, index in commentContent.children()
@@ -364,5 +380,41 @@ $ ->
           commentId: commentMin.elementId
           owner: owner
           text: commentText.text
+
+    initHideCommentsBlock: (commentContent) ->
+      commentsCount = commentContent.children().length
+      hiddenCommentsCount = commentsCount - 3
+      showCommentsText = "Show #{commentsCount - 3} previous #{if hiddenCommentsCount == 1 then 'comment' else 'comments'}"
+      $(commentContent).parent().find(".comment-show-comments").html(showCommentsText)
+      for comment, index in commentContent.children()
+        if commentsCount - index > 3
+          $(comment).slideUp("fast")
+        else
+          $(comment).slideDown("fast")
+
+    editText: (elementId) ->
+      comment = $("#commentText#{elementId}")
+      replyBox = comment.parent().parent().find(".comment-reply")
+      commentText = comment.find(".the-comment-text").html()
+
+      # show the buttons
+      comment.parent().parent().find(".comment-send").val("Save").show()
+      comment.parent().parent().find(".edit-cancel").data("edited-comment-text-id", elementId).show()
+
+      replyBox.val(commentText)
+
+    doEditText: (elementId, newText, emit) ->
+      comment = $("#commentText#{elementId}")
+      comment.find(".the-comment-text").html(newText).animate(backgroundColor: "yellow", -> $(@).animate(backgroundColor: "transparent"))
+      room.socket.emit "updateCommentText", elementId: elementId, text: newText if emit
+
+    removeText: (elementId, emit) ->
+      comment = $("#commentText#{elementId}")
+      commentContent = $(comment).parent()
+      comment.slideUp "fast", =>
+        $(comment).remove()
+
+        @initHideCommentsBlock commentContent if $(commentContent).parent().data("hidden") is "true"
+        room.socket.emit "removeCommentText", elementId if emit
 
   App.room.comments = new RoomComments
