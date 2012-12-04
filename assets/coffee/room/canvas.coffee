@@ -141,8 +141,11 @@ $ ->
 
     handleUpload: (canvasId, fileId, emit) ->
       @addNewThumbAndSelect(canvasId) if opts.image
-      img = @addImage fileId
-      @setImage(img)
+      img = @addImage fileId, (raster, executeLoadImage) =>
+        executeLoadImage()
+
+        @updateThumb(canvasId)
+
       @updateSelectedThumb()
       room.socket.emit("fileAdded", {canvasId: canvasId, fileId: fileId}) if emit
 
