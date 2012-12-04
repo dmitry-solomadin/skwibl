@@ -14,7 +14,7 @@
 </head>
 <body <%= "class='room'" if @template == 'room' %>>
 <input type="hidden" id="currentTemplate" value="<%= @template %>"/>
-<% include './header.ect' %>
+<% include './header/header.ect' %>
 
 <% if (@template == 'room') : %>
 <div id="room-content" class="room-content">

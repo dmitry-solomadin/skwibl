@@ -131,3 +131,6 @@ exports.sendError = (res, err) ->
   if err
     return res.send err if err.error
     return res.send false
+
+exports.logError = (err, val) ->
+  console.log err, val if err

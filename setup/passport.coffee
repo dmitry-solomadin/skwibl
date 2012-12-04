@@ -50,20 +50,20 @@ exports.setUp = ->
     clientSecret: cfg.GOOGLE_CLIENT_SECRET
     callbackURL: "#{cfg.DOMAIN}/auth/google/callback"
   , (accessToken, refreshToken, profile, done) ->
-    db.auth.findOrCreate profile, accessToken, done
+    db.auth.findOrCreate profile, accessToken, refreshToken, done
 
   passport.use new FacebookStrategy
     clientID: cfg.FACEBOOK_APP_ID
     clientSecret: cfg.FACEBOOK_APP_SECRET
     callbackURL: "#{cfg.DOMAIN}/auth/facebook/callback"
   , (accessToken, refreshToken, profile, done) ->
-    db.auth.findOrCreate profile, accessToken, done
+    db.auth.findOrCreate profile, accessToken, refreshToken, done
 
   passport.use new LinkedInStrategy
     consumerKey: cfg.LINKEDIN_CONSUMER_KEY
     consumerSecret: cfg.LINKEDIN_CONSUMER_SECRET
     callbackURL: "#{cfg.DOMAIN}/auth/linkedin/callback"
   , (token, tokenSecret, profile, done) ->
-    db.auth.findOrCreate profile, token, done
+    db.auth.findOrCreate profile, token, tokenSecret, done
 
   return passport
