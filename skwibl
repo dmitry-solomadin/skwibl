@@ -57,6 +57,7 @@ USAGE="Usage: $0 -a -b -c -d -e -i -p -r -s -u -h \n\n
       -d --deploy Deploy the project \n
       -e --debug Run skwibl in debug mode \n
       -i --init Init the project \n
+      -o --connect Connect to the production skwibl service through ssh \n
       -p --product Run skwibl in production mode \n
       -r --reset Reset the project \n
       -s --socket Start socket server \n
@@ -150,6 +151,11 @@ function product {
   eval "NODE_ENV=production $NODE_CMD $DYN.js & NODE_ENV=production  $NODE_CMD $SOC.js"
 }
 
+## connect procedure
+function connect {
+  sshpass -p $PASSWORD ssh root@$IP
+}
+
 ## deploy procedure
 function deploy {
   echo "deploing"
@@ -161,7 +167,7 @@ function deploy {
   find ./assets/coffee -name "*.js" -delete
   rm -f $TOOLS_FILE
   mv $TOOLS_FILE.save $TOOLS_FILE
-  sshpass -p $PASSWORD rsync ./pass.rsync -rvuz ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee"
+  sshpass -p $PASSWORD rsync ./pass.rsync -rvuz ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee" --exclude "vendor/socket.io/socket.io.js"
 }
 
 ## debug procedure
@@ -204,6 +210,8 @@ case "$1" in
   -i|--init)
     init
     exit 0;;
+  -o|--connect)
+    connect;;
   -p|--product)
     init
     build
