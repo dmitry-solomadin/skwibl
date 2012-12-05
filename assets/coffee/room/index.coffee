@@ -141,37 +141,13 @@ $ ->
         when 'straightline'
           @opts.tool.lastSegment.point = event.point
         when 'arrow'
-          arrow = @opts.tool.arrow
-          arrow.lastSegment.point = event.point
+          arrowLine = @opts.tool.arrow
+          arrowLine.lastSegment.point = event.point
 
-          arrowGroup = new Group([arrow])
-          arrowGroup.arrow = arrow
-          arrowGroup.drawTriangle = ->
-            vector = new Point(@arrow.lastSegment.point.x - @arrow.segments[0].point.x, @arrow.lastSegment.point.y - @arrow.segments[0].point.y)
-            vector = vector.normalize(10)
-            vrplus = vector.rotate(135)
-            vrminus = vector.rotate(-135)
-            if @triangle
-              @triangle.segments[0].point = new Point(@arrow.lastSegment.point.x + vrplus.x, @arrow.lastSegment.point.y + vrplus.y)
-              @triangle.segments[1].point = @arrow.lastSegment.point
-              @triangle.segments[2].point = new Point(@arrow.lastSegment.point.x + vrminus.x, @arrow.lastSegment.point.y + vrminus.y)
-            else
-              triangle = new Path([
-                new Point(@arrow.lastSegment.point.x + vrplus.x, @arrow.lastSegment.point.y + vrplus.y)
-                @arrow.lastSegment.point
-                new Point(@arrow.lastSegment.point.x + vrminus.x, @arrow.lastSegment.point.y + vrminus.y)
-              ])
-              @triangle = triangle
-              @addChild(triangle)
-
-            @triangle
-
-          triangle = arrowGroup.drawTriangle()
-          @items.create(triangle)
+          arrowGroup = @items.drawArrow(arrowLine)
 
           @opts.tool = arrowGroup
-
-          triangle.removeOnDrag()
+          arrowGroup.triangle.removeOnDrag()
         when 'pan'
           @items.pan(event.delta.x, event.delta.y)
         when 'select'
