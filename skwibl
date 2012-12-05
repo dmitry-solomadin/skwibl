@@ -121,15 +121,15 @@ function reset {
   eval $FLUSH_REDIS_CMD
   npm install -d
   patch
-  sudo nginx -s stop
-  mkdir -p /etc/haproxy
-  sudo update-rc.d haproxy remove
-  sudo cp -f $EXTERNAL/nginx.conf /etc/nginx/
-  sudo cp -f $EXTERNAL/haproxy.cfg /etc/haproxy/
-  sudo cp -f $EXTERNAL/haproxy /etc/init.d/
-  sudo update-rc.d haproxy defaults
-  sudo nginx
-  sudo service haproxy restart
+#   sudo nginx -s stop
+#   mkdir -p /etc/haproxy
+#   sudo update-rc.d haproxy remove
+#   sudo cp -f $EXTERNAL/nginx.conf /etc/nginx/
+#   sudo cp -f $EXTERNAL/haproxy.cfg /etc/haproxy/
+#   sudo cp -f $EXTERNAL/haproxy /etc/init.d/
+#   sudo update-rc.d haproxy defaults
+#   sudo nginx
+#   sudo service haproxy restart
 }
 
 ## start dynamic server
