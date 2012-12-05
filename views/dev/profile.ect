@@ -15,7 +15,8 @@ LinkedIn: <%= @connections.linkedin %>
 <button name="dropboxOn" onclick="App.userProfile.connect('dropbox')">Connect</button>
 <button name="dropboxOff" onclick="App.userProfile.disconnect('dropbox')">Disconnect</button>
 Dropbox: <%= @connections.dropbox %>
-<div id="dropbox"></div><hr>
+<div id="dropbox"></div>
+<button name="dropboxFiles" onclick="App.userProfile.files('dropbox')">Files</button><hr>
 <button name="yahooOn" onclick="App.userProfile.connect('yahoo')">Connect</button>
 <button name="yahooOff" onclick="App.userProfile.disconnect('yahoo')">Disconnect</button>
 Yahoo: <%= @connections.yahoo %>

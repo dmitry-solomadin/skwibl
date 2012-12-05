@@ -109,9 +109,7 @@ exports.googleCb = (passport) ->
 # Google connect
 #
 exports.connectGoogle = (req, res, next) ->
-  return res.redirect "https://accounts.google.com/o/oauth2/auth?
-  client_id=#{cfg.GOOGLE_CLIENT_ID}&
-  response_type=code& scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile" #&access_type=offline'
+  return res.redirect "https://accounts.google.com/o/oauth2/auth?client_id=#{cfg.GOOGLE_CLIENT_ID}&response_type=code&redirect_uri=http%3A%2F%2Flocalhost/connect/google/callback&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile" #&access_type=offline'
 
 #
 # GET
@@ -124,12 +122,16 @@ exports.connectGoogleCb = (req, res) ->
     code: code
     client_id: cfg.GOOGLE_CLIENT_ID
     client_secret: cfg.GOOGLE_CLIENT_SECRET
-    redirect_uri: 'http://localhost/connect/google/callback'
+    redirect_uri: 'https://localhost/connect/google/callback'
     grant_type: 'authorization_code'
   return request.post(tokenURL, (error, response, body) ->
-    if not error and response.statusCode is 200
+    if not error and (response.statusCode is 200 or response.statusCode is 302)
       ans = JSON.parse body
-      return db.auth.connect req.user.id, 'google', ans.access_token, (err, val) ->
+      console.log ans
+      return db.auth.connect req.user.id, 'google',
+        access_token: ans.access_token
+        oauth_token_secret: ans.oauth_token_secret
+      , (err, val) ->
         return res.redirect '/dev/conns'
     return res.redirect '/dev/conns'
   ).form(oauth)
@@ -161,10 +163,7 @@ exports.facebookCb = (passport) ->
 # Facebook connect
 #
 exports.connectFacebook = (req, res, next) ->
-  return res.redirect "https://graph.facebook.com/oauth/authorize?
-  client_id=#{cfg.FACEBOOK_APP_ID}&
-  redirect_uri=http%3A%2F%2Flocalhost/connect/facebook/callback&
-  scope=email,user_online_presence"
+  return res.redirect "https://graph.facebook.com/oauth/authorize?client_id=#{cfg.FACEBOOK_APP_ID}&redirect_uri=http%3A%2F%2Flocalhost/connect/facebook/callback&scope=email,user_online_presence"
 
 #
 # GET
@@ -172,15 +171,14 @@ exports.connectFacebook = (req, res, next) ->
 #
 exports.connectFacebookCb = (req, res) ->
   code = req.query['code']
-  tokenURL = "https://graph.facebook.com/oauth/access_token?
-  client_id=#{cfg.FACEBOOK_APP_ID}
-  &redirect_uri=http%3A%2F%2Flocalhost/connect/facebook/callback
-  &client_secret=#{cfg.FACEBOOK_APP_SECRET}
-  &code=#{code}"
+  tokenURL = "https://graph.facebook.com/oauth/access_token?client_id=#{cfg.FACEBOOK_APP_ID}&redirect_uri=http%3A%2F%2Flocalhost/connect/facebook/callback&client_secret=#{cfg.FACEBOOK_APP_SECRET}&code=#{code}"
   return request tokenURL, (error, response, body) ->
     if not error and response.statusCode is 200
       ans = qs.parse body
-      return db.auth.connect req.user.id, 'facebook', ans.access_token, (err, val) ->
+      console.log ans
+      return db.auth.connect req.user.id, 'facebook',
+        access_token: ans.access_token
+      , (err, val) ->
         return res.redirect '/dev/conns'
     return res.redirect '/dev/conns'
 
@@ -204,14 +202,15 @@ exports.connectLinkedin = (req, res) ->
     consumer_key: cfg.LINKEDIN_CONSUMER_KEY
     consumer_secret: cfg.LINKEDIN_CONSUMER_SECRET
   url = '   https://api.linkedin.com/uas/oauth/requestToken?scope=r_basicprofile+r_emailaddress'
-  return request.post url: url, oauth: oauth, (error, responce, body) ->
-    if not error and responce.statusCode is 200
+  return request.post url: url, oauth: oauth, (error, response, body) ->
+    if not error and response.statusCode is 200
       ans = qs.parse body
       res.redirect ans.xoauth_request_auth_url + '?oauth_token=' + ans.oauth_token
 
 exports.connectLinkedinCb = (req, res) ->
   token = req.query['oauth_token']
   verifier = req.query['oauth_verifier']
+  console.log req.query
   return db.auth.connect req.user.id, 'linkedin', token, (err, val) ->
     return res.redirect('/dev/conns')
 
@@ -221,18 +220,39 @@ exports.connectDropbox = (req, res) ->
     consumer_key: cfg.DROPBOX_APP_KEY
     consumer_secret: cfg.DROPBOX_APP_SECRET
   url = 'https://api.dropbox.com/1/oauth/request_token'
-  return request.post url: url, oauth: oauth, (error, responce, body) ->
-    if not error and responce.statusCode is 200
+  return request.post url: url, oauth: oauth, (error, response, body) ->
+    if not error and response.statusCode is 200
       ans = qs.parse body
-      res.redirect "https://www.dropbox.com/1/oauth/authorize?oauth_token=
-      #{ans.oauth_token}
-      &oauth_callback=http://localhost/connect/dropbox/callback"
+      console.log 'dropbox connect', ans
+      return db.auth.setConnection req.user.id, 'dropbox',
+        oauth_token_secret: ans.oauth_token_secret
+      , (err, val) ->
+        return res.redirect "https://www.dropbox.com/1/oauth/authorize?oauth_token=#{ans.oauth_token}&oauth_callback=http://localhost/connect/dropbox/callback"
 
 exports.connectDropboxCb = (req, res) ->
   token = req.query['oauth_token']
-  uid = req.query['uid']
-  return db.auth.connect req.user.id, 'dropbox', token, (err, val) ->
-    return res.redirect '/dev/conns'
+  db.auth.getConnection req.user.id, 'dropbox', (err, connection) ->
+    url = 'https://api.dropbox.com/1/oauth/access_token'
+    oauth =
+      consumer_key: cfg.DROPBOX_APP_KEY
+      consumer_secret: cfg.DROPBOX_APP_SECRET
+      token: token
+      token_secret: connection.oauth_token_secret
+    console.log 'dropbox callback', req.query
+    return request url: url, oauth: oauth, (err, response, body) ->
+      console.log response.statusCode, body
+      if not err and response.statusCode is 200
+        ans = qs.parse body
+        db.auth.connect req.user.id, 'dropbox',
+          oauth_token_secret: ans.oauth_token_secret
+          oauth_token: ans.oauth_token
+          uid: ans.uid
+        , (err, val) ->
+          return res.redirect '/dev/conns'
+#   return db.auth.connect req.user.id, 'dropbox',
+#     access_token: token
+#     oauth_token_secret: ans.oauth_token_secret
+#     , (err, val) ->
 
 # Yahoo does not support localhost
 exports.connectYahoo = (req, res) ->
@@ -241,14 +261,15 @@ exports.connectYahoo = (req, res) ->
     consumer_key: cfg.YAHOO_CONSUMER_KEY
     consumer_secret: cfg.YAHOO_CONSUMER_SECRET
   url = 'https://api.login.yahoo.com/oauth/v2/get_request_token'
-  return request.post url: url, oauth: oauth, (error, responce, body) ->
-    if not error and responce.statusCode is 200
+  return request.post url: url, oauth: oauth, (error, response, body) ->
+    if not error and response.statusCode is 200
       ans = qs.parse body
       res.redirect ans.xoauth_request_auth_url + '?oauth_token=' + ans.oauth_token
 
 exports.connectYahooCb = (req, res) ->
   token = req.query['oauth_token']
   verifier = req.query['oauth_verifier']
+  console.log req.query
   return db.auth.connect req.user.id, 'dropbox', token, (err, val) ->
     return res.redirect '/dev/conns'
 

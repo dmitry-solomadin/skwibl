@@ -4,9 +4,7 @@ exports.configure = (app, passport) ->
 
   app.get '/files', ctrls.mid.isAuth, ctrls.files.get
 
-  app.get '/files/:pid', ctrls.mid.isAuth, ctrls.files.project
-
-  app.get '/files/:pid/:fid', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.mid.isFileInProject, ctrls.files.file
+  app.get '/files/dropbox', ctrls.mid.isAuth, ctrls.files.dropbox
 
   app.post '/files/add', ctrls.mid.isAuth, ctrls.files.add
 
@@ -16,3 +14,7 @@ exports.configure = (app, passport) ->
 
   #TODO change to work with mid.isMember (be ready to listen req.data event understand how to use req.pause() properly)
   app.post '/file/upload', ctrls.mid.isAuth, ctrls.files.upload
+
+  app.get '/files/:pid', ctrls.mid.isAuth, ctrls.files.project
+
+  app.get '/files/:pid/:fid', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.mid.isFileInProject, ctrls.files.file
