@@ -3,7 +3,7 @@ body.room {
 }
 
 #room-controls {
-    padding-top: 7px;
+    padding-top: 5px;
     float:left;
 }
 
@@ -25,6 +25,19 @@ body.room {
 
 .colorDropdown {
     padding: 3px !important;
+}
+
+.additionalInsDropdown {
+    padding: 0 3px !important;
+}
+
+.additionalInsDropdown .caret {
+    margin-top: 10px;
+}
+
+#additionalInsSelect {
+    min-width: 145px;
+    padding: 0 5px;
 }
 
 .activen {

@@ -26,6 +26,8 @@ $ ->
           path.eligible = false
           room.history.add(path)
 
+        room.redraw()
+
     initComments: ->
       selectedCid = @getSelectedCanvasId()
       @forEachThumbInContext (cid) ->

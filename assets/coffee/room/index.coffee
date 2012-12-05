@@ -16,6 +16,9 @@ $ ->
       $(".toolTypeChanger").on "click", ->
         opts.tooltype = $(@).data("tooltype")
 
+      $("#additionalInsSelect a").click ->
+        $("#additionalInsDropdown").find("img").attr("src", $(@).find("img").attr("src"))
+
       $('#colorSelect .color').click ->
         $('#colorSelect .color').removeClass('activen')
         opts.color = $(@).attr('data-color')
