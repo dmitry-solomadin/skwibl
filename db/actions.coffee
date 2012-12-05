@@ -28,7 +28,19 @@ exports.setUp = (client, db) ->
 
       client.lrem "projects:#{action.project}:#{action.type}", 0, aid
       client.lrem "canvases:#{action.canvasId}:#{action.type}", 0, aid if action.canvasId
-      client.del "actions:#{aid}", fn
+
+      if action.type is 'comment'
+        client.lrange "comments:#{aid}:texts", 0, -1, (err, commentTextsIds) ->
+          if not err and commentTextsIds and commentTextsIds.length
+            return tools.asyncParallel commentTextsIds, (commentTextId) ->
+              db.actions.removeCommentText commentTextId, ->
+                return tools.asyncOpt fn, null, null
+
+              return tools.asyncDone commentTextsIds, ->
+                return tools.asyncOpt fn, null, null
+          return tools.asyncOpt fn, null, null
+      else
+        client.del "actions:#{aid}", fn
 
   mod.findById = (aid, fn) ->
     client.hgetall "actions:#{aid}", fn
