@@ -106,6 +106,9 @@ $ ->
       path.closed = data.closed
       path.elementId = data.elementId
 
+      if data.isArrow
+        room.items.drawArrow(path)
+
       path
 
     prepareElementToSend: (elementToSend) ->
@@ -119,8 +122,10 @@ $ ->
           strokeColor: elementToSend.strokeColor.toCssString()
           strokeWidth: elementToSend.strokeWidth
           opacity: elementToSend.opacity
+          isArrow: if elementToSend.arrow then true else false
 
-      for segment in elementToSend.segments
+      segments = if elementToSend.arrow then elementToSend.arrow.segments else elementToSend.segments
+      for segment in segments
         data.element.segments.push
           x: segment.point.x
           y: segment.point.y

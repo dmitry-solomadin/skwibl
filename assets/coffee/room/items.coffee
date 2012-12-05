@@ -225,4 +225,33 @@ $ ->
       else
         return null
 
+    # ITEMS MISC
+    drawArrow: (arrowLine) ->
+      arrowGroup = new Group([arrowLine])
+      arrowGroup.arrow = arrowLine
+      arrowGroup.drawTriangle = => @drawArrowTriangle arrowGroup
+      triangle = arrowGroup.drawTriangle()
+      @create(triangle)
+      arrowGroup
+
+    drawArrowTriangle: (element) ->
+      vector = new Point(element.arrow.lastSegment.point.x - element.arrow.segments[0].point.x, element.arrow.lastSegment.point.y - element.arrow.segments[0].point.y)
+      vector = vector.normalize(10)
+      vrplus = vector.rotate(135)
+      vrminus = vector.rotate(-135)
+      if element.triangle
+        element.triangle.segments[0].point = new Point(element.arrow.lastSegment.point.x + vrplus.x, element.arrow.lastSegment.point.y + vrplus.y)
+        element.triangle.segments[1].point = element.arrow.lastSegment.point
+        element.triangle.segments[2].point = new Point(element.arrow.lastSegment.point.x + vrminus.x, element.arrow.lastSegment.point.y + vrminus.y)
+      else
+        triangle = new Path([
+          new Point(element.arrow.lastSegment.point.x + vrplus.x, element.arrow.lastSegment.point.y + vrplus.y)
+          element.arrow.lastSegment.point
+          new Point(element.arrow.lastSegment.point.x + vrminus.x, element.arrow.lastSegment.point.y + vrminus.y)
+        ])
+        element.triangle = triangle
+        element.addChild(triangle)
+
+      element.triangle
+
   App.room.items = new RoomItems
