@@ -17,7 +17,8 @@ $ ->
         for element in canvasElements
           path = room.socketHelper.createElementFromData(element)
 
-          room.helper.findById(path.id).remove() unless cid is selectedCid
+          unless cid is selectedCid
+            room.helper.findById(path.id).remove()
 
           path.strokeColor = element.strokeColor
           path.strokeWidth = element.strokeWidth
@@ -76,6 +77,13 @@ $ ->
 
     # INITIALIZATION END
 
+    delete: ->
+      if confirm "Are you sure? This will delete all canvas content."
+        if @getThumbs().length <= 1
+          @clear()
+        else
+          alert "removing canvas"
+
     clear: ->
       room.history.add
         actionType: "clear", tools: room.history.getSelectableTools(), eligible: true
@@ -86,7 +94,7 @@ $ ->
       room.items.unselect()
       room.redrawWithThumb()
 
-      room.socket.emit("eraseCanvas")
+      room.socket.emit "eraseCanvas", canvasId: @getSelectedCanvasId()
 
     # used upon eraseCanvas event
     erase: ->
@@ -146,9 +154,8 @@ $ ->
       img = @addImage fileId, (raster, executeLoadImage) =>
         executeLoadImage()
 
-        @updateThumb(canvasId)
+        @updateSelectedThumb(canvasId)
 
-      @updateSelectedThumb()
       room.socket.emit("fileAdded", {canvasId: canvasId, fileId: fileId}) if emit
 
     addImage: (fileId, loadWrap) ->

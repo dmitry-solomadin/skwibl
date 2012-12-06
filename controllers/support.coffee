@@ -19,5 +19,6 @@ exports.passwordRecovery = (req, res) ->
 # Check mail page
 #
 exports.checkMail = (req, res) ->
-  res.render './users/check_mail',
+  res.render 'index',
+    template: '/users/check_mail'
     message: req.flash 'message'

@@ -358,7 +358,8 @@ $ ->
       showCommentsDiv.html(showCommentsText) if showCommentsDiv[0]
 
       commentContent.append(
-        "<div id='commentText#{elementId}' class='comment-text'>
+        "<div id='commentText#{elementId}' class='comment-text' data-comment-id='#{commentMin.elementId}'
+           data-element-id='#{elementId}' data-owner='#{owner}' data-time='#{time}'>
              <div class='comment-avatar'><img src='#{user.picture}' width='32'/></div>
              <div class='comment-heading'>
                  <div class='comment-author'>#{user.displayName}</div>

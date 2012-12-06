@@ -31,7 +31,13 @@ $ ->
         room.comments.redrawArrow(comment.commentMin)
 
       foundComment = room.helper.findByElementId(data.elementId)
-      if foundComment then updateComment(foundComment, data) else @createCommentFromData(data)
+      if foundComment
+        updateComment(foundComment, data)
+      else
+        commentMin = @createCommentFromData(data)
+
+        for text in data.texts
+          room.comments.addCommentText commentMin, text
 
       room.redrawWithThumb()
 
@@ -53,12 +59,13 @@ $ ->
       commentMin
 
     socketRemoveElement: (elementId) ->
-      room.helper.findByElementId(elementId).remove()
+      room.helper.findAndRemoveByElementId(elementId).remove()
+      console.log opts.historytools.allHistory
       room.items.unselectIfSelected(elementId)
       room.redrawWithThumb()
 
     socketRemoveComment: (elementId) ->
-      element = room.helper.findByElementId(elementId)
+      element = room.helper.findAndRemoveByElementId(elementId)
 
       commentMin = element.commentMin
       commentMin[0].$maximized.remove()
@@ -76,6 +83,9 @@ $ ->
         foundPath.removeSegments()
         $(element.segments).each ->
           foundPath.addSegment(room.socketHelper.createSegment(@.x, @.y, @.ix, @.iy, @.ox, @.oy))
+
+        foundPath.opacity = 1
+        console.log foundPath
 
         if foundPath.commentMin
           room.comments.redrawArrow(foundPath.commentMin)
@@ -108,8 +118,8 @@ $ ->
 
       if data.isArrow
         room.items.drawArrow(path)
-
-      path
+      else
+        path
 
     prepareElementToSend: (elementToSend) ->
       data =
@@ -137,13 +147,17 @@ $ ->
       data
 
     prepareCommentToSend: (commentMin) ->
+      # comment may already contain text if we are restoring deleted comment via 'undo'
       data =
         canvasId: room.canvas.getSelectedCanvasId()
         element:
           elementId: commentMin.elementId
+          texts: @prepareCommentTextsToSend commentMin
           min:
             x: commentMin.position().left
             y: commentMin.position().top
+
+      console.log data
 
       commentMax = commentMin[0].$maximized[0]
       if commentMax
@@ -160,5 +174,17 @@ $ ->
           h: commentRect.bounds.height
 
       data
+
+    prepareCommentTextsToSend: (commentMin) ->
+      texts = []
+      for commentText in commentMin[0].$maximized.find(".comment-text")
+        texts.push @prepareCommentTextToSend(commentText)
+      texts
+
+    prepareCommentTextToSend: (commentText) ->
+      elementId: $(commentText).data("element-id")
+      commentId: $(commentText).data("comment-id")
+      owner: $(commentText).data("owner")
+      text: $(commentText).find(".the-comment-text").html()
 
   App.room.socketHelper = new RoomSocketHelper

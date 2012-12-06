@@ -96,11 +96,6 @@ body.room {
     text-align: center;
 }
 
-.canvasUpload {
-    color: blue;
-    text-decoration: underline;
-}
-
 .canvasSelectDiv a {
     width: 80px;
     height: 60px;
@@ -140,9 +135,10 @@ body.room {
 }
 
 .canvasFooterTop {
-    height: 20px;
-    background: #e3e3e3;
-    padding: 5px 10px;
+    height: 29px;
+    background: #f1f1f1;
+    padding: 3px 10px;
+    box-shadow: 0 1px 3px #a5a5a5;
 }
 
 .canvasFooterBottom {

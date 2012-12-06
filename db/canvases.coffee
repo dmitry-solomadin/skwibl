@@ -1,17 +1,14 @@
-
 tools = require '../tools'
 
 exports.setUp = (client, db) ->
-
   mod = {}
 
   mod.add = (pid, fid, time, fn) ->
     client.incr 'canvases:next', (err, val) ->
       if not err
-        canvas = {
+        canvas =
           id: val
           project: pid
-        }
         canvas.file = fid if fid
         canvas.time = time if time
         client.hmset "canvases:#{val}", canvas
@@ -41,6 +38,20 @@ exports.setUp = (client, db) ->
                     return tools.asyncDone array, ->
                       return tools.asyncOpt fn, null, canvases
       return tools.asyncOpt fn, err, []
+
+  mod.clear = (cid) ->
+    db.canvases.deleteActions cid, "element"
+    db.canvases.deleteActions cid, "comment"
+
+  mod.deleteActions = (cid, type, fn) ->
+    client.lrange "canvases:#{cid}:#{type}", 0, -1, (err, actionIds) ->
+      return tools.asyncOpt fn, null, null if not actionIds or not actionIds.length
+
+      return tools.asyncParallel actionIds, (aid) ->
+        db.actions.delete aid, fn
+
+        return tools.asyncDone actionIds, ->
+          return tools.asyncOpt fn, null, null
 
   mod.setProperties = (cid, properties) ->
     client.hmset "canvases:#{cid}", properties

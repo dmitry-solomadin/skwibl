@@ -37,7 +37,8 @@
 <div id="canvasFooter" class="canvasFooter">
   <div class="canvasFooterInner">
     <div class="canvasFooterTop">
-      <div id="file-uploader" class="canvasUpload" style="float: right;"></div>
+      <div id="file-uploader" class="canvasUpload fr"></div>
+      <a href="#" onclick="App.room.canvas.delete(); return false;" class="btn btn-warning small-btn fr">Delete</a>
     </div>
     <div class="canvasFooterBottom">
       <div id="canvasSelectDiv" class="canvasSelectDiv">
@@ -45,6 +46,7 @@
           <% for element in canvas.elements : %>
             <input class="canvasElement<%= canvas.canvasId %>" type="hidden" value="<%= JSON.stringify(element) %>"/>
           <% end %>
+          <% console.log canvas.comments %>
           <% for comment in canvas.comments : %>
             <input class="canvasComment<%= canvas.canvasId %>" type="hidden" value="<%= JSON.stringify(comment) %>"/>
             <% for text in comment.texts : %>

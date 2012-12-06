@@ -37,7 +37,6 @@ exports.configure = (sio) ->
         db.actions.delete elementId
 
       socket.on 'commentUpdate', (data, cb) ->
-        data.comment = true
         socket.broadcast.to(socket.project).emit 'commentUpdate',
           id: id
           canvasId: data.canvasId
@@ -64,11 +63,9 @@ exports.configure = (sio) ->
         db.actions.updateCommentText data.elementId, data.text
 
       socket.on 'eraseCanvas', (data, cb) ->
-        console.log 'erasecanv'
-        console.log data
         socket.broadcast.to(socket.project).emit 'eraseCanvas',
           id: id
-          canvasId: data.cancasId
+        db.canvases.clear(data.canvasId)
 
       socket.on 'fileAdded', (data, cb) ->
         socket.broadcast.to(socket.project).emit "fileAdded",
