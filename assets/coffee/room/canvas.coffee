@@ -79,22 +79,39 @@ $ ->
 
     delete: ->
       if confirm "Are you sure? This will delete all canvas content."
-        if @getThumbs().length <= 1
-          @clear()
-        else
-          alert "removing canvas"
+        @clear true, true
 
-    clear: ->
+    clear: (force, emit) ->
       room.history.add
         actionType: "clear", tools: room.history.getSelectableTools(), eligible: true
       for element in opts.historytools.allHistory
-        element.opacity = 0 unless element.actionType
+        element.opacity = 0 if (not element.actionType and not element.isImage) or force
         room.comments.hideComment(element.commentMin) if element.commentMin
 
       room.items.unselect()
       room.redrawWithThumb()
 
-      room.socket.emit "eraseCanvas", canvasId: @getSelectedCanvasId()
+      selectedCanvasId = @getSelectedCanvasId()
+
+      if force
+        for element, index in opts.historytools.allHistory
+          if element.isImage
+            opts.historytools.allHistory.splice(index, 1)
+            opts.image = null
+            element.remove()
+            break
+
+        if @getThumbs().length > 1
+          @getSelected().remove()
+          @selectThumb($("#canvasSelectDiv a:first"))
+          room.savedOpts.splice(room.savedOpts.indexOf(@findCanvasOptsById(selectedCanvasId)), 1)
+          room.setOpts @findCanvasOptsById(@getSelectedCanvasId())
+
+      if emit
+        if force
+          room.socket.emit "removeCanvas", canvasId: selectedCanvasId
+        else
+          room.socket.emit "eraseCanvas", canvasId: selectedCanvasId
 
     # used upon eraseCanvas event
     erase: ->

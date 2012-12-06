@@ -9,34 +9,26 @@ exports.setUp = (client, db) ->
     return client.incr 'files:next', (err, val) ->
       return tools.asyncOpt(fn, err, null) if err
 
-      if cid
-        file =
-          id: val
-          name: name
-          mime: mime
-          owner: owner
+      file =
+        id: val
+        name: name
+        mime: mime
+        owner: owner
 
+      if cid
         client.hmset "files:#{val}", file
         db.canvases.setProperties cid, file: val
         client.sadd "projects:#{pid}:files", val
         return tools.asyncOpt fn, null, canvasId: cid, element: file
 
-      client.incr 'canvases:next', (err, cid) ->
-        return tools.asyncOpt(fn, err, null) if err
+      client.hmset "files:#{val}", file
+      client.sadd "projects:#{pid}:files", val
 
-        file =
-          id: val
-          name: name
-          mime: mime
-          owner: owner
+      time = 0 if tools.getFileType(mime) is 'video'
 
-        client.hmset "files:#{val}", file
-        client.sadd "projects:#{pid}:files", val
-
-        time = 0 if tools.getFileType(mime) is 'video'
-
-        db.canvases.add pid, val, time
-        return tools.asyncOpt fn, null, canvasId: cid, element: file
+      db.canvases.add pid, val, time, (err, canvas) ->
+        return tools.asyncOpt fn, err, null if err
+        return tools.asyncOpt fn, null, canvasId: canvas.id, element: file
 
   mod.get = (uid, fn) ->
     #TODO

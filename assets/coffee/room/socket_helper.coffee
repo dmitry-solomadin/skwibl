@@ -15,10 +15,8 @@ $ ->
       socket.on 'updateCommentText', (data) => room.comments.doEditText(data.elementId, data.text, false)
       socket.on 'switchCanvas', (data) =>
         room.canvas.selectThumb(room.canvas.findThumbByCanvasId(data.canvasId), false)
-
-      socket.on 'eraseCanvas', =>
-        room.canvas.erase()
-        room.redrawWithThumb()
+      socket.on 'eraseCanvas', => room.canvas.clear false, false
+      socket.on 'removeCanvas', => room.canvas.clear true, false
 
     addCommentText: (element) ->
       foundComment = room.helper.findByElementId element.commentId

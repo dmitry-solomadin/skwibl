@@ -65,7 +65,13 @@ exports.configure = (sio) ->
       socket.on 'eraseCanvas', (data, cb) ->
         socket.broadcast.to(socket.project).emit 'eraseCanvas',
           id: id
-        db.canvases.clear(data.canvasId)
+        db.canvases.clear data.canvasId
+
+      socket.on 'removeCanvas', (data, cb) ->
+        socket.broadcast.to(socket.project).emit 'removeCanvas',
+          id: id
+          canvasId: data.canvasId
+        db.canvases.delete data.canvasId
 
       socket.on 'fileAdded', (data, cb) ->
         socket.broadcast.to(socket.project).emit "fileAdded",

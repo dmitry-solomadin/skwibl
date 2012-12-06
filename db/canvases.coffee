@@ -43,6 +43,21 @@ exports.setUp = (client, db) ->
     db.canvases.deleteActions cid, "element"
     db.canvases.deleteActions cid, "comment"
 
+  mod.delete = (cid, fn) ->
+    db.canvases.get cid, (err, canvas)->
+      if not err and canvas
+        client.smembers "projects:#{canvas.project}:canvases", (err, canvases) ->
+          if not err and canvases and canvases.length
+            if canvases.length <= 1
+              db.canvases.clear cid
+              client.hdel "canvases:#{cid}", "file"
+              tools.asyncOpt fn, null, null
+            else
+              client.srem "projects:#{canvas.project}:canvases", cid
+              db.canvases.clear cid
+              client.del "canvases:#{cid}", cid
+      tools.asyncOpt fn, null, null
+
   mod.deleteActions = (cid, type, fn) ->
     client.lrange "canvases:#{cid}:#{type}", 0, -1, (err, actionIds) ->
       return tools.asyncOpt fn, null, null if not actionIds or not actionIds.length
