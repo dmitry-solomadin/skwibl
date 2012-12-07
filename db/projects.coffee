@@ -9,8 +9,9 @@ exports.setUp = (client, db) ->
 
   mod = {}
 
-  mod.get = (id, fn) ->
-    client.smembers "users:#{id}:projects", (err, array) ->
+  # get all the projects that are available for the user
+  mod.get = (uid, fn) ->
+    client.smembers "users:#{uid}:projects", (err, array) ->
       if not err and array and array.length
         projects = []
         return tools.asyncParallel array, (pid) ->
@@ -25,10 +26,24 @@ exports.setUp = (client, db) ->
   mod.getData = (pid, fn) ->
     client.hgetall "projects:#{pid}", (err, project) ->
       if not err and project
-        return db.projects.getUsers pid, (err, array) ->
-          project.users = array
-          return tools.asyncOpt fn, err, project
+        return db.projects.getUsers pid, (err, users) ->
+          project.users = users
+          return db.projects.getFiles pid, (err, files) ->
+            project.files = files
+            return tools.asyncOpt fn, err, project
       return tools.asyncOpt fn, err, null
+
+  mod.getFiles = (pid, fn) ->
+    client.smembers "projects:#{pid}:files", (err, fileIds) ->
+      if not err and fileIds and fileIds.length
+        files = []
+        return tools.asyncParallel fileIds, (fid) ->
+          db.files.findById fid, (err, file) ->
+            files.push file
+            return tools.asyncDone fileIds, ->
+              tools.asyncOpt fn, null, files
+
+      return tools.asyncOpt fn, err, []
 
   mod.getUsers = (pid, fn) ->
     client.smembers "projects:#{pid}:users", (err, array) ->

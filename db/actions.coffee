@@ -124,4 +124,28 @@ exports.setUp = (client, db) ->
       client.lrem "comments:#{commentText.commentId}:texts", 0, elementId
       client.del "texts:#{elementId}", fn
 
+  mod.markAsTodo = (elementId, fn) ->
+    db.actions.findCommentTextById elementId, (err, commentText) ->
+      if not err and commentText
+        client.hset "texts:#{elementId}", "todo", true
+        return tools.asyncOpt fn, err, null
+
+      return tools.asyncOpt fn, err, null
+
+  mod.resolveTodo = (elementId, fn) ->
+    db.actions.findCommentTextById elementId, (err, commentText) ->
+      if not err and commentText
+        client.hset "texts:#{elementId}", "resolved", true
+        return tools.asyncOpt fn, err, null
+
+      return tools.asyncOpt fn, err, null
+
+  mod.reopenTodo = (elementId, fn) ->
+    db.actions.findCommentTextById elementId, (err, commentText) ->
+      if not err and commentText
+        client.hdel "texts:#{elementId}", "resolved"
+        return tools.asyncOpt fn, err, null
+
+      return tools.asyncOpt fn, err, null
+
   return mod

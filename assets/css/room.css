@@ -4,7 +4,7 @@ body.room {
 
 #room-controls {
     padding-top: 5px;
-    float:left;
+    float: left;
 }
 
 .color {
@@ -130,7 +130,7 @@ body.room {
     z-index: 10;
 }
 
-.canvasFooterInner{
+.canvasFooterInner {
     width: 100%;
 }
 
@@ -204,7 +204,6 @@ body.room {
     width: 100%;
     padding: 10px 0;
     cursor: pointer;
-    margin-bottom: 10px;
     text-align: center;
     background: rgba(194, 225, 245, 0.5);
     -webkit-touch-callout: none;
@@ -220,7 +219,7 @@ body.room {
 }
 
 .comment-avatar {
-    float:left;
+    float: left;
     margin-right: 5px;
 }
 
@@ -229,8 +228,8 @@ body.room {
     border-bottom: 2px solid #e3e3e3;
 }
 
-.comment-content {
-    padding: 10px;
+.comment-content-actions {
+    padding: 0 10px 10px 10px;
 }
 
 .comment-content-inner {
@@ -239,11 +238,20 @@ body.room {
 }
 
 .comment-text {
+    padding: 8px 10px;
     border-bottom: 1px solid #e3e3e3;
     color: #202020;
     font-size: 11px;
     padding-bottom: 3px;
-    margin-bottom: 8px;
+}
+
+.comment-text.todo {
+    background: #f5f5f5;
+    font-size: 12px;
+}
+
+.comment-text.todo.resolved {
+    background: #f5fff5;
 }
 
 .the-comment-text {
@@ -254,6 +262,10 @@ body.room {
     font-size: 11px;
     font-weight: bold;
     color: #505050;
+}
+
+.comment-actions {
+    font-size: 11px;
 }
 
 .comment-time {
@@ -273,6 +285,40 @@ body.room {
     margin-bottom: 10px;
 }
 
+.openTab {
+    float: left;
+    padding: 5px 10px;
+    background: #A0A0A0;
+    width: 105px;
+    font-size: 14px;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+}
+
+.resolvedTab {
+    margin-left: 15px;
+    float: left;
+    padding: 5px 10px;
+    background: #A9E9A9;
+    width: 105px;
+    font-size: 14px;
+    text-align: center;
+    color: black;
+    cursor: pointer;
+}
+
+.openList {
+    padding-top: 10px;
+    clear: both;
+}
+
+.resolvedList {
+    padding-top: 10px;
+    display: none;
+    clear: both;
+}
+
 .header-foldable {
     display: inline-block;
     float: left;
@@ -285,6 +331,22 @@ body.room {
     padding-right: 5px;
 }
 
+.projectHeader {
+    background: #a0a0a0;
+    color: white;
+    padding: 3px 10px;
+    font-size: 14px;
+    text-shadow: 1px 1px 0 #808080;
+}
+
+.chatFilters {
+    padding: 7px 10px 0 10px;
+}
+
+.chatFilters .btn {
+    margin-left: 0 !important;
+}
+
 .chat {
     width: 300px;
     left: 0;
@@ -294,10 +356,17 @@ body.room {
     border-right: 1px solid #b1b1b1;
     box-shadow: gray 1px 3px 5px;
     position: fixed;
-    padding: 10px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
-    z-index: 1031;
+    z-index: 199;
+}
+
+.chatInner {
+    padding: 10px;
+    width: 300px;
+    height: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
 }
 
 .chat .conversation-controls {
@@ -308,10 +377,10 @@ body.room {
 
 .chat .conversation {
     height: 100%;
-    margin-bottom: -290px;
+    margin-bottom: -340px;
     position: relative;
     z-index: 1;
-    padding-bottom: 300px;
+    padding-bottom: 350px;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
@@ -354,7 +423,7 @@ body.room {
 
 .chatUser {
     position: relative;
-    float:left;
+    float: left;
 }
 
 .chatUserOffline {

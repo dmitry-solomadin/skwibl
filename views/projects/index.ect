@@ -8,8 +8,21 @@
   <% for project in @projects : %>
   <div id="project<%= project.id %>" class="project">
     <div class="fl projectLeft">
-      <div>Project images</div>
-      <div>Project participants</div>
+      <div>
+        <% for file, index in project.files : %>
+          <% break if index > 3 %>
+          <div class="projectImage">
+            <img src="/files/<%= file.owner %>/<%= file.id %>" width="64"/>
+          </div>
+        <% end %>
+      </div>
+      <div>
+        <h5>Participants:</h5>
+        <% for user in project.users : %>
+          <img src="<%= if user.picture then user.picture else '/images/avatar.png' %>"
+               class="tooltipize" width="32" title="<%= user.displayName %>" data-placement="bottom"/>
+        <% end %>
+      </div>
     </div>
     <div class="fl projectRight">
       <h3><a href="/projects/<%= project.id %>"><%= project.name %></a></h3>

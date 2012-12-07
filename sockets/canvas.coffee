@@ -55,6 +55,24 @@ exports.configure = (sio) ->
           element: data
         db.actions.addCommentText data
 
+      socket.on 'markAsTodo', (elementId, cb) ->
+        socket.broadcast.to(socket.project).emit 'markAsTodo',
+          id: id
+          elementId: elementId
+        db.actions.markAsTodo elementId
+
+      socket.on 'resolveTodo', (elementId, cb) ->
+        socket.broadcast.to(socket.project).emit 'resolveTodo',
+          id: id
+          elementId: elementId
+        db.actions.resolveTodo elementId
+
+      socket.on 'reopenTodo', (elementId, cb) ->
+        socket.broadcast.to(socket.project).emit 'reopenTodo',
+          id: id
+          elementId: elementId
+        db.actions.reopenTodo elementId
+
       socket.on 'updateCommentText', (data, cb) ->
         socket.broadcast.to(socket.project).emit 'updateCommentText',
           id: id

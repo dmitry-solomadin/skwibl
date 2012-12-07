@@ -2,6 +2,8 @@ $ ->
   class Home
 
     constructor: ->
+      $(".tooltipize").tooltip()
+
       $("#forgotpasswordlink").click => @showForgotPassword()
       $("#backToLogin").click => @hideForgotPassword()
       $("#submitForgotPassword").click => @submitForgotPassword()
