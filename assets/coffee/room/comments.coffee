@@ -82,7 +82,10 @@ $ ->
         $(commentMax).find(".edit-cancel").hide()
 
       commentMin[0].$maximized = commentMax
-      commentMin[0].rect = rect
+
+      if rect
+        commentMin[0].rect = rect
+        rect.commentMin = commentMin
 
       $("#room-content").prepend(commentMin)
       $("#room-content").prepend(commentMax)

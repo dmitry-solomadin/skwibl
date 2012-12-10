@@ -47,6 +47,9 @@ $ ->
       @setSelected(null)
 
     pan: (dx, dy) ->
+      opts.pandx = opts.pandx + dx
+      opts.pandy = opts.pandy + dy
+
       for element in opts.historytools.allHistory
         if element.commentMin
           room.comments.translate(element.commentMin, dx, dy)

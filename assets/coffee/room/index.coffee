@@ -9,6 +9,8 @@ $ ->
         defaultWidth: 2
         currentScale: 1
         opacity: 1
+        pandx: 0
+        pandy: 0
 
     init: (canvasId) ->
       @initOpts(canvasId)
@@ -193,7 +195,12 @@ $ ->
           commentMin.elementId = @generateId()
           @socket.emit("commentUpdate", @socketHelper.prepareCommentToSend(commentMin))
         when 'select'
-          @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@items.selected())) if @items.selected()
+          selectedItem = @items.selected()
+          if selectedItem
+            if selectedItem.commentMin # if the dragged element is comment rectangle
+              @socket.emit "commentUpdate", @socketHelper.prepareCommentToSend(selectedItem.commentMin)
+            else
+              @socket.emit "elementUpdate", @socketHelper.prepareElementToSend(selectedItem)
 
       @opts.tooltype = "select" if tooltype == 'comment'
 
@@ -203,6 +210,9 @@ $ ->
 
     applyCurrentScale: (point) ->
       point.transform(new Matrix(1 / @opts.currentScale, 0, 0, 1 / @opts.currentScale, 0, 0))
+
+    applyReverseCurrentScale: (point) ->
+      point.transform(new Matrix(@opts.currentScale, 0, 0, @opts.currentScale, 0, 0))
 
     generateId: -> $("#uid").val() + new Date().getTime()
 

@@ -26,9 +26,33 @@ $ ->
       room.comments.addCommentText foundComment.commentMin, element
 
     addOrUpdateComment: (data) ->
+      # adjust position if canvas was panned
+      if opts.pandx isnt 0 or opts.pandy isnt 0
+        data.min.x = data.min.x + opts.pandx
+        data.min.y = data.min.y + opts.pandy
+        data.max.x = data.max.x + opts.pandx
+        data.max.y = data.max.y + opts.pandy
+
+        if data.rect
+          data.rect.x = data.rect.x + opts.pandx
+          data.rect.y = data.rect.y + opts.pandy
+
+      # adjust position if canvas was sacled
+      minPos = room.applyReverseCurrentScale(new Point(data.min.x, data.min.y))
+      data.min.x = minPos.x
+      data.min.y = minPos.y
+      maxPos = room.applyReverseCurrentScale(new Point(data.max.x, data.max.y))
+      data.max.x = maxPos.x
+      data.max.y = maxPos.y
+
       updateComment = (comment, updatedComment) =>
-        comment.commentMin.css(left: updatedComment.min.x, top: updatedComment.min.y)
-        comment.commentMin[0].$maximized.css(left: updatedComment.max.x, top: updatedComment.max.y)
+        comment.commentMin.css(left: minPos.x, top: minPos.y)
+        comment.commentMin[0].$maximized.css(left: maxPos.x, top: maxPos.y)
+
+        if comment.commentMin[0].rect and updatedComment.rect
+          comment.commentMin[0].rect.position = new Point(updatedComment.rect.x + (updatedComment.rect.w / 2),
+            updatedComment.rect.y + (updatedComment.rect.h / 2));
+
         room.comments.redrawArrow(comment.commentMin)
 
       foundComment = room.helper.findByElementId(data.elementId)
@@ -61,7 +85,6 @@ $ ->
 
     socketRemoveElement: (elementId) ->
       room.helper.findAndRemoveByElementId(elementId).remove()
-      console.log opts.historytools.allHistory
       room.items.unselectIfSelected(elementId)
       room.redrawWithThumb()
 
@@ -78,6 +101,11 @@ $ ->
       room.redrawWithThumb()
 
     addOrUpdateElement: (element) ->
+      if opts.pandx isnt 0 or opts.pandy isnt 0
+        for segment in element.segments
+          segment.x = segment.x + opts.pandx
+          segment.y = segment.y + opts.pandy
+
       foundPath = room.helper.findByElementId(element.elementId)
       if foundPath
         room.items.unselectIfSelected(foundPath.elementId)
@@ -86,7 +114,6 @@ $ ->
           foundPath.addSegment(room.socketHelper.createSegment(@.x, @.y, @.ix, @.iy, @.ox, @.oy))
 
         foundPath.opacity = 1
-        console.log foundPath
 
         if foundPath.commentMin
           room.comments.redrawArrow(foundPath.commentMin)
@@ -138,8 +165,8 @@ $ ->
       segments = if elementToSend.arrow then elementToSend.arrow.segments else elementToSend.segments
       for segment in segments
         data.element.segments.push
-          x: segment.point.x
-          y: segment.point.y
+          x: segment.point.x - opts.pandx
+          y: segment.point.y - opts.pandy
           ix: segment.handleIn.x
           iy: segment.handleIn.y
           ox: segment.handleOut.x
@@ -148,6 +175,13 @@ $ ->
       data
 
     prepareCommentToSend: (commentMin) ->
+      # apply current scale before sending coordinates
+      commentMax = commentMin[0].$maximized[0]
+      commentMinPosition = new Point(commentMin.position().left, commentMin.position().top)
+      commentMaxPosition = new Point($(commentMax).position().left, $(commentMax).position().top)
+      commentMinPosition = room.applyCurrentScale commentMinPosition
+      commentMaxPosition = room.applyCurrentScale commentMaxPosition
+
       # comment may already contain text if we are restoring deleted comment via 'undo'
       data =
         canvasId: room.canvas.getSelectedCanvasId()
@@ -155,22 +189,19 @@ $ ->
           elementId: commentMin.elementId
           texts: @prepareCommentTextsToSend commentMin
           min:
-            x: commentMin.position().left
-            y: commentMin.position().top
+            x: commentMinPosition.x - opts.pandx
+            y: commentMinPosition.y - opts.pandy
 
-      console.log data
-
-      commentMax = commentMin[0].$maximized[0]
       if commentMax
         data.element.max =
-          x: $(commentMax).position().left
-          y: $(commentMax).position().top
+          x: commentMaxPosition.x - opts.pandx
+          y: commentMaxPosition.y - opts.pandy
 
       commentRect = commentMin[0].rect
       if commentRect
         data.element.rect =
-          x: commentRect.bounds.x
-          y: commentRect.bounds.y
+          x: commentRect.bounds.x - opts.pandx
+          y: commentRect.bounds.y - opts.pandy
           w: commentRect.bounds.width
           h: commentRect.bounds.height
 
