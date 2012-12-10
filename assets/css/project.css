@@ -71,3 +71,7 @@
     vertical-align: middle;
 }
 
+.unconfirmed {
+    color: gray;
+}
+

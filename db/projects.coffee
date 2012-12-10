@@ -28,9 +28,11 @@ exports.setUp = (client, db) ->
       if not err and project
         return db.projects.getUsers pid, (err, users) ->
           project.users = users
-          return db.projects.getFiles pid, (err, files) ->
-            project.files = files
-            return tools.asyncOpt fn, err, project
+          return db.projects.getUnconfirmedUsers pid, users, (err, unconfirmedUsers) ->
+            project.unconfirmedUsers = unconfirmedUsers
+            return db.projects.getFiles pid, (err, files) ->
+              project.files = files
+              return tools.asyncOpt fn, err, project
       return tools.asyncOpt fn, err, null
 
   mod.getFiles = (pid, fn) ->
@@ -45,6 +47,7 @@ exports.setUp = (client, db) ->
 
       return tools.asyncOpt fn, err, []
 
+  # list of users that confirmed invitations
   mod.getUsers = (pid, fn) ->
     client.smembers "projects:#{pid}:users", (err, array) ->
       if not err and array and array.length
@@ -53,6 +56,26 @@ exports.setUp = (client, db) ->
           db.contacts.getInfo uid, (err, user) ->
             users.push user
             return tools.asyncDone array, ->
+              return tools.asyncOpt fn, null, users
+      return tools.asyncOpt fn, err, []
+
+  # list of users that are not confirmed invitations
+  mod.getUnconfirmedUsers = (pid, confirmedUsers, fn) ->
+    client.smembers "projects:#{pid}:invitedUsers", (err, invitedUsersIds) ->
+      if not err and invitedUsersIds and invitedUsersIds.length
+        unconfirmedUsersIds = []
+        for invitedUserId in invitedUsersIds
+          for confirmedUser in confirmedUsers
+            found = true if invitedUserId is confirmedUser.id
+          unconfirmedUsersIds.push invitedUserId unless found
+
+        return tools.asyncOpt fn, null, [] if not unconfirmedUsersIds.length
+
+        users = []
+        return tools.asyncParallel unconfirmedUsersIds, (uid) ->
+          db.contacts.getInfo uid, (err, user) ->
+            users.push user
+            return tools.asyncDone unconfirmedUsersIds, ->
               return tools.asyncOpt fn, null, users
       return tools.asyncOpt fn, err, []
 
@@ -125,8 +148,8 @@ exports.setUp = (client, db) ->
     return client.exists "users:#{user.id}", (err, val) ->
       if not err and val
         client.sadd "projects:#{pid}:unconfirmed", user.id
-        db.activities.add pid, user.id, 'projectInvite', id
-        return tools.asyncOpt fn, null, user
+        return db.activities.add pid, user.id, 'projectInvite', id, (err, val)->
+          return tools.asyncOpt fn, err, user
 
       if not val
         return tools.asyncOpt fn, new Error 'Record not found'
@@ -138,6 +161,9 @@ exports.setUp = (client, db) ->
     console.log 'invite social'
 
   mod.inviteEmail = (pid, id, email, fn) ->
+    if not email or email.trim().length is 0
+      return tools.asyncOptError fn, "Please, enter an email."
+
     db.users.findByEmail email, (err, user) ->
       return tools.asyncOpt fn, err if err
 
@@ -202,6 +228,7 @@ exports.setUp = (client, db) ->
           return tools.asyncDone array, ->
             # Remove user from project members
             client.srem "projects:#{pid}:users", id
+            client.srem "projects:#{pid}:invitedUsers", id
             return tools.asyncOpt fn, null
       return tools.asyncOpt fn, err
 

@@ -6,23 +6,34 @@ exports.setUp = (client, db) ->
 
   mod = {}
 
-  mod.add = (project, owner, type, invitingUserId, fn) ->
-    client.incr 'activities:next', (err, val) ->
+  # type is 'projectInvite' or ...
+  mod.add = (pid, owner, type, invitingUserId, fn) ->
+    client.incr 'activities:next', (err, aid) ->
       if not err
         activity = {}
-        activity.id = val
-        activity.project = project
+        activity.id = aid
+        activity.project = pid
         activity.owner = owner
         activity.type = type
         activity.time = new Date().getTime()
         activity.status = 'new'
         activity.inviting = invitingUserId
-        client.hmset "activities:#{val}", activity
-        # stub for #103 and #99
-        # cliend.sadd("project:pid:invitedUsers", owner);
-        client.rpush "users:#{owner}:activities", val
-        announce.in("activities#{owner}").emit 'new'
-        return tools.asyncOpt fn, null, activity
+        client.hmset "activities:#{aid}", activity
+
+        executeAdd = ->
+          client.rpush "users:#{owner}:activities", aid
+          announce.in("activities#{owner}").emit 'new'
+          return tools.asyncOpt fn, null, activity
+
+        if type is 'projectInvite'
+          client.sismember "projects:#{pid}:invitedUsers", owner, (err, val) ->
+            if not err and not val
+              client.sadd("projects:#{pid}:invitedUsers", owner)
+              return executeAdd()
+            return tools.asyncOptError fn, "This user has already been invited to project.", null
+        else
+          return executeAdd()
+
       return tools.asyncOpt fn, err, null
 
   mod.getAllNew = (id, fn) ->
