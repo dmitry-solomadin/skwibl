@@ -93,11 +93,11 @@ exports.asyncOrdered = (array, index, fn, done) ->
 
 exports.asyncParallel = (array, fn) ->
   array.left = array.length
-  for el in array
-    ((val) ->
+  for el, index in array
+    ((val, index) ->
       process.nextTick ->
-        fn val
-    )(el)
+        fn val, index
+    )(el, index)
 
 exports.asyncDone = (array, fn) ->
   --array.left

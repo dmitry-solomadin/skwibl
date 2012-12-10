@@ -10,14 +10,14 @@ exports.setUp = (client, db) ->
   mod = {}
 
   # get all the projects that are available for the user
-  mod.get = (uid, fn) ->
-    client.smembers "users:#{uid}:projects", (err, array) ->
+  mod.index = (uid, fn) ->
+    client.sort "users:#{uid}:projects", "by", "projects:*->createdAt", "desc", (err, array) ->
       if not err and array and array.length
         projects = []
-        return tools.asyncParallel array, (pid) ->
+        return tools.asyncParallel array, (pid, index) ->
           return db.projects.getData pid, (err, project) ->
             if not err and project
-              projects.push project
+              projects[index] = project
               return tools.asyncDone array, ->
                 return tools.asyncOpt fn, null, projects
             return tools.asyncOpt fn, err, []
@@ -90,7 +90,9 @@ exports.setUp = (client, db) ->
         project.id = val
         project.name = name
         project.owner = uid
+        project.createdAt = new Date().getTime()
         project.start = new Date
+
         project.status = 'new'
         client.hmset "projects:#{val}", project
         client.sadd "projects:#{val}:users", uid
@@ -222,7 +224,7 @@ exports.setUp = (client, db) ->
     client.smembers "projects:#{pid}:users", (err, array) ->
       if not err and array and array.length
         db.contacts.recalculate id, array, pid
-        return tools.asyncParallel array, (left, cid) ->
+        return tools.asyncParallel array, (cid) ->
           # Recalculate member contacts
           db.contacts.recalculate cid, [id], pid
           return tools.asyncDone array, ->

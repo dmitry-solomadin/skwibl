@@ -4,15 +4,16 @@ exports.setUp = (client, db) ->
   mod = {}
 
   mod.add = (pid, fid, time, fn) ->
-    client.incr 'canvases:next', (err, val) ->
+    client.incr 'canvases:next', (err, cid) ->
       if not err
         canvas =
-          id: val
+          id: cid
           project: pid
         canvas.file = fid if fid
         canvas.time = time if time
-        client.hmset "canvases:#{val}", canvas
-        client.sadd "projects:#{pid}:canvases", val
+        canvas.createdAt = new Date().getTime()
+        client.hmset "canvases:#{cid}", canvas
+        client.sadd "projects:#{pid}:canvases", cid
         return tools.asyncOpt fn, null, canvas
       return tools.asyncOpt fn, err, null
 
@@ -20,21 +21,20 @@ exports.setUp = (client, db) ->
     client.hgetall 'canvases:' + cid, fn
 
   mod.index = (pid, fn) ->
-    client.smembers "projects:#{pid}:canvases", (err, array) ->
+    client.sort "projects:#{pid}:canvases", "by", "canvases:*->createdAt", (err, array) ->
       if not err and array and array.length
         canvases = []
-        return tools.asyncParallel array, (cid) ->
+        return tools.asyncParallel array, (cid, index) ->
           db.canvases.get cid, (err, canvas) ->
             if not err and canvas
               db.files.findById canvas.file, (err, file) ->
+                canvas.file = file
                 db.actions.getElements cid, "element", (err, elements) ->
+                  canvas.elements = elements
                   db.actions.getElements cid, "comment", (err, comments) ->
+                    canvas.comments = comments
                     unless err
-                      canvases.push
-                        canvasId: cid
-                        file: file
-                        elements: elements
-                        comments: comments
+                      canvases[index] = canvas
                     return tools.asyncDone array, ->
                       return tools.asyncOpt fn, null, canvases
       return tools.asyncOpt fn, err, []

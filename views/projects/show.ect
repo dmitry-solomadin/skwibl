@@ -58,20 +58,18 @@
     <div class="canvasFooterBottom">
       <div id="canvasSelectDiv" class="canvasSelectDiv">
         <% for canvas, i in @canvases : %>
-        <% for element in canvas.elements : %>
-        <input class="canvasElement<%= canvas.canvasId %>" type="hidden" value="<%= JSON.stringify(element) %>"/>
-        <% end %>
-        <% console.log canvas.comments %>
-        <% for comment in canvas.comments : %>
-        <input class="canvasComment<%= canvas.canvasId %>" type="hidden" value="<%= JSON.stringify(comment) %>"/>
-        <% for text in comment.texts : %>
-        <input class="commentTexts<%= comment.elementId %>" type="hidden" value="<%= JSON.stringify(text) %>"/>
-        <% end %>
-        <% end %>
-        <a href="#" class="<%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.canvasId %>" <%-
-        "data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
-        <canvas width="80" height="60"></canvas>
-        </a>
+          <% for element in canvas.elements : %>
+            <input class="canvasElement<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(element) %>"/>
+          <% end %>
+          <% for comment in canvas.comments : %>
+            <input class="canvasComment<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(comment) %>"/>
+            <% for text in comment.texts : %>
+              <input class="commentTexts<%= comment.elementId %>" type="hidden" value="<%= JSON.stringify(text) %>"/>
+            <% end %>
+          <% end %>
+          <a href="#" class="<%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.id %>" <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
+            <canvas width="80" height="60"></canvas>
+          </a>
         <% end %>
       </div>
     </div>

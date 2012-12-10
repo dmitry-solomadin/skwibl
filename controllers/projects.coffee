@@ -7,7 +7,7 @@ tools = require '../tools'
 # Get all projects
 #
 exports.index = (req, res, next) ->
-  db.projects.get req.user.id, (err, projects) ->
+  db.projects.index req.user.id, (err, projects) ->
     unless err
       return res.render 'index',
         template: 'projects/index'
