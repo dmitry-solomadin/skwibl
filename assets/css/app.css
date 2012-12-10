@@ -253,6 +253,10 @@ body {
     margin-left: 25px !important;
 }
 
+.mr25 {
+    margin-right: 25px;
+}
+
 .alert ul {
     margin-bottom: 0;
 }

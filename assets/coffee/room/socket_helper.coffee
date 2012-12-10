@@ -1,4 +1,6 @@
 $ ->
+  return unless currentPage "projects/show"
+
   class RoomSocketHelper
 
     constructor: ->

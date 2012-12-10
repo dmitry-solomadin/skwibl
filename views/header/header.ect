@@ -30,15 +30,13 @@
             <li class="activityLi"><a href="/activities">Activities</a></li>
             <li class="activity-badge-wrapper"><span id="activityBadge" class="badge activity-badge">0</span></li>
             <li><a href="/projects">Projects</a></li>
-            <li><a href="#contact">Contacts</a></li>
-            <li><a href="/files" data-remote="true">Files</a></li>
           </ul>
 
-          <a id="createNewProject" href="/projects/new">
+          <%- include './header/user_dropdown.ect' %>
+
+          <a class="fr mr25" id="createNewProject" href="/projects/new">
             <button class="btn btn-success">Create a Project</button>
           </a>
-
-          <%- include './header/user_dropdown.ect' %>
         </div>
         <% end %>
       <% end %>
