@@ -27,7 +27,7 @@ exports.setUp = (client, db) ->
       return tools.asyncOpt fn, err, null
 
   mod.getAllNew = (id, fn) ->
-    mod.get id, fn, (activity) ->
+    mod.index id, fn, (activity) ->
       return activity.status is 'new'
 
   mod.index = (id, fn, filter) ->

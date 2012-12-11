@@ -114,7 +114,6 @@ exports.invite = (req, res) ->
       db.projects.getData data.pid, (err, project) ->
         unless err
           return res.render './projects/invite/participants.ect', project: project, (err, html) ->
-            console.log err, html
             return res.send
               html: html
               msg: "Invitation has been sent."
