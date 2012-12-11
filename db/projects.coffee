@@ -35,6 +35,10 @@ exports.setUp = (client, db) ->
               return tools.asyncOpt fn, err, project
       return tools.asyncOpt fn, err, null
 
+  mod.findById = (pid, fn) ->
+    client.hgetall "projects:#{pid}", (err, project) ->
+      tools.asyncOpt fn, err, project
+
   mod.getFiles = (pid, fn) ->
     client.smembers "projects:#{pid}:files", (err, fileIds) ->
       if not err and fileIds and fileIds.length
@@ -61,16 +65,8 @@ exports.setUp = (client, db) ->
 
   # list of users that are not confirmed invitations
   mod.getUnconfirmedUsers = (pid, confirmedUsers, fn) ->
-    client.smembers "projects:#{pid}:invitedUsers", (err, invitedUsersIds) ->
-      if not err and invitedUsersIds and invitedUsersIds.length
-        unconfirmedUsersIds = []
-        for invitedUserId in invitedUsersIds
-          for confirmedUser in confirmedUsers
-            found = true if invitedUserId is confirmedUser.id
-          unconfirmedUsersIds.push invitedUserId unless found
-
-        return tools.asyncOpt fn, null, [] if not unconfirmedUsersIds.length
-
+    client.smembers "projects:#{pid}:unconfirmed", (err, unconfirmedUsersIds) ->
+      if not err and unconfirmedUsersIds and unconfirmedUsersIds.length
         users = []
         return tools.asyncParallel unconfirmedUsersIds, (uid) ->
           db.contacts.getInfo uid, (err, user) ->
@@ -149,10 +145,12 @@ exports.setUp = (client, db) ->
     # Check if user exists
     return client.exists "users:#{user.id}", (err, val) ->
       if not err and val
-        client.sadd "projects:#{pid}:unconfirmed", user.id
-        return db.activities.add pid, user.id, 'projectInvite', id, (err, val)->
-          return tools.asyncOpt fn, err, user
-
+        return client.sismember "projects:#{pid}:unconfirmed", user.id, (err, val) ->
+          if not err and not val
+            client.sadd "projects:#{pid}:unconfirmed", user.id
+            db.activities.add pid, user.id, 'projectInvite', id
+            return tools.asyncOpt fn, err, user
+          return tools.asyncOptError fn, "This user has already been invited to project.", null
       if not val
         return tools.asyncOpt fn, new Error 'Record not found'
 
@@ -230,7 +228,6 @@ exports.setUp = (client, db) ->
           return tools.asyncDone array, ->
             # Remove user from project members
             client.srem "projects:#{pid}:users", id
-            client.srem "projects:#{pid}:invitedUsers", id
             return tools.asyncOpt fn, null
       return tools.asyncOpt fn, err
 

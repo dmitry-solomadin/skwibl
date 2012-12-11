@@ -20,19 +20,9 @@ exports.setUp = (client, db) ->
         activity.inviting = invitingUserId
         client.hmset "activities:#{aid}", activity
 
-        executeAdd = ->
-          client.rpush "users:#{owner}:activities", aid
-          announce.in("activities#{owner}").emit 'new'
-          return tools.asyncOpt fn, null, activity
-
-        if type is 'projectInvite'
-          client.sismember "projects:#{pid}:invitedUsers", owner, (err, val) ->
-            if not err and not val
-              client.sadd("projects:#{pid}:invitedUsers", owner)
-              return executeAdd()
-            return tools.asyncOptError fn, "This user has already been invited to project.", null
-        else
-          return executeAdd()
+        client.rpush "users:#{owner}:activities", aid
+        announce.in("activities#{owner}").emit 'new'
+        return tools.asyncOpt fn, null, activity
 
       return tools.asyncOpt fn, err, null
 
@@ -40,7 +30,7 @@ exports.setUp = (client, db) ->
     mod.get id, fn, (activity) ->
       return activity.status is 'new'
 
-  mod.get = (id, fn, filter) ->
+  mod.index = (id, fn, filter) ->
     client.lrange "users:#{id}:activities", -cfg.ACTIONS_BUFFER_SIZE, -1, (err, array) ->
       if not err and array and array.length
         activities = []

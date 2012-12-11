@@ -93,8 +93,11 @@ exports.reopen = (req, res) ->
 # Delete project
 #
 exports.delete = (req, res) ->
-  db.projects.delete req.body.pid, (err) ->
-    tools.returnStatus err, res
+  db.projects.findById req.body.pid, (err, project) ->
+    return tools.sendError res, new Error("only project owner may delete it") if project.owner isnt req.user.id
+
+    db.projects.delete project.id, (err) ->
+      tools.returnStatus err, res
 
 #
 # POST
@@ -106,14 +109,15 @@ exports.invite = (req, res) ->
     return tools.sendError res, err if err
     unless user
       return res.send
-        msg: "We have not found the user in our
-                database, but the invitation was sent to
-                his email."
+        msg: "Invitation has been sent to user's email."
     return db.users.persist user, ->
       db.projects.getData data.pid, (err, project) ->
         unless err
-          return res.send
-            msg: "Invitation has been sent."
+          return res.render './projects/invite/participants.ect', project: project, (err, html) ->
+            console.log err, html
+            return res.send
+              html: html
+              msg: "Invitation has been sent."
         return res.send no
 
 #
@@ -163,8 +167,16 @@ exports.confirm = (req, res) ->
 #
 exports.remove = (req, res) ->
   data = req.body
-  if req.user.id isnt data.id
-    return db.projects.remove data.pid, data.id, (err) ->
+  if req.user.id isnt data.uid
+    return db.projects.remove data.pid, data.uid, (err) ->
       return res.send no if err
-      return res.send uid: data.id
+      return res.send uid: data.uid
   return res.send no
+
+#
+# POST
+# Remove current user from a project
+#
+exports.leave = (req, res) ->
+  db.projects.remove req.body.pid, req.user.id, (err) ->
+    if err then res.send no else res.send yes

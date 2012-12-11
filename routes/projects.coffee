@@ -18,6 +18,8 @@ exports.configure = (app, passport) ->
 
   app.post '/projects/delete', ctrls.mid.isAuth, ctrls.mid.isOwner, ctrls.projects.delete
 
+  app.post '/projects/leave', ctrls.mid.isAuth, ctrls.projects.leave
+
   app.post '/projects/invite', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.projects.invite
 
   app.post '/projects/invitesocial', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.projects.inviteSocial
