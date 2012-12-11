@@ -71,9 +71,9 @@ $ ->
     createCommentFromData: (comment) ->
       if comment.rect
         rect = new Path.RoundRectangle(comment.rect.x, comment.rect.y, comment.rect.w, comment.rect.h, 8, 8)
-        room.items.create(rect, room.comments.COMMENT_STYLE)
+        room.items.create rect, color: comment.color
 
-      commentMin = room.comments.create(comment.min.x, comment.min.y, rect, comment.max)
+      commentMin = room.comments.create(comment.min.x, comment.min.y, rect, comment.max, comment.color)
       commentMin.elementId = comment.elementId
 
       if rect
@@ -189,6 +189,7 @@ $ ->
         canvasId: room.canvas.getSelectedCanvasId()
         element:
           elementId: commentMin.elementId
+          color: commentMin.data("color")
           texts: @prepareCommentTextsToSend commentMin
           min:
             x: commentMinPosition.x - opts.pandx

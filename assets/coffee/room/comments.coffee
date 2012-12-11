@@ -6,9 +6,9 @@ $ ->
       @CORNER_OFFSET = 18
 
       @COMMENT_RECTANGLE_ROUNDNESS = 8
-      @COMMENT_STYLE = {width: "2", color: "#C2E1F5"}
 
-    create: (x, y, rect, max) ->
+    create: (x, y, rect, max, color) ->
+      color = if color then color else opts.color
       COMMENT_SHIFT_X = 75
       COMMENT_SHIFT_Y = -135
 
@@ -18,8 +18,10 @@ $ ->
 
       commentMin = $("<div class=\"comment-minimized #{'hide' if rect}\">&nbsp;</div>")
       commentMin.css(left: x, top: y)
+      commentMin.data("color", color)
 
       commentMax = $("<div class='comment-maximized'></div>")
+      commentMax.css(borderColor: color)
       max_x = if max then max.x else x + COMMENT_SHIFT_X
       max_y = if max then max.y else y + COMMENT_SHIFT_Y
       commentMax.css(left: max_x, top: max_y)
@@ -97,8 +99,8 @@ $ ->
 
       coords = @getArrowCoords(commentMin, zone)
       path = new Path()
-      path.strokeColor = '#C2E1F5'
-      path.strokeWidth = "2"
+      path.strokeColor = color
+      path.strokeWidth = "1"
       path.fillColor = "#FCFCFC"
       path.add(new Point(coords.x0, coords.y0))
       path.add(new Point(coords.x1, coords.y1))
