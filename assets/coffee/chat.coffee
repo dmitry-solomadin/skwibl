@@ -66,7 +66,7 @@ $ ->
       @chatIO.on 'exit', (uid, cb) =>
         @changeUserStatus uid, false
         user = @getUserById uid
-        @addTechMessage("<i>#{user.displayName} leaved the project</i>")
+        @addTechMessage("<i>#{user.displayName} left the project</i>")
 
       @chatIO.on 'onlineUsers', (uids) => @changeUserStatus(uid, true) for uid in uids
 

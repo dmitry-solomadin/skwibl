@@ -1,7 +1,7 @@
 $ ->
   class RoomCanvas
 
-    # INITIALIZATION START
+  # INITIALIZATION START
 
     init: ->
       @initElements()
@@ -77,7 +77,25 @@ $ ->
       selectedOpts = @findCanvasOptsById(selectedCid)
       room.setOpts(selectedOpts)
 
+    initNameChanger: ->
+      $("#canvasName").on "click", ->
+        $("#canvasName").hide()
+        $("#canvasNameInputDiv").show()
+        $("#canvasNameInput").val($("#canvasName").html().trim()).focus()
+
+      $("#canvasNameSave").on "click", =>
+        $("#canvasName").show()
+        $("#canvasNameInputDiv").hide()
+
+        name = $("#canvasNameInput").val()
+        @changeName name
+
+        room.socket.emit "changeCanvasName", canvasId: @getSelectedCanvasId(), name: name
+
     # INITIALIZATION END
+
+    changeName: (name) ->
+      $("#canvasName").html(name)
 
     delete: ->
       if confirm "Are you sure? This will delete all canvas content."
@@ -173,14 +191,14 @@ $ ->
 
     # CANVAS THUMBNAILS & IMAGE UPLOAD
 
-    handleUpload: (canvasId, fileId, emit) ->
-      @addNewThumbAndSelect(canvasId) if opts.image
+    handleUpload: (canvasId, fileId, name, emit) ->
+      @addNewThumbAndSelect(canvasId, fileId, name) if opts.image
       img = @addImage fileId, (raster, executeLoadImage) =>
         executeLoadImage()
 
         @updateSelectedThumb(canvasId)
 
-      room.socket.emit("fileAdded", {canvasId: canvasId, fileId: fileId}) if emit
+      room.socket.emit("fileAdded", {canvasId: canvasId, fileId: fileId, name: name}) if emit
 
     addImage: (fileId, loadWrap) ->
       src = "/files/#{$("#pid").val()}/#{fileId}"
@@ -207,18 +225,19 @@ $ ->
 
       img
 
-    addNewThumb: (canvasId) ->
-      thumb = $("<a href='#' data-cid='#{canvasId}'><canvas width='80' height='60'></canvas></a>")
+    addNewThumb: (canvasId, fileId, name) ->
+      thumb = $("<a href='#' data-cid='#{canvasId}' data-fid='#{fileId}' data-name='#{name}'><canvas width='80' height='60'></canvas></a>")
       $("#canvasSelectDiv").append(thumb)
 
-    addNewThumbAndSelect: (canvasId) ->
+    addNewThumbAndSelect: (canvasId, fileId, name) ->
       @erase()
       room.initOpts(canvasId)
 
-      @addNewThumb(canvasId)
+      @addNewThumb(canvasId, fileId, name)
 
       $("#canvasSelectDiv a").removeClass("canvasSelected")
       $("#canvasSelectDiv a:last").addClass("canvasSelected")
+      $("#canvasName").html(name)
 
     updateThumb: (canvasId)  ->
       selectedCanvasId = @getSelectedCanvasId()
@@ -283,6 +302,7 @@ $ ->
       @restore(true)
 
       $(anchor).addClass("canvasSelected")
+      $("#canvasName").html($(anchor).data("name"))
 
       room.socket.emit("switchCanvas", cid) if emit
       room.redraw()

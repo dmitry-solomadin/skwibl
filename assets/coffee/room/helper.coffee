@@ -43,7 +43,7 @@ $ ->
         onComplete: (id, fileName, responseJSON) =>
           $(room.uploader._listElement).css('dispaly', 'none')
 
-          room.canvas.handleUpload(responseJSON.canvasId, responseJSON.fileId, true)
+          room.canvas.handleUpload(responseJSON.canvasId, responseJSON.fileId, responseJSON.name, true)
 
       $(".qq-upload-button").addClass("btn btn-success small-btn")
 

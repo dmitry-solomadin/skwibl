@@ -12,12 +12,13 @@ $ ->
       socket.on 'commentUpdate', (data) => @addOrUpdateComment(data.element)
       socket.on 'commentRemove', (data) => @socketRemoveComment(data.elementId)
       socket.on 'commentText', (data) => @addCommentText(data.element)
-      socket.on 'fileAdded', (data) => room.canvas.handleUpload(data.canvasId, data.fileId, false)
+      socket.on 'fileAdded', (data) => room.canvas.handleUpload(data.canvasId, data.fileId, data.name, false)
       socket.on 'removeCommentText', (data) => room.comments.removeText(data.elementId, false)
       socket.on 'updateCommentText', (data) => room.comments.doEditText(data.elementId, data.text, false)
       socket.on 'markAsTodo', (data) => room.comments.markAsTodo(data.elementId, false)
       socket.on 'resolveTodo', (data) => room.comments.resolveTodo(data.elementId, false)
       socket.on 'reopenTodo', (data) => room.comments.reopenTodo(data.elementId, false)
+      socket.on 'changeCanvasName', (data) => room.canvas.changeName(data.name)
       socket.on 'switchCanvas', (data) =>
         room.canvas.selectThumb(room.canvas.findThumbByCanvasId(data.canvasId), false)
       socket.on 'eraseCanvas', => room.canvas.clear false, false

@@ -438,3 +438,18 @@ body.room {
     display: inline-block;
     margin-left: 10px;
 }
+
+.canvasNameInput {
+    font-size: 16px !important;
+}
+
+.canvasNameSave {
+    margin-bottom: 9px;
+}
+
+.canvasName {
+    vertical-align: top;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 28px;
+}
