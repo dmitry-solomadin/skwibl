@@ -135,7 +135,7 @@ exports.dropbox = (req, res) ->
       path = req.query.path or ''
       console.log path
       url = "https://api.dropbox.com/1/metadata/dropbox/#{path}"
-      return request url: url, oauth: oauth, (err, response, body) ->
-        console.log response.statusCode, body
+      return request url: url, oauth: oauth, json: true, (err, response, body) ->
+        console.log response.statusCode, body, typeof body
         return res.send body
     return res.send no

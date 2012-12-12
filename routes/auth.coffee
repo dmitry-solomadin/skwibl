@@ -10,9 +10,9 @@ exports.configure = (app, passport) ->
 
   app.post '/login', ctrls.auth.local passport
 
-  app.get '/confirm/:hash', ctrls.auth.hash passport, ctrls.auth.confirm, ctrls.auth.logIn
+  app.get '/confirm/:hash', ctrls.auth.hash(passport), ctrls.auth.confirm, ctrls.auth.logIn
 
-  app.get '/auth/google', ctrls.auth.google passport, ctrls.aux.empty
+  app.get '/auth/google', ctrls.auth.google(passport), ctrls.aux.empty
 
   app.get '/auth/google/callback', ctrls.auth.googleCb(passport), ctrls.auth.logIn
 

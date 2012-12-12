@@ -12,7 +12,7 @@ $ ->
         facebook.html('disconnected')
 
     files: (provider) ->
-      $.get "/files/#{provider}?path=A-Tease%2FPitchDeck%2F", (data, status, xhr) ->
+      $.get "/files/#{provider}?path=Skwibl_Wireframes_3_1%2F", (data, status, xhr) ->
         console.log status
 
   App.userProfile = new UserProfile
