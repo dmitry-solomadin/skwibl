@@ -214,7 +214,6 @@ case "$1" in
     connect;;
   -p|--product)
     init
-    build
     product;;
   -r|--reset)
     read -p "You are going to reset project files and flush db. Do you want to continue (y/n)?" REPLY
