@@ -6,9 +6,13 @@ exports.configure = (app, passport) ->
 
   app.get '/projects/new', ctrls.mid.isAuth, ctrls.projects.new
 
+  app.get '/projects/download', ctrls.mid.isAuth, ctrls.projects.download
+
   app.get '/projects/:pid', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.projects.show
 
   app.get '/projects/:pid/participants', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.projects.participants
+
+  app.post '/projects/prepareDownload', ctrls.mid.isAuth, ctrls.projects.prepareDownload
 
   app.post '/projects/add', ctrls.mid.isAuth, ctrls.projects.add
 

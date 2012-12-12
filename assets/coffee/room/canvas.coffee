@@ -162,6 +162,11 @@ $ ->
 
       room.redraw()
 
+    download: ->
+      dataURL = $("#myCanvas")[0].toDataURL("image/png")
+      $.post '/projects/prepareDownload', {pid: $("#pid").val(), canvasData: dataURL}, (data, status, xhr) =>
+        window.location = "/projects/download?pid=#{$("#pid").val()}&img=#{data}"
+
     addScale: -> @setScale(opts.currentScale + 0.1);
 
     subtractScale: -> @setScale(opts.currentScale - 0.1);

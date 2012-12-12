@@ -1,4 +1,5 @@
 db = require '../db'
+fs = require 'fs'
 
 tools = require '../tools'
 
@@ -45,6 +46,22 @@ exports.show = (req, res, next) ->
 #
 exports.new = (req, res) ->
   return res.render 'index', template: 'projects/new'
+
+exports.prepareDownload = (req, res) ->
+  dir = "./uploads/#{req.body.pid}"
+  fname = "canvas.png"
+
+  # base64 format is: data:image/png;base64,[data]
+  # let's cutoff everything that goes before data
+  data = req.body.canvasData.substring(22, req.body.canvasData.length)
+
+  fs.writeFile "#{dir}/#{fname}", data, 'base64'
+
+  return res.send "canvas.png"
+
+exports.download = (req, res) ->
+  res.attachment()
+  return res.sendfile "./uploads/#{req.query.pid}/canvas.png"
 
 #
 # POST
