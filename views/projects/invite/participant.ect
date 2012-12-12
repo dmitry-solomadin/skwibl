@@ -1,8 +1,9 @@
 <% currentUserIsOwner = @project.owner == @currentUser().id %>
 <% isCurrentUser = @currentUser(@participant.id) %>
-<div id="participant<%= @participant.id%>" class="participant">
-  <span><%= @participant.displayName %><%= if isCurrentUser then " (you)" else ""%></span>
-  <% if currentUserIsOwner and not isCurrentUser : %>
+<% unconfirmed = @participant.unconfirmed %>
+<div id="participant<%= @participant.id%>" class="participant <%= 'unconfirmed' if unconfirmed %>">
+  <span><%= @participant.displayName %><%= " (you)" if isCurrentUser %><%= " (unconfirmed)" if unconfirmed %></span>
+  <% if currentUserIsOwner and not isCurrentUser and not unconfirmed : %>
   <a class="btn btn-danger small-btn fr" href="#" onclick="App.projects.removeUserFromProject('<%= @participant.id %>');">Remove</a>
   <% end %>
   <div style="clear: both;"></div>

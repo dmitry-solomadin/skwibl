@@ -7,7 +7,7 @@ tools = require '../tools'
 # Get all activities
 #
 exports.index = (req, res, next) ->
-  return db.activities.get req.user.id, (err, activities) ->
+  return db.activities.index req.user.id, (err, activities) ->
     if not activities or activities.length is 0
       return res.render 'index', template:"activities/index", activities:activities
 

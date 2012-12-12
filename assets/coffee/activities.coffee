@@ -1,4 +1,6 @@
 $ ->
+  return unless $("#uid")[0] # if user is not logged in
+
   class Activities
 
     constructor: ->

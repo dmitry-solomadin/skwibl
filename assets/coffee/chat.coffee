@@ -12,6 +12,12 @@ $ ->
 
       @initSockets()
 
+      $("#chatFilters a").click ->
+        $("#chatFilters a").removeClass("active")
+        $(@).addClass("active")
+        $("#conversation-inner .tab-content").hide()
+        $("##{$(@).data('tab')}").show()
+
     fold: (link) ->
       $("#chat").animate(left: -305)
       $("#header-foldable").animate(width: 200)
@@ -35,10 +41,10 @@ $ ->
 
     addMessage: (uid, message) ->
       user = @getUserById(uid)
-      $('#conversation-inner').append("<div><b>#{user.displayName}:</b> #{message}</div>")
+      $('#conversation-inner #chat-tab').append("<div><b>#{user.displayName}:</b> #{message}</div>")
 
     addTechMessage: (message) ->
-      $('#conversation-inner').append("<div>#{message}</div>")
+      $('#conversation-inner #chat-tab').append("<div>#{message}</div>")
 
     changeUserStatus: (uid, online) ->
       chatStatus = $("#chatUser#{uid}").find(".chatUserStatus")

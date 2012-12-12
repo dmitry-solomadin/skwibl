@@ -6,9 +6,9 @@ $ ->
       @CORNER_OFFSET = 18
 
       @COMMENT_RECTANGLE_ROUNDNESS = 8
-      @COMMENT_STYLE = {width: "2", color: "#C2E1F5"}
 
-    create: (x, y, rect, max) ->
+    create: (x, y, rect, max, color) ->
+      color = if color then color else opts.color
       COMMENT_SHIFT_X = 75
       COMMENT_SHIFT_Y = -135
 
@@ -18,8 +18,10 @@ $ ->
 
       commentMin = $("<div class=\"comment-minimized #{'hide' if rect}\">&nbsp;</div>")
       commentMin.css(left: x, top: y)
+      commentMin.data("color", color)
 
       commentMax = $("<div class='comment-maximized'></div>")
+      commentMax.css(borderColor: color)
       max_x = if max then max.x else x + COMMENT_SHIFT_X
       max_y = if max then max.y else y + COMMENT_SHIFT_Y
       commentMax.css(left: max_x, top: max_y)
@@ -33,9 +35,9 @@ $ ->
 
       commentMax.append(commentHeader)
       commentContent = $("<div class='comment-content'><div class='comment-content-inner'></div>" +
-      "<textarea class='comment-reply' placeholder='Type a comment...'></textarea>" +
+      "<div class='comment-content-actions'><textarea class='comment-reply' placeholder='Type a comment...'></textarea>" +
       "<input type='button' class='btn small-btn fr comment-send hide' value='Send'>" +
-      "<input type='button' class='btn small-btn fr edit-cancel hide' value='Cancel edit'>" +
+      "<input type='button' class='btn small-btn fr edit-cancel hide' value='Cancel edit'></div>" +
       "</div>")
       $(commentContent).data("hidden", "false")
       commentMax.append(commentContent)
@@ -64,7 +66,7 @@ $ ->
             $(commentSendButton).hide()
             @redrawArrow(commentMin)
 
-        $(evt.target).parent(".comment-content").find(".comment-send").show() if evt.target
+        $(evt.target).parent(".comment-content-actions").find(".comment-send").show() if evt.target
 
       $(commentMax).find(".comment-send").on "click", =>
         editCancelButton = commentMax.find(".edit-cancel:visible")[0]
@@ -82,7 +84,10 @@ $ ->
         $(commentMax).find(".edit-cancel").hide()
 
       commentMin[0].$maximized = commentMax
-      commentMin[0].rect = rect
+
+      if rect
+        commentMin[0].rect = rect
+        rect.commentMin = commentMin
 
       $("#room-content").prepend(commentMin)
       $("#room-content").prepend(commentMax)
@@ -94,8 +99,8 @@ $ ->
 
       coords = @getArrowCoords(commentMin, zone)
       path = new Path()
-      path.strokeColor = '#C2E1F5'
-      path.strokeWidth = "2"
+      path.strokeColor = color
+      path.strokeWidth = "1"
       path.fillColor = "#FCFCFC"
       path.add(new Point(coords.x0, coords.y0))
       path.add(new Point(coords.x1, coords.y1))
@@ -287,6 +292,10 @@ $ ->
           tool = {actionType: "comment", commentMin: $commentmin}
           room.history.add({actionType: "remove", tool: tool, eligible: true})
 
+        for commentText in $commentmin[0].$maximized.find(".comment-text")
+          $("#todo-tab").find("#" + commentText.id).remove()
+        @recalcTasksCount()
+
         room.socket.emit("commentRemove", $commentmin.elementId)
         room.redraw()
 
@@ -358,7 +367,8 @@ $ ->
       showCommentsDiv.html(showCommentsText) if showCommentsDiv[0]
 
       commentContent.append(
-        "<div id='commentText#{elementId}' class='comment-text'>
+        "<div id='commentText#{elementId}' class='comment-text' data-comment-id='#{commentMin.elementId}'
+           data-element-id='#{elementId}' data-owner='#{owner}' data-time='#{time}'>
              <div class='comment-avatar'><img src='#{user.picture}' width='32'/></div>
              <div class='comment-heading'>
                  <div class='comment-author'>#{user.displayName}</div>
@@ -366,10 +376,22 @@ $ ->
              </div>
              <div class='the-comment-text'>#{commentText.text}</div>
              <div class='comment-actions'>
-                 <a href='#' onclick='App.room.comments.editText(#{elementId}); return false;'>edit</a>
-                 <a href='#' onclick='App.room.comments.removeText(#{elementId}, true); return false;'>remove</a>
+                 <a href='#' class='markAsTodoLink' onclick='App.room.comments.markAsTodo(#{elementId}, true); return false;'>todo</a>
+                 <a href='#' class='editCommentTextLink' onclick='App.room.comments.editText(#{elementId}); return false;'>edit</a>
+                 <a href='#' class='removeCommentTextLink' onclick='App.room.comments.removeText(#{elementId}, true); return false;'>remove</a>
              </div>
          </div>")
+
+      if commentText.todo
+        commentTextDiv = commentContent.find("#commentText#{elementId}")
+        commentTextDiv.addClass("todo")
+        commentTextDiv.find(".markAsTodoLink").remove()
+
+        if commentText.resolved
+          commentTextDiv.find(".comment-actions").prepend("<a href='#' class='resolve-link' onclick='App.room.comments.reopenTodo(#{elementId}, true); return false;'>reopen</a>")
+          commentTextDiv.addClass("resolved")
+        else
+          commentTextDiv.find(".comment-actions").prepend("<a href='#' class='resolve-link' onclick='App.room.comments.resolveTodo(#{elementId}, true); return false;'>resolve</a>")
 
       for comment, index in commentContent.children()
         $(comment).hide() if commentsCount - index > 2
@@ -378,6 +400,7 @@ $ ->
         room.socket.emit "commentText",
           elementId: elementId
           commentId: commentMin.elementId
+          pid: $("#pid").val()
           owner: owner
           text: commentText.text
 
@@ -416,5 +439,68 @@ $ ->
 
         @initHideCommentsBlock commentContent if $(commentContent).parent().data("hidden") is "true"
         room.socket.emit "removeCommentText", elementId if emit
+
+    markAsTodo: (elementId, emit) ->
+      comment = $("#commentText#{elementId}")
+      comment.addClass("todo")
+      comment.find(".markAsTodoLink").replaceWith("<a href='#' class='resolve-link'
+                   onclick='App.room.comments.resolveTodo(#{elementId}, true); return false;'>resolve</a>")
+
+      @addTodo $("#commentText#{elementId}")
+
+      room.socket.emit "markAsTodo", elementId if emit
+
+    resolveTodo: (elementId, emit) ->
+      comment = $("#commentText#{elementId}")
+      comment.addClass("resolved")
+      comment.find(".resolve-link").replaceWith("<a href='#' class='resolve-link'
+             onclick='App.room.comments.reopenTodo(#{elementId}, true); return false;'>reopen</a>")
+
+      @addTodo $("#commentText#{elementId}")
+
+      room.socket.emit "resolveTodo", elementId if emit
+
+    reopenTodo: (elementId, emit) ->
+      comment = $("#commentText#{elementId}")
+      comment.removeClass("resolved")
+      comment.find(".resolve-link").replaceWith("<a href='#' class='resolve-link'
+       onclick='App.room.comments.resolveTodo(#{elementId}, true); return false;'>resolve</a>")
+
+      @addTodo $("#commentText#{elementId}")
+
+      room.socket.emit "reopenTodo", elementId if emit
+
+    addTodo: (commentText) ->
+      if $("#todo-tab").children().length == 0
+        # if it's the first comment added let's prepare todolist structure
+        $("#todo-tab").html("")
+        $("#todo-tab").append(
+          "<div class='openTab' onclick='App.room.comments.viewOpen()'>0 open</div>
+           <div class='resolvedTab' onclick='App.room.comments.viewResolved()'>0 resolved</div>")
+        $("#todo-tab").append("<div class='openList'></div><div class='resolvedList'></div>")
+
+      commentText = commentText.clone()
+      commentText.find(".editCommentTextLink, .removeCommentTextLink").remove()
+
+      $("#todo-tab").find("#" + commentText[0].id).remove()
+      if commentText.hasClass("resolved")
+        $("#todo-tab").find(".resolvedList").append(commentText)
+      else
+        $("#todo-tab").find(".openList").append(commentText)
+      commentText.show() #it may be hidden in the main view.
+
+      @recalcTasksCount()
+
+    recalcTasksCount: ->
+      $(".resolvedTab").html($(".resolvedList").children().length + " resolved")
+      $(".openTab").html($(".openList").children().length + " open")
+
+    viewResolved: ->
+      $(".openList").hide()
+      $(".resolvedList").show()
+
+    viewOpen: ->
+      $(".resolvedList").hide()
+      $(".openList").show()
 
   App.room.comments = new RoomComments

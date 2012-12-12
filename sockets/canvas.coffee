@@ -37,7 +37,6 @@ exports.configure = (sio) ->
         db.actions.delete elementId
 
       socket.on 'commentUpdate', (data, cb) ->
-        data.comment = true
         socket.broadcast.to(socket.project).emit 'commentUpdate',
           id: id
           canvasId: data.canvasId
@@ -56,6 +55,24 @@ exports.configure = (sio) ->
           element: data
         db.actions.addCommentText data
 
+      socket.on 'markAsTodo', (elementId, cb) ->
+        socket.broadcast.to(socket.project).emit 'markAsTodo',
+          id: id
+          elementId: elementId
+        db.actions.markAsTodo elementId
+
+      socket.on 'resolveTodo', (elementId, cb) ->
+        socket.broadcast.to(socket.project).emit 'resolveTodo',
+          id: id
+          elementId: elementId
+        db.actions.resolveTodo elementId
+
+      socket.on 'reopenTodo', (elementId, cb) ->
+        socket.broadcast.to(socket.project).emit 'reopenTodo',
+          id: id
+          elementId: elementId
+        db.actions.reopenTodo elementId
+
       socket.on 'updateCommentText', (data, cb) ->
         socket.broadcast.to(socket.project).emit 'updateCommentText',
           id: id
@@ -64,11 +81,15 @@ exports.configure = (sio) ->
         db.actions.updateCommentText data.elementId, data.text
 
       socket.on 'eraseCanvas', (data, cb) ->
-        console.log 'erasecanv'
-        console.log data
         socket.broadcast.to(socket.project).emit 'eraseCanvas',
           id: id
-          canvasId: data.cancasId
+        db.canvases.clear data.canvasId
+
+      socket.on 'removeCanvas', (data, cb) ->
+        socket.broadcast.to(socket.project).emit 'removeCanvas',
+          id: id
+          canvasId: data.canvasId
+        db.canvases.delete data.canvasId
 
       socket.on 'fileAdded', (data, cb) ->
         socket.broadcast.to(socket.project).emit "fileAdded",

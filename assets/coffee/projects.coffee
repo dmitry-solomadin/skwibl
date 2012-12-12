@@ -13,6 +13,11 @@ $ ->
         $.post '/projects/delete', {pid: pid}, (data, status, xhr) ->
           $("#project#{pid}").fadeOut()
 
+    leaveProject: (pid) ->
+      if confirm("Are you sure?")
+        $.post '/projects/leave', {pid: pid}, (data, status, xhr) ->
+          $("#project#{pid}").fadeOut() if data
+
     showInviteModal: (pid) ->
       $.get "/projects/#{pid}/participants", (data) ->
         $('#inviteModal').find(".pid").val(pid)
@@ -30,13 +35,14 @@ $ ->
           if data.error
             $("#inviteError").html(data.msg)
           else
+            $("#inviteModal").find("#projectParticipants").html(data.html) if data.html
             $("#inviteError").html(data.msg)
         else
           $("#inviteError").html("Unsuccessful.")
 
     removeUserFromProject: (uid) ->
       pid = $("#inviteModal").find(".pid").val()
-      $.post '/projects/remove', {pid: pid, id: uid}, (data, status, xhr) ->
+      $.post '/projects/remove', {pid: pid, uid: uid}, (data, status, xhr) ->
         $("#participant#{data.uid}").fadeOut() if data
 
   App.projects = new Projects

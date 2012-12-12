@@ -45,6 +45,8 @@ $ ->
 
           room.canvas.handleUpload(responseJSON.canvasId, responseJSON.fileId, true)
 
+      $(".qq-upload-button").addClass("btn btn-success small-btn")
+
     reverseOpacity: (elem) -> if elem.opacity == 0 then elem.opacity = 1 else elem.opacity = 0
 
     notifyComment: -> App.notificator.notify("Drag to comment an area.")
@@ -52,6 +54,16 @@ $ ->
     elementInArrayContainsPoint: (array, point) ->
       for element in array
         return element if element.bounds.contains point
+      return null
+
+    findAndRemoveByElementId: (id) ->
+      return null unless id
+
+      for element, index in opts.historytools.allHistory
+        if element.elementId is id or (element.commentMin and element.commentMin.elementId is id)
+          opts.historytools.allHistory.splice(index, 1)
+          return element
+
       return null
 
     findByElementId: (id) ->

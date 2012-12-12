@@ -6,30 +6,31 @@ exports.setUp = (client, db) ->
 
   mod = {}
 
-  mod.add = (project, owner, type, invitingUserId, fn) ->
-    client.incr 'activities:next', (err, val) ->
+  # type is 'projectInvite' or ...
+  mod.add = (pid, owner, type, invitingUserId, fn) ->
+    client.incr 'activities:next', (err, aid) ->
       if not err
         activity = {}
-        activity.id = val
-        activity.project = project
+        activity.id = aid
+        activity.project = pid
         activity.owner = owner
         activity.type = type
         activity.time = new Date().getTime()
         activity.status = 'new'
         activity.inviting = invitingUserId
-        client.hmset "activities:#{val}", activity
-        # stub for #103 and #99
-        # cliend.sadd("project:pid:invitedUsers", owner);
-        client.rpush "users:#{owner}:activities", val
+        client.hmset "activities:#{aid}", activity
+
+        client.rpush "users:#{owner}:activities", aid
         announce.in("activities#{owner}").emit 'new'
         return tools.asyncOpt fn, null, activity
+
       return tools.asyncOpt fn, err, null
 
   mod.getAllNew = (id, fn) ->
-    mod.get id, fn, (activity) ->
+    mod.index id, fn, (activity) ->
       return activity.status is 'new'
 
-  mod.get = (id, fn, filter) ->
+  mod.index = (id, fn, filter) ->
     client.lrange "users:#{id}:activities", -cfg.ACTIONS_BUFFER_SIZE, -1, (err, array) ->
       if not err and array and array.length
         activities = []

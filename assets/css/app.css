@@ -18,6 +18,10 @@ body {
     width: 940px;
 }
 
+.navbar-fixed-top {
+    z-index: 99;
+}
+
 .btn {
     margin-left: 3px;
     color: #484e58;
@@ -58,6 +62,10 @@ body {
     color: #fff;
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
     border-color: transparent;
+}
+
+.btn.btn-warning  {
+    color: #fff;
 }
 
 .btn.btn-success {
@@ -115,7 +123,7 @@ body {
 }
 
 .loginBlock {
-    z-index: 1000;
+    z-index: 69;
     padding: 25px 10px 10px 10px;
     box-shadow: #202020 0 10px 20px;
     border-bottom-left-radius: 4px;
@@ -200,7 +208,7 @@ body {
     float:left;
     width: 32px;
     height: 32px;
-    padding-top: 10px;
+    padding-top: 12px;
 }
 
 .userDropdown .caret {
@@ -243,6 +251,10 @@ body {
 
 .ml25 {
     margin-left: 25px !important;
+}
+
+.mr25 {
+    margin-right: 25px;
 }
 
 .alert ul {

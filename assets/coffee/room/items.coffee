@@ -20,15 +20,17 @@ $ ->
       opts.tool.dashArray = if settings.dashArray then settings.dashArray else undefined
 
     removeSelected: ->
-      if @selected()
-        # add new 'remove' item into history and link it to removed item.
-        room.history.add({actionType: "remove", tool: @selected(), eligible: true})
-        @selected().opacity = 0
+      @remove @selected(), true if @selected()
 
-        room.socket.emit("elementRemove", @selected().elementId)
+    remove: (item, historize) ->
+      console.trace "asd"
+      # add new 'remove' item into history and link it to removed item.
+      room.history.add({actionType: "remove", tool: item, eligible: true}) if historize
 
-        @unselect()
-        room.redrawWithThumb()
+      item.opacity = 0
+      room.socket.emit("elementRemove", item.elementId)
+      @unselectIfSelected item.elementId
+      room.redrawWithThumb()
 
     translateSelected: (deltaPoint) ->
       if @selected()
@@ -45,6 +47,9 @@ $ ->
       @setSelected(null)
 
     pan: (dx, dy) ->
+      opts.pandx = opts.pandx + dx
+      opts.pandy = opts.pandy + dy
+
       for element in opts.historytools.allHistory
         if element.commentMin
           room.comments.translate(element.commentMin, dx, dy)

@@ -12,7 +12,14 @@
 </div>
 
 <div id="room-controls">
-  <a href="#" class="btn toolTypeChanger skwibl_image_btn ml25" data-tooltype="line">
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn ml25" data-tooltype="select">
+    <img src="/images/room/select.png">
+  </a>
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="pan">
+    <img src="/images/room/pan.png">
+  </a>
+
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="line">
     <img src="/images/room/pencil.png">
   </a>
   <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="highligher">
@@ -22,18 +29,29 @@
      onclick="App.room.helper.notifyComment()">
     <img src="/images/room/comment.png">
   </a>
-  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="rectangle">
-    <img src="/images/room/rectangle.png">
-  </a>
-  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="circle">
-    <img src="/images/room/circle.png">
-  </a>
-  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="straightline">
-    <img src="/images/room/line.png">
-  </a>
-  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="arrow">
-    <img src="/images/room/arrow.png">
-  </a>
+
+  <span class="dropdown">
+    <a id="additionalInsDropdown" href="#" class="btn additionalInsDropdown" data-toggle="dropdown">
+      <img src="/images/room/arrow.png">
+      <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu" id="additionalInsSelect">
+      <li>
+        <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="rectangle">
+          <img src="/images/room/rectangle.png">
+        </a>
+        <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="circle">
+          <img src="/images/room/circle.png">
+        </a>
+        <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="straightline">
+          <img src="/images/room/line.png">
+        </a>
+        <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="arrow">
+          <img src="/images/room/arrow.png">
+        </a>
+      </li>
+    </ul>
+  </span>
 
   <span class="dropdown">
     <a href="#" class="btn colorDropdown" data-toggle="dropdown">
@@ -53,13 +71,6 @@
       </li>
     </ul>
   </span>
-
-  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="select">
-    <img src="/images/room/select.png">
-  </a>
-  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="pan">
-    <img src="/images/room/pan.png">
-  </a>
 
   <span>
     <select class="btn" style="width:75px; padding: 0;"
@@ -86,7 +97,7 @@
     </a>
   </span>
 
-  <a href="#" class="btn small-btn" onclick="App.room.history.clear();return false;">
+  <a href="#" class="btn small-btn" onclick="App.room.canvas.clear(false, true);return false;">
     Clear
   </a>
 

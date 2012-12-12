@@ -7,15 +7,21 @@ $ ->
       executePrevHistory = (item, reverse) =>
         if item.actionType == "remove"
           executePrevHistory(item.tool, true)
-        if item.actionType == "clear"
+        else if item.actionType == "clear"
           $(item.tools).each -> executePrevHistory(@, true)
         else if item.commentMin
           if reverse
-            room.comments.showComment(item.commentMin)
+            room.comments.showComment item.commentMin
+            room.socket.emit "commentUpdate", room.socketHelper.prepareCommentToSend item.commentMin
           else
-            room.comments.hideComment(item.commentMin)
+            room.comments.hideComment item.commentMin
+            room.socket.emit "commentRemove", item.commentMin.elementId
         else
-          room.helper.reverseOpacity(item)
+          if reverse
+            item.opacity = 1
+            room.socket.emit "elementUpdate", room.socketHelper.prepareElementToSend item
+          else
+            room.items.remove item, false
 
       $("#redoLink").removeClass("disabled")
 
@@ -38,11 +44,17 @@ $ ->
           $(item.tools).each -> executeNextHistory(@, true)
         else if item.commentMin
           if reverse
-            room.comments.hideComment(item.commentMin)
+            room.comments.hideComment item.commentMin
+            room.socket.emit "commentRemove", item.commentMin.elementId
           else
-            room.comments.showComment(item.commentMin)
+            room.comments.showComment item.commentMin
+            room.socket.emit "commentUpdate", room.socketHelper.prepareCommentToSend item.commentMin
         else
-          room.helper.reverseOpacity(item)
+          if reverse
+            room.items.remove item, false
+          else
+            item.opacity = 1
+            room.socket.emit "elementUpdate", room.socketHelper.prepareElementToSend item
 
       $("#undoLink").removeClass("disabled")
 

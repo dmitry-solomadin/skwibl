@@ -2,4 +2,8 @@
   <% for @participant in @project.users : %>
     <%- include './projects/invite/participant.ect' %>
   <% end %>
+  <% for @participant in @project.unconfirmedUsers : %>
+    <% @participant.unconfirmed = true %>
+    <%- include './projects/invite/participant.ect' %>
+  <% end %>
 <% end %>

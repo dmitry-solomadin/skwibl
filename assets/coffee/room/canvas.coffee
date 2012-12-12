@@ -17,7 +17,8 @@ $ ->
         for element in canvasElements
           path = room.socketHelper.createElementFromData(element)
 
-          room.helper.findById(path.id).remove() unless cid is selectedCid
+          unless cid is selectedCid
+            room.helper.findById(path.id).remove()
 
           path.strokeColor = element.strokeColor
           path.strokeWidth = element.strokeWidth
@@ -25,6 +26,8 @@ $ ->
 
           path.eligible = false
           room.history.add(path)
+
+        room.redraw()
 
     initComments: ->
       selectedCid = @getSelectedCanvasId()
@@ -42,6 +45,8 @@ $ ->
 
           for text in texts
             room.comments.addCommentText createdComment, text
+            if text.todo
+              room.comments.addTodo $("#commentText#{text.elementId}").clone()
 
     initThumbnails: ->
       selectedCid = @getSelectedCanvasId()
@@ -74,17 +79,41 @@ $ ->
 
     # INITIALIZATION END
 
-    clear: ->
+    delete: ->
+      if confirm "Are you sure? This will delete all canvas content."
+        @clear true, true
+
+    clear: (force, emit) ->
       room.history.add
         actionType: "clear", tools: room.history.getSelectableTools(), eligible: true
       for element in opts.historytools.allHistory
-        element.opacity = 0 unless element.actionType
+        element.opacity = 0 if (not element.actionType and not element.isImage) or force
         room.comments.hideComment(element.commentMin) if element.commentMin
 
       room.items.unselect()
       room.redrawWithThumb()
 
-      room.socket.emit("eraseCanvas")
+      selectedCanvasId = @getSelectedCanvasId()
+
+      if force
+        for element, index in opts.historytools.allHistory
+          if element.isImage
+            opts.historytools.allHistory.splice(index, 1)
+            opts.image = null
+            element.remove()
+            break
+
+        if @getThumbs().length > 1
+          @getSelected().remove()
+          @selectThumb($("#canvasSelectDiv a:first"))
+          room.savedOpts.splice(room.savedOpts.indexOf(@findCanvasOptsById(selectedCanvasId)), 1)
+          room.setOpts @findCanvasOptsById(@getSelectedCanvasId())
+
+      if emit
+        if force
+          room.socket.emit "removeCanvas", canvasId: selectedCanvasId
+        else
+          room.socket.emit "eraseCanvas", canvasId: selectedCanvasId
 
     # used upon eraseCanvas event
     erase: ->
@@ -133,6 +162,11 @@ $ ->
 
       room.redraw()
 
+    download: ->
+      dataURL = $("#myCanvas")[0].toDataURL("image/png")
+      $.post '/projects/prepareDownload', {pid: $("#pid").val(), canvasData: dataURL}, (data, status, xhr) =>
+        window.location = "/projects/download?pid=#{$("#pid").val()}&img=#{data}"
+
     addScale: -> @setScale(opts.currentScale + 0.1);
 
     subtractScale: -> @setScale(opts.currentScale - 0.1);
@@ -144,9 +178,8 @@ $ ->
       img = @addImage fileId, (raster, executeLoadImage) =>
         executeLoadImage()
 
-        @updateThumb(canvasId)
+        @updateSelectedThumb(canvasId)
 
-      @updateSelectedThumb()
       room.socket.emit("fileAdded", {canvasId: canvasId, fileId: fileId}) if emit
 
     addImage: (fileId, loadWrap) ->

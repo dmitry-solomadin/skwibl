@@ -1,4 +1,5 @@
 db = require '../db'
+fs = require 'fs'
 
 tools = require '../tools'
 
@@ -7,7 +8,7 @@ tools = require '../tools'
 # Get all projects
 #
 exports.index = (req, res, next) ->
-  db.projects.get req.user.id, (err, projects) ->
+  db.projects.index req.user.id, (err, projects) ->
     unless err
       return res.render 'index',
         template: 'projects/index'
@@ -45,6 +46,22 @@ exports.show = (req, res, next) ->
 #
 exports.new = (req, res) ->
   return res.render 'index', template: 'projects/new'
+
+exports.prepareDownload = (req, res) ->
+  dir = "./uploads/#{req.body.pid}"
+  fname = "canvas.png"
+
+  # base64 format is: data:image/png;base64,[data]
+  # let's cutoff everything that goes before data
+  data = req.body.canvasData.substring(22, req.body.canvasData.length)
+
+  fs.writeFile "#{dir}/#{fname}", data, 'base64'
+
+  return res.send "canvas.png"
+
+exports.download = (req, res) ->
+  res.attachment()
+  return res.sendfile "./uploads/#{req.query.pid}/canvas.png"
 
 #
 # POST
@@ -93,8 +110,11 @@ exports.reopen = (req, res) ->
 # Delete project
 #
 exports.delete = (req, res) ->
-  db.projects.delete req.body.pid, (err) ->
-    tools.returnStatus err, res
+  db.projects.findById req.body.pid, (err, project) ->
+    return tools.sendError res, new Error("only project owner may delete it") if project.owner isnt req.user.id
+
+    db.projects.delete project.id, (err) ->
+      tools.returnStatus err, res
 
 #
 # POST
@@ -106,14 +126,14 @@ exports.invite = (req, res) ->
     return tools.sendError res, err if err
     unless user
       return res.send
-        msg: "We have not found the user in our
-                database, but the invitation was sent to
-                his email."
+        msg: "Invitation has been sent to user's email."
     return db.users.persist user, ->
       db.projects.getData data.pid, (err, project) ->
         unless err
-          return res.send
-            msg: "Invitation has been sent."
+          return res.render './projects/invite/participants.ect', project: project, (err, html) ->
+            return res.send
+              html: html
+              msg: "Invitation has been sent."
         return res.send no
 
 #
@@ -163,8 +183,16 @@ exports.confirm = (req, res) ->
 #
 exports.remove = (req, res) ->
   data = req.body
-  if req.user.id isnt data.id
-    return db.projects.remove data.pid, data.id, (err) ->
+  if req.user.id isnt data.uid
+    return db.projects.remove data.pid, data.uid, (err) ->
       return res.send no if err
-      return res.send uid: data.id
+      return res.send uid: data.uid
   return res.send no
+
+#
+# POST
+# Remove current user from a project
+#
+exports.leave = (req, res) ->
+  db.projects.remove req.body.pid, req.user.id, (err) ->
+    if err then res.send no else res.send yes

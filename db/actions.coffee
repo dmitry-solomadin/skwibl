@@ -16,9 +16,15 @@ exports.setUp = (client, db) ->
 
     client.exists "actions:#{aid}", (err, val) ->
       client.hmset "actions:#{aid}", action
-      if not err and not val
+      if not err and not val # creating new action
         client.rpush "projects:#{pid}:#{type}", aid
         client.rpush "canvases:#{data.canvasId}:#{type}", aid if data.canvasId
+
+        if data.element.texts and data.element.texts.length
+          tools.asyncParallel data.element.texts, (text) ->
+            db.actions.addCommentText text, ->
+              tools.asyncDone data.element.texts, ->
+                tools.asyncOpt fn, null, action
 
       tools.asyncOpt fn, null, action
 
@@ -37,7 +43,7 @@ exports.setUp = (client, db) ->
                 return tools.asyncOpt fn, null, null
 
               return tools.asyncDone commentTextsIds, ->
-                return tools.asyncOpt fn, null, null
+                return client.del "actions:#{aid}", fn
           return tools.asyncOpt fn, null, null
       else
         client.del "actions:#{aid}", fn
@@ -117,5 +123,29 @@ exports.setUp = (client, db) ->
 
       client.lrem "comments:#{commentText.commentId}:texts", 0, elementId
       client.del "texts:#{elementId}", fn
+
+  mod.markAsTodo = (elementId, fn) ->
+    db.actions.findCommentTextById elementId, (err, commentText) ->
+      if not err and commentText
+        client.hset "texts:#{elementId}", "todo", true
+        return tools.asyncOpt fn, err, null
+
+      return tools.asyncOpt fn, err, null
+
+  mod.resolveTodo = (elementId, fn) ->
+    db.actions.findCommentTextById elementId, (err, commentText) ->
+      if not err and commentText
+        client.hset "texts:#{elementId}", "resolved", true
+        return tools.asyncOpt fn, err, null
+
+      return tools.asyncOpt fn, err, null
+
+  mod.reopenTodo = (elementId, fn) ->
+    db.actions.findCommentTextById elementId, (err, commentText) ->
+      if not err and commentText
+        client.hdel "texts:#{elementId}", "resolved"
+        return tools.asyncOpt fn, err, null
+
+      return tools.asyncOpt fn, err, null
 
   return mod
