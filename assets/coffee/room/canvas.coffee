@@ -193,18 +193,20 @@ $ ->
     # CANVAS THUMBNAILS & IMAGE UPLOAD
 
     foldPreviews: (link) ->
+      $("#canvasFolder").addClass("canvasFolderDown")
       $("#canvasFooter").animate(height: 37, 500, 'easeInBack')
-      $("#canvasFolder").animate(bottom: 81, 500, 'easeInBack')
+      $("#canvasFolder").animate(bottom: 81, 500, 'easeInBack', -> $(@).removeClass("canvasFolderDown").find("img").attr("src", "/images/room/unfold-up.png"))
       $("#nameChanger").animate(left: -500, 500, 'linear')
       $("#smallCanvasPreviews").animate(left: 0, 500, 'linear')
-      $(link).attr("onclick", "App.room.canvas.unfoldPreviews(this); return false;").find("img").attr("src", "/images/room/unfold-up.png")
+      $(link).attr("onclick", "App.room.canvas.unfoldPreviews(this); return false;")
 
     unfoldPreviews: (link) ->
+      $("#canvasFolder").addClass("canvasFolderDown")
       $("#canvasFooter").animate(height: 108, 500, 'easeOutBack')
-      $("#canvasFolder").animate(bottom: 152, 500, 'easeOutBack')
+      $("#canvasFolder").animate(bottom: 152, 500, 'easeOutBack', -> $(@).removeClass("canvasFolderDown").find("img").attr("src", "/images/room/fold-down.png"))
       $("#nameChanger").animate(left: 0, 500, 'linear')
       $("#smallCanvasPreviews").animate(left: -500, 500, 'linear')
-      $(link).attr("onclick", "App.room.canvas.foldPreviews(this); return false;").find("img").attr("src", "/images/room/fold-down.png")
+      $(link).attr("onclick", "App.room.canvas.foldPreviews(this); return false;")
 
     handleUpload: (canvasId, fileId, name, emit) ->
       @addNewThumbAndSelect(canvasId, fileId, name) if opts.image

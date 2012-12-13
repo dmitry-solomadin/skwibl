@@ -491,3 +491,12 @@ body.room {
     border-bottom-right-radius: 0;
     border-bottom: none;
 }
+
+.canvasFolderDown img {
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    transition: all 0.5s;
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
