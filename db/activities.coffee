@@ -26,12 +26,12 @@ exports.setUp = (client, db) ->
 
       return tools.asyncOpt fn, err, null
 
-  mod.getAllNew = (id, fn) ->
-    mod.index id, fn, (activity) ->
+  mod.getAllNew = (uid, fn) ->
+    mod.index uid, fn, (activity) ->
       return activity.status is 'new'
 
-  mod.index = (id, fn, filter) ->
-    client.lrange "users:#{id}:activities", -cfg.ACTIONS_BUFFER_SIZE, -1, (err, array) ->
+  mod.index = (uid, fn, filter) ->
+    client.lrange "users:#{uid}:activities", -cfg.ACTIONS_BUFFER_SIZE, -1, (err, array) ->
       if not err and array and array.length
         activities = []
         return tools.asyncParallel array, (aid) ->

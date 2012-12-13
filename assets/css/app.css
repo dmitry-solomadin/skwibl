@@ -22,10 +22,27 @@ body {
     z-index: 99;
 }
 
+.btn-skwibl {
+    border: 1px solid #22570f;
+    background: #4ec523;
+    background: -webkit-gradient(linear, left top, left bottom, from(#85e363), to(#4ec523));
+    background: -webkit-linear-gradient(top, #85e363, #4ec523);
+    background: -moz-linear-gradient(top, #85e363, #4ec523);
+    background: -ms-linear-gradient(top, #85e363, #4ec523);
+    background: -o-linear-gradient(top, #85e363, #4ec523);
+    background-image: -ms-linear-gradient(top, #85e363 0%, #4ec523 100%);
+    -webkit-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
+    -moz-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
+    box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(255,255,255,0.4) 0 1px 0;
+
+    color: #ffffff !important;
+}
+
 .btn {
     margin-left: 3px;
     color: #484e58;
-    font: 17px/19px 'MyriadPro-Bold';
+    font: 16px 'MyriadPro-Bold';
+    line-height: 18px;
     vertical-align: bottom;
     padding-top: 8px;
     padding-bottom: 7px;
@@ -70,14 +87,14 @@ body {
 
 .btn.btn-success {
     color: #fff;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-    background-color: #cbed9c;
-    background-image: -moz-linear-gradient(top, #cbed9c, #88c433);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#cbed9c), to(#88c433));
-    background-image: -webkit-linear-gradient(top, #cbed9c, #88c433);
-    background-image: -o-linear-gradient(top, #cbed9c, #88c433);
-    background-image: linear-gradient(to bottom, #cbed9c, #88c433);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#82c9ef', endColorstr='#59ACD9', GradientType=0 );
+    text-shadow: #307915 0 1px 0;
+    background-color: #4ec523;
+    background-image: -moz-linear-gradient(top, #cbed9c, #4ec523);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#cbed9c), to(#4ec523));
+    background-image: -webkit-linear-gradient(top, #cbed9c, #4ec523);
+    background-image: -o-linear-gradient(top, #cbed9c, #4ec523);
+    background-image: linear-gradient(to bottom, #cbed9c, #4ec523);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4ec523', endColorstr='#59ACD9', GradientType=0 );
     background-repeat: repeat-x;
     border-color: #bbbbbb #878585 #6a6c65 #a9a8a8;
 }
@@ -85,11 +102,11 @@ body {
 .btn.btn-success:hover,
 .btn.btn-success:active {
     color: #ffffff;
-    background-color: #88c433;
+    background-color: #4ec523;
 }
 
 .btn.btn-success:active {
-    background-color: #88c433;
+    background-color: #4ec523;
 }
 
 #topLinks {
@@ -97,11 +114,11 @@ body {
 }
 
 #createNewProject button {
-    margin-top: 10px;
+    margin-top: 6px;
 }
 
 .navbar .nav > li > a {
-    padding: 18px 10px 11px;
+    padding: 14px 10px 11px;
     line-height: 16px;
     height: 17px;
     text-shadow: none;
@@ -189,7 +206,7 @@ body {
 
 .activity-badge {
     position: absolute;
-    top: 19px;
+    top: 15px;
     left: -25px;
     padding: 2px 6px 2px !important;
     line-height: 11px;
@@ -208,7 +225,7 @@ body {
     float:left;
     width: 32px;
     height: 32px;
-    padding-top: 12px;
+    padding-top: 7px;
 }
 
 .userDropdown .caret {
@@ -220,7 +237,7 @@ body {
     float: left;
     vertical-align: top;
     margin-left: 5px;
-    padding-top: 18px;
+    padding-top: 14px;
     line-height: 16px;
     height: 17px;
     padding-bottom: 11px;
