@@ -34,6 +34,10 @@ $ ->
         App.room.canvas.selectThumb(@, true)
         false
 
+      $(document).on "click", ".smallCanvasPreview", ->
+        App.room.canvas.selectMiniThumb(@, true)
+        false
+
       @helper.initUploader()
       @helper.initHotkeys()
       @canvas.init()

@@ -49,14 +49,28 @@
 <canvas id="myCanvas" resize="true"></canvas>
 <canvas id="copyCanvas" resize="true" style="display: none;"></canvas>
 
+<a id="canvasFolder" class="btn skwibl_image_btn canvasFolder" href="#" onclick="App.room.canvas.foldPreviews(this); return false;">
+  <img src="/images/room/fold-down.png">
+</a>
+
 <div id="canvasFooter" class="canvasFooter">
   <div class="canvasFooterInner">
     <div class="canvasFooterTop">
-      <span id="canvasName" class="canvasName tooltipize" data-delay="500" title="Click to change name"><%= @canvases[0].name %></span>
-      <span id="canvasNameInputDiv" style="display: none">
-        <input id="canvasNameInput" class="canvasNameInput" type="text"/>
-        <a id="canvasNameSave" class="btn small-btn canvasNameSave">Save</a>
-      </span>
+      <div id="nameChanger">
+        <span id="canvasName" class="canvasName tooltipize" data-delay="500" title="Click to change name"><%= @canvases[0].name %></span>
+        <span id="canvasNameInputDiv" style="display: none">
+          <input id="canvasNameInput" class="canvasNameInput" type="text"/>
+          <a id="canvasNameSave" class="btn small-btn canvasNameSave">Save</a>
+        </span>
+      </div>
+      <div style="position: absolute">
+      <div id="smallCanvasPreviews">
+        <% for canvas, i in @canvases : %>
+          <div class="smallCanvasPreview tooltipize <%- 'previewSelected' if i is 0 %>" title="<%= canvas.name %>"
+               data-cid="<%= canvas.id %>" data-name="<%= canvas.name %>" <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>></div>
+        <% end %>
+      </div>
+      </div>
 
       <div id="file-uploader" class="canvasUpload fr"></div>
       <a href="#" onclick="App.room.canvas.download(); return false;" class="btn small-btn fr">Download</a>

@@ -453,3 +453,41 @@ body.room {
     font-size: 16px;
     line-height: 28px;
 }
+
+#nameChanger {
+    position: relative;
+    left: 0;
+    float:left;
+}
+
+#smallCanvasPreviews {
+    float:left;
+    left: -500px;
+    position: relative;
+    margin-left: 10px;
+}
+
+.smallCanvasPreview {
+    border-radius: 50%;
+    background: #b0b0b0;
+    cursor: pointer;
+    width: 12px;
+    height: 12px;
+    margin: 10px 5px 10px 0;
+    border: 1px solid #808080;
+    float: left;
+}
+
+.smallCanvasPreview.previewSelected {
+    border: 1px solid #ff4500 !important;
+}
+
+.canvasFolder {
+    right: 25px;
+    bottom: 153px;
+    position: absolute;
+    z-index: 19;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+}
