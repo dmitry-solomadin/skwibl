@@ -6,18 +6,26 @@
 
   <%- include './shared/application_scripts.ect' %>
 
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-37020806-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function () {
+      var ga = document.createElement('script');
+      ga.type = 'text/javascript';
+      ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+
 </head>
 <body class="mainpage">
 <% include './header/header.ect' %>
-<!--<div class="header">
-  <div class="page_container">
-    <div class="logo"><a href="#" title="Skwibl"><img src="img/logo.png" alt="Skwibl"></a></div>
-    <div class="header_btns">
-      <a href="#" class="btn btn-success">Join Skwibl</a>
-      <a href="#" class="btn">Sign In</a>
-    </div>
-  </div>
-</div>-->
 <div class="banner_bg">
   <div class="banner_radial_bg">
     <div class="page_container">
@@ -92,9 +100,12 @@
   <div class="page_container">
     <address>@ 2012 Skwibl. All rights reserved.</address>
     <div class="social">
-      <a href="#" title="Google +"><img src="/images/mainpage/soc1_a.png" alt="Google +"><img src="/images/mainpage/soc1.png" alt="Google +"></a>
-      <a href="#" title="Facebook"><img src="/images/mainpage/soc2_a.png" alt="Facebook"><img src="/images/mainpage/soc2.png" alt="Facebook"></a>
-      <a href="#" title="Twitter"><img src="/images/mainpage/soc3_a.png" alt="Twitter"><img src="/images/mainpage/soc3.png" alt="Twitter"></a>
+      <a href="#" title="Google +"><img src="/images/mainpage/soc1_a.png" alt="Google +"><img
+          src="/images/mainpage/soc1.png" alt="Google +"></a>
+      <a href="#" title="Facebook"><img src="/images/mainpage/soc2_a.png" alt="Facebook"><img
+          src="/images/mainpage/soc2.png" alt="Facebook"></a>
+      <a href="#" title="Twitter"><img src="/images/mainpage/soc3_a.png" alt="Twitter"><img
+          src="/images/mainpage/soc3.png" alt="Twitter"></a>
     </div>
     <ul>
       <li><a href="#">About us</a></li>
@@ -104,5 +115,34 @@
     </ul>
   </div>
 </div>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+  (function (d, w, c) {
+    (w[c] = w[c] || []).push(function() {
+      try {
+        w.yaCounter18806251 = new Ya.Metrika({id:18806251,
+          webvisor:true,
+          clickmap:true,
+          trackLinks:true,
+          accurateTrackBounce:true});
+      } catch(e) { }
+    });
+
+    var n = d.getElementsByTagName("script")[0],
+        s = d.createElement("script"),
+        f = function () { n.parentNode.insertBefore(s, n); };
+    s.type = "text/javascript";
+    s.async = true;
+    s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js";
+
+    if (w.opera == "[object Opera]") {
+      d.addEventListener("DOMContentLoaded", f, false);
+    } else { f(); }
+  })(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="//mc.yandex.ru/watch/18806251" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+
 </body>
 </html>
