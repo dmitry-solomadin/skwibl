@@ -30,7 +30,7 @@ exports.setUp = ->
         return done null, no, message: "Unknown user #{username}"
       if user.password isnt password
         return done null, no, message: 'Invalid password'
-      if user.status is 'unconfirmed'
+      if user.status is 'unconfirmed' and cfg.ENVIRONMENT == 'development'
         return db.users.persist user, done
       if user.status is 'deleted'
         return db.users.restore user, done
