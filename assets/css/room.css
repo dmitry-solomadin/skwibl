@@ -447,6 +447,10 @@ body.room {
     margin-bottom: 9px;
 }
 
+.noname {
+    color: #a0a0a0;
+}
+
 .canvasName {
     vertical-align: top;
     cursor: pointer;
@@ -458,6 +462,7 @@ body.room {
     position: relative;
     left: 0;
     float: left;
+    z-index: 1;
 }
 
 #smallCanvasPreviews {

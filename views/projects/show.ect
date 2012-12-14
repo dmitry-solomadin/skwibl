@@ -53,7 +53,10 @@
   <div class="canvasFooterInner">
     <div class="canvasFooterTop">
       <div id="nameChanger">
-        <span id="canvasName" class="canvasName tooltipize" data-delay="500" title="Click to change name"><%= @canvases[0].name %></span>
+        <% hasName = @canvases[0].name.trim().length > 0 %>
+        <span id="canvasName" class="canvasName tooltipize <%= 'noname' unless hasName %>" data-delay="500" title="Click to change name">
+          <%= if hasName then @canvases[0].name else "blank name" %>
+        </span>
         <span id="canvasNameInputDiv" style="display: none">
           <input id="canvasNameInput" class="canvasNameInput" type="text"/>
           <a id="canvasNameSave" class="btn small-btn canvasNameSave">Save</a>

@@ -81,7 +81,13 @@ $ ->
       $("#canvasName").on "click", ->
         $("#canvasName").hide()
         $("#canvasNameInputDiv").show()
-        $("#canvasNameInput").val($("#canvasName").html().trim()).focus()
+
+        if $("#canvasName").hasClass("noname")
+          name = ""
+        else
+          name = $.trim($("#canvasName").html())
+
+        $("#canvasNameInput").val(name).focus()
 
       $("#canvasNameSave").on "click", =>
         $("#canvasName").show()
@@ -95,7 +101,12 @@ $ ->
     # INITIALIZATION END
 
     changeName: (name) ->
-      $("#canvasName").html(name)
+      if $.trim(name).length > 0
+        $("#canvasName").removeClass("noname")
+        $("#canvasName").html(name)
+      else
+        $("#canvasName").addClass("noname")
+        $("#canvasName").html("blank name")
 
     delete: ->
       if confirm "Are you sure? This will delete all canvas content."

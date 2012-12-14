@@ -12,20 +12,18 @@ exports.setUp = (client, db) ->
           project: pid
         canvas.time = time if time
 
-        executeCreate = ->
+        client.scard "projects:#{pid}:canvases", (err, canvasCount) ->
+          if file
+            canvas.file = file.id
+
+          if file and file.name.trim().length > 0
+            canvas.name = file.name
+          else
+            canvas.name = "Canvas #{canvasCount + 1}"
+
           client.hmset "canvases:#{cid}", canvas
           client.sadd "projects:#{pid}:canvases", cid
           return tools.asyncOpt fn, null, canvas
-
-        if file
-          canvas.file = file.id
-          console.log file.name
-          canvas.name = file.name
-          executeCreate()
-        else
-          client.scard "projects:#{pid}:canvases", (err, canvasCount) ->
-            canvas.name = "Canvas #{canvasCount + 1}"
-            executeCreate()
 
       return tools.asyncOpt fn, err, null
 
