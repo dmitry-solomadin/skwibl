@@ -52,6 +52,28 @@
 <div id="canvasFooter" class="canvasFooter">
   <div class="canvasFooterInner">
     <div class="canvasFooterTop">
+      <div id="nameChanger">
+        <% hasName = @canvases[0].name.trim().length > 0 %>
+        <span id="canvasName" class="canvasName tooltipize <%= 'noname' unless hasName %>" data-delay="500" title="Click to change name">
+          <%= if hasName then @canvases[0].name else "blank name" %>
+        </span>
+        <span id="canvasNameInputDiv" style="display: none">
+          <input id="canvasNameInput" class="canvasNameInput" type="text"/>
+          <a id="canvasNameSave" class="btn small-btn canvasNameSave">Save</a>
+        </span>
+      </div>
+      <div style="position: absolute">
+      <div id="smallCanvasPreviews">
+        <% for canvas, i in @canvases : %>
+          <div class="smallCanvasPreview tooltipize <%- 'previewSelected' if i is 0 %>" title="<%= canvas.name %>"
+               data-cid="<%= canvas.id %>" data-name="<%= canvas.name %>" <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>></div>
+        <% end %>
+      </div>
+      </div>
+
+      <a id="canvasFolder" class="btn skwibl_image_btn canvasFolder" href="#" onclick="App.room.canvas.foldPreviews(this); return false;">
+        <img src="/images/room/fold-down.png">
+      </a>
       <div id="file-uploader" class="canvasUpload fr"></div>
       <a href="#" onclick="App.room.canvas.download(); return false;" class="btn small-btn fr">Download</a>
       <a href="#" onclick="App.room.canvas.delete(); return false;" class="btn btn-warning small-btn fr">Delete</a>
@@ -68,7 +90,8 @@
               <input class="commentTexts<%= comment.elementId %>" type="hidden" value="<%= JSON.stringify(text) %>"/>
             <% end %>
           <% end %>
-          <a href="#" class="<%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.id %>" <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
+          <a href="#" class="<%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.id %>" data-name="<%= canvas.name %>"
+            <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
             <canvas width="80" height="60"></canvas>
           </a>
         <% end %>

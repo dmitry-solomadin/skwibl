@@ -3,18 +3,28 @@ tools = require '../tools'
 exports.setUp = (client, db) ->
   mod = {}
 
-  mod.add = (pid, fid, time, fn) ->
+  mod.add = (pid, file, time, fn) ->
     client.incr 'canvases:next', (err, cid) ->
       if not err
         canvas =
           id: cid
+          createdAt: new Date().getTime()
           project: pid
-        canvas.file = fid if fid
         canvas.time = time if time
-        canvas.createdAt = new Date().getTime()
-        client.hmset "canvases:#{cid}", canvas
-        client.sadd "projects:#{pid}:canvases", cid
-        return tools.asyncOpt fn, null, canvas
+
+        client.scard "projects:#{pid}:canvases", (err, canvasCount) ->
+          if file
+            canvas.file = file.id
+
+          if file and file.name.trim().length > 0
+            canvas.name = file.name
+          else
+            canvas.name = "Canvas #{canvasCount + 1}"
+
+          client.hmset "canvases:#{cid}", canvas
+          client.sadd "projects:#{pid}:canvases", cid
+          return tools.asyncOpt fn, null, canvas
+
       return tools.asyncOpt fn, err, null
 
   mod.get = (cid, fn) ->

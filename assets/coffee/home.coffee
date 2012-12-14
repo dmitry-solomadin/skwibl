@@ -9,6 +9,11 @@ $ ->
       $("#submitForgotPassword").click => @submitForgotPassword()
       $("#loginForm").data "process-submit", (data) => @processLogin(data)
 
+      $(".banner_nav a").on "click", ->
+        $(".banner_nav a").removeClass("selected")
+        $(@).addClass("selected")
+        false
+
     showLogin: ->
       $("#loginBlock").show().css(
         position: 'absolute'

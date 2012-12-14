@@ -12,7 +12,7 @@
         <% for file, index in project.files : %>
           <% break if index > 3 %>
           <div class="projectImage">
-            <img src="/files/<%= file.owner %>/<%= file.id %>" width="64"/>
+            <img src="/files/<%= project.id %>/<%= file.id %>" width="64"/>
           </div>
         <% end %>
       </div>

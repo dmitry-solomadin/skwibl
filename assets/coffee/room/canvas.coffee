@@ -1,7 +1,7 @@
 $ ->
   class RoomCanvas
 
-    # INITIALIZATION START
+  # INITIALIZATION START
 
     init: ->
       @initElements()
@@ -77,7 +77,36 @@ $ ->
       selectedOpts = @findCanvasOptsById(selectedCid)
       room.setOpts(selectedOpts)
 
+    initNameChanger: ->
+      $("#canvasName").on "click", ->
+        $("#canvasName").hide()
+        $("#canvasNameInputDiv").show()
+
+        if $("#canvasName").hasClass("noname")
+          name = ""
+        else
+          name = $.trim($("#canvasName").html())
+
+        $("#canvasNameInput").val(name).focus()
+
+      $("#canvasNameSave").on "click", =>
+        $("#canvasName").show()
+        $("#canvasNameInputDiv").hide()
+
+        name = $("#canvasNameInput").val()
+        @changeName name
+
+        room.socket.emit "changeCanvasName", canvasId: @getSelectedCanvasId(), name: name
+
     # INITIALIZATION END
+
+    changeName: (name) ->
+      if $.trim(name).length > 0
+        $("#canvasName").removeClass("noname")
+        $("#canvasName").html(name)
+      else
+        $("#canvasName").addClass("noname")
+        $("#canvasName").html("blank name")
 
     delete: ->
       if confirm "Are you sure? This will delete all canvas content."
@@ -105,6 +134,7 @@ $ ->
 
         if @getThumbs().length > 1
           @getSelected().remove()
+          @getMiniSelected().remove()
           @selectThumb($("#canvasSelectDiv a:first"))
           room.savedOpts.splice(room.savedOpts.indexOf(@findCanvasOptsById(selectedCanvasId)), 1)
           room.setOpts @findCanvasOptsById(@getSelectedCanvasId())
@@ -173,14 +203,30 @@ $ ->
 
     # CANVAS THUMBNAILS & IMAGE UPLOAD
 
-    handleUpload: (canvasId, fileId, emit) ->
-      @addNewThumbAndSelect(canvasId) if opts.image
+    foldPreviews: (link) ->
+      $("#canvasFolder").addClass("canvasFolderDown")
+      $("#canvasFooter").animate(height: 37, 500, 'easeInBack', ->
+        $("#canvasFolder").removeClass("canvasFolderDown").find("img").attr("src", "/images/room/unfold-up.png"))
+      $("#nameChanger").animate(left: -500, 500, 'linear')
+      $("#smallCanvasPreviews").animate(left: 0, 500, 'linear')
+      $(link).attr("onclick", "App.room.canvas.unfoldPreviews(this); return false;")
+
+    unfoldPreviews: (link) ->
+      $("#canvasFolder").addClass("canvasFolderDown")
+      $("#canvasFooter").animate(height: 108, 500, 'easeOutBack', ->
+        $("#canvasFolder").removeClass("canvasFolderDown").find("img").attr("src", "/images/room/fold-down.png"))
+      $("#nameChanger").animate(left: 0, 500, 'linear')
+      $("#smallCanvasPreviews").animate(left: -500, 500, 'linear')
+      $(link).attr("onclick", "App.room.canvas.foldPreviews(this); return false;")
+
+    handleUpload: (canvasId, fileId, name, emit) ->
+      @addNewThumbAndSelect(canvasId, fileId, name) if opts.image
       img = @addImage fileId, (raster, executeLoadImage) =>
         executeLoadImage()
 
         @updateSelectedThumb(canvasId)
 
-      room.socket.emit("fileAdded", {canvasId: canvasId, fileId: fileId}) if emit
+      room.socket.emit("fileAdded", {canvasId: canvasId, fileId: fileId, name: name}) if emit
 
     addImage: (fileId, loadWrap) ->
       src = "/files/#{$("#pid").val()}/#{fileId}"
@@ -207,18 +253,26 @@ $ ->
 
       img
 
-    addNewThumb: (canvasId) ->
-      thumb = $("<a href='#' data-cid='#{canvasId}'><canvas width='80' height='60'></canvas></a>")
+    addNewThumb: (canvasId, fileId, name) ->
+      thumb = $("<a href='#' data-cid='#{canvasId}' data-fid='#{fileId}' data-name='#{name}'><canvas width='80' height='60'></canvas></a>")
       $("#canvasSelectDiv").append(thumb)
 
-    addNewThumbAndSelect: (canvasId) ->
+    addNewMiniThumb: (canvasId, fileId, name) ->
+      mini = $("<div class='smallCanvasPreview tooltipize' title='#{name}' data-cid='#{canvasId}' data-fid='#{fileId}' data-name='#{name}'></div>")
+      $("#smallCanvasPreviews").append(mini)
+
+    addNewThumbAndSelect: (canvasId, fileId, name) ->
       @erase()
       room.initOpts(canvasId)
 
-      @addNewThumb(canvasId)
+      @addNewThumb(canvasId, fileId, name)
+      @addNewMiniThumb(canvasId, fileId, name)
 
       $("#canvasSelectDiv a").removeClass("canvasSelected")
       $("#canvasSelectDiv a:last").addClass("canvasSelected")
+      $(".smallCanvasPreview").removeClass("previewSelected")
+      $(".smallCanvasPreview:last").addClass("previewSelected")
+      $("#canvasName").html(name)
 
     updateThumb: (canvasId)  ->
       selectedCanvasId = @getSelectedCanvasId()
@@ -264,9 +318,19 @@ $ ->
 
     getSelected: -> $(".canvasSelected")
 
+    getMiniSelected: -> $("#smallCanvasPreviews .previewSelected")
+
     getThumbs: -> $("#canvasSelectDiv a")
 
     findThumbByCanvasId: (canvasId) -> $("#canvasSelectDiv a[data-cid='#{canvasId}']")
+
+    findMiniThumbByCanvasId: (canvasId) -> $(".smallCanvasPreview[data-cid='#{canvasId}']")
+
+    selectMiniThumb: (mini, emit) ->
+      cid = $(mini).data("cid")
+      $(".smallCanvasPreview").removeClass("previewSelected")
+      $(mini).addClass("previewSelected")
+      @selectThumb @findThumbByCanvasId(cid), emit
 
     selectThumb: (anchor, emit) ->
       return if $(anchor).hasClass("canvasSelected")
@@ -283,6 +347,11 @@ $ ->
       @restore(true)
 
       $(anchor).addClass("canvasSelected")
+
+      $(".smallCanvasPreview").removeClass("previewSelected")
+      $(@findMiniThumbByCanvasId(cid)).addClass("previewSelected")
+
+      $("#canvasName").html($(anchor).data("name"))
 
       room.socket.emit("switchCanvas", cid) if emit
       room.redraw()

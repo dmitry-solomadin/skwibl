@@ -85,6 +85,12 @@ exports.configure = (sio) ->
           id: id
         db.canvases.clear data.canvasId
 
+      socket.on 'changeCanvasName', (data, cb) ->
+        socket.broadcast.to(socket.project).emit 'changeCanvasName',
+          id: id
+          name: data.name
+        db.canvases.setProperties data.canvasId, name: data.name
+
       socket.on 'removeCanvas', (data, cb) ->
         socket.broadcast.to(socket.project).emit 'removeCanvas',
           id: id
@@ -96,6 +102,7 @@ exports.configure = (sio) ->
           id: id
           canvasId: data.canvasId
           fileId: data.fileId
+          name: data.name
 
       socket.on 'switchCanvas', (msg, cb) ->
         socket.broadcast.to(socket.project).emit 'switchCanvas',

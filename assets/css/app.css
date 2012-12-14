@@ -25,7 +25,8 @@ body {
 .btn {
     margin-left: 3px;
     color: #484e58;
-    font: 17px/19px 'MyriadPro-Bold';
+    font: 17px 'MyriadPro-Bold';
+    line-height: 19px;
     vertical-align: bottom;
     padding-top: 8px;
     padding-bottom: 7px;

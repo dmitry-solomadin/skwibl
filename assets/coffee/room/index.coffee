@@ -28,8 +28,14 @@ $ ->
 
         $(".colorSelected").css("background", opts.color)
 
+      @canvas.initNameChanger()
+
       $(document).on "click", "#canvasSelectDiv a", ->
         App.room.canvas.selectThumb(@, true)
+        false
+
+      $(document).on "click", ".smallCanvasPreview", ->
+        App.room.canvas.selectMiniThumb(@, true)
         false
 
       @helper.initUploader()

@@ -65,7 +65,7 @@ exports.upload = (req, res, next) ->
     cid = req.query.cid
     dir = "./uploads/#{pid}"
     size = req.header 'x-file-size'
-    name = path.basename req.header 'x-file-name'
+    name = decodeURIComponent path.basename(req.header('x-file-name'))
     mime = tools.getFileMime path.extname name
     type = tools.getFileType mime
 
@@ -101,6 +101,7 @@ exports.upload = (req, res, next) ->
         return res.json
           success: yes
           canvasId: data.canvasId
+          name: data.canvasName
           fileId: data.element.id
 
     req.on 'close', ->
