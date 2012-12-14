@@ -26,6 +26,13 @@
     </div>
     <div class="fl projectRight">
       <h3><a href="/projects/<%= project.id %>"><%= project.name %></a></h3>
+
+      <div class="todosDiv">
+        <% for todo in project.todos : %>
+          <a href="/projects/<%= project.id %>#tsl=<%= todo.elementId %>" onclick=""><%= todo.text %></a><br>
+        <% end %>
+      </div>
+
       <a class="btn small-btn btn-success" href="#" onclick="App.projects.showInviteModal('<%= project.id %>'); return false;">Invite</a>
       <% if project.owner == @currentUser().id : %>
         <a class="btn small-btn btn-danger" href="#" onclick="App.projects.deleteProject('<%= project.id %>'); return false;">Delete</a>

@@ -32,7 +32,9 @@ exports.setUp = (client, db) ->
             project.unconfirmedUsers = unconfirmedUsers
             return db.projects.getFiles pid, (err, files) ->
               project.files = files
-              return tools.asyncOpt fn, err, project
+              return db.commentTexts.getProjectTodos pid, 3, (err, todos) ->
+                project.todos = todos
+                return tools.asyncOpt fn, err, project
       return tools.asyncOpt fn, err, null
 
   mod.findById = (pid, fn) ->

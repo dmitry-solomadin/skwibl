@@ -46,12 +46,12 @@ $ ->
           for text in texts
             room.comments.addCommentText createdComment, text
             if text.todo
-              room.comments.addTodo $("#commentText#{text.elementId}").clone()
+              room.comments.addTodo $("#commentText#{text.elementId}")
 
     initThumbnails: ->
       selectedCid = @getSelectedCanvasId()
 
-      @forEachThumbInContext (cid, fid) =>
+      @forEachThumbInContext (cid, fid, index) =>
         if fid
           @addImage fid, (raster, executeLoadImage) =>
             executeLoadImage()
@@ -59,23 +59,31 @@ $ ->
             if cid isnt selectedCid and opts.image.id isnt raster.id
               room.helper.findById(raster.id).remove()
 
-            @updateThumb(cid)
+            if (room.canvas.getThumbs().length - 1) == index
+              @updateThumb(cid)
+              @onLoadingFinished()
         else
           @updateThumb(cid)
 
     # executes function for each cavnvas in context of opts of this canvas
     forEachThumbInContext: (fn) ->
       selectedCid = @getSelectedCanvasId()
-      for thumb in @getThumbs()
+      for thumb, index in @getThumbs()
         cid = $(thumb).data("cid")
         fid = $(thumb).data("fid")
         opts = @findCanvasOptsById(cid)
         if opts then room.setOpts(opts) else room.initOpts(cid)
 
-        fn(cid, fid)
+        fn(cid, fid, index)
 
       selectedOpts = @findCanvasOptsById(selectedCid)
       room.setOpts(selectedOpts)
+
+    onLoadingFinished: ->
+      # highlight to-do if id is provided
+      if window.location.hash
+        commentTextId = window.location.hash.match(/tsl=(\d+)/)[1]
+        room.comments.highlightComment(commentTextId)
 
     initNameChanger: ->
       $("#canvasName").on "click", ->
@@ -200,6 +208,15 @@ $ ->
     addScale: -> @setScale(opts.currentScale + 0.1);
 
     subtractScale: -> @setScale(opts.currentScale - 0.1);
+
+
+    getViewportAdjustX: -> if App.chat.isVisible() == "true" then 300 else 0
+
+    getViewportAdjustY: -> $("#canvasFooter").height()
+
+    getViewportSize: ->
+      w: $("#myCanvas").width() - @getViewportAdjustX()
+      h: $("#myCanvas").height() - @getViewportAdjustY()
 
     # CANVAS THUMBNAILS & IMAGE UPLOAD
 

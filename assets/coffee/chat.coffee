@@ -18,7 +18,13 @@ $ ->
         $("#conversation-inner .tab-content").hide()
         $("##{$(@).data('tab')}").show()
 
+      $("#chat").data("visible", "true")
+
+    isVisible: ->
+      $("#chat").data("visible")
+
     fold: (link) ->
+      $("#chat").data("visible", "false")
       $("#chat").animate(left: -305)
       $("#header-foldable").animate(width: 200)
       $("#canvasFooter").animate(paddingLeft: 0)
@@ -27,6 +33,7 @@ $ ->
       $(link).attr("onclick", "App.chat.unfold(this); return false;").find("img").attr("src", "/images/room/unfold.png")
 
     unfold: (link) ->
+      $("#chat").data("visible", "true")
       $("#chat").animate(left: 0)
       $("#header-foldable").data("width", $("#header-foldable").width())
       $("#header-foldable").animate(width: 280)

@@ -53,32 +53,32 @@ exports.configure = (sio) ->
         socket.broadcast.to(socket.project).emit 'commentText',
           id: id
           element: data
-        db.actions.addCommentText data
+        db.commentTexts.add data
 
       socket.on 'markAsTodo', (elementId, cb) ->
         socket.broadcast.to(socket.project).emit 'markAsTodo',
           id: id
           elementId: elementId
-        db.actions.markAsTodo elementId
+        db.commentTexts.markAsTodo elementId
 
       socket.on 'resolveTodo', (elementId, cb) ->
         socket.broadcast.to(socket.project).emit 'resolveTodo',
           id: id
           elementId: elementId
-        db.actions.resolveTodo elementId
+        db.commentTexts.resolveTodo elementId
 
       socket.on 'reopenTodo', (elementId, cb) ->
         socket.broadcast.to(socket.project).emit 'reopenTodo',
           id: id
           elementId: elementId
-        db.actions.reopenTodo elementId
+        db.commentTexts.reopenTodo elementId
 
       socket.on 'updateCommentText', (data, cb) ->
         socket.broadcast.to(socket.project).emit 'updateCommentText',
           id: id
           elementId: data.elementId
           text: data.text
-        db.actions.updateCommentText data.elementId, data.text
+        db.commentTexts.update data.elementId, data.text
 
       socket.on 'eraseCanvas', (data, cb) ->
         socket.broadcast.to(socket.project).emit 'eraseCanvas',
@@ -113,4 +113,4 @@ exports.configure = (sio) ->
         socket.broadcast.to(socket.project).emit 'removeCommentText',
           id: id
           elementId: elementId
-        db.actions.removeCommentText elementId
+        db.commentTexts.remove elementId

@@ -314,7 +314,7 @@ $ ->
       $commentmin[0].rect.opacity = 1 if $commentmin[0].rect
 
     foldComment: ($commentmin) ->
-      $commentmin[0].$maximized.hide()
+      $commentmin[0].$maximized.css("visibility", "hidden")
       $commentmin[0].arrow.opacity = 0
       $commentmin[0].arrow.isHidden = true
       $commentmin.show()
@@ -322,7 +322,7 @@ $ ->
       room.redrawWithThumb()
 
     unfoldComment: ($commentmin) ->
-      $commentmin[0].$maximized.show()
+      $commentmin[0].$maximized.css("visibility", "visible")
       $commentmin[0].arrow.opacity = 1
       $commentmin[0].arrow.isHidden = false
 
@@ -428,7 +428,7 @@ $ ->
 
     doEditText: (elementId, newText, emit) ->
       comment = $("#commentText#{elementId}")
-      comment.find(".the-comment-text").html(newText).animate(backgroundColor: "yellow", -> $(@).animate(backgroundColor: "transparent"))
+      comment.find(".the-comment-text").html(newText).highlight()
       room.socket.emit "updateCommentText", elementId: elementId, text: newText if emit
 
     removeText: (elementId, emit) ->
@@ -444,7 +444,7 @@ $ ->
       comment = $("#commentText#{elementId}")
       comment.addClass("todo")
       comment.find(".markAsTodoLink").replaceWith("<a href='#' class='resolve-link'
-                   onclick='App.room.comments.resolveTodo(#{elementId}, true); return false;'>resolve</a>")
+        onclick='App.room.comments.resolveTodo(#{elementId}, true); return false;'>resolve</a>")
 
       @addTodo $("#commentText#{elementId}")
 
@@ -454,7 +454,7 @@ $ ->
       comment = $("#commentText#{elementId}")
       comment.addClass("resolved")
       comment.find(".resolve-link").replaceWith("<a href='#' class='resolve-link'
-             onclick='App.room.comments.reopenTodo(#{elementId}, true); return false;'>reopen</a>")
+        onclick='App.room.comments.reopenTodo(#{elementId}, true); return false;'>reopen</a>")
 
       @addTodo $("#commentText#{elementId}")
 
@@ -480,14 +480,18 @@ $ ->
         $("#todo-tab").append("<div class='openList'></div><div class='resolvedList'></div>")
 
       commentText = commentText.clone()
+      commentText.css("cursor", "pointer")
       commentText.find(".editCommentTextLink, .removeCommentTextLink").remove()
+      commentText.on 'click', =>
+        @highlightComment commentText.data("element-id")
 
       $("#todo-tab").find("#" + commentText[0].id).remove()
       if commentText.hasClass("resolved")
         $("#todo-tab").find(".resolvedList").append(commentText)
       else
         $("#todo-tab").find(".openList").append(commentText)
-      commentText.show() #it may be hidden in the main view.
+      commentText.show()
+      #it may be hidden in the main view.
 
       @recalcTasksCount()
 
@@ -502,5 +506,32 @@ $ ->
     viewOpen: ->
       $(".resolvedList").hide()
       $(".openList").show()
+
+    highlightComment: (commentTextId) ->
+      commentText = $("#commentText#{commentTextId}")
+
+      result = room.helper.findByElementIdAllCanvases commentText.data("comment-id")
+
+      room.canvas.findThumbByCanvasId(result.canvasId).click()
+
+      comment = result.element
+      @unfoldComment comment.commentMin
+
+      commentText.highlight()
+
+      commentX = commentText.offset().left - (room.canvas.getViewportAdjustX() / 2 )
+      commentY = commentText.offset().top + (room.canvas.getViewportAdjustY()  / 2 )
+
+      commentWidth = commentText.width()
+      commentHeight = commentText.height()
+
+      canvasX = paper.view.center.x
+      canvasY = paper.view.center.y
+
+      diffX = canvasX - commentX - (commentWidth / 2)
+      diffY = canvasY - commentY - (commentHeight / 2)
+
+      room.items.pan(diffX, diffY)
+      room.redrawWithThumb()
 
   App.room.comments = new RoomComments
