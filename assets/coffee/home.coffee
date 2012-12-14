@@ -12,6 +12,7 @@ $ ->
       $(".banner_nav a").on "click", ->
         $(".banner_nav a").removeClass("selected")
         $(@).addClass("selected")
+        false
 
     showLogin: ->
       $("#loginBlock").show().css(
@@ -19,7 +20,7 @@ $ ->
         top: $("#header").height() - 500
         left: $("#signInButton").offset().left - $("#loginBlock").width() + 95
       ).animate(
-        top: $("#header").height() - 15
+        top: $("#header").height() - 5
       , 400)
 
       $(document).on "click.login", (event) ->

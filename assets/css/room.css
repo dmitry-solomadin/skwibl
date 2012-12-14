@@ -1,9 +1,9 @@
 body.room {
-    padding-top: 45px;
+    padding-top: 55px;
 }
 
 #room-controls {
-    padding-top: 1px;
+    padding-top: 5px;
     float: left;
 }
 
@@ -322,7 +322,7 @@ body.room {
 .header-foldable {
     display: inline-block;
     float: left;
-    padding-top: 3px;
+    padding-top: 7px;
     padding-bottom: 8px;
     width: 279px;
 }
@@ -377,10 +377,10 @@ body.room {
 
 .chat .conversation {
     height: 100%;
-    margin-bottom: -330px;
+    margin-bottom: -340px;
     position: relative;
     z-index: 1;
-    padding-bottom: 340px;
+    padding-bottom: 350px;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }

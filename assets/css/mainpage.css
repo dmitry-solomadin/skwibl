@@ -23,7 +23,7 @@ body {
 }
 
 body.mainpage {
-    padding-top: 45px !important;
+    padding-top: 55px !important;
     background-color: #f6f1ed;
 }
 
@@ -33,7 +33,7 @@ body.mainpage {
 }
 
 .header {
-    height: 45px;
+    height: 55px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     position: relative;
 }
@@ -54,38 +54,38 @@ body.mainpage {
 
 .header_btns {
     float: right;
-    margin: 0 8px 0 0;
+    margin: 3px 8px 0 0;
 }
 
 .header_btns .btn {
-    width: 105px;
+    width: 113px;
     padding-left: 0 !important;
     padding-right: 0 !important;
-    padding-top: 8px !important;
-    padding-bottom: 7px !important;
+    padding-top: 11px !important;
+    padding-bottom: 9px !important;
 }
 
 .banner_bg {
-    height: 462px;
+    height: 532px;
     background: url(/images/mainpage/banner_bg.jpg);
     border-bottom: 1px solid #eae5e1;
     box-shadow: 0 1px 0 #cec9c6;
 }
 
 .banner_radial_bg {
-    height: 462px;
+    height: 532px;
     background: url(/images/mainpage/banner_radial_bg.png) 50% -55px no-repeat;
 }
 
 .banner {
     float: left;
     width: 960px;
-    height: 372px;
+    height: 432px;
 }
 
 .tour {
-    height: 372px;
-    background: url(/images/mainpage/take-a-tour.png) 50% 100% no-repeat;
+    height: 432px;
+    background: url(/images/mainpage/tour_bg.png) 50% 100% no-repeat;
     position: relative;
 }
 
@@ -103,9 +103,9 @@ body.mainpage {
 }
 
 .tour_item {
-    padding-top: 225px;
-    padding-left: 35px;
-    font-size: 15px;
+    padding-top: 265px;
+    padding-left: 50px;
+    font-size: 18px;
 }
 
 .tour_item.left {
@@ -117,9 +117,9 @@ body.mainpage {
 
 .tour_item_head {
     font-family: Arial Unicode MS, Arial, Helvetica, sans-serif;
-    font-size: 28px;
-    line-height: 22px;
-    margin-bottom: 12px;
+    font-size: 36px;
+    line-height: 27px;
+    margin-bottom: 18px;
 }
 
 .tour_item ul {
@@ -128,7 +128,7 @@ body.mainpage {
 }
 
 .tour_item ul li {
-    line-height: 20px;
+    line-height: 22px;
 }
 
 .tour_item ul li span {
@@ -141,27 +141,25 @@ body.mainpage {
     left: -25px;
     top: 0;
     bottom: 0;
-    background: url(/images/mainpage/list_style.png) 0 5px no-repeat;
+    background: url(/images/mainpage/list_style.png) 0 7px no-repeat;
     width: 25px;
 }
 
 .tour_item.center {
     position: absolute;
     top: 0;
-    left: 350px;
-    padding: 90px 0 0;
+    left: 330px;
+    padding: 110px 0 0;
     background: url(/images/mainpage/tour2.png) 50% 10px no-repeat;
     text-align: center;
 }
 
 .tour_item.center .tour_item_head {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .tour_item.right {
     float: right;
-    position: relative;
-    left: -50px;
     background: url(/images/mainpage/tour3.png) 0 115px no-repeat;
 }
 
@@ -186,15 +184,15 @@ body.mainpage {
 
 .ribbon {
     background: url(/images/mainpage/ribbon_bg.png) 50% 0 no-repeat;
-    height: 70px;
-    margin: -39px 0 0;
+    height: 77px;
+    margin: -43px 0 0;
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 28px;
+    font-size: 30px;
     font-style: italic;
     color: #fff;
     text-shadow: 1px 0 1px rgba(0, 0, 0, 0.35);
-    line-height: 45px;
+    line-height: 50px;
     padding: 4px 0 0;
 }
 
@@ -222,9 +220,9 @@ body.mainpage {
 }
 
 .promo_text {
-    font-size: 15px;
+    font-size: 17px;
     color: #5d6271;
-    line-height: 20px;
+    line-height: 22px;
 }
 
 .footer {
