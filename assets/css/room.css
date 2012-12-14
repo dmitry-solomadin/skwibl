@@ -457,11 +457,11 @@ body.room {
 #nameChanger {
     position: relative;
     left: 0;
-    float:left;
+    float: left;
 }
 
 #smallCanvasPreviews {
-    float:left;
+    float: left;
     left: -500px;
     position: relative;
     margin-left: 10px;
@@ -483,13 +483,7 @@ body.room {
 }
 
 .canvasFolder {
-    right: 25px;
-    bottom: 153px;
-    position: absolute;
-    z-index: 19;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    border-bottom: none;
+    float: right;
 }
 
 .canvasFolderDown img {

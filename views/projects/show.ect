@@ -49,10 +49,6 @@
 <canvas id="myCanvas" resize="true"></canvas>
 <canvas id="copyCanvas" resize="true" style="display: none;"></canvas>
 
-<a id="canvasFolder" class="btn skwibl_image_btn canvasFolder" href="#" onclick="App.room.canvas.foldPreviews(this); return false;">
-  <img src="/images/room/fold-down.png">
-</a>
-
 <div id="canvasFooter" class="canvasFooter">
   <div class="canvasFooterInner">
     <div class="canvasFooterTop">
@@ -72,6 +68,9 @@
       </div>
       </div>
 
+      <a id="canvasFolder" class="btn skwibl_image_btn canvasFolder" href="#" onclick="App.room.canvas.foldPreviews(this); return false;">
+        <img src="/images/room/fold-down.png">
+      </a>
       <div id="file-uploader" class="canvasUpload fr"></div>
       <a href="#" onclick="App.room.canvas.download(); return false;" class="btn small-btn fr">Download</a>
       <a href="#" onclick="App.room.canvas.delete(); return false;" class="btn btn-warning small-btn fr">Delete</a>
