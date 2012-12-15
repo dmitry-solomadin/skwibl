@@ -13,7 +13,7 @@ cfg = require '../config'
 passportUp = require './passport'
 moment = require 'moment'
 
-exports.setUp = ->
+exports.setUp = (logger) ->
 
   app = express()
 
@@ -22,6 +22,10 @@ exports.setUp = ->
   viewsDir = path.join __dirname, '../views'
   assetsDir = path.join __dirname, '../assets'
   vendorDir = path.join __dirname, '../vendor'
+
+  logStream =
+    write: (message, encoding) ->
+      logger.info message
 
   app.configure 'development', ->
     app.use express.errorHandler {
@@ -40,9 +44,10 @@ exports.setUp = ->
       root: viewsDir
     }).render
     app.set 'view engine', 'ect'
+    app.use express.logger stream: logStream
+    app.enable 'trust proxy'
     app.use express.favicon "#{assetsDir}/images/butterfly-tiny.png"
     app.set 'view options', {layout: false}
-    app.use express.logger 'dev'
     app.use express.bodyParser()
     app.use express.methodOverride()
     app.use express.cookieParser()
@@ -75,7 +80,7 @@ exports.setUp = ->
 
   return app
 
-exports.start = ->
-  console.log "Express server listening on
+exports.start = (logger) ->
+  logger.info "Express server listening on
   #{cfg.HOST}:#{cfg.PORT} in
   #{cfg.ENVIRONMENT} mode"
