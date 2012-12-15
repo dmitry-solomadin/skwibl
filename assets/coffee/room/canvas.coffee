@@ -8,7 +8,7 @@ $ ->
       @initComments()
       @initThumbnails()
 
-      @initBackground()
+      #@initBackground()
 
     initElements: ->
       selectedCid = @getSelectedCanvasId()
@@ -68,9 +68,9 @@ $ ->
           @updateThumb(cid)
 
     initBackground: ->
-      wFreq = 75
+      wFreq = 25
       wCount = Math.ceil($("#myCanvas").width() / wFreq)
-      hFreq = 75
+      hFreq = 25
       hCount = Math.ceil($("#myCanvas").height() / hFreq)
       each = 3
 
@@ -78,8 +78,8 @@ $ ->
 
       createItem = (index, vertical) ->
         path = new Path()
-        path.strokeColor = "#b0b0b0"
-        path.opacity = if index % each == 0 then "0.18" else "0.1"
+        path.strokeColor = "#c7c7c7"
+        path.opacity = if index % each == 0 then "0.26" else "0.12"
         path.strokeWidth = "1"
         if vertical
           startX = wFreq * index
@@ -350,7 +350,7 @@ $ ->
       shift = -((sy * cvw) - tw) / 2
 
       thumbContext.clearRect(0, 0, tw, th)
-      thumbContext.drawImage(canvas, shift, 0) for i in [0..5]
+      thumbContext.drawImage(canvas, shift, 0) for i in [0..2]
 
       transformMatrix = new Matrix(opts.currentScale / sy, 0, 0, opts.currentScale / sy, 0, 0)
       paper.project.activeLayer.transform(transformMatrix)

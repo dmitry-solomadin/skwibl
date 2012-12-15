@@ -232,8 +232,7 @@ $ ->
 
     # ITEMS MISC
     insertFirst: (item) ->
-      # 0 is background
-      paper.project.activeLayer.insertChild(1, item)
+      paper.project.activeLayer.insertChild(0, item)
 
     drawArrow: (arrowLine) ->
       arrowGroup = new Group([arrowLine])
