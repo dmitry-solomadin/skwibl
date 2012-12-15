@@ -70,8 +70,20 @@ $ ->
       return null unless id
 
       for element in opts.historytools.allHistory
-        return element if element.commentMin and element.commentMin.elementId == id
-        return element if element.elementId == id
+        return element if element.commentMin and ` element.commentMin.elementId == id `
+        return element if ` element.elementId == id `
+      return null
+
+    findByElementIdAllCanvases: (id) ->
+      return null unless id
+
+      for opts in room.savedOpts
+        for element in opts.historytools.allHistory
+          if element.commentMin and ` element.commentMin.elementId == id `
+            return canvasId: opts.canvasId, element: element
+          if ` element.elementId == id `
+            return canvasId: opts.canvasId, element: element
+        return null
       return null
 
     findById: (id) ->

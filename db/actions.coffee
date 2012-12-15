@@ -22,7 +22,7 @@ exports.setUp = (client, db) ->
 
         if data.element.texts and data.element.texts.length
           tools.asyncParallel data.element.texts, (text) ->
-            db.actions.addCommentText text, ->
+            db.commentTexts.add text, ->
               tools.asyncDone data.element.texts, ->
                 tools.asyncOpt fn, null, action
 
@@ -39,7 +39,7 @@ exports.setUp = (client, db) ->
         client.lrange "comments:#{aid}:texts", 0, -1, (err, commentTextsIds) ->
           if not err and commentTextsIds and commentTextsIds.length
             return tools.asyncParallel commentTextsIds, (commentTextId) ->
-              db.actions.removeCommentText commentTextId, ->
+              db.commentTexts.remove commentTextId, ->
                 return tools.asyncOpt fn, null, null
 
               return tools.asyncDone commentTextsIds, ->
@@ -78,7 +78,7 @@ exports.setUp = (client, db) ->
             return tools.asyncOpt fn, err, [] if err
 
             if type is 'comment'
-              return db.actions.getCommentTexts fetchedAction.elementId, (err, texts) ->
+              return db.commentTexts.index fetchedAction.elementId, (err, texts) ->
                 fetchedAction.texts = texts
                 fetchedActions.push fetchedAction
                 tools.asyncDone actions, ->
@@ -89,63 +89,5 @@ exports.setUp = (client, db) ->
                 tools.asyncOpt fn, null, fetchedActions
 
       return tools.asyncOpt fn, err, []
-
-  mod.getCommentTexts = (eid, fn) ->
-    client.sort "comments:#{eid}:texts", "by", "texts:*->time", (err, elementIds) ->
-      console.log err, elementIds
-      if not err and elementIds and elementIds.length
-        texts = []
-
-        return tools.asyncParallel elementIds, (elementId) ->
-          client.hgetall "texts:#{elementId}", (err, text) ->
-            texts.push text
-
-            tools.asyncDone elementIds, ->
-              tools.asyncOpt fn, null, texts
-
-      return tools.asyncOpt fn, err, []
-
-  mod.addCommentText = (element, fn) ->
-    element.time = new Date().getTime()
-    client.hmset "texts:#{element.elementId}", element
-    client.rpush "comments:#{element.commentId}:texts", element.elementId
-    return tools.asyncOpt fn, null, element
-
-  mod.updateCommentText = (elementId, text, fn) ->
-    client.hset "texts:#{elementId}", "text", text
-
-  mod.findCommentTextById = (elementId, fn) ->
-    client.hgetall "texts:#{elementId}", fn
-
-  mod.removeCommentText = (elementId, fn) ->
-    db.actions.findCommentTextById elementId, (err, commentText) ->
-      return tools.asyncOpt fn, err, null if err or not commentText
-
-      client.lrem "comments:#{commentText.commentId}:texts", 0, elementId
-      client.del "texts:#{elementId}", fn
-
-  mod.markAsTodo = (elementId, fn) ->
-    db.actions.findCommentTextById elementId, (err, commentText) ->
-      if not err and commentText
-        client.hset "texts:#{elementId}", "todo", true
-        return tools.asyncOpt fn, err, null
-
-      return tools.asyncOpt fn, err, null
-
-  mod.resolveTodo = (elementId, fn) ->
-    db.actions.findCommentTextById elementId, (err, commentText) ->
-      if not err and commentText
-        client.hset "texts:#{elementId}", "resolved", true
-        return tools.asyncOpt fn, err, null
-
-      return tools.asyncOpt fn, err, null
-
-  mod.reopenTodo = (elementId, fn) ->
-    db.actions.findCommentTextById elementId, (err, commentText) ->
-      if not err and commentText
-        client.hdel "texts:#{elementId}", "resolved"
-        return tools.asyncOpt fn, err, null
-
-      return tools.asyncOpt fn, err, null
 
   return mod

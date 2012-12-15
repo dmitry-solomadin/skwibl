@@ -12,13 +12,28 @@ $ ->
 
       @initSockets()
 
+      # when the client clicks SEND
+      $('#chatsend').click => @sendMessage()
+
+      # when the client hits ENTER on the keyboard
+      $('#chattext').keypress (e) =>
+        if e.which is 13
+          @sendMessage()
+          false
+
       $("#chatFilters a").click ->
         $("#chatFilters a").removeClass("active")
         $(@).addClass("active")
         $("#conversation-inner .tab-content").hide()
         $("##{$(@).data('tab')}").show()
 
+      $("#chat").data("visible", "true")
+
+    isVisible: ->
+      $("#chat").data("visible")
+
     fold: (link) ->
+      $("#chat").data("visible", "false")
       $("#chat").animate(left: -305)
       $("#header-foldable").animate(width: 200)
       $("#canvasFooter").animate(paddingLeft: 0)
@@ -27,6 +42,7 @@ $ ->
       $(link).attr("onclick", "App.chat.unfold(this); return false;").find("img").attr("src", "/images/room/unfold.png")
 
     unfold: (link) ->
+      $("#chat").data("visible", "true")
       $("#chat").animate(left: 0)
       $("#header-foldable").data("width", $("#header-foldable").width())
       $("#header-foldable").animate(width: 280)
@@ -53,6 +69,17 @@ $ ->
       else
         chatStatus.addClass("chatUserOffline").removeClass("chatUserOnline")
 
+    sendMessage: ->
+      chatMessage =
+        element:
+          msg: $('#chattext').val()
+          elementId: App.room.generateId()
+
+      $('#chattext').val("")
+      unless chatMessage.element.msg is ''
+        App.chat.addMessage($("#uid")[0].value, chatMessage.element.msg)
+        App.chat.chatIO.emit("message", chatMessage)
+
     initSockets: ->
       @chatIO = io.connect('/chat', window.copt)
 
@@ -69,24 +96,6 @@ $ ->
         @addTechMessage("<i>#{user.displayName} left the project</i>")
 
       @chatIO.on 'onlineUsers', (uids) => @changeUserStatus(uid, true) for uid in uids
-
-  # when the client clicks SEND
-  $('#chatsend').click ->
-    chatMessage =
-      element:
-        msg: $('#chattext').val()
-        elementId: App.room.generateId()
-
-    $('#chattext').val('').focus()
-    unless chatMessage.element.msg is ''
-      App.chat.addMessage($("#uid")[0].value, chatMessage.element.msg)
-      App.chat.chatIO.emit("message", chatMessage)
-
-  # when the client hits ENTER on the keyboard
-  $('#chattext').keypress (e) ->
-    if e.which == 13
-      $(@).blur()
-      $('#chatsend').focus().click()
 
   App.chat = new Chat
 

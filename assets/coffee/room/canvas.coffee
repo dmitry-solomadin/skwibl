@@ -8,6 +8,8 @@ $ ->
       @initComments()
       @initThumbnails()
 
+      #@initBackground()
+
     initElements: ->
       selectedCid = @getSelectedCanvasId()
       @forEachThumbInContext (cid) ->
@@ -46,12 +48,12 @@ $ ->
           for text in texts
             room.comments.addCommentText createdComment, text
             if text.todo
-              room.comments.addTodo $("#commentText#{text.elementId}").clone()
+              room.comments.addTodo $("#commentText#{text.elementId}")
 
     initThumbnails: ->
       selectedCid = @getSelectedCanvasId()
 
-      @forEachThumbInContext (cid, fid) =>
+      @forEachThumbInContext (cid, fid, index) =>
         if fid
           @addImage fid, (raster, executeLoadImage) =>
             executeLoadImage()
@@ -60,22 +62,59 @@ $ ->
               room.helper.findById(raster.id).remove()
 
             @updateThumb(cid)
+            if (room.canvas.getThumbs().length - 1) == index
+              @onLoadingFinished()
         else
           @updateThumb(cid)
+
+    initBackground: ->
+      wFreq = 25
+      wCount = Math.ceil($("#myCanvas").width() / wFreq)
+      hFreq = 25
+      hCount = Math.ceil($("#myCanvas").height() / hFreq)
+      each = 3
+
+      background = new Group()
+
+      createItem = (index, vertical) ->
+        path = new Path()
+        path.strokeColor = "#c7c7c7"
+        path.opacity = if index % each == 0 then "0.26" else "0.12"
+        path.strokeWidth = "1"
+        if vertical
+          startX = wFreq * index
+          path.add new Point(startX, 0)
+          path.add new Point(startX, $("#myCanvas").height())
+        else
+          startY = hFreq * index
+          path.add new Point(0, startY)
+          path.add new Point($("#myCanvas").width(), startY)
+        background.addChild(path)
+
+      createItem index, true for index in [1..wCount]
+      createItem index, false for index in [1..hCount]
+
+      paper.project.activeLayer.insertChild(0, background)
 
     # executes function for each cavnvas in context of opts of this canvas
     forEachThumbInContext: (fn) ->
       selectedCid = @getSelectedCanvasId()
-      for thumb in @getThumbs()
+      for thumb, index in @getThumbs()
         cid = $(thumb).data("cid")
         fid = $(thumb).data("fid")
         opts = @findCanvasOptsById(cid)
         if opts then room.setOpts(opts) else room.initOpts(cid)
 
-        fn(cid, fid)
+        fn(cid, fid, index)
 
       selectedOpts = @findCanvasOptsById(selectedCid)
       room.setOpts(selectedOpts)
+
+    onLoadingFinished: ->
+      # highlight to-do if id is provided
+      if window.location.hash
+        commentTextId = window.location.hash.match(/tsl=(\d+)/)[1]
+        room.comments.highlightComment(commentTextId)
 
     initNameChanger: ->
       $("#canvasName").on "click", ->
@@ -166,7 +205,7 @@ $ ->
       for element in opts.historytools.allHistory
         unless element.actionType
           if element.isImage
-            paper.project.activeLayer.insertChild(0, element)
+            room.items.insertFirst(element)
           else
             paper.project.activeLayer.addChild(element)
 
@@ -200,6 +239,15 @@ $ ->
     addScale: -> @setScale(opts.currentScale + 0.1);
 
     subtractScale: -> @setScale(opts.currentScale - 0.1);
+
+
+    getViewportAdjustX: -> if App.chat.isVisible() == "true" then 300 else 0
+
+    getViewportAdjustY: -> $("#canvasFooter").height()
+
+    getViewportSize: ->
+      w: $("#myCanvas").width() - @getViewportAdjustX()
+      h: $("#myCanvas").height() - @getViewportAdjustY()
 
     # CANVAS THUMBNAILS & IMAGE UPLOAD
 
@@ -238,7 +286,7 @@ $ ->
 
       img = new Raster(fakeImage)
       img.isImage = true
-      paper.project.activeLayer.insertChild(0, img)
+      room.items.insertFirst(img)
       img.fileId = fileId
       opts.image = img
       room.history.add(img)
@@ -302,7 +350,7 @@ $ ->
       shift = -((sy * cvw) - tw) / 2
 
       thumbContext.clearRect(0, 0, tw, th)
-      thumbContext.drawImage(canvas, shift, 0) for i in [0..5]
+      thumbContext.drawImage(canvas, shift, 0) for i in [0..2]
 
       transformMatrix = new Matrix(opts.currentScale / sy, 0, 0, opts.currentScale / sy, 0, 0)
       paper.project.activeLayer.transform(transformMatrix)

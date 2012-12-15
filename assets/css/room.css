@@ -128,6 +128,7 @@ body.room {
     border-top: 1px solid #a1a1a1;
     background: white;
     z-index: 10;
+    height: 108px;
 }
 
 .canvasFooterInner {
