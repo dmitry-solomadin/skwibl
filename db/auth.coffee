@@ -11,7 +11,7 @@ exports.setUp = (client, db) ->
   mod.findOrCreate = (profile, token, secret, fn) ->
     emails = profile.emails
     return db.users.findByEmails emails, (err, user) ->
-      if not user
+      unless user
         email = emails[0].value
         password = tools.genPass()
         return db.users.add
@@ -29,11 +29,11 @@ exports.setUp = (client, db) ->
             , tools.logError
             return smtp.sendRegMail user, fn
           return tools.asyncOpt fn, err, user
-      if not user.picture
+      unless user.picture
         user.picture = profile._json.picture;
         db.users.setProperties user.id, picture: user.picture
       purifiedName = tools.purify profile.name
-      if not _.isEqual user.name, purifiedName
+      unless _.isEqual user.name, purifiedName
         user.name = _.extend purifiedName, user.name
         db.users.setName user.id, user.name
       diff = _.difference profile.emails, user.emails

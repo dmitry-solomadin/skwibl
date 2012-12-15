@@ -5,11 +5,12 @@ cfg = require '../config'
 
 exports.setUp = (name) ->
 
-  if cfg.ENVIRONMENT == 'development'
+  if cfg.ENVIRONMENT is 'development'
     infoTransport = new (winston.transports.Console)
       colorize: on
     errorTransport = new (winston.transports.Console)
       colorize: on
+      json: on
   else
     infoTransport = new (winston.transports.File)
       filename: "/var/log/skwibl/#{name}.log"

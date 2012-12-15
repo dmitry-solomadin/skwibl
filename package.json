@@ -43,7 +43,8 @@
     "lodash": "*",
     "coffee-script": "*",
     "moment": "*",
-    "winston": "*"
+    "winston": "*",
+    "validator": "*"
   },
   "devDependencies": {
     "node-inspector": "0.2.x"
