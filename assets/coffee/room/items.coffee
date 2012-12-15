@@ -231,6 +231,10 @@ $ ->
         return null
 
     # ITEMS MISC
+    insertFirst: (item) ->
+      # 0 is background
+      paper.project.activeLayer.insertChild(1, item)
+
     drawArrow: (arrowLine) ->
       arrowGroup = new Group([arrowLine])
       arrowGroup.arrow = arrowLine

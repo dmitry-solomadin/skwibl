@@ -8,6 +8,8 @@ $ ->
       @initComments()
       @initThumbnails()
 
+      @initBackground()
+
     initElements: ->
       selectedCid = @getSelectedCanvasId()
       @forEachThumbInContext (cid) ->
@@ -59,11 +61,40 @@ $ ->
             if cid isnt selectedCid and opts.image.id isnt raster.id
               room.helper.findById(raster.id).remove()
 
+            @updateThumb(cid)
             if (room.canvas.getThumbs().length - 1) == index
-              @updateThumb(cid)
               @onLoadingFinished()
         else
           @updateThumb(cid)
+
+    initBackground: ->
+      wFreq = 75
+      wCount = Math.ceil($("#myCanvas").width() / wFreq)
+      hFreq = 75
+      hCount = Math.ceil($("#myCanvas").height() / hFreq)
+      each = 3
+
+      background = new Group()
+
+      createItem = (index, vertical) ->
+        path = new Path()
+        path.strokeColor = "#b0b0b0"
+        path.opacity = if index % each == 0 then "0.18" else "0.1"
+        path.strokeWidth = "1"
+        if vertical
+          startX = wFreq * index
+          path.add new Point(startX, 0)
+          path.add new Point(startX, $("#myCanvas").height())
+        else
+          startY = hFreq * index
+          path.add new Point(0, startY)
+          path.add new Point($("#myCanvas").width(), startY)
+        background.addChild(path)
+
+      createItem index, true for index in [1..wCount]
+      createItem index, false for index in [1..hCount]
+
+      paper.project.activeLayer.insertChild(0, background)
 
     # executes function for each cavnvas in context of opts of this canvas
     forEachThumbInContext: (fn) ->
@@ -174,7 +205,7 @@ $ ->
       for element in opts.historytools.allHistory
         unless element.actionType
           if element.isImage
-            paper.project.activeLayer.insertChild(0, element)
+            room.items.insertFirst(element)
           else
             paper.project.activeLayer.addChild(element)
 
@@ -255,7 +286,7 @@ $ ->
 
       img = new Raster(fakeImage)
       img.isImage = true
-      paper.project.activeLayer.insertChild(0, img)
+      room.items.insertFirst(img)
       img.fileId = fileId
       opts.image = img
       room.history.add(img)
