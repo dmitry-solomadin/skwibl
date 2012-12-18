@@ -273,10 +273,14 @@ $ ->
       room.redraw()
 
     translate: (commentMin, dx, dy) ->
-      commentMin.css(top: commentMin.position().top + dy, left: commentMin.position().left + dx)
+      commentMin.css
+        top: commentMin.position().top + (dy * opts.currentScale)
+        left: commentMin.position().left + (dx * opts.currentScale)
       commentMin[0].arrow.translate(new Point(dx, dy))
       maximized = commentMin[0].$maximized
-      maximized.css(top: maximized.position().top + dy, left: maximized.position().left + dx)
+      maximized.css
+        top: maximized.position().top + (dy * opts.currentScale)
+        left: maximized.position().left + (dx * opts.currentScale)
       commentMin[0].rect.translate(new Point(dx, dy)) if commentMin[0].rect
 
     removeComment: ($commentmin) ->
