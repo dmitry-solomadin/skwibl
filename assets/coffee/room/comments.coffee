@@ -439,6 +439,9 @@ $ ->
       comment.slideUp "fast", =>
         $(comment).remove()
 
+        $("#todo-tab").find("#commentText#{elementId}").remove()
+        @recalcTasksCount()
+
         @initHideCommentsBlock commentContent if $(commentContent).parent().data("hidden") is "true"
         room.socket.emit "removeCommentText", elementId if emit
 
