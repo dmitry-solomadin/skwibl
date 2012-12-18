@@ -14,9 +14,7 @@
         <div class="tab-content" id="chat-tab">
           <% for message in @chatMessages : %>
           <div>
-            <% for user in @users : %>
-            <b><%= "#{user.displayName}:" if user.id is message.owner %></b>
-            <% end %>
+            <b><%= "#{message.owner.displayName}:" %></b>
             <%= JSON.parse(message.data).msg %>
           </div>
           <% end %>

@@ -30,14 +30,14 @@ exports.show = (req, res, next) ->
         db.projects.getUsers req.params.pid, (err, users) ->
           return next(err) if err
 
-          db.actions.get req.params.pid, 'chat', (err, actions) ->
+          db.actions.getProjectActions req.params.pid, 'chat', (err, chatMessages) ->
 
             return res.render 'index',
               template: 'projects/show'
               pid: req.params.pid
               canvases: canvases,
               users: users,
-              chatMessages: actions,
+              chatMessages: chatMessages,
               project: project
 
 #

@@ -51,18 +51,22 @@ exports.setUp = (client, db) ->
   mod.findById = (aid, fn) ->
     client.hgetall "actions:#{aid}", fn
 
-  mod.get = (pid, type, fn) ->
+  mod.getProjectActions = (pid, type, fn) ->
     negativeActionsBufferSize = -cfg.ACTIONS_BUFFER_SIZE
     client.lrange "projects:#{pid}:#{type}", negativeActionsBufferSize, -1, (err, array) ->
       if not err and array and array.length
         actions = []
         return tools.asyncParallel array, (aid) ->
           client.hgetall "actions:#{aid}", (err, action) ->
-            if err
-              return tools.asyncOpt fn, err, []
-            actions.push action
-            return tools.asyncDone array, ->
-              return tools.asyncOpt fn, null, actions
+            return tools.asyncOpt fn, err, [] if err
+
+            db.users.findById action.owner, (err, user) ->
+              return tools.asyncOpt fn, err, [] if err
+
+              action.owner = user
+              actions.push action
+              return tools.asyncDone array, ->
+                return tools.asyncOpt fn, null, actions
       return tools.asyncOpt fn, err, []
 
   mod.getElements = (cid, type, fn) ->

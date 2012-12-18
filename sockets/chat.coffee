@@ -25,7 +25,6 @@ exports.configure = (sio) ->
 
     db.projects.current id, (err, pid) ->
       if err or not pid
-        console.log err, pid
         return socket.disconnect()
 
       socket.join pid
@@ -33,10 +32,12 @@ exports.configure = (sio) ->
 
       sendInitData pid, socket
 
-      socket.broadcast.to(pid).emit 'enter', id
+      socket.broadcast.to(pid).emit 'enter',
+        id: id
+        displayName: hs.user.displayName
+        picture: hs.user.picutre
 
       socket.on 'disconnect', ->
-        console.log "A socket with sessionId ${hs.sessionId} disconnected."
         socket.leave socket.project
         socket.broadcast.to(socket.project).emit 'exit', id
 

@@ -31,6 +31,17 @@ $ ->
 
       $("#chat").data("visible", "true")
 
+    addNewUser: (user) ->
+      @users.push user
+
+      picture = if user.picture then user.picture else '/images/avatar.png'
+
+      $("#participants").append("<div class='chatUser' id='chatUser#{user.id}' data-uid='#{user.id}'
+            data-display-name='#{user.displayName}' data-picture='#{picture}'>
+            <img class='userAvatar tooltipize' src='#{picture}' width='48' title='#{user.displayName}'/>
+            <span class='chatUserStatus'></span>
+            </div>")
+
     isVisible: ->
       $("#chat").data("visible")
 
@@ -87,14 +98,15 @@ $ ->
     initSockets: ->
       @chatIO = io.connect('/chat', window.copt)
 
-      @chatIO.on 'message', (data, cb) => @addMessage(data.id, data.message.element.msg)
+      @chatIO.on 'message', (data) => @addMessage(data.id, data.message.element.msg)
 
-      @chatIO.on 'enter', (uid, cb) =>
-        @changeUserStatus uid, true
-        user = @getUserById uid
+      @chatIO.on 'enter', (user) =>
+        @addNewUser user if not @getUserById user.id
+
+        @changeUserStatus user.id, true
         @addTechMessage("<i>#{user.displayName} entered the project</i>")
 
-      @chatIO.on 'exit', (uid, cb) =>
+      @chatIO.on 'exit', (uid) =>
         @changeUserStatus uid, false
         user = @getUserById uid
         @addTechMessage("<i>#{user.displayName} left the project</i>")
