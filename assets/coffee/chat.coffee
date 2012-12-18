@@ -13,7 +13,9 @@ $ ->
       @initSockets()
 
       # when the client clicks SEND
-      $('#chatsend').click => @sendMessage()
+      $('#chatsend').click =>
+        @sendMessage()
+        $('#chattext').focus()
 
       # when the client hits ENTER on the keyboard
       $('#chattext').keypress (e) =>
@@ -76,9 +78,11 @@ $ ->
           elementId: App.room.generateId()
 
       $('#chattext').val("")
-      unless chatMessage.element.msg is ''
-        App.chat.addMessage($("#uid")[0].value, chatMessage.element.msg)
-        App.chat.chatIO.emit("message", chatMessage)
+
+      return if $.trim(chatMessage.element.msg).length == 0
+
+      App.chat.addMessage($("#uid")[0].value, chatMessage.element.msg)
+      App.chat.chatIO.emit("message", chatMessage)
 
     initSockets: ->
       @chatIO = io.connect('/chat', window.copt)

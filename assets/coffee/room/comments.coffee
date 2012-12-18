@@ -334,6 +334,8 @@ $ ->
       room.redrawWithThumb()
 
     addCommentText: (commentMin, commentText) ->
+      return if $.trim(commentText.text).length == 0
+
       emit = if commentText.elementId then false else true
       elementId = commentText.elementId or room.generateId()
       owner = commentText.owner or $("#uid").val()
