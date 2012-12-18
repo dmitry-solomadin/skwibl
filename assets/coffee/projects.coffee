@@ -45,4 +45,8 @@ $ ->
       $.post '/projects/remove', {pid: pid, uid: uid}, (data, status, xhr) ->
         $("#participant#{data.uid}").fadeOut() if data
 
+        if currentPage "projects/show"
+          App.chat.chatIO.emit "userRemoved", uid
+          App.chat.removeUser uid
+
   App.projects = new Projects

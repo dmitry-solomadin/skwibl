@@ -41,6 +41,9 @@ exports.configure = (sio) ->
         socket.leave socket.project
         socket.broadcast.to(socket.project).emit 'exit', id
 
+      socket.on 'userRemoved', (uid, cb) ->
+        socket.broadcast.to(socket.project).emit 'userRemoved', uid
+
       socket.on 'message', (msg, cb) ->
         socket.broadcast.to(socket.project).emit 'message',
           id: id

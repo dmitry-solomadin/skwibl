@@ -95,10 +95,22 @@ $ ->
       App.chat.addMessage($("#uid")[0].value, chatMessage.element.msg)
       App.chat.chatIO.emit("message", chatMessage)
 
+    removeUser: (uid) ->
+      for user, index in @users
+        @users.splice(index, 1) if ` user.id == uid `
+
+      $("#chatUser#{uid}").remove()
+
     initSockets: ->
       @chatIO = io.connect('/chat', window.copt)
 
       @chatIO.on 'message', (data) => @addMessage(data.id, data.message.element.msg)
+
+      @chatIO.on 'userRemoved', (uid) =>
+        if ` uid == $("#uid").val() `
+          window.location.reload()
+        else
+          @removeUser uid
 
       @chatIO.on 'enter', (user) =>
         @addNewUser user if not @getUserById user.id
