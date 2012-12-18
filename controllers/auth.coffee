@@ -29,6 +29,9 @@ exports.regPage = (req, res) ->
 exports.register = (req, res, next) ->
   if req.body isnt null
     email = req.body.email
+    unless cfg.ENVIRONMENT is 'development' or tools.isEmail email
+      tools.addError req, "Incorrect email address: #{email}"
+      return res.redirect '/registration'
     db.users.findByEmail email, (err, user) ->
       return next err if err
       unless user

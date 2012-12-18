@@ -3,12 +3,22 @@ cluster = require 'cluster'
 os = require 'os'
 fs = require 'fs'
 crypto = require 'crypto'
+validator = require 'validator'
 generatePassword = require 'password-generator'
 _ = require 'lodash'
 
 cfg = require '../config'
 
 numCPUs = os.cpus().length
+
+exports.isEmail = (value) ->
+  try
+    validator.check(value).len(6,64).isEmail()
+    return true
+  catch error
+    return false
+
+exports.sanitize = validator.sanitize
 
 exports.emailType = (x) ->
   return "emails:#{x}:type"
@@ -78,10 +88,10 @@ exports.asyncOpt = (fn, err, val)->
 
 exports.asyncOptError = (fn, msg, val) ->
   process.nextTick(->
-    fn {
+    fn
       error: true
       msg: msg
-    }, val
+    , val
   ) if fn
 
 exports.asyncOrdered = (array, index, fn, done) ->
@@ -120,10 +130,9 @@ exports.startCluster = (stop, start) ->
 exports.addError = (req, text, id) ->
   errors = req.flash "objectErrors"
 
-  errors.push {
+  errors.push
     text: text
     id: id
-  }
 
   req.flash "objectErrors", errors
 

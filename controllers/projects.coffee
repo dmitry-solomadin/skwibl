@@ -73,7 +73,7 @@ exports.add = (req, res) ->
     return res.redirect '/projects/new'
   db.projects.add req.user.id, req.body.name, (err, project) ->
     unless err
-      if req.body.inviteeEmails
+      if req.body.inviteeEmails and req.body.inviteeEmails isnt ''
         return db.projects.inviteEmail project.id, req.user.id, req.body.inviteeEmails, (err, user) ->
           if err
             req.flash 'warning', 'Project was created but there was some problems with sending invites.'

@@ -7,7 +7,7 @@ sockets = require '../sockets'
 cfg = require '../config'
 db = require '../db'
 
-exports.setUp = (server) ->
+exports.setUp = (server, logger) ->
 
   sio = io.listen server
 
@@ -24,6 +24,12 @@ exports.setUp = (server) ->
   sio.configure ->
 
     #   io.disable 'browser client cache'
+
+    sio.set 'logger',
+      debug: logger.info
+      info: logger.info
+      error: logger.error
+      warn: logger.warn
 
     sio.set 'store', new io.RedisStore
       redisPub : pub
@@ -51,7 +57,7 @@ exports.setUp = (server) ->
 
   sockets.configure sio
 
-exports.start = ->
-  console.log "socket.io serer is started on
+exports.start = (logger) ->
+  logger.info "socket.io serer is started on
   #{cfg.HOST}:#{cfg.SOCKET_PORT} in
   #{cfg.ENVIRONMENT} mode"

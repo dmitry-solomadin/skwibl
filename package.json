@@ -1,16 +1,19 @@
 {
   "name": "skwibl",
-  "version": "0.3.1",
+  "version": "0.5.1",
   "private": true,
   "author": "skwibl <info@skwibl.com>",
   "description": "Realtime collaboration engine for WEB",
   "contributors": [{
     "name": "Yuri Karadzhov",
     "email": "yuri@skwibl.com"
+  }, {
+    "name": "Dmitriy Solomadin",
+    "email": "dmitriy@skwibl.com"
   }],
   "repository": {
     "type": "git",
-    "url": "https://github.com/a-tease/http-server.git"
+    "url": "https://github.com/znvPredatoR/skwibl.git"
   },
   "scripts": {
     "start": "./skwibl -s",
@@ -18,7 +21,7 @@
     "debug": "./skwibl -d"
   },
   "dependencies": {
-    "express": "3.0.x",
+    "express": "3.x.x",
     "connect-flash": "*",
     "connect-redis": "1.x.x",
     "cookie": "*",
@@ -39,7 +42,9 @@
     "redis": "0.7.2",
     "lodash": "*",
     "coffee-script": "*",
-    "moment": "*"
+    "moment": "*",
+    "winston": "*",
+    "validator": "*"
   },
   "devDependencies": {
     "node-inspector": "0.2.x"

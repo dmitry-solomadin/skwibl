@@ -4,7 +4,7 @@ exports.PORT = 3000
 exports.SOCKET_PORT = 9000
 exports.ENVIRONMENT = process.env.NODE_ENV or 'development'
 
-exports.DOMAIN = if @ENVIRONMENT == 'development' then 'http://localhost' else 'http://skwibl.com'
+exports.DOMAIN = if @ENVIRONMENT is 'development' then 'http://localhost' else 'http://skwibl.com'
 
 exports.GOOGLE_CLIENT_ID = '435757431999.apps.googleusercontent.com'
 exports.GOOGLE_CLIENT_SECRET = 'IoZpFsfeyBuRvs2Djbut1wSZ'
@@ -61,5 +61,7 @@ exports.DIRECTORY_PERMISION = 0o751 # rwxr-x--x
 exports.FILE_PERMISSION = 0o640 # rw-r-----
 
 exports.ACTIONS_BUFFER_SIZE = 50
+
+exports.LOG_FILE_SIZE = 1024 # 1MB
 
 exports.GC_INTERVAL = 60000 # 1 min

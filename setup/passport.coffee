@@ -1,6 +1,7 @@
 passport = require 'passport'
 
 db = require '../db'
+tools = require '../tools'
 cfg = require '../config'
 
 LocalStrategy = require('passport-local').Strategy
@@ -24,13 +25,15 @@ exports.setUp = ->
     usernameField: 'email'
     passwordField: 'password'
   , (username, password, done) ->
+    unless cfg.ENVIRONMENT is 'development' or tools.isEmail(username)
+      return done null, no, message: "Incorrect email adress #{username}"
     db.users.findByEmail username, (err, user) ->
       return done err if err
       unless user
         return done null, no, message: "Unknown user #{username}"
       if user.password isnt password
         return done null, no, message: 'Invalid password'
-      if user.status is 'unconfirmed' and cfg.ENVIRONMENT == 'development'
+      if user.status is 'unconfirmed' and cfg.ENVIRONMENT is 'development'
         return db.users.persist user, done
       if user.status is 'deleted'
         return db.users.restore user, done

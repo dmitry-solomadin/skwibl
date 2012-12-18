@@ -96,15 +96,14 @@ exports.setUp = (client, db) ->
         client.sadd "projects:#{val}:users", uid
         client.sadd "users:#{uid}:projects", val
 
-        return db.canvases.add val, null, null, ->
-          if !err
-            return tools.asyncOpt(fn, null, project)
+        return db.canvases.add val, null, null, (err, canvas) ->
+          return tools.asyncOpt(fn, err, project)
 
       return tools.asyncOpt fn, err, null
 
   mod.deleteCanvases = (pid, fn) ->
     client.smembers "projects:#{pid}:canvases", (err, array) ->
-      client.del "projects:#{pid}:canvases"
+      client.del "projects:#{pid}:canvases" unless err
       if not err and array and array.length
         return tools.asyncParallel array, (cid) ->
           client.del "canvases:#{cid}"
@@ -118,6 +117,15 @@ exports.setUp = (client, db) ->
         db.contacts.deleteContacts pid, array, 0, fn
       client.del "projects:#{pid}:users"
       return tools.asyncOpt fn, err, pid
+
+  mod.deleteUnconfirmedUsers = (pid, fn) ->
+    client.smembers "projects:#{pid}:unconfirmed", (err, array) ->
+      client.del "projects:#{pid}:unconfirmed" unless err
+      if not err and array and array.length
+        return tools.asyncParallel array, (cid) ->
+          #TODO
+      return tools.asyncOpt fn, err, pid
+
 
   mod.deleteActions = (pid, type, fn) ->
     client.lrange "projects:#{pid}:#{type}", 0, -1, (err, array) ->
@@ -163,7 +171,7 @@ exports.setUp = (client, db) ->
     console.log 'invite social'
 
   mod.inviteEmail = (pid, id, email, fn) ->
-    if not email or email.trim().length is 0
+    unless email and tools.isEmail email
       return tools.asyncOptError fn, "Please, enter an email."
 
     db.users.findByEmail email, (err, user) ->
@@ -191,7 +199,7 @@ exports.setUp = (client, db) ->
           client.sadd "users:#{contact.id}:requests", id
           return db.users.findById id, (err, user) ->
             return smtp.regPropose user, contact, hash, fn
-      return mod.invite pid, id, user, fn
+      return db.projects.invite pid, id, user, fn
 
   mod.inviteLink = (pid, fn) ->
     #TODO

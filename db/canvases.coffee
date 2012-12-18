@@ -5,21 +5,20 @@ exports.setUp = (client, db) ->
 
   mod.add = (pid, file, time, fn) ->
     client.incr 'canvases:next', (err, cid) ->
-      if not err
+      unless err
         canvas =
           id: cid
           createdAt: new Date().getTime()
           project: pid
         canvas.time = time if time
 
-        client.scard "projects:#{pid}:canvases", (err, canvasCount) ->
-          if file
-            canvas.file = file.id
+        return client.scard "projects:#{pid}:canvases", (err, count) ->
+          canvas.file = file.id if file
 
           if file and file.name.trim().length > 0
             canvas.name = file.name
           else
-            canvas.name = "Canvas #{canvasCount + 1}"
+            canvas.name = "Canvas #{count + 1}"
 
           client.hmset "canvases:#{cid}", canvas
           client.sadd "projects:#{pid}:canvases", cid
