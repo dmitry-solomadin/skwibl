@@ -368,6 +368,8 @@ $ ->
       showCommentsDiv = $(commentContent).parent().find(".comment-show-comments")
       showCommentsDiv.html(showCommentsText) if showCommentsDiv[0]
 
+      isCommentOwner = ` owner == $("#uid").val() `
+
       commentContent.append(
         "<div id='commentText#{elementId}' class='comment-text' data-comment-id='#{commentMin.elementId}'
            data-element-id='#{elementId}' data-owner='#{owner}' data-time='#{time}'>
@@ -379,7 +381,7 @@ $ ->
              <div class='the-comment-text'>#{commentText.text}</div>
              <div class='comment-actions'>
                  <a href='#' class='markAsTodoLink' onclick='App.room.comments.markAsTodo(#{elementId}, true); return false;'>todo</a>
-                 <a href='#' class='editCommentTextLink' onclick='App.room.comments.editText(#{elementId}); return false;'>edit</a>
+                 <a href='#' class='editCommentTextLink #{'hide' unless isCommentOwner}' onclick='App.room.comments.editText(#{elementId}); return false;'>edit</a>
                  <a href='#' class='removeCommentTextLink' onclick='App.room.comments.removeText(#{elementId}, true); return false;'>remove</a>
              </div>
          </div>")
@@ -430,8 +432,10 @@ $ ->
 
     doEditText: (elementId, newText, emit) ->
       comment = $("#commentText#{elementId}")
-      comment.find(".the-comment-text").html(newText).highlight()
-      room.socket.emit "updateCommentText", elementId: elementId, text: newText if emit
+      comment.find(".the-comment-text").html(newText).effect("highlight", {}, 800);
+      if emit
+        owner = comment.data("owner")
+        room.socket.emit "updateCommentText", elementId: elementId, text: newText, owner: owner
 
     removeText: (elementId, emit) ->
       comment = $("#commentText#{elementId}")
@@ -522,7 +526,7 @@ $ ->
       comment = result.element
       @unfoldComment comment.commentMin
 
-      commentText.highlight()
+      commentText.effect("highlight", {}, 800);
 
       commentX = commentText.offset().left - (room.canvas.getViewportAdjustX() / 2 )
       commentY = commentText.offset().top + (room.canvas.getViewportAdjustY()  / 2 )

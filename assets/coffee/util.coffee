@@ -29,10 +29,6 @@ $ ->
     @val("")
     value
 
-  $.fn.highlight = ->
-    prevBackgroundColor = if @css("backgroundColor") then @css("backgroundColor") else "transparent"
-    @animate(backgroundColor: "yellow", -> $(@).animate(backgroundColor: prevBackgroundColor))
-
   $.fn.drags = (opt) ->
     opt = $.extend({cursor:"move"}, opt)
 

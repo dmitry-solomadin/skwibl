@@ -74,6 +74,8 @@ exports.configure = (sio) ->
         db.commentTexts.reopenTodo elementId
 
       socket.on 'updateCommentText', (data, cb) ->
+        return unless `(data.owner == id)`
+
         socket.broadcast.to(socket.project).emit 'updateCommentText',
           id: id
           elementId: data.elementId
