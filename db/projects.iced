@@ -11,17 +11,17 @@ exports.setUp = (client, db) ->
 
   # get all the projects that are available for the user
   mod.index = (uid, fn) ->
-    client.sort "users:#{uid}:projects", "by", "projects:*->createdAt", "desc", (err, array) ->
-      if not err and array and array.length
-        projects = []
-        return tools.asyncParallel array, (pid, index) ->
-          return db.projects.getData pid, (err, project) ->
-            if not err and project
-              projects[index] = project
-              return tools.asyncDone array, ->
-                return tools.asyncOpt fn, null, projects
-            return tools.asyncOpt fn, err, []
-      return tools.asyncOpt fn, err, []
+    await client.sort "users:#{uid}:projects", "by", "projects:*->createdAt", "desc", defer(err, array)
+    projects = []
+
+    if not err and array and array.length
+      getProjectData = (pid, autocb) ->
+        await db.projects.getData pid, defer(err, project)
+        projects.push project if not err and project
+
+      await getProjectData pid, defer() for pid in array
+
+    return tools.asyncOpt fn, null, projects
 
   mod.getData = (pid, fn) ->
     client.hgetall "projects:#{pid}", (err, project) ->
@@ -137,12 +137,27 @@ exports.setUp = (client, db) ->
             return tools.asyncOpt fn, null, pid
       return tools.asyncOpt fn, err, pid
 
+  mod.deleteInvitations = (pid, fn) ->
+    client.del "projects:#{pid}:unconfirmed"
+
+    # remove projectInvite activities one by one
+    await client.smembers "activities:projectInvite:#{pid}", defer(err, aids)
+    if not err and aids
+      deleteActivity = (aid, autocb) -> await db.activities.delete aid, defer()
+      await deleteActivity aid, defer() for aid in aids
+
+    # remove projectInvite bucket
+    client.del "activities:projectInvite:#{pid}"
+
+    tools.asyncOpt fn, err, null
+
   mod.delete = (pid, fn) ->
     db.projects.deleteCanvases pid
     db.projects.deleteUsers pid
     db.projects.deleteActions pid, 'chat'
     db.projects.deleteActions pid, 'element'
     db.projects.deleteActions pid, 'comment'
+    db.projects.deleteInvitations pid
     client.del "projects:#{pid}", fn
 
   mod.setProperties = (pid, properties, fn) ->
@@ -225,6 +240,7 @@ exports.setUp = (client, db) ->
   mod.decline = (pid, id, fn) ->
     client.srem "projects:#{pid}:unconfirmed", id, fn
 
+  # remove user from project.
   mod.remove = (pid, id, fn) ->
     # Remove project from user projects
     client.srem "users:#{id}:projects", pid

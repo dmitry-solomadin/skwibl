@@ -8,6 +8,7 @@ exports.setUp = (name) ->
   if cfg.ENVIRONMENT is 'development'
     infoTransport = new (winston.transports.Console)
       colorize: on
+      level: "error"
     errorTransport = new (winston.transports.Console)
       colorize: on
       json: on

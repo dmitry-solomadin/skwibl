@@ -20,15 +20,29 @@ exports.setUp = (client, db) ->
         activity.inviting = invitingUserId
         client.hmset "activities:#{aid}", activity
 
+        client.sadd "activities:#{type}:#{pid}", aid if type is 'projectInvite'
+
         client.rpush "users:#{owner}:activities", aid
         announce.in("activities#{owner}").emit 'new'
         return tools.asyncOpt fn, null, activity
 
       return tools.asyncOpt fn, err, null
 
+  # todo consider refactoring in scope of #138
   mod.getAllNew = (uid, fn) ->
     mod.index uid, fn, (activity) ->
       return activity.status is 'new'
+
+  mod.findById = (aid, fn) ->
+    client.hgetall "activities:#{aid}", fn
+
+  mod.delete = (aid, fn) ->
+    await db.activities.findById aid, defer(err, activity)
+    if not err and activity
+      client.lrem "users:#{activity.owner}:activities", 0, aid
+      client.del "activities:#{aid}"
+
+    tools.asyncOpt fn, err, activity
 
   mod.index = (uid, fn, filter) ->
     client.lrange "users:#{uid}:activities", -cfg.ACTIONS_BUFFER_SIZE, -1, (err, array) ->

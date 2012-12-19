@@ -74,7 +74,7 @@ exports.include = (dir, fn) ->
   for name in fs.readdirSync(dir)
     shortName = name.split('.')[0]
     ext = name.split('.')[1]
-    isModule = shortName isnt 'index' and ( ext is 'js' or ext is 'coffee' )
+    isModule = shortName isnt 'index' and ( ext is 'js' or ext is 'coffee' or ext is 'iced' )
     if isModule
       mod = require dir + '/' + name
       fn mod, shortName

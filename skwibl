@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 ## dynamic server
 DYN='app'
 
@@ -8,7 +7,7 @@ DYN='app'
 SOC='server'
 
 ## coffee executable
-COFFEE='node_modules/coffee-script/bin/coffee'
+COFFEE='node_modules/iced-coffee-script/bin/coffee'
 
 ## coffee dir
 COFFEE_DIR='assets/coffee/'
