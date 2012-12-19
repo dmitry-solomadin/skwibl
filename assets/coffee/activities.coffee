@@ -13,6 +13,8 @@ $ ->
       $.post '/projects/confirm', {aid: aid, answer: true}, (data, status, xhr) =>
         if data
           $("#activity#{aid}").replaceWith(data)
+          $("#activity#{aid}").find(".projectText").hide()
+          $("#activity#{aid}").find(".projectLink").show()
           @subtractActivityCount()
 
     decline: (aid) ->

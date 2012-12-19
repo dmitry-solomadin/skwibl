@@ -9,7 +9,9 @@
   </h4>
 
   <div class="activityText">
-    <%= @activity.inviting.displayName %> invites you to the <b><%= @activity.project.name %></b>
+    <%= @activity.inviting.displayName %> invites you to the
+    <b class="projectText"><%= @activity.project.name %></b>
+    <a class="projectLink hide" href="/projects/<%= @activity.project.id %>"><b><%= @activity.project.name %></b></a>
   </div>
 
   <% if @activity.status is 'new' : %>
