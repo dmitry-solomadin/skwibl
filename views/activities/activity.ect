@@ -10,8 +10,11 @@
 
   <div class="activityText">
     <%= @activity.inviting.displayName %> invites you to the
+    <% if @activity.status is 'accepted' : %>
+    <a class="projectLink" href="/projects/<%= @activity.project.id %>"><b><%= @activity.project.name %></b></a>
+    <% else : %>
     <b class="projectText"><%= @activity.project.name %></b>
-    <a class="projectLink hide" href="/projects/<%= @activity.project.id %>"><b><%= @activity.project.name %></b></a>
+    <% end %>
   </div>
 
   <% if @activity.status is 'new' : %>
