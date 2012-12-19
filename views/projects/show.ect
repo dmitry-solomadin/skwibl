@@ -83,6 +83,7 @@
           <% for element in canvas.elements : %>
             <input class="canvasElement<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(element) %>"/>
           <% end %>
+          <% console.log canvas.comments %>
           <% for comment in canvas.comments : %>
             <input class="canvasComment<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(comment) %>"/>
             <% for text in comment.texts : %>

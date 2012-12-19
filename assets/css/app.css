@@ -315,4 +315,8 @@ input.error {
     margin-right: 0 !important;
 }
 
+.vis-hidden {
+    visibility: hidden;
+}
+
 /* MISC END */

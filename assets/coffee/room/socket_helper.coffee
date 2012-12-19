@@ -18,6 +18,7 @@ $ ->
       socket.on 'markAsTodo', (data) => room.comments.markAsTodo(data.elementId, false)
       socket.on 'resolveTodo', (data) => room.comments.resolveTodo(data.elementId, false)
       socket.on 'reopenTodo', (data) => room.comments.reopenTodo(data.elementId, false)
+      socket.on 'commentNumberUpdate', (data) => room.comments.updateCommentNumber data
       socket.on 'changeCanvasName', (data) => room.canvas.changeName(data.name)
       socket.on 'switchCanvas', (data) =>
         room.canvas.selectThumb(room.canvas.findThumbByCanvasId(data.canvasId), false)
@@ -72,9 +73,11 @@ $ ->
     createCommentFromData: (comment) ->
       if comment.rect
         rect = new Path.RoundRectangle(comment.rect.x, comment.rect.y, comment.rect.w, comment.rect.h, 8, 8)
-        room.items.create rect, color: comment.color
 
-      commentMin = room.comments.create(comment.min.x, comment.min.y, rect, comment.max, comment.color)
+        styleObject = $.extend({color: comment.color}, room.comments.COMMENT_RECT_DEFAULT_STYLE)
+        room.items.create(rect, styleObject)
+
+      commentMin = room.comments.create(comment.min.x, comment.min.y, rect, comment.max, comment.color, comment.number)
       commentMin.elementId = comment.elementId
 
       if rect

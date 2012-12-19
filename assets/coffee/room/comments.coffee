@@ -7,7 +7,11 @@ $ ->
 
       @COMMENT_RECTANGLE_ROUNDNESS = 8
 
-    create: (x, y, rect, max, color) ->
+      @COMMENT_RECT_DEFAULT_STYLE =
+        opacity: 0.75
+        dashArray: [8, 3]
+
+    create: (x, y, rect, max, color, number) ->
       color = if color then color else opts.color
       COMMENT_SHIFT_X = 75
       COMMENT_SHIFT_Y = -135
@@ -16,9 +20,11 @@ $ ->
         COMMENT_SHIFT_X = 75
         COMMENT_SHIFT_Y = 55
 
-      commentMin = $("<div class=\"comment-minimized #{'hide' if rect}\">&nbsp;</div>")
-      commentMin.css(left: x, top: y)
-      commentMin.data("color", color)
+      commentMin = $("<div class='comment-minimized'></div>")
+      commentMin.addClass("vis-hidden") if rect
+      commentMin.css(left: x, top: y, borderColor: color).data("color", color)
+
+      @setNumber commentMin, number
 
       commentMax = $("<div class='comment-maximized'></div>")
       commentMax.css(borderColor: color)
@@ -321,7 +327,7 @@ $ ->
       $commentmin[0].$maximized.css("visibility", "hidden")
       $commentmin[0].arrow.opacity = 0
       $commentmin[0].arrow.isHidden = true
-      $commentmin.show()
+      $commentmin.css("visibility", "visible")
 
       room.redrawWithThumb()
 
@@ -333,7 +339,7 @@ $ ->
       # the comment position might have been changed.
       @redrawArrow($commentmin)
 
-      $commentmin.hide() if $commentmin[0].rect
+      $commentmin.css("visibility", "hidden") if $commentmin[0].rect
 
       room.redrawWithThumb()
 
@@ -385,10 +391,12 @@ $ ->
              <div class='the-comment-text'>#{commentText.text}</div>
              <div class='comment-actions'>
                  <a href='#' class='markAsTodoLink' onclick='App.room.comments.markAsTodo(#{elementId}, true); return false;'>todo</a>
-                 <a href='#' class='editCommentTextLink #{'hide' unless isCommentOwner}' onclick='App.room.comments.editText(#{elementId}); return false;'>edit</a>
+                 <a href='#' class='editCommentTextLink' onclick='App.room.comments.editText(#{elementId}); return false;'>edit</a>
                  <a href='#' class='removeCommentTextLink' onclick='App.room.comments.removeText(#{elementId}, true); return false;'>remove</a>
              </div>
          </div>")
+
+      commentContent.find(".editCommentTextLink").hide() unless isCommentOwner
 
       if commentText.todo
         commentTextDiv = commentContent.find("#commentText#{elementId}")
@@ -546,5 +554,24 @@ $ ->
 
       room.items.pan(diffX, diffY)
       room.redrawWithThumb()
+
+    setNumber: (commentMin, newNumber) ->
+      commentMin.html("X") if not newNumber
+
+      intNumber = parseInt newNumber
+      if intNumber >= 1000
+        commentMin.css fontSize: "9px"
+      if intNumber >= 100
+        commentMin.css fontSize: "11px"
+      if intNumber >= 10
+        commentMin.css fontSize: "14px"
+      else
+        commentMin.css fontSize: "18px"
+
+      commentMin.html newNumber
+
+    updateCommentNumber: (data) ->
+      comment = room.helper.findByElementId(data.elementId)
+      @setNumber(comment.commentMin, data.newNumber)
 
   App.room.comments = new RoomComments

@@ -148,7 +148,8 @@ $ ->
           rectangle = new Path.RoundRectangle(x, y, w, h,
           @comments.COMMENT_RECTANGLE_ROUNDNESS, @comments.COMMENT_RECTANGLE_ROUNDNESS)
           rectangle.isCommentRect = true
-          @items.create(rectangle)
+          styleObject = $.extend({}, @comments.COMMENT_RECT_DEFAULT_STYLE)
+          @items.create(rectangle, styleObject)
           @opts.tool.removeOnDrag()
         when 'straightline'
           @opts.tool.lastSegment.point = event.point

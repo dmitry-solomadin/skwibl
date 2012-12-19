@@ -14,19 +14,28 @@ exports.setUp = (client, db) ->
     action.time = new Date
     action.data = JSON.stringify(data.element)
 
-    client.exists "actions:#{aid}", (err, val) ->
+    return client.exists "actions:#{aid}", (err, val) ->
       client.hmset "actions:#{aid}", action
       if not err and not val # creating new action
         client.rpush "projects:#{pid}:#{type}", aid
         client.rpush "canvases:#{data.canvasId}:#{type}", aid if data.canvasId
 
-        if data.element.texts and data.element.texts.length
-          tools.asyncParallel data.element.texts, (text) ->
-            db.commentTexts.add text, ->
-              tools.asyncDone data.element.texts, ->
-                tools.asyncOpt fn, null, action
+        if type is 'comment'
+          client.incr "actions:#{data.canvasId}:next", (err, commentNumber) ->
+            action.number = commentNumber
+            action.newAction = true # this won't go into db, just a marker for top level code
+            client.hset "actions:#{aid}", "number", commentNumber
+            if data.element.texts and data.element.texts.length
+              return tools.asyncParallel data.element.texts, (text) ->
+                return db.commentTexts.add text, ->
+                  return tools.asyncDone data.element.texts, ->
+                    return tools.asyncOpt fn, null, action
+            else
+              return tools.asyncOpt fn, null, action
+        else
+          return tools.asyncOpt fn, null, action
 
-      tools.asyncOpt fn, null, action
+      return tools.asyncOpt fn, null, action
 
   mod.delete = (aid, fn) ->
     db.actions.findById aid, (err, action) ->
@@ -79,6 +88,7 @@ exports.setUp = (client, db) ->
         return tools.asyncParallel actions, (aid) ->
           client.hgetall "actions:#{aid}", (err, action) ->
             fetchedAction = JSON.parse(action.data)
+            fetchedAction.number = action.number
             return tools.asyncOpt fn, err, [] if err
 
             if type is 'comment'

@@ -170,8 +170,17 @@ body.room {
     position: absolute;
     width: 25px;
     height: 25px;
-    background: url("/images/comment-small.png");
+    background: #fafafa;
+    border-radius: 50%;
     z-index: 1;
+    border: 1px solid black;
+    font-size: 18px;
+    line-height: 25px;
+    text-align: center;
+}
+
+.comment-minimized img {
+    display: none;
 }
 
 .comment-remove {

@@ -1,13 +1,10 @@
-
 db = require '../db'
 tools = require '../tools'
 
 exports.configure = (sio) ->
-
   canvas = sio.of '/canvas'
 
   canvas.on 'connection', (socket) ->
-
     hs = socket.handshake
     id = hs.user.id
 
@@ -41,7 +38,15 @@ exports.configure = (sio) ->
           id: id
           canvasId: data.canvasId
           element: data.element
-        db.actions.update socket.project, id, 'comment', data
+        db.actions.update socket.project, id, 'comment', data, (err, action) ->
+          if action.newAction
+            newNumber =
+              elementId: data.element.elementId
+              newNumber: action.number
+
+            # broadcast new number to everyone including sender
+            socket.emit 'commentNumberUpdate', newNumber
+            socket.broadcast.to(socket.project).emit 'commentNumberUpdate', newNumber
 
       socket.on 'commentRemove', (elementId, cb) ->
         socket.broadcast.to(socket.project).emit 'commentRemove',
