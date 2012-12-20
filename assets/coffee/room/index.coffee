@@ -188,11 +188,13 @@ $ ->
 
       switch tooltype
         when 'straightline', 'arrow', 'circle', 'rectangle', 'line', 'highligher'
-          @opts.tool.eligible = true
-          @history.add()
+          # Check if the item is empty then there is no need to save it on the server.
+          unless @items.isItemEmpty(@opts.tool)
+            @opts.tool.eligible = true
+            @history.add()
 
-          @opts.tool.elementId = @generateId()
-          @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@opts.tool))
+            @opts.tool.elementId = @generateId()
+            @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@opts.tool))
         when "comment"
           if commentRect
             @opts.tool.eligible = true

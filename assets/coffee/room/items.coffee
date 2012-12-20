@@ -23,8 +23,6 @@ $ ->
       @remove @selected(), true if @selected()
 
     remove: (item, historize) ->
-      console.trace "asd"
-      # add new 'remove' item into history and link it to removed item.
       room.history.add({actionType: "remove", tool: item, eligible: true}) if historize
 
       item.opacity = 0
@@ -231,6 +229,14 @@ $ ->
         return null
 
     # ITEMS MISC
+    isItemEmpty: (item) ->
+      return true unless item
+      return true if item.segments.length is 1
+      if item.segments.length is 2
+        segmentsAreEqual = item.segments[0].point.x is item.segments[1].point.x and item.segments[0].point.y is item.segments[1].point.y
+        return true if segmentsAreEqual
+      return false
+
     insertFirst: (item) ->
       paper.project.activeLayer.insertChild(0, item)
 

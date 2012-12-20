@@ -38,24 +38,20 @@ exports.setUp = (client, db) ->
       return tools.asyncOpt fn, null, action
 
   mod.delete = (aid, fn) ->
-    db.actions.findById aid, (err, action) ->
-      return tools.asyncOpt fn, err, null if err or not action
+    await db.actions.findById aid, defer(err, action)
+    return tools.asyncOpt fn, err, null if err or not action
 
-      client.lrem "projects:#{action.project}:#{action.type}", 0, aid
-      client.lrem "canvases:#{action.canvasId}:#{action.type}", 0, aid if action.canvasId
+    client.lrem "projects:#{action.project}:#{action.type}", 0, aid
+    client.lrem "canvases:#{action.canvasId}:#{action.type}", 0, aid if action.canvasId
 
-      if action.type is 'comment'
-        client.lrange "comments:#{aid}:texts", 0, -1, (err, commentTextsIds) ->
-          if not err and commentTextsIds and commentTextsIds.length
-            return tools.asyncParallel commentTextsIds, (commentTextId) ->
-              db.commentTexts.remove commentTextId, ->
-                return tools.asyncOpt fn, null, null
+    if action.type is 'comment'
+      await client.lrange "comments:#{aid}:texts", 0, -1, defer(err, commentTextsIds)
+      return tools.asyncOpt fn, err, null if err
 
-              return tools.asyncDone commentTextsIds, ->
-                return client.del "actions:#{aid}", fn
-          return tools.asyncOpt fn, null, null
-      else
-        client.del "actions:#{aid}", fn
+      deleteCommentText = (commentTextId, autocb) -> await db.commentTexts.remove commentTextId, defer()
+      await deleteCommentText commentTextId, defer() for commentTextId in commentTextsIds
+
+    client.del "actions:#{aid}", fn
 
   mod.findById = (aid, fn) ->
     client.hgetall "actions:#{aid}", fn
