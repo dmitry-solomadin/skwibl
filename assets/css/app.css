@@ -26,6 +26,11 @@ body {
     margin-left: 3px;
     color: #484e58;
     font: 17px 'MyriadPro-Bold';
+    -webkit-font-smoothing: antialiased;
+    -moz-font-smoothing:antialiased;
+    font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    font-smooth:always;
     line-height: 19px;
     vertical-align: bottom;
     padding-top: 8px;
@@ -44,6 +49,7 @@ body {
 .small-btn {
     padding: 4px 5px !important;
     font: 14px 'MyriadPro-Bold';
+    -webkit-font-smoothing: antialiased;
     line-height: 20px;
     height: 18px;
 }

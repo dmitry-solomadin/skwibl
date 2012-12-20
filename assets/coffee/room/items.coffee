@@ -229,6 +229,21 @@ $ ->
         return null
 
     # ITEMS MISC
+    createUserBadge: (uid, x, y) ->
+      getUserIndex = (uid) ->
+        for user, index in App.chat.users
+          return (index + 1) if ` user.id == uid `
+        return 1
+
+      badge = $("<span class='userBadge label-#{getUserIndex(uid)}'>#{App.chat.getUserById(uid).displayName}</span>")
+      badge.css
+        left: x + opts.pandx
+        top: y + opts.pandy + parseInt($("#header").height())
+      $("body").append(badge)
+
+      fadeOutBadge = -> $(badge).fadeOut('fast')
+      setTimeout fadeOutBadge, 2000
+
     isItemEmpty: (item) ->
       return true unless item
       return true if item.segments.length is 1

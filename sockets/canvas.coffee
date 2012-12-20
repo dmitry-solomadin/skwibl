@@ -121,3 +121,9 @@ exports.configure = (sio) ->
           id: id
           elementId: elementId
         db.commentTexts.remove elementId
+
+      socket.on 'userMouseDown', (data, cb) ->
+        socket.broadcast.to(socket.project).emit 'userMouseDown',
+          id: id
+          x: data.x
+          y: data.y
