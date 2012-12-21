@@ -95,7 +95,7 @@ function clean {
 ## build procedure
 function build {
   echo "building"
-  $COFFEE -w -o $JS_OUTPUT_DIR $COFFEE_DIR &
+  $COFFEE -c -o $JS_OUTPUT_DIR $COFFEE_DIR &
 }
 
 function build_deploy {
@@ -166,7 +166,7 @@ function deploy {
   find ./assets/coffee -name "*.js" -delete
   rm -f $TOOLS_FILE
   mv $TOOLS_FILE.save $TOOLS_FILE
-  sshpass -p $PASSWORD rsync ./pass.rsync -rvuz ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee" --exclude "vendor/socket.io/socket.io.js"
+  sshpass -p $PASSWORD rsync ./pass.rsync -rvuz ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee" --exclude "*.iced" --exclude "vendor/socket.io/socket.io.js"
 }
 
 ## debug procedure
