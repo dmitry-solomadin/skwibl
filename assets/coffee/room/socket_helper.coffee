@@ -24,6 +24,7 @@ $ ->
         room.canvas.selectThumb(room.canvas.findThumbByCanvasId(data.canvasId), false)
       socket.on 'eraseCanvas', => room.canvas.clear false, false
       socket.on 'removeCanvas', => room.canvas.clear true, false
+      socket.on 'userMouseDown', (data) => room.items.createUserBadge data.id, data.x, data.y
 
     addCommentText: (element) ->
       foundComment = room.helper.findByElementId element.commentId

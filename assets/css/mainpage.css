@@ -115,6 +115,14 @@ body.mainpage {
     background: url(/images/mainpage/tour1.png) 0 90px no-repeat;
 }
 
+.tour_item span {
+    -webkit-font-smoothing: antialiased;
+    -moz-font-smoothing:antialiased;
+    font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    font-smooth:always;
+}
+
 .tour_item_head {
     font-family: Arial Unicode MS, Arial, Helvetica, sans-serif;
     font-size: 36px;

@@ -112,6 +112,13 @@ $ ->
           @items.testSelect(event.point)
           @items.drawSelectRect(event.point)
 
+      tooltype = @opts.tooltype
+      if tooltype is 'line' or tooltype is 'highligher' or tooltype is 'arrow' or
+        tooltype is 'circle' or tooltype is 'rectangle' or tooltype is 'comment' or tooltype is 'straightline'
+        @socket.emit "userMouseDown",
+          x: event.point.x - opts.pandx
+          y: event.point.y - opts.pandy
+
     onMouseDrag: (canvas, event) ->
       event.point = @applyCurrentScale(event.point)
       event.delta = @applyCurrentScale(event.delta)
@@ -188,11 +195,13 @@ $ ->
 
       switch tooltype
         when 'straightline', 'arrow', 'circle', 'rectangle', 'line', 'highligher'
-          @opts.tool.eligible = true
-          @history.add()
+          # Check if the item is empty then there is no need to save it on the server.
+          unless @items.isItemEmpty(@opts.tool)
+            @opts.tool.eligible = true
+            @history.add()
 
-          @opts.tool.elementId = @generateId()
-          @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@opts.tool))
+            @opts.tool.elementId = @generateId()
+            @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@opts.tool))
         when "comment"
           if commentRect
             @opts.tool.eligible = true

@@ -509,3 +509,99 @@ body.room {
     -moz-transform: rotate(180deg);
     transform: rotate(180deg);
 }
+
+.userBadge {
+    background: white;
+    position: absolute;
+    padding: 4px;
+    line-height: 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    box-shadow: 1px 1px 2px #A0A0A0;
+    z-index: 99;
+}
+
+/* LABELS */
+
+span.label-1, span.labelstyle-02e10c, .labelstyle-02e10c.selected {
+    background: #02e81d !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#02e81d', endColorstr = '#08d901') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#02e81d), to(#08d901)) !important;
+    background: -moz-linear-gradient(top, #02e81d, #08d901) !important;
+    color: #006605 !important;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+span.label-2, span.labelstyle-d7e102, .labelstyle-d7e102.selected {
+    background: #d5e802 !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#d5e802', endColorstr = '#d8d901') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#d5e802), to(#d8d901)) !important;
+    background: -moz-linear-gradient(top, #d5e802, #d8d901) !important;
+    color: #616600 !important;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+span.label-3, span.labelstyle-02d7e1, .labelstyle-02d7e1.selected {
+    background: #02c4e8 !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#02c4e8', endColorstr = '#01d9ca') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#02c4e8), to(#01d9ca)) !important;
+    background: -moz-linear-gradient(top, #02c4e8, #01d9ca) !important;
+    color: #006166 !important;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+span.label-4, span.labelstyle-444444, .labelstyle-444444.selected {
+    background: #727272 !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#727272', endColorstr = '#151313') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#727272), to(#151313)) !important;
+    background: -moz-linear-gradient(top, #727272, #151313) !important;
+    color: #FFFFFF !important;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+span.label-5, span.labelstyle-e10c02, .labelstyle-e10c02.selected {
+    background: #e80c02 !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#e80c02', endColorstr = '#d90b01') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#e80c02), to(#d90b01)) !important;
+    background: -moz-linear-gradient(top, #e80c02, #d90b01) !important;
+    color: #FFFFFF !important;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+span.label-6, span.labelstyle-e102d8, .labelstyle-e102d8.selected {
+    background: #e802b4 !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#e802b4', endColorstr = '#b901d9') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#e802b4), to(#b901d9)) !important;
+    background: -moz-linear-gradient(top, #e802b4, #b901d9) !important;
+    color: #FFFFFF !important;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+span.label-7, span.labelstyle-0b02e1, .labelstyle-0b02e1.selected {
+    background: #2d02e8 !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#2d02e8', endColorstr = '#0119d9') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#2d02e8), to(#0119d9)) !important;
+    background: -moz-linear-gradient(top, #2d02e8, #0119d9) !important;
+    color: #FFFFFF !important;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+span.label-8, span.labelstyle-DDDDDD, .labelstyle-DDDDDD.selected {
+    background: #e5e5e5 !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#e5e5e5', endColorstr = '#d4c7c7') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#e5e5e5), to(#d4c7c7)) !important;
+    background: -moz-linear-gradient(top, #e5e5e5, #d4c7c7) !important;
+    color: #666666 !important;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+span.label-9, span.labelstyle-ffcc00, ffcc00.selected {
+    background: #FFD300 !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#ffd300', endColorstr = '#ffc400') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#FFD300), to(#FFC400)) !important;
+    background: -moz-linear-gradient(top, #FFD300, #FFC400) !important;
+    color: #665100 !important;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* LABELS END */
