@@ -113,8 +113,7 @@ $ ->
           @items.drawSelectRect(event.point)
 
       tooltype = @opts.tooltype
-      if tooltype is 'line' or tooltype is 'highligher' or tooltype is 'arrow' or
-        tooltype is 'circle' or tooltype is 'rectangle' or tooltype is 'comment' or tooltype is 'straightline'
+      if tooltype is 'line' or tooltype is 'highligher' or tooltype is 'arrow' or tooltype is 'circle' or tooltype is 'rectangle' or tooltype is 'comment' or tooltype is 'straightline'
         @socket.emit "userMouseDown",
           x: event.point.x - opts.pandx
           y: event.point.y - opts.pandy
