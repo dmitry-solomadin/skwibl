@@ -323,6 +323,20 @@ $ ->
       $commentmin.show()
       $commentmin[0].rect.opacity = 1 if $commentmin[0].rect
 
+    toggleComments: ->
+      if $("#toggleComments").hasClass("active")
+        @foldAll()
+        $("#toggleComments").removeClass("active").html("Show comments")
+      else
+        @unfoldAll()
+        $("#toggleComments").addClass("active").html("Hide comments")
+
+    foldAll: ->
+      @foldComment(element.commentMin) for element in opts.historytools.allHistory when element.commentMin
+
+    unfoldAll: ->
+      @unfoldComment(element.commentMin) for element in opts.historytools.allHistory when element.commentMin
+
     foldComment: ($commentmin) ->
       $commentmin[0].$maximized.css("visibility", "hidden")
       $commentmin[0].arrow.opacity = 0
