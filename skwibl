@@ -162,7 +162,7 @@ function deploy {
   mv $TOOLS_FILE $TOOLS_FILE.save
   sed 's/#  / /g' $TOOLS_FILE.save  > $TOOLS_FILE
   $COFFEE -c -o $JS_OUTPUT_DIR $COFFEE_DIR &
-  find ./ -name "*.coffee" -exec $COFFEE -cb {} \;
+  find ./ -name "*.coffee" -o -name "*.iced" -exec $COFFEE -I node -cb {} \;
   find ./assets/coffee -name "*.js" -delete
   rm -f $TOOLS_FILE
   mv $TOOLS_FILE.save $TOOLS_FILE
