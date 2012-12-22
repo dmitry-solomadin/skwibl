@@ -97,7 +97,12 @@
     </a>
   </span>
 
-  <a href="#" class="btn small-btn" onclick="App.room.canvas.clear(false, true);return false;">
+  <a id="toggleComments" href="#" class="btn small-btn active"
+     onclick="App.room.comments.toggleComments(); return false;">
+    Hide comments
+  </a>
+
+  <a href="#" class="btn small-btn" onclick="App.room.canvas.clear(true);return false;">
     Clear
   </a>
 

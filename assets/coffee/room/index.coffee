@@ -34,6 +34,14 @@ $ ->
         App.room.canvas.selectThumb(@, true)
         false
 
+      $(document).on "mouseover", "#canvasSelectDiv div", ->
+        App.room.canvas.onMouseOverThumb(@)
+        false
+
+      $(document).on "mouseout", "#canvasSelectDiv div", ->
+        App.room.canvas.onMouseOutThumb(@)
+        false
+
       $(document).on "click", ".smallCanvasPreview", ->
         App.room.canvas.selectMiniThumb(@, true)
         false
@@ -73,7 +81,7 @@ $ ->
       canvas.css({cursor: "default"})
 
       selectedTool = @items.selected()
-      if selectedTool && selectedTool.selectionRect
+      if selectedTool?.selectionRect?
         if selectedTool.selectionRect.bottomRightScaler.bounds.contains(event.point)
           canvas.css(cursor: "se-resize")
         else if selectedTool.selectionRect.topLeftScaler.bounds.contains(event.point)
@@ -112,11 +120,9 @@ $ ->
           @items.testSelect(event.point)
           @items.drawSelectRect(event.point)
 
-      tooltype = @opts.tooltype
-      if tooltype is 'line' or tooltype is 'highligher' or tooltype is 'arrow' or tooltype is 'circle' or tooltype is 'rectangle' or tooltype is 'comment' or tooltype is 'straightline'
-        @socket.emit "userMouseDown",
-          x: event.point.x - opts.pandx
-          y: event.point.y - opts.pandy
+      switch @opts.tooltype
+        when 'line', 'highligher', 'arrow', 'circle', 'rectangle', 'comment', 'straightline'
+          @socket.emit "userMouseDown", x: event.point.x - opts.pandx, y: event.point.y - opts.pandy
 
     onMouseDrag: (canvas, event) ->
       event.point = @applyCurrentScale(event.point)
@@ -170,7 +176,7 @@ $ ->
         when 'pan'
           @items.pan(event.delta.x, event.delta.y)
         when 'select'
-          scalersSelected = @items.selected() and @items.selected().scalersSelected
+          scalersSelected = @items.selected()?.scalersSelected
           if scalersSelected then @items.sacleSelected(event) else @items.translateSelected(event.delta)
 
           # redraw comment arrow if there is one.

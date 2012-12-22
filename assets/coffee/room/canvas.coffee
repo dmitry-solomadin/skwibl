@@ -147,15 +147,36 @@ $ ->
         $("#canvasName").addClass("noname")
         $("#canvasName").html("blank name")
 
-    delete: ->
+    delete: (deleteLink, emit) ->
       if confirm "Are you sure? This will delete all canvas content."
-        @clear true, true
+        cid = $(deleteLink).parent().find("a").data("cid")
+        @destroy cid, emit
 
-    clear: (force, emit) ->
+    destroy: (cid, emit) ->
+      optsToRemove = @findCanvasOptsById(cid)
+
+      for element, index in optsToRemove.historytools.allHistory
+        if element.isImage
+          optsToRemove.historytools.allHistory.splice(index, 1)
+          optsToRemove.image = null
+          element.remove()
+          break
+
+      if @getThumbs().length > 1
+        @findThumbByCanvasId(cid).parent().remove()
+        @findMiniThumbByCanvasId(cid).remove()
+        @selectThumb($("#canvasSelectDiv div:first a"))
+        room.savedOpts.splice(room.savedOpts.indexOf(optsToRemove), 1)
+        room.setOpts @findCanvasOptsById(@getSelectedCanvasId())
+
+      if emit
+        room.socket.emit "removeCanvas", canvasId: cid
+
+    clear: (emit) ->
       room.history.add
         actionType: "clear", tools: room.history.getSelectableTools(), eligible: true
       for element in opts.historytools.allHistory
-        element.opacity = 0 if (not element.actionType and not element.isImage) or force
+        element.opacity = 0 if not element.actionType and not element.isImage
         room.comments.hideComment(element.commentMin) if element.commentMin
 
       room.items.unselect()
@@ -163,26 +184,8 @@ $ ->
 
       selectedCanvasId = @getSelectedCanvasId()
 
-      if force
-        for element, index in opts.historytools.allHistory
-          if element.isImage
-            opts.historytools.allHistory.splice(index, 1)
-            opts.image = null
-            element.remove()
-            break
-
-        if @getThumbs().length > 1
-          @getSelected().remove()
-          @getMiniSelected().remove()
-          @selectThumb($("#canvasSelectDiv a:first"))
-          room.savedOpts.splice(room.savedOpts.indexOf(@findCanvasOptsById(selectedCanvasId)), 1)
-          room.setOpts @findCanvasOptsById(@getSelectedCanvasId())
-
       if emit
-        if force
-          room.socket.emit "removeCanvas", canvasId: selectedCanvasId
-        else
-          room.socket.emit "eraseCanvas", canvasId: selectedCanvasId
+        room.socket.emit "eraseCanvas", canvasId: selectedCanvasId
 
     # used upon eraseCanvas event
     erase: ->
@@ -201,9 +204,20 @@ $ ->
 
     activateNormalCanvas: -> paper.projects[1].activate()
 
-    restore: (withComments)->
+    flushCanvasIntoCopy: (cid) ->
+      @activateCopyCanvas()
+      prevOpts = room.getOpts()
+      room.setOpts(@findCanvasOptsById(cid))
+      @clearCopyCanvas()
+      @restore(false, true)
+      room.redraw()
+      @activateNormalCanvas()
+      room.setOpts(prevOpts)
+
+    restore: (withComments, clone)->
       for element in opts.historytools.allHistory
         unless element.actionType
+          element = element.clone() if clone
           if element.isImage
             room.items.insertFirst(element)
           else
@@ -231,8 +245,11 @@ $ ->
 
       room.redraw()
 
-    download: ->
-      dataURL = $("#myCanvas")[0].toDataURL("image/png")
+    download: (downloadLink) ->
+      cid = $(downloadLink).parent().find("a").data("cid")
+      @flushCanvasIntoCopy cid
+
+      dataURL = $("#copyCanvas")[0].toDataURL("image/png")
       $.post '/projects/prepareDownload', {pid: $("#pid").val(), canvasData: dataURL}, (data, status, xhr) =>
         window.location = "/projects/download?pid=#{$("#pid").val()}&img=#{data}"
 
@@ -251,11 +268,17 @@ $ ->
 
     # CANVAS THUMBNAILS & IMAGE UPLOAD
 
+    onMouseOverThumb: (thumb) ->
+      $(thumb).find(".canvasRemoveImg, .canvasDownloadImg, .canvasReorderImg").show()
+
+    onMouseOutThumb: (thumb) ->
+      $(thumb).find(".canvasRemoveImg, .canvasDownloadImg, .canvasReorderImg").hide()
+
     foldPreviews: (link) ->
       $("#canvasFolder").addClass("canvasFolderDown")
       $("#canvasFooter").animate(height: 37, 500, 'easeInBack', ->
         $("#canvasFolder").removeClass("canvasFolderDown").find("img").attr("src", "/images/room/unfold-up.png"))
-      $("#nameChanger").animate(left: -500, 500, 'linear')
+      $("#nameChanger").animate(left: $("#smallCanvasPreviews").outerWidth(true) + 20, 500, 'linear')
       $("#smallCanvasPreviews").animate(left: 0, 500, 'linear')
       $(link).attr("onclick", "App.room.canvas.unfoldPreviews(this); return false;")
 
@@ -302,7 +325,8 @@ $ ->
       img
 
     addNewThumb: (canvasId, fileId, name) ->
-      thumb = $("<a href='#' data-cid='#{canvasId}' data-fid='#{fileId}' data-name='#{name}'><canvas width='80' height='60'></canvas></a>")
+      thumb = $("#canvasSelectDiv div:first").clone()
+      thumb.find("a").attr("data-cid", canvasId).attr("data-fid", fileId).attr("data-name", name)
       $("#canvasSelectDiv").append(thumb)
 
     addNewMiniThumb: (canvasId, fileId, name) ->
@@ -317,7 +341,7 @@ $ ->
       @addNewMiniThumb(canvasId, fileId, name)
 
       $("#canvasSelectDiv a").removeClass("canvasSelected")
-      $("#canvasSelectDiv a:last").addClass("canvasSelected")
+      $("#canvasSelectDiv div:last a").addClass("canvasSelected")
       $(".smallCanvasPreview").removeClass("previewSelected")
       $(".smallCanvasPreview:last").addClass("previewSelected")
       $("#canvasName").html(name)
@@ -330,7 +354,7 @@ $ ->
         prevOpts = room.getOpts()
         room.setOpts(@findCanvasOptsById(canvasId))
         @clearCopyCanvas()
-        @restore(false)
+        @restore(false, false)
 
       thumb = @findThumbByCanvasId(canvasId).find("canvas")
       thumbContext = thumb[0].getContext('2d')
@@ -368,7 +392,7 @@ $ ->
 
     getMiniSelected: -> $("#smallCanvasPreviews .previewSelected")
 
-    getThumbs: -> $("#canvasSelectDiv a")
+    getThumbs: -> $("#canvasSelectDiv > div > a")
 
     findThumbByCanvasId: (canvasId) -> $("#canvasSelectDiv a[data-cid='#{canvasId}']")
 
@@ -392,7 +416,7 @@ $ ->
 
       @erase()
       room.setOpts(canvasOpts)
-      @restore(true)
+      @restore(true, false)
 
       $(anchor).addClass("canvasSelected")
 

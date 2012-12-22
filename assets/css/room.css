@@ -107,6 +107,12 @@ body.room {
     box-shadow: #ff4500 0 0 3px;
 }
 
+.canvasPreviewDiv {
+    float: left;
+    margin-right: 10px;
+    position: relative;
+}
+
 .canvasSelected {
     color: black;
     box-shadow: #ff4500 0 0 3px;
@@ -116,6 +122,30 @@ body.room {
     cursor: default;
     text-decoration: none;
     box-shadow: #ff4500 0 0 5px;
+}
+
+.canvasRemoveImg {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    cursor: pointer;
+    display: none;
+}
+
+.canvasDownloadImg {
+    position: absolute;
+    bottom: 7px;
+    left: 5px;
+    display: none;
+    cursor: pointer;
+}
+
+.canvasReorderImg {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    display: none;
+    cursor: pointer;
 }
 
 .canvasFooter {
@@ -184,7 +214,7 @@ body.room {
 }
 
 .comment-remove {
-    background: url("/images/remove.png");
+    background: url("/images/room/remove.png");
     display: inline-block;
     width: 16px;
     height: 16px;
@@ -193,7 +223,7 @@ body.room {
 }
 
 .comment-minimize {
-    background: url("/images/minimize.png");
+    background: url("/images/room/minimize.png");
     display: inline-block;
     width: 16px;
     height: 16px;
@@ -473,6 +503,7 @@ body.room {
     left: 0;
     float: left;
     z-index: 1;
+    top: 1px;
 }
 
 #smallCanvasPreviews {
@@ -480,6 +511,11 @@ body.room {
     left: -500px;
     position: relative;
     margin-left: 10px;
+}
+
+#smallCanvasPreviewsWrap {
+    position: absolute;
+    top: 1px;
 }
 
 .smallCanvasPreview {

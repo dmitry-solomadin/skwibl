@@ -3,7 +3,7 @@ $ ->
 
     constructor: ->
       @removeImg = new Image()
-      @removeImg.src = "/images/remove.png"
+      @removeImg.src = "/images/room/remove.png"
 
     # ITEMS MANIPULATION
 
