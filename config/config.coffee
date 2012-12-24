@@ -62,6 +62,6 @@ exports.FILE_PERMISSION = 0o640 # rw-r-----
 
 exports.ACTIONS_BUFFER_SIZE = 50
 
-exports.LOG_FILE_SIZE = 1024 # 1MB
+exports.LOG_FILE_SIZE = 1048576 # 1MB
 
 exports.GC_INTERVAL = 60000 # 1 min
