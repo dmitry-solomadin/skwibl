@@ -245,6 +245,7 @@ $ ->
       setTimeout fadeOutBadge, 2000
 
     isItemEmpty: (item) ->
+      return false if not item.segments
       return true unless item
       return true if item.segments.length is 1
       if item.segments.length is 2
