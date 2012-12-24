@@ -13,7 +13,7 @@ $ ->
 
       tool.strokeJoin = "round"
 
-      opts.tool.strokeColor = if settings.color then settings.color else opts.color
+      opts.tool.strokeColor = if settings.color then settings.color else sharedOpts.color
       opts.tool.strokeWidth = if settings.width then settings.width else opts.defaultWidth
       opts.tool.fillColor = settings.fillColor if settings.fillColor
       opts.tool.opacity = if settings.opacity then settings.opacity else opts.opacity
