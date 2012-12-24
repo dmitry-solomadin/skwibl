@@ -21,7 +21,6 @@ $ ->
       $("#additionalInsSelect a").click ->
         $("#additionalInsDropdown").find("img").attr("src", $(@).find("img").attr("src"))
         $("#additionalInsDropdown").attr("data-tooltype", $(@).data("tooltype")).data("tooltype", $(@).data("tooltype"))
-        console.log $("#additionalInsDropdown").data("tooltype")
 
       $('#colorSelect .color').click ->
         $('#colorSelect .color').removeClass('activen')
@@ -29,6 +28,8 @@ $ ->
         $(@).addClass('activen')
 
         $(".colorSelected").css("background", opts.color)
+
+      $("#scaleDiv .dropdown-menu a").on "click", -> App.room.canvas.setScale($(@).data('scale'))
 
       @canvas.initNameChanger()
 

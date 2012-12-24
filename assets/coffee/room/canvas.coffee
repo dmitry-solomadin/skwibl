@@ -226,6 +226,8 @@ $ ->
         room.comments.showComment(element.commentMin) if element.commentMin and withComments
 
     setScale: (scale) ->
+      $("#scaleAmount").html "#{parseInt(scale * 100)}%"
+
       finalScale = scale / opts.currentScale
       opts.currentScale = scale
 
@@ -256,7 +258,6 @@ $ ->
     addScale: -> @setScale(opts.currentScale + 0.1);
 
     subtractScale: -> @setScale(opts.currentScale - 0.1);
-
 
     getViewportAdjustX: -> if App.chat.isVisible() == "true" then 300 else 0
 
