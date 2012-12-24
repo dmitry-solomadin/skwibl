@@ -317,9 +317,14 @@ $ ->
       $commentmin[0].rect.opacity = 0 if $commentmin[0].rect
 
     showComment: ($commentmin) ->
+      folded = $commentmin[0].arrow.isFolded
+
       $commentmin[0].$maximized.show()
-      $commentmin[0].arrow.opacity = 1
-      $commentmin[0].arrow.isHidden = false
+
+      if not folded
+        $commentmin[0].arrow.opacity = 1
+        $commentmin[0].arrow.isHidden = false
+
       $commentmin.show()
       $commentmin[0].rect.opacity = 1 if $commentmin[0].rect
 
@@ -341,6 +346,7 @@ $ ->
       $commentmin[0].$maximized.css("visibility", "hidden")
       $commentmin[0].arrow.opacity = 0
       $commentmin[0].arrow.isHidden = true
+      $commentmin[0].arrow.isFolded = true
       $commentmin.css("visibility", "visible")
 
       room.redrawWithThumb()
@@ -349,6 +355,7 @@ $ ->
       $commentmin[0].$maximized.css("visibility", "visible")
       $commentmin[0].arrow.opacity = 1
       $commentmin[0].arrow.isHidden = false
+      $commentmin[0].arrow.isFolded = false
 
       # the comment position might have been changed.
       @redrawArrow($commentmin)
