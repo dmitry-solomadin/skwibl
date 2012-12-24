@@ -27,12 +27,26 @@ body.room {
     padding: 3px !important;
 }
 
-.additionalInsDropdown {
-    padding: 0 3px !important;
+.additionalInsDropdownDiv .dropdown-toggle {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    margin-left: -7px !important;
+    padding: 4px !important;
 }
 
-.additionalInsDropdown .caret {
-    margin-top: 10px;
+.additionalInsDropdownDiv .dropdown-menu::before {
+    left: 35px;
+}
+
+.additionalInsDropdownDiv .dropdown-menu::after {
+    left: 36px;
+}
+
+.additionalInsDropdown {
+    padding: 0 3px !important;
+    margin-right: 0 !important;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 #additionalInsSelect {

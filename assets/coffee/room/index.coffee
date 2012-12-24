@@ -20,6 +20,8 @@ $ ->
 
       $("#additionalInsSelect a").click ->
         $("#additionalInsDropdown").find("img").attr("src", $(@).find("img").attr("src"))
+        $("#additionalInsDropdown").attr("data-tooltype", $(@).data("tooltype")).data("tooltype", $(@).data("tooltype"))
+        console.log $("#additionalInsDropdown").data("tooltype")
 
       $('#colorSelect .color').click ->
         $('#colorSelect .color').removeClass('activen')
