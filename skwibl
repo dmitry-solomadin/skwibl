@@ -177,7 +177,7 @@ function deploy {
   find ./assets/coffee -name "*.js" -delete
   rm -f $TOOLS_FILE
   mv $TOOLS_FILE.save $TOOLS_FILE
-  find ./assets/js -name *.js -exec cat {} >> $APP_NAME.js \;
+  find ./assets/js -name "*.js" -exec cat {} >> $APP_NAME.js \;
   uglifyjs $APP_NAME.js -c -o $APP_NAME.min.js
   gzip -9 $APP_NAME.min.js -c > $APP_NAME.min.js.gz
   rm -f $APP_NAME.js $APP_NAME.min.js
