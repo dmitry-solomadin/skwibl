@@ -3,9 +3,11 @@ $ ->
     constructor: ->
       @opts = {}
       @savedOpts = new Array
-      @defaultOpts =
+      @sharedOpts =
         tooltype: 'line'
         color: '#404040'
+
+      @defaultOpts =
         defaultWidth: 2
         currentScale: 1
         opacity: 1
@@ -16,17 +18,20 @@ $ ->
       @initOpts(canvasId)
 
       $(".toolTypeChanger").on "click", ->
-        opts.tooltype = $(@).data("tooltype")
+        sharedOpts.tooltype = $(@).data("tooltype")
 
       $("#additionalInsSelect a").click ->
         $("#additionalInsDropdown").find("img").attr("src", $(@).find("img").attr("src"))
+        $("#additionalInsDropdown").attr("data-tooltype", $(@).data("tooltype")).data("tooltype", $(@).data("tooltype"))
 
       $('#colorSelect .color').click ->
         $('#colorSelect .color').removeClass('activen')
-        opts.color = $(@).attr('data-color')
+        sharedOpts.color = $(@).attr('data-color')
         $(@).addClass('activen')
 
-        $(".colorSelected").css("background", opts.color)
+        $(".colorSelected").css("background", sharedOpts.color)
+
+      $("#scaleDiv .dropdown-menu a").on "click", -> App.room.canvas.setScale($(@).data('scale'))
 
       @canvas.initNameChanger()
 
@@ -102,11 +107,11 @@ $ ->
 
       @opts.tool = null
 
-      switch @opts.tooltype
+      switch @sharedOpts.tooltype
         when 'line'
           @items.create(new Path())
         when 'highligher'
-          @items.create(new Path(), {color: @opts.color, width: 15, opacity: 0.7})
+          @items.create(new Path(), {color: @sharedOpts.color, width: 15, opacity: 0.7})
         when 'straightline'
           @items.create(new Path())
           @opts.tool.add(event.point) for [0..1]
@@ -120,7 +125,7 @@ $ ->
           @items.testSelect(event.point)
           @items.drawSelectRect(event.point)
 
-      switch @opts.tooltype
+      switch @sharedOpts.tooltype
         when 'line', 'highligher', 'arrow', 'circle', 'rectangle', 'comment', 'straightline'
           @socket.emit "userMouseDown", x: event.point.x - opts.pandx, y: event.point.y - opts.pandy
 
@@ -130,7 +135,7 @@ $ ->
 
       deltaPoint = event.downPoint.subtract(event.point)
 
-      switch @opts.tooltype
+      switch @sharedOpts.tooltype
         when 'line'
           @opts.tool.add(event.point)
           @opts.tool.smooth()
@@ -184,7 +189,7 @@ $ ->
 
     onMouseUp: (canvas, event) ->
       event.point = @applyCurrentScale(event.point)
-      tooltype = @opts.tooltype
+      tooltype = @sharedOpts.tooltype
 
       switch tooltype
         when 'line'
@@ -224,7 +229,7 @@ $ ->
             else
               @socket.emit "elementUpdate", @socketHelper.prepareElementToSend(selectedItem)
 
-      @opts.tooltype = "select" if tooltype == 'comment'
+      @sharedOpts.tooltype = "select" if tooltype == 'comment'
 
       @canvas.updateSelectedThumb()
 
@@ -267,6 +272,7 @@ $ ->
 
   window.room = App.room
   window.opts = App.room.opts
+  window.sharedOpts = App.room.sharedOpts
 
   App.room.init(App.room.canvas.getSelectedCanvasId())
 

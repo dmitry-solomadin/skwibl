@@ -12,7 +12,7 @@ $ ->
         dashArray: [8, 3]
 
     create: (x, y, rect, max, color, number) ->
-      color = if color then color else opts.color
+      color = if color then color else sharedOpts.color
       COMMENT_SHIFT_X = 75
       COMMENT_SHIFT_Y = -135
 

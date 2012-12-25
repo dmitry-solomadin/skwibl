@@ -30,11 +30,13 @@
     <img src="/images/room/comment.png">
   </a>
 
-  <span class="dropdown">
-    <a id="additionalInsDropdown" href="#" class="btn additionalInsDropdown" data-toggle="dropdown">
+  <span class="dropdown additionalInsDropdownDiv">
+    <button id="additionalInsDropdown" class="btn additionalInsDropdown toolTypeChanger" data-tooltype="arrow">
       <img src="/images/room/arrow.png">
+    </button>
+    <button class="btn dropdown-toggle" data-toggle="dropdown">
       <span class="caret"></span>
-    </a>
+    </button>
     <ul class="dropdown-menu" id="additionalInsSelect">
       <li>
         <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="rectangle">
@@ -72,20 +74,23 @@
     </ul>
   </span>
 
-  <span>
-    <select class="btn" style="width:75px; padding: 0;"
-            onchange="App.room.canvas.setScale($(this).find(':selected').val())">
-      <option value="0.5">50%</option>
-      <option value="0.75">75%</option>
-      <option value="1" selected="selected">100%</option>
-      <option value="1.25">125%</option>
-      <option value="1.5">150%</option>
-      <option value="2">200%</option>
-    </select>
-    <span class="skwibl-btn-group">
-      <a class="btn small-btn" href="#" onclick="App.room.canvas.addScale(); return false;">+</a>
-      <a class="btn small-btn" href="#" onclick="App.room.canvas.subtractScale(); return false;">-</a>
-    </span>
+  <span id="scaleDiv" class="dropdown scaleDiv">
+    <a class="btn small-btn plusButton" href="#" onclick="App.room.canvas.addScale(); return false;">+</a>
+    <button id="scaleAmount" class="btn toolTypeChanger scaleAmount" data-tooltype="arrow">
+      100%
+    </button>
+    <button class="btn dropdown-toggle scaleDropdownCaret" data-toggle="dropdown">
+      <span class="caret"></span>
+    </button>
+    <a class="btn small-btn minusButton" href="#" onclick="App.room.canvas.subtractScale(); return false;">&ndash;</a>
+    <ul class="dropdown-menu">
+      <li><a href="#" data-scale="0.5">50%</a></li>
+      <li><a href="#" data-scale="0.75">75%</a></li>
+      <li><a href="#" data-scale="1">100%</a></li>
+      <li><a href="#" data-scale="1.25">125%</a></li>
+      <li><a href="#" data-scale="1.5">150%</a></li>
+      <li><a href="#" data-scale="2">200%</a></li>
+    </ul>
   </span>
 
   <span class="skwibl-btn-group">

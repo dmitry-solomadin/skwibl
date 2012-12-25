@@ -92,6 +92,11 @@ function clean {
   find ./tools -name "*.js" -delete
 }
 
+function buildWatch {
+  echo "building"
+  $COFFEE -w -o $JS_OUTPUT_DIR $COFFEE_DIR &
+}
+
 ## build procedure
 function build {
   echo "building"
@@ -184,6 +189,11 @@ function update {
 }
 
 case "$1" in
+  -w|--dynamicWatch)
+    init
+    buildWatch
+    startDyn
+    exit 0;;
   -a|--dynamic)
     init
     build

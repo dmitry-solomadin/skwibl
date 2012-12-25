@@ -225,23 +225,28 @@ $ ->
 
         room.comments.showComment(element.commentMin) if element.commentMin and withComments
 
-    setScale: (scale) ->
-      finalScale = scale / opts.currentScale
+    setScale: (scale, prevScale) ->
+      $("#scaleAmount").html "#{parseInt(scale * 100)}%"
+
+      previousScale = prevScale || opts.currentScale
+
+      finalScale = scale / previousScale
       opts.currentScale = scale
 
       transformMatrix = new Matrix(finalScale, 0, 0, finalScale, 0, 0)
 
       paper.project.activeLayer.transform(transformMatrix)
 
-      for element in opts.historytools.allHistory
-        if element.commentMin
-          element.commentMin.css({top: element.commentMin.position().top * finalScale,
-          left: element.commentMin.position().left * finalScale})
+      if not prevScale
+        for element in opts.historytools.allHistory
+          if element.commentMin
+            element.commentMin.css({top: element.commentMin.position().top * finalScale,
+            left: element.commentMin.position().left * finalScale})
 
-          commentMax = element.commentMin[0].$maximized
-          commentMax.css({top: commentMax.position().top * finalScale, left: commentMax.position().left * finalScale})
+            commentMax = element.commentMin[0].$maximized
+            commentMax.css({top: commentMax.position().top * finalScale, left: commentMax.position().left * finalScale})
 
-          room.comments.redrawArrow(element.commentMin)
+            room.comments.redrawArrow(element.commentMin)
 
       room.redraw()
 
@@ -256,7 +261,6 @@ $ ->
     addScale: -> @setScale(opts.currentScale + 0.1);
 
     subtractScale: -> @setScale(opts.currentScale - 0.1);
-
 
     getViewportAdjustX: -> if App.chat.isVisible() == "true" then 300 else 0
 
@@ -415,8 +419,10 @@ $ ->
       alert("No canvas opts by given canvasId=" + cid) unless canvasOpts
 
       @erase()
+      previousScale = opts.currentScale
       room.setOpts(canvasOpts)
       @restore(true, false)
+      @setScale opts.currentScale, previousScale
 
       $(anchor).addClass("canvasSelected")
 

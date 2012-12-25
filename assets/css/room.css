@@ -3,8 +3,9 @@ body.room {
 }
 
 #room-controls {
-    padding-top: 5px;
+    padding-top: 7px;
     float: left;
+    font-size: 0;
 }
 
 .color {
@@ -27,17 +28,75 @@ body.room {
     padding: 3px !important;
 }
 
-.additionalInsDropdown {
-    padding: 0 3px !important;
+.additionalInsDropdownDiv .dropdown-toggle {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    margin-left: -2px !important;
+    padding: 4px !important;
 }
 
-.additionalInsDropdown .caret {
-    margin-top: 10px;
+.additionalInsDropdownDiv .dropdown-menu::before {
+    left: 35px;
+}
+
+.additionalInsDropdownDiv .dropdown-menu::after {
+    left: 36px;
+}
+
+.additionalInsDropdown {
+    padding: 0 3px !important;
+    margin-right: 0 !important;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 #additionalInsSelect {
     min-width: 145px;
     padding: 0 5px;
+}
+
+.scaleDiv {
+    margin-left: 5px;
+    margin-right: 5px;
+    padding-bottom: 10px;
+}
+
+.scaleDiv .dropdown-menu {
+    font-size: 14px;
+    text-align: center;
+    min-width: 80px;
+    margin-left: 60px;
+}
+
+.scaleDiv a, .scaleDiv button {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 4px !important;
+}
+
+.scaleAmount {
+    border-radius: 0 !important;
+    border-left: none;
+    border-right: none;
+    box-shadow: none;
+    width: 40px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.scaleDropdownCaret {
+    border-radius: 0 !important;
+    border-right: none;
+}
+
+.plusButton {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.minusButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 
 .activen {
@@ -76,14 +135,14 @@ body.room {
 }
 
 .skwibl-btn-group .btn:last-child {
-    margin-left: -4px;
+    margin-left: -1px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
 
 .navbar .btn {
-    margin-left: 2px;
-    margin-right: 2px;
+    margin-left: 4px;
+    margin-right: 4px;
 }
 
 .skwibl_image_btn {
