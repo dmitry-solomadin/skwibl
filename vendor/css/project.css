@@ -1,0 +1,77 @@
+.activity {
+    margin: 5px 0;
+}
+
+.activityText {
+    margin: 10px 0 10px 0;
+}
+
+.activity .datetext {
+    color: #b2b2b2;
+    font-weight: normal;
+    font-size: 11px;
+}
+
+#showInviteParticipants .caret {
+    vertical-align: middle;
+    margin-top: -1px;
+    margin-left: 5px;
+}
+
+#inviteParticipants {
+    margin-bottom: 10px;
+    display: none;
+}
+
+.showInviteParticipantsDiv {
+    margin-bottom: 5px;
+}
+
+.projectLeft {
+    margin-right: 20px;
+    padding-top: 5px;
+    width: 360px;
+}
+
+.projectRight {
+    vertical-align: top;
+}
+
+.project {
+    margin-bottom: 35px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #e3e3e3;
+}
+
+.inviteNewDiv > * {
+    vertical-align: top;
+}
+
+.inviteNewDiv {
+    border-bottom: 1px solid #b2b2b2;
+    margin-bottom: 5px;
+}
+
+.participant {
+    padding: 10px 0 10px 0;
+}
+
+.participant span {
+    font-size: 18px;
+}
+
+.projectImage {
+    background: #f5f5f5;
+    padding: 10px;
+    vertical-align: top;
+    display: inline-block;
+}
+
+.projectImage img {
+    vertical-align: middle;
+}
+
+.unconfirmed {
+    color: gray;
+}
+

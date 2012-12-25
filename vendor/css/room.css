@@ -1,0 +1,702 @@
+body.room {
+    padding-top: 55px;
+}
+
+#room-controls {
+    padding-top: 7px;
+    float: left;
+    font-size: 0;
+}
+
+.color {
+    cursor: pointer;
+    display: inline-block;
+    height: 20px;
+    margin: 10px 2px 0 0;
+    width: 20px;
+    border: 1px solid #b2b2b2;
+}
+
+.colorSelected {
+    margin: 0;
+    height: 18px;
+    width: 18px;
+    vertical-align: top;
+}
+
+.colorDropdown {
+    padding: 3px !important;
+}
+
+.additionalInsDropdownDiv .dropdown-toggle {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    margin-left: -2px !important;
+    padding: 4px !important;
+}
+
+.additionalInsDropdownDiv .dropdown-menu::before {
+    left: 35px;
+}
+
+.additionalInsDropdownDiv .dropdown-menu::after {
+    left: 36px;
+}
+
+.additionalInsDropdown {
+    padding: 0 3px !important;
+    margin-right: 0 !important;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+#additionalInsSelect {
+    min-width: 145px;
+    padding: 0 5px;
+}
+
+.scaleDiv {
+    margin-left: 5px;
+    margin-right: 5px;
+    padding-bottom: 10px;
+}
+
+.scaleDiv .dropdown-menu {
+    font-size: 14px;
+    text-align: center;
+    min-width: 80px;
+    margin-left: 60px;
+}
+
+.scaleDiv a, .scaleDiv button {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 4px !important;
+}
+
+.scaleAmount {
+    border-radius: 0 !important;
+    border-left: none;
+    border-right: none;
+    box-shadow: none;
+    width: 40px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.scaleDropdownCaret {
+    border-radius: 0 !important;
+    border-right: none;
+}
+
+.plusButton {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.minusButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.activen {
+    border: 1px solid orange;
+    box-shadow: orange 0 0 5px;
+}
+
+.activeMenu li {
+    font-size: 16px;
+    padding: 7px;
+    color: #404040;
+    cursor: pointer;
+}
+
+.activeMenu li.disabled {
+    color: #b2b2b2;
+    text-shadow: #808080 0 0 1px;
+}
+
+.activeMenu li:hover {
+    background-color: #87ceeb;
+}
+
+.activeMenu li.disabled:hover {
+    background-color: transparent;
+}
+
+.skwibl-btn-group {
+    display: inline-block;
+}
+
+.skwibl-btn-group .btn:first-child {
+    margin-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.skwibl-btn-group .btn:last-child {
+    margin-left: -1px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.navbar .btn {
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.skwibl_image_btn {
+    padding: 0 !important;
+    background: whiteSmoke;
+}
+
+#colorSelect {
+    width: 250px;
+    text-align: center;
+}
+
+.canvasSelectDiv a {
+    width: 80px;
+    height: 60px;
+    display: inline-block;
+    border: 1px solid gray;
+}
+
+.canvasSelectDiv a:hover {
+    box-shadow: #ff4500 0 0 3px;
+}
+
+.canvasPreviewDiv {
+    float: left;
+    margin-right: 10px;
+    position: relative;
+}
+
+.canvasSelected {
+    color: black;
+    box-shadow: #ff4500 0 0 3px;
+}
+
+.canvasSelected:hover {
+    cursor: default;
+    text-decoration: none;
+    box-shadow: #ff4500 0 0 5px;
+}
+
+.canvasRemoveImg {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    cursor: pointer;
+    display: none;
+}
+
+.canvasDownloadImg {
+    position: absolute;
+    bottom: 7px;
+    left: 5px;
+    display: none;
+    cursor: pointer;
+}
+
+.canvasReorderImg {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    display: none;
+    cursor: pointer;
+}
+
+.canvasFooter {
+    bottom: 0;
+    position: fixed;
+    width: 100%;
+    padding-left: 300px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    border-top: 1px solid #a1a1a1;
+    background: white;
+    z-index: 10;
+    height: 108px;
+}
+
+.canvasFooterInner {
+    width: 100%;
+}
+
+.canvasFooterTop {
+    height: 29px;
+    background: #f1f1f1;
+    padding: 3px 10px;
+    box-shadow: 0 1px 3px #a5a5a5;
+}
+
+.canvasFooterBottom {
+    padding: 5px 10px;
+    height: 63px;
+}
+
+body.room {
+    overflow: hidden;
+}
+
+.room-content {
+    height: 100%;
+    position: relative;
+}
+
+.comment-maximized {
+    position: absolute;
+    width: 250px;
+    box-shadow: #e3e3e3 0 0 3px;
+    background: #fefefe;
+    border: 1px solid #c2e1f5;
+    border-radius: 3px;
+    z-index: 2;
+}
+
+.comment-minimized {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    background: #fafafa;
+    border-radius: 50%;
+    z-index: 1;
+    border: 1px solid black;
+    font-size: 18px;
+    line-height: 25px;
+    text-align: center;
+}
+
+.comment-minimized img {
+    display: none;
+}
+
+.comment-remove {
+    background: url("/images/room/remove.png");
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    cursor: pointer !important;
+}
+
+.comment-minimize {
+    background: url("/images/room/minimize.png");
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    cursor: pointer !important;
+}
+
+.comment-min-rect {
+    width: 0;
+    height: 0;
+}
+
+.comment-heading {
+    padding-bottom: 2px;
+}
+
+.comment-show-comments {
+    width: 100%;
+    padding: 10px 0;
+    cursor: pointer;
+    text-align: center;
+    background: rgba(194, 225, 245, 0.5);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.comment-show-comments:hover {
+    background: rgba(194, 225, 245, 1);
+}
+
+.comment-avatar {
+    float: left;
+    margin-right: 5px;
+}
+
+.comment-header {
+    height: 20px;
+    border-bottom: 2px solid #e3e3e3;
+}
+
+.comment-content-actions {
+    padding: 0 10px 10px 10px;
+}
+
+.comment-content-inner {
+    max-height: 320px;
+    overflow: auto;
+}
+
+.comment-text {
+    padding: 8px 10px;
+    border-bottom: 1px solid #e3e3e3;
+    color: #202020;
+    font-size: 11px;
+    padding-bottom: 3px;
+}
+
+.comment-text.todo {
+    background: #f5f5f5;
+    font-size: 12px;
+}
+
+.comment-text.todo.resolved {
+    background: #f5fff5;
+}
+
+.the-comment-text {
+    line-height: 14px;
+}
+
+.comment-author {
+    font-size: 11px;
+    font-weight: bold;
+    color: #505050;
+}
+
+.comment-actions {
+    font-size: 11px;
+}
+
+.comment-time {
+    font-size: 10px;
+    color: gray;
+    margin-top: -5px;
+}
+
+.comment-reply {
+    margin-top: 10px;
+    width: 220px;
+    height: 40px;
+    font-size: 11px;
+}
+
+.comment-send {
+    margin-bottom: 10px;
+}
+
+.openTab {
+    float: left;
+    padding: 5px 10px;
+    background: #A0A0A0;
+    width: 105px;
+    font-size: 14px;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+}
+
+.resolvedTab {
+    margin-left: 15px;
+    float: left;
+    padding: 5px 10px;
+    background: #A9E9A9;
+    width: 105px;
+    font-size: 14px;
+    text-align: center;
+    color: black;
+    cursor: pointer;
+}
+
+.openList {
+    padding-top: 10px;
+    clear: both;
+}
+
+.resolvedList {
+    padding-top: 10px;
+    display: none;
+    clear: both;
+}
+
+.header-foldable {
+    display: inline-block;
+    float: left;
+    padding-top: 7px;
+    padding-bottom: 8px;
+    width: 279px;
+}
+
+.header-foldable > span {
+    padding-right: 5px;
+}
+
+.projectHeader {
+    background: #a0a0a0;
+    color: white;
+    padding: 3px 10px;
+    font-size: 14px;
+    text-shadow: 1px 1px 0 #808080;
+}
+
+.chatFilters {
+    padding: 7px 10px 0 10px;
+}
+
+.chatFilters .btn {
+    margin-left: 0 !important;
+}
+
+.chat {
+    width: 300px;
+    left: 0;
+    height: 100%;
+    margin: 0;
+    background: #f1f1f1;
+    border-right: 1px solid #b1b1b1;
+    box-shadow: gray 1px 3px 5px;
+    position: fixed;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    z-index: 199;
+}
+
+.chatInner {
+    padding: 10px;
+    width: 300px;
+    height: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+.chat .conversation-controls {
+    height: 300px;
+    position: relative;
+    z-index: 2;
+}
+
+.chat .conversation {
+    height: 100%;
+    margin-bottom: -340px;
+    position: relative;
+    z-index: 1;
+    padding-bottom: 350px;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.chat .conversation-inner {
+    height: 100%;
+    background: white;
+    border: 1px solid #e1e1e1;
+    overflow: auto;
+    padding: 5px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+.chattext {
+    width: 100%;
+    height: 120px;
+    box-sizing: border-box;
+}
+
+.participants {
+    background: #fff;
+    padding: 5px;
+    border: 1px solid #e1e1e1;
+    margin-bottom: 5px;
+    height: 48px;
+}
+
+.chatUserStatus {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    position: absolute;
+    background-color: gray;
+    left: 52px;
+    top: 42px;
+    border: 1px solid #404040;
+}
+
+.chatUser {
+    position: relative;
+    float: left;
+}
+
+.chatUserOffline {
+    background-color: red;
+}
+
+.chatUserOnline {
+    background-color: green;
+}
+
+.participants .userAvatar {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.canvasNameInput {
+    font-size: 16px !important;
+}
+
+.canvasNameSave {
+    margin-bottom: 9px;
+}
+
+.noname {
+    color: #a0a0a0;
+}
+
+.canvasName {
+    vertical-align: top;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 28px;
+}
+
+#nameChanger {
+    position: relative;
+    left: 0;
+    float: left;
+    z-index: 1;
+    top: 1px;
+}
+
+#smallCanvasPreviews {
+    float: left;
+    left: -500px;
+    position: relative;
+    margin-left: 10px;
+}
+
+#smallCanvasPreviewsWrap {
+    position: absolute;
+    top: 1px;
+}
+
+.smallCanvasPreview {
+    border-radius: 50%;
+    background: #b0b0b0;
+    cursor: pointer;
+    width: 12px;
+    height: 12px;
+    margin: 10px 5px 10px 0;
+    border: 1px solid #808080;
+    float: left;
+}
+
+.smallCanvasPreview.previewSelected {
+    border: 1px solid #ff4500 !important;
+}
+
+.canvasFolder {
+    float: right;
+}
+
+.canvasFolderDown img {
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    transition: all 0.5s;
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+
+.userBadge {
+    background: white;
+    position: absolute;
+    padding: 4px;
+    line-height: 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    box-shadow: 1px 1px 2px #A0A0A0;
+    z-index: 99;
+}
+
+/* LABELS */
+
+span.label-1, span.labelstyle-02e10c, .labelstyle-02e10c.selected {
+    background: #02e81d !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#02e81d', endColorstr = '#08d901') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#02e81d), to(#08d901)) !important;
+    background: -moz-linear-gradient(top, #02e81d, #08d901) !important;
+    color: #006605 !important;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+span.label-2, span.labelstyle-d7e102, .labelstyle-d7e102.selected {
+    background: #d5e802 !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#d5e802', endColorstr = '#d8d901') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#d5e802), to(#d8d901)) !important;
+    background: -moz-linear-gradient(top, #d5e802, #d8d901) !important;
+    color: #616600 !important;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+span.label-3, span.labelstyle-02d7e1, .labelstyle-02d7e1.selected {
+    background: #02c4e8 !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#02c4e8', endColorstr = '#01d9ca') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#02c4e8), to(#01d9ca)) !important;
+    background: -moz-linear-gradient(top, #02c4e8, #01d9ca) !important;
+    color: #006166 !important;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+span.label-4, span.labelstyle-444444, .labelstyle-444444.selected {
+    background: #727272 !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#727272', endColorstr = '#151313') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#727272), to(#151313)) !important;
+    background: -moz-linear-gradient(top, #727272, #151313) !important;
+    color: #FFFFFF !important;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+span.label-5, span.labelstyle-e10c02, .labelstyle-e10c02.selected {
+    background: #e80c02 !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#e80c02', endColorstr = '#d90b01') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#e80c02), to(#d90b01)) !important;
+    background: -moz-linear-gradient(top, #e80c02, #d90b01) !important;
+    color: #FFFFFF !important;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+span.label-6, span.labelstyle-e102d8, .labelstyle-e102d8.selected {
+    background: #e802b4 !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#e802b4', endColorstr = '#b901d9') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#e802b4), to(#b901d9)) !important;
+    background: -moz-linear-gradient(top, #e802b4, #b901d9) !important;
+    color: #FFFFFF !important;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+span.label-7, span.labelstyle-0b02e1, .labelstyle-0b02e1.selected {
+    background: #2d02e8 !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#2d02e8', endColorstr = '#0119d9') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#2d02e8), to(#0119d9)) !important;
+    background: -moz-linear-gradient(top, #2d02e8, #0119d9) !important;
+    color: #FFFFFF !important;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+span.label-8, span.labelstyle-DDDDDD, .labelstyle-DDDDDD.selected {
+    background: #e5e5e5 !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#e5e5e5', endColorstr = '#d4c7c7') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#e5e5e5), to(#d4c7c7)) !important;
+    background: -moz-linear-gradient(top, #e5e5e5, #d4c7c7) !important;
+    color: #666666 !important;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+span.label-9, span.labelstyle-ffcc00, ffcc00.selected {
+    background: #FFD300 !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 0, startColorstr = '#ffd300', endColorstr = '#ffc400') !important;
+    background: -webkit-gradient(linear, left top, left bottom, from(#FFD300), to(#FFC400)) !important;
+    background: -moz-linear-gradient(top, #FFD300, #FFC400) !important;
+    color: #665100 !important;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* LABELS END */
