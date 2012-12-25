@@ -331,10 +331,10 @@ $ ->
     toggleComments: ->
       if $("#toggleComments").hasClass("active")
         @foldAll()
-        $("#toggleComments").removeClass("active").html("Show comments")
+        $("#toggleComments").removeClass("active").html("Show comments").attr("data-original-title", "Show all comments")
       else
         @unfoldAll()
-        $("#toggleComments").addClass("active").html("Hide comments")
+        $("#toggleComments").addClass("active").html("Hide comments").attr("data-original-title", "Hide all comments")
 
     foldAll: ->
       for savedOpt in room.savedOpts

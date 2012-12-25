@@ -2,36 +2,44 @@
   <a class="brand" href="/">Skwibl</a>
 
   <span style="float:right">
-    <a href="#inviteModal" class="btn skwibl_image_btn" data-toggle="modal">
+    <a href="#inviteModal" class="btn skwibl_image_btn tooltipize" title="Invite new participant" data-delay="1000"
+       data-placement="bottom" data-toggle="modal">
       <img src="/images/room/invite.png">
     </a>
-    <a class="btn skwibl_image_btn" href="#" onclick="App.chat.fold(this); return false;">
+    <a class="btn skwibl_image_btn tooltipize" title="Toggle chat" data-delay="1000" data-placement="bottom"
+       href="#" onclick="App.chat.fold(this); return false;">
       <img src="/images/room/fold.png">
     </a>
   </span>
 </div>
 
 <div id="room-controls">
-  <a href="#" class="btn toolTypeChanger skwibl_image_btn ml25" data-tooltype="select">
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn ml25 tooltipize" title="Select" data-delay="1000"
+     data-placement="bottom" data-tooltype="select">
     <img src="/images/room/select.png">
   </a>
-  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="pan">
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn tooltipize" title="Move canvas" data-delay="1000"
+     data-placement="bottom" data-tooltype="pan">
     <img src="/images/room/pan.png">
   </a>
-
-  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="line">
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn tooltipize" title="Pencil" data-delay="1000"
+     data-placement="bottom" data-tooltype="line">
     <img src="/images/room/pencil.png">
   </a>
-  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="highligher">
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn tooltipize" title="Highligher" data-delay="1000"
+     data-placement="bottom" data-tooltype="highligher">
     <img src="/images/room/highlighter.png">
   </a>
-  <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="comment"
+  <a href="#" class="btn toolTypeChanger skwibl_image_btn tooltipize" title="Note" data-delay="1000"
+     data-placement="bottom" data-tooltype="comment"
      onclick="App.room.helper.notifyComment()">
     <img src="/images/room/comment.png">
   </a>
 
   <span class="dropdown additionalInsDropdownDiv">
-    <button id="additionalInsDropdown" class="btn additionalInsDropdown toolTypeChanger" data-tooltype="arrow">
+    <button id="additionalInsDropdown" class="btn additionalInsDropdown toolTypeChanger tooltipize"
+            data-tooltype="arrow"
+            data-title="Arrow" data-delay="1000" data-placement="bottom">
       <img src="/images/room/arrow.png">
     </button>
     <button class="btn dropdown-toggle" data-toggle="dropdown">
@@ -39,16 +47,20 @@
     </button>
     <ul class="dropdown-menu" id="additionalInsSelect">
       <li>
-        <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="rectangle">
+        <a href="#" class="btn toolTypeChanger skwibl_image_btn tooltipize" data-placement="bottom"
+           data-title="Rectangle" data-delay="1000" data-tooltype="rectangle">
           <img src="/images/room/rectangle.png">
         </a>
-        <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="circle">
+        <a href="#" class="btn toolTypeChanger skwibl_image_btn tooltipize" data-placement="bottom"
+           data-title="Circle" data-delay="1000" data-tooltype="circle">
           <img src="/images/room/circle.png">
         </a>
-        <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="straightline">
+        <a href="#" class="btn toolTypeChanger skwibl_image_btn tooltipize" data-placement="bottom"
+           data-title="Line" data-delay="1000" data-tooltype="straightline">
           <img src="/images/room/line.png">
         </a>
-        <a href="#" class="btn toolTypeChanger skwibl_image_btn" data-tooltype="arrow">
+        <a href="#" class="btn toolTypeChanger skwibl_image_btn tooltipize" data-placement="bottom"
+           data-title="Arrow" data-delay="1000" data-tooltype="arrow">
           <img src="/images/room/arrow.png">
         </a>
       </li>
@@ -56,7 +68,8 @@
   </span>
 
   <span class="dropdown">
-    <a href="#" class="btn colorDropdown" data-toggle="dropdown">
+    <a href="#" class="btn colorDropdown tooltipize" title="Color"
+       data-placement="bottom" data-delay="1000" data-toggle="dropdown">
       <div class="color colorSelected active" style="background-color:black;" data-color="black"></div>
       <span class="caret"></span>
     </a>
@@ -75,14 +88,18 @@
   </span>
 
   <span id="scaleDiv" class="dropdown scaleDiv">
-    <a class="btn small-btn plusButton" href="#" onclick="App.room.canvas.addScale(); return false;">+</a>
-    <button id="scaleAmount" class="btn toolTypeChanger scaleAmount" data-tooltype="arrow">
+    <a class="btn small-btn plusButton tooltipize" title="Zoom In"
+       data-placement="bottom" data-delay="1000" href="#" onclick="App.room.canvas.addScale(); return false;">+</a>
+    <button id="scaleAmount" class="btn toolTypeChanger scaleAmount tooltipize" title="Current scale"
+            data-placement="bottom" data-delay="1000" data-tooltype="arrow">
       100%
     </button>
     <button class="btn dropdown-toggle scaleDropdownCaret" data-toggle="dropdown">
       <span class="caret"></span>
     </button>
-    <a class="btn small-btn minusButton" href="#" onclick="App.room.canvas.subtractScale(); return false;">&ndash;</a>
+    <a class="btn small-btn minusButton tooltipize" title="Zoom out"
+       data-placement="bottom" data-delay="1000" href="#"
+       onclick="App.room.canvas.subtractScale(); return false;">&ndash;</a>
     <ul class="dropdown-menu">
       <li><a href="#" data-scale="0.5">50%</a></li>
       <li><a href="#" data-scale="0.75">75%</a></li>
@@ -94,20 +111,23 @@
   </span>
 
   <span class="skwibl-btn-group">
-    <a href="#" id="undoLink" class="btn skwibl_image_btn disabled" onclick="App.room.history.prev();return false;">
+    <a href="#" id="undoLink" class="btn skwibl_image_btn disabled tooltipize" title="Undo"
+       data-placement="bottom" data-delay="1000" onclick="App.room.history.prev();return false;">
       <img src="/images/room/undo.png">
     </a>
-    <a href="#" id="redoLink" class="btn skwibl_image_btn disabled" onclick="App.room.history.next();return false;">
+    <a href="#" id="redoLink" class="btn skwibl_image_btn disabled tooltipize" title="Redo"
+       data-placement="bottom" data-delay="1000" onclick="App.room.history.next();return false;">
       <img src="/images/room/redo.png">
     </a>
   </span>
 
-  <a id="toggleComments" href="#" class="btn small-btn active"
-     onclick="App.room.comments.toggleComments(); return false;">
+  <a id="toggleComments" href="#" class="btn small-btn active tooltipize" data-title="Hide all comments"
+     data-placement="bottom" data-delay="1000" onclick="App.room.comments.toggleComments(); return false;">
     Hide comments
   </a>
 
-  <a href="#" class="btn small-btn" onclick="App.room.canvas.clear(true);return false;">
+  <a href="#" class="btn small-btn tooltipize" title="Clear canvas"
+     data-placement="bottom" data-delay="1000" onclick="App.room.canvas.clear(true);return false;">
     Clear
   </a>
 
