@@ -163,7 +163,7 @@ function connect {
 ## deploy procedure
 function deploy {
   echo "deploing"
-  TOOLS_FILE="./tools/tools.coffee"
+  TOOLS_FILE="./tools/tools.iced"
   mv $TOOLS_FILE $TOOLS_FILE.save
   sed 's/#  / /g' $TOOLS_FILE.save  > $TOOLS_FILE
   $COFFEE -I none -c -o $JS_OUTPUT_DIR $COFFEE_DIR &
