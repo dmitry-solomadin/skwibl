@@ -77,13 +77,15 @@ $ ->
     findByElementIdAllCanvases: (id) ->
       return null unless id
 
-      for opts in room.savedOpts
-        for element in opts.historytools.allHistory
-          if element.commentMin and ` element.commentMin.elementId == id `
-            return canvasId: opts.canvasId, element: element
+      for savedOpt in room.savedOpts
+        for element in savedOpt.historytools.allHistory
+          if element.commentMin
+            console.log element.commentMin.elementId
+            if element.commentMin and ` element.commentMin.elementId == id `
+              return canvasId: savedOpt.canvasId, element: element
           if ` element.elementId == id `
-            return canvasId: opts.canvasId, element: element
-        return null
+            return canvasId: savedOpt.canvasId, element: element
+
       return null
 
     findById: (id) ->
