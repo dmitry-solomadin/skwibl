@@ -7,7 +7,7 @@ exports.setUp = (client, db) ->
   mod = {}
 
   # type is 'projectInvite' or ...
-  mod.add = (pid, owner, type, invitingUserId, fn) ->
+  mod.add = (pid, owner, type, uid, fn) ->
     client.incr 'activities:next', (err, aid) ->
       if not err
         activity = {}
@@ -15,17 +15,13 @@ exports.setUp = (client, db) ->
         activity.project = pid
         activity.owner = owner
         activity.type = type
-        activity.time = new Date().getTime()
+        activity.time = Date.now()
         activity.status = 'new'
-        activity.inviting = invitingUserId
+        activity.inviting = uid
         client.hmset "activities:#{aid}", activity
-
-        client.sadd "activities:#{type}:#{pid}", aid if type is 'projectInvite'
-
         client.rpush "users:#{owner}:activities", aid
         announce.in("activities#{owner}").emit 'new'
         return tools.asyncOpt fn, null, activity
-
       return tools.asyncOpt fn, err, null
 
   # todo consider refactoring in scope of #138
@@ -37,12 +33,11 @@ exports.setUp = (client, db) ->
     client.hgetall "activities:#{aid}", fn
 
   mod.delete = (aid, fn) ->
-    await db.activities.findById aid, defer(err, activity)
-    if not err and activity
-      client.lrem "users:#{activity.owner}:activities", 0, aid
-      client.del "activities:#{aid}"
-
-    tools.asyncOpt fn, err, activity
+    db.activities.findById aid, (err, activity) ->
+      if not err and activity
+        client.lrem "users:#{activity.owner}:activities", 0, aid
+        client.del "activities:#{aid}"
+      return tools.asyncOpt fn, err, activity
 
   mod.index = (uid, fn, filter) ->
     client.lrange "users:#{uid}:activities", -cfg.ACTIONS_BUFFER_SIZE, -1, (err, array) ->

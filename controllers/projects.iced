@@ -23,15 +23,11 @@ exports.show = (req, res, next) ->
   db.projects.set req.user.id, req.params.pid, ->
     db.projects.getData req.params.pid, (err, project) ->
       return next(err) if err
-
       return db.canvases.index req.params.pid, (err, canvases) ->
         return next(err) if err
-
         db.projects.getUsers req.params.pid, (err, users) ->
           return next(err) if err
-
           db.actions.getProjectActions req.params.pid, 'chat', (err, chatMessages) ->
-
             return res.render 'index',
               template: 'projects/show'
               pid: req.params.pid
@@ -50,13 +46,10 @@ exports.new = (req, res) ->
 exports.prepareDownload = (req, res) ->
   dir = "./uploads/#{req.body.pid}"
   fname = "canvas.png"
-
   # base64 format is: data:image/png;base64,[data]
   # let's cutoff everything that goes before data
   data = req.body.canvasData.substring(22, req.body.canvasData.length)
-
   fs.writeFile "#{dir}/#{fname}", data, 'base64'
-
   return res.send "canvas.png"
 
 exports.download = (req, res) ->
@@ -79,9 +72,9 @@ exports.add = (req, res) ->
             req.flash 'warning', 'Project was created but there was some problems with sending invites.'
           else
             req.flash 'message', 'Project was created invites were sent.'
-          return res.redirect '/projects'
+          return res.redirect "/projects/#{project.id}"
       req.flash 'message', 'Project was created'
-      return res.redirect '/projects'
+      return res.redirect "/projects/#{project.id}"
     return res.redirect '/projects/new'
 
 #
@@ -91,7 +84,7 @@ exports.add = (req, res) ->
 exports.close = (req, res) ->
   db.projects.setProperties req.body.pid,
     status: 'closed'
-    end: new Date
+    end: Date()
   , (err) ->
     tools.returnStatus err, res
 
@@ -112,7 +105,6 @@ exports.reopen = (req, res) ->
 exports.delete = (req, res) ->
   db.projects.findById req.body.pid, (err, project) ->
     return tools.sendError res, new Error("only project owner may delete it") if project.owner isnt req.user.id
-
     db.projects.delete project.id, (err) ->
       tools.returnStatus err, res
 

@@ -51,34 +51,10 @@ exports.setUp = (client, db) ->
       return tools.asyncOpt fn, err, null
 
   mod.restore = (id, fn) ->
-    # Get contacts list
-    client.smembers "users:#{id}:contacts", (err, array) ->
-      if not err
-        for cid in array
-          # Add user from contacts' lists
-          client.sadd "users:#{cid}:contacts"
-    # Get unconfirmed contacts list
-    client.smembers "users:#{id}unconfirmed", (err, array) ->
-      if not err
-        for cid in array
-          # Add user from contacts' requests
-          client.sadd "users:#{cid}:requests"
     # Set status to registred
     return client.hset "users:#{id}:emails" , 'status', 'registred', fn
 
   mod.delete = (id, fn) ->
-    # Get contacts list
-    client.smembers "users:#{id}:contacts", (err, array) ->
-      if not err
-        for cid in array
-          # Delete user from contacts' lists
-          client.srem "users:#{cid}:contacts"
-    # Get unconfirmed contacts list
-    client.smembers "users:#{id}unconfirmed", (err, array) ->
-      if not err
-        for cid in array
-          # Delete user from contacts' requests
-          client.srem "users:#{cid}:requests"
     # Set status to deleted
     return client.hset "users:#{id}:emails" , 'status', 'deleted', fn
 
@@ -94,10 +70,9 @@ exports.setUp = (client, db) ->
           client.hgetall "users:#{id}:name", (err, name) ->
             umails = []
             for email, index in emails
-              umails.push {
+              umails.push
                 value: email
                 type: types[index]
-              }
             user.emails = umails
             user.name = name
             return tools.asyncOpt fn, null, user

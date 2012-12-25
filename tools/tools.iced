@@ -28,7 +28,7 @@ exports.emailUid = (x) ->
 
 exports.hash = (email) ->
   hash = crypto.createHash 'md5'
-  hash.update new Date + email, 'ascii'
+  hash.update Date() + email, 'ascii'
   return hash.digest 'hex'
 
 exports.genPass = ->

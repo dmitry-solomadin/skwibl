@@ -8,24 +8,19 @@ exports.setUp = (client, db) ->
   mod.add = (owner, cid, pid, name, mime, fn) ->
     return client.incr 'files:next', (err, fid) ->
       return tools.asyncOpt(fn, err, null) if err
-
       file =
         id: fid
         name: name
         mime: mime
         owner: owner
-
       if cid
         client.hmset "files:#{fid}", file
         db.canvases.setProperties cid, file: fid
         client.sadd "projects:#{pid}:files", fid
         return tools.asyncOpt fn, null, canvasId: cid, element: file
-
       client.hmset "files:#{fid}", file
       client.sadd "projects:#{pid}:files", fid
-
       time = 0 if tools.getFileType(mime) is 'video'
-
       db.canvases.add pid, file, time, (err, canvas) ->
         return tools.asyncOpt fn, err, null if err
         return tools.asyncOpt fn, null, canvasId: canvas.id, element: file, canvasName: canvas.name

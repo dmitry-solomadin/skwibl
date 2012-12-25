@@ -49,6 +49,19 @@ exports.setUp = (client, db) ->
                 return tools.asyncOpt fn, null, no
       return tools.asyncOpt fn, null, no
 
+  mod.add = (pid, id, fn) ->
+    # Get project members
+    client.smembers "projects:#{pid}:users", (err, array) ->
+      if not err and array and array.length
+        return tools.asyncParallel array, (cid) ->
+          # Add the user as a contact to all project members
+          client.sadd "users:#{cid}:contacts", id
+          # And vise-versa
+          client.sadd "users:#{id}:contacts", cid
+          return tools.asyncDone array, ->
+            return tools.asyncOpt fn, null, pid
+      return tools.asyncOpt fn, err, pid
+
   mod.recalculate = (id, contacts, pid, fn) ->
     for cid in contacts
       db.contacts.isContact id, cid, pid, (err, val) ->
@@ -64,58 +77,5 @@ exports.setUp = (client, db) ->
     return db.projects.remove pid, array[index], (err) ->
       return process.nextTick ->
         db.contacts.deleteContacts pid, array, ++index, fn
-
-#   mod.inviteEmailUserContact = function(id, email, fn) {
-#     db.users.findByEmail(email, function(err, contact) {
-#       if(err) {
-#         return process.nextTick(function () {
-#           fn(err);
-#         });
-#       }
-#       if(contact) {
-#         return db.users.addContact(id, contact.id, fn);
-#       }
-#       var hash = tools.hash(email)
-#       , password = tools.genPass();
-#       return db.users.add({
-#         hash: hash,
-#         password: password,
-#         status: 'unconfirmed',
-#         provider: 'local'
-#       }, null, [{
-#         value: email,
-#         type: 'main'
-#       }], function(err, contact) {
-#         if (err) {
-#           return process.nextTick(function () {
-#             fn(err);
-#           });
-#         }
-#         if (!contact) {
-#           return process.nextTick(function () {
-#             fn(new Error('Can not create user.'));
-#           });
-#         }
-#         client.sadd('users:' + id + ':unconfirmed', contact.id);
-#         client.sadd('users:' + contact.id + ':requests', id);
-#         return db.users.findById(id, function(err, user) {
-#           return smtp.regPropose(user, contact, hash, fn);
-#         });
-#         //       return db.expireUser(contact, db.users.findById(id, function(err, user) {
-#         //         return smtp.regPropose(user, contact, hash, fn);
-#         //       }));
-#       });
-#     });
-#   };
-#
-#   mod.confirmUserContact = function(id, cid, accept, fn) {
-#     if(accept) {
-#       client.smove('users:' + id + ':requests', 'users:' + id + ':contacts', cid);
-#       return client.smove('users:' + cid + ':unconfirmed', 'users:' + cid + ':contacts', id, fn);
-#       // TODO send notification to a new fried
-#     }
-#     client.srem('users:' + id + ':requests', cid);
-#     return client.srem('users:' + cid + 'unconfirmed', id, fn);
-#   };
 
   return mod
