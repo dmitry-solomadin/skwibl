@@ -95,12 +95,12 @@ function clean {
 ## build procedure
 function build {
   echo "building"
-  $COFFEE -c -o $JS_OUTPUT_DIR $COFFEE_DIR &
+  $COFFEE -I none -c -o $JS_OUTPUT_DIR $COFFEE_DIR &
 }
 
 function build_deploy {
   echo "building"
-  $COFFEE -c -o $JS_OUTPUT_DIR $COFFEE_DIR &
+  $COFFEE -I none -c -o $JS_OUTPUT_DIR $COFFEE_DIR &
 }
 
 ## init procedure
@@ -135,13 +135,13 @@ function reset {
 ## start dynamic server
 function startDyn {
   echo "starting dynamic"
-  eval "$COFFEE $DYN.coffee $COFFEE_OPT"
+  eval "$COFFEE $DYN.iced $COFFEE_OPT"
 }
 
 ## start socket server
 function startSocket {
   echo "starting sockets"
-  eval "$COFFEE $SOC.coffee $COFFEE_OPT"
+  eval "$COFFEE $SOC.iced $COFFEE_OPT"
 }
 
 ## run in production procedure
@@ -161,8 +161,8 @@ function deploy {
   TOOLS_FILE="./tools/tools.coffee"
   mv $TOOLS_FILE $TOOLS_FILE.save
   sed 's/#  / /g' $TOOLS_FILE.save  > $TOOLS_FILE
-  $COFFEE -c -o $JS_OUTPUT_DIR $COFFEE_DIR &
-  find ./ -name "*.coffee" -o -name "*.iced" -exec $COFFEE -I node -cb {} \;
+  $COFFEE -I none -c -o $JS_OUTPUT_DIR $COFFEE_DIR &
+  find ./ -name "*.coffee" -o -name "*.iced" -exec $COFFEE -I none -cb {} \;
   find ./assets/coffee -name "*.js" -delete
   rm -f $TOOLS_FILE
   mv $TOOLS_FILE.save $TOOLS_FILE

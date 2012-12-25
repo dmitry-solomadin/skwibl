@@ -8,22 +8,18 @@ exports.setUp = (client, db) ->
       unless err
         canvas =
           id: cid
-          createdAt: new Date().getTime()
+          createdAt: Date.now()
           project: pid
         canvas.time = time if time
-
         return client.scard "projects:#{pid}:canvases", (err, count) ->
           canvas.file = file.id if file
-
           if file and file.name.trim().length > 0
             canvas.name = file.name
           else
             canvas.name = "Canvas #{count + 1}"
-
           client.hmset "canvases:#{cid}", canvas
           client.sadd "projects:#{pid}:canvases", cid
           return tools.asyncOpt fn, null, canvas
-
       return tools.asyncOpt fn, err, null
 
   mod.get = (cid, fn) ->
@@ -68,13 +64,11 @@ exports.setUp = (client, db) ->
       tools.asyncOpt fn, null, null
 
   mod.deleteActions = (cid, type, fn) ->
-    client.lrange "canvases:#{cid}:#{type}", 0, -1, (err, actionIds) ->
-      return tools.asyncOpt fn, null, null if not actionIds or not actionIds.length
-
-      return tools.asyncParallel actionIds, (aid) ->
+    client.lrange "canvases:#{cid}:#{type}", 0, -1, (err, array) ->
+      return tools.asyncOpt fn, null, null if not array or not array.length
+      return tools.asyncParallel array, (aid) ->
         db.actions.delete aid, fn
-
-        return tools.asyncDone actionIds, ->
+        return tools.asyncDone array, ->
           return tools.asyncOpt fn, null, null
 
   mod.setProperties = (cid, properties) ->

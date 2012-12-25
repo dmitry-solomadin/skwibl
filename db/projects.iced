@@ -11,17 +11,15 @@ exports.setUp = (client, db) ->
 
   # get all the projects that are available for the user
   mod.index = (uid, fn) ->
-    await client.sort "users:#{uid}:projects", "by", "projects:*->createdAt", "desc", defer(err, array)
-    projects = []
-
-    if not err and array and array.length
-      getProjectData = (pid, autocb) ->
-        await db.projects.getData pid, defer(err, project)
-        projects.push project if not err and project
-
-      await getProjectData pid, defer() for pid in array
-
-    return tools.asyncOpt fn, null, projects
+    client.sort "users:#{uid}:projects", "by", "projects:*->createdAt", "desc", (err, array) ->
+      projects = []
+      if not err and array and array.length
+        return tools.asyncParallel array, (pid) ->
+          db.projects.getData pid, (err, project) ->
+            projects.push project if not err and project
+            return tools.asyncDone array, ->
+              return tools.asyncOpt fn, null, projects
+      return tools.asyncOpt fn, err, projects
 
   mod.getData = (pid, fn) ->
     client.hgetall "projects:#{pid}", (err, project) ->
@@ -32,7 +30,7 @@ exports.setUp = (client, db) ->
             project.unconfirmedUsers = unconfirmedUsers
             return db.projects.getFiles pid, (err, files) ->
               project.files = files
-              return db.commentTexts.getProjectTodos pid, 3, (err, todos) ->
+              return db.comments.getProjectTodos pid, 3, (err, todos) ->
                 project.todos = todos
                 return tools.asyncOpt fn, err, project
       return tools.asyncOpt fn, err, null
@@ -50,7 +48,6 @@ exports.setUp = (client, db) ->
             files.push file
             return tools.asyncDone fileIds, ->
               tools.asyncOpt fn, null, files
-
       return tools.asyncOpt fn, err, []
 
   # list of users that confirmed invitations
@@ -67,14 +64,15 @@ exports.setUp = (client, db) ->
 
   # list of users that are not confirmed invitations
   mod.getUnconfirmedUsers = (pid, confirmedUsers, fn) ->
-    client.smembers "projects:#{pid}:unconfirmed", (err, unconfirmedUsersIds) ->
-      if not err and unconfirmedUsersIds and unconfirmedUsersIds.length
+    client.zrange "projects:#{pid}:unconfirmed", 0, -1, 'WITHSCORES', (err, array) ->
+      if not err and array and array.length
         users = []
-        return tools.asyncParallel unconfirmedUsersIds, (uid) ->
-          db.contacts.getInfo uid, (err, user) ->
-            users.push user
-            return tools.asyncDone unconfirmedUsersIds, ->
-              return tools.asyncOpt fn, null, users
+        return tools.asyncParallel array, (uid, i) ->
+          unless i % 2
+            db.contacts.getInfo uid, (err, user) ->
+              users.push user
+          return tools.asyncDone array, ->
+            return tools.asyncOpt fn, null, users
       return tools.asyncOpt fn, err, []
 
   mod.add = (uid, name, fn) ->
@@ -88,17 +86,14 @@ exports.setUp = (client, db) ->
         project.id = val
         project.name = name
         project.owner = uid
-        project.createdAt = new Date().getTime()
-        project.start = new Date
-
+        project.createdAt = Date.now()
+        project.start = Date()
         project.status = 'new'
         client.hmset "projects:#{val}", project
         client.sadd "projects:#{val}:users", uid
         client.sadd "users:#{uid}:projects", val
-
         return db.canvases.add val, null, null, (err, canvas) ->
           return tools.asyncOpt(fn, err, project)
-
       return tools.asyncOpt fn, err, null
 
   mod.deleteCanvases = (pid, fn) ->
@@ -118,38 +113,25 @@ exports.setUp = (client, db) ->
       client.del "projects:#{pid}:users"
       return tools.asyncOpt fn, err, pid
 
-  mod.deleteUnconfirmedUsers = (pid, fn) ->
-    client.smembers "projects:#{pid}:unconfirmed", (err, array) ->
-      client.del "projects:#{pid}:unconfirmed" unless err
-      if not err and array and array.length
-        return tools.asyncParallel array, (cid) ->
-          #TODO
-      return tools.asyncOpt fn, err, pid
-
-
   mod.deleteActions = (pid, type, fn) ->
     client.lrange "projects:#{pid}:#{type}", 0, -1, (err, array) ->
-      client.del "projects:#{pid}:#{type}"
+      client.del "projects:#{pid}:#{type}" unless err
       if not err and array and array.length
         return tools.asyncParallel array, (aid) ->
-          client.del "actions:#{aid}"
+          client.del db.actions.delete aid
           return tools.asyncDone array, ->
             return tools.asyncOpt fn, null, pid
       return tools.asyncOpt fn, err, pid
 
   mod.deleteInvitations = (pid, fn) ->
-    client.del "projects:#{pid}:unconfirmed"
-
-    # remove projectInvite activities one by one
-    await client.smembers "activities:projectInvite:#{pid}", defer(err, aids)
-    if not err and aids
-      deleteActivity = (aid, autocb) -> await db.activities.delete aid, defer()
-      await deleteActivity aid, defer() for aid in aids
-
-    # remove projectInvite bucket
-    client.del "activities:projectInvite:#{pid}"
-
-    tools.asyncOpt fn, err, null
+    client.zrange "projects:#{pid}:unconfirmed", 0, -1, (err, array) ->
+      client.del "projects:#{pid}:unconfirmed" unless err
+      if not err and array and array.length
+        return tools.asyncParallel array, (aid) ->
+          db.activities.delete aid
+          return tools.asyncDone array, ->
+            return tools.asyncOpt fn, err, pid
+      return tools.asyncOpt fn, err, pid
 
   mod.delete = (pid, fn) ->
     db.projects.deleteCanvases pid
@@ -165,21 +147,25 @@ exports.setUp = (client, db) ->
     return client.hmset "projects:#{pid}", purifiedProp, fn
 
   mod.invite = (pid, id, user, fn) ->
+    # Do not invite yourself
     if user.id is id
       return tools.asyncOptError fn, 'Cannot invite yourself'
+    if user.status is 'deleted'
+      return tools.asyncOptError fn, 'Cannot invite deleted user'
     # Check if user exists
     return client.exists "users:#{user.id}", (err, val) ->
       if not err and val
-        return client.sismember "projects:#{pid}:unconfirmed", user.id, (err, val) ->
-          if not err and not val
-            client.sadd "projects:#{pid}:unconfirmed", user.id
-            db.activities.add pid, user.id, 'projectInvite', id
-            return tools.asyncOpt fn, err, user
+        # check if user is already invited
+        return client.zrangebyscore "projects:#{pid}:unconfirmed", user.id, user.id, (err, array) ->
+          if not err and array and not array.length
+            return db.activities.add pid, user.id, 'projectInvite', id, (err, activity) ->
+              if not err and activity
+                client.zadd "projects:#{pid}:unconfirmed", user.id, activity.id
+              return tools.asyncOpt fn, err, user
           return tools.asyncOptError fn, "This user has already been invited to project.", null
       if not val
         return tools.asyncOpt fn, new Error 'Record not found'
-
-      return tools.asyncOpt fn, err
+      return tools.asyncOpt fn, err, null
 
   mod.inviteSocial = (pid, provider, providerId, fn) ->
     #TODO
@@ -188,10 +174,8 @@ exports.setUp = (client, db) ->
   mod.inviteEmail = (pid, id, email, fn) ->
     unless email and tools.isEmail email
       return tools.asyncOptError fn, "Please, enter an email."
-
     db.users.findByEmail email, (err, user) ->
       return tools.asyncOpt fn, err if err
-
       if not user
         hash = tools.hash email
         password = tools.genPass();
@@ -205,40 +189,29 @@ exports.setUp = (client, db) ->
             value: email
             type: 'main'
           }
-        ], (err, contact) ->
-          return process.nextTick(-> fn err) if err
-          if not contact
-            return process.nextTick ->
-              fn new Error 'Can not create user.'
-          client.sadd "users:#{id}:unconfirmed", contact.id
-          client.sadd "users:#{contact.id}:requests", id
-          return db.users.findById id, (err, user) ->
-            return smtp.regPropose user, contact, hash, fn
+        ], (err, user) ->
+          return tools.asyncOpt fn err, null if err
+          return tools.asyncOpt fn new Error 'Can not create user.', null if not user
+          db.projects.invite pid, id, user
+          return db.users.findById id, (err, contact) ->
+            return smtp.regPropose contact, user, hash, fn
       return db.projects.invite pid, id, user, fn
 
   mod.inviteLink = (pid, fn) ->
     #TODO
     console.log 'invite link'
 
-  mod.accept = (pid, id, fn) ->
-    # Get project members
-    client.smembers "projects:#{pid}:users", (err, array) ->
-      if not err and array and array.length
-        return tools.asyncParallel array, (cid) ->
-          # Add the user as a contact to all project members
-          client.sadd "users:#{cid}:contacts", id
-          # And vise-versa
-          client.sadd "users:#{id}:contacts", cid
-          return tools.asyncDone array, ->
-            # Add the user to the project
-            client.smove "projects:#{pid}:unconfirmed", "projects:#{pid}:users", id
-            # Add the project to the user
-            client.sadd "users:#{id}:projects", pid
-            return fn null
-      fn err
+  mod.accept = (pid, aid, id, fn) ->
+    db.contacts.add pid, id
+    # Add the user to the project
+    client.zrem "projects:#{pid}:unconfirmed", aid
+    client.sadd "projects:#{pid}:users", id
+    # Add the project to the user
+    client.sadd "users:#{id}:projects", pid
+    return fn null, pid
 
-  mod.decline = (pid, id, fn) ->
-    client.srem "projects:#{pid}:unconfirmed", id, fn
+  mod.decline = (pid, aid, fn) ->
+    client.zrem "projects:#{pid}:unconfirmed", aid, fn
 
   # remove user from project.
   mod.remove = (pid, id, fn) ->
@@ -262,9 +235,9 @@ exports.setUp = (client, db) ->
       if not err and val
         if answer is 'true'
           client.hset "activities:#{aid}", 'status', 'accepted'
-          return db.projects.accept val, uid, fn
+          return db.projects.accept val, aid, uid, fn
         client.hset "activities:#{aid}", 'status', 'declined'
-        return db.projects.decline val, uid, fn
+        return db.projects.decline val, aid, fn
       return tools.asyncOpt fn, err, val
 
   mod.set = (id, pid, fn) ->
@@ -274,4 +247,3 @@ exports.setUp = (client, db) ->
     client.get "users:#{id}:current", fn
 
   return mod
-

@@ -58,25 +58,25 @@ exports.configure = (sio) ->
         socket.broadcast.to(socket.project).emit 'commentText',
           id: id
           element: data
-        db.commentTexts.add data
+        db.comments.add data
 
       socket.on 'markAsTodo', (elementId, cb) ->
         socket.broadcast.to(socket.project).emit 'markAsTodo',
           id: id
           elementId: elementId
-        db.commentTexts.markAsTodo elementId
+        db.comments.markAsTodo elementId
 
       socket.on 'resolveTodo', (elementId, cb) ->
         socket.broadcast.to(socket.project).emit 'resolveTodo',
           id: id
           elementId: elementId
-        db.commentTexts.resolveTodo elementId
+        db.comments.resolveTodo elementId
 
       socket.on 'reopenTodo', (elementId, cb) ->
         socket.broadcast.to(socket.project).emit 'reopenTodo',
           id: id
           elementId: elementId
-        db.commentTexts.reopenTodo elementId
+        db.comments.reopenTodo elementId
 
       socket.on 'updateCommentText', (data, cb) ->
         return unless `(data.owner == id)`
@@ -85,7 +85,7 @@ exports.configure = (sio) ->
           id: id
           elementId: data.elementId
           text: data.text
-        db.commentTexts.update data.elementId, data.text
+        db.comments.update data.elementId, data.text
 
       socket.on 'eraseCanvas', (data, cb) ->
         socket.broadcast.to(socket.project).emit 'eraseCanvas',
@@ -120,7 +120,7 @@ exports.configure = (sio) ->
         socket.broadcast.to(socket.project).emit 'removeCommentText',
           id: id
           elementId: elementId
-        db.commentTexts.remove elementId
+        db.comments.remove elementId
 
       socket.on 'userMouseDown', (data, cb) ->
         socket.broadcast.to(socket.project).emit 'userMouseDown',

@@ -32,7 +32,6 @@ exports.file = (req, res) ->
     return res.send err if err
     type = tools.getFileType file.mime
     res.writeHead 200, 'Content-Type': file.mime
-
     rs = fs.createReadStream "./uploads/#{req.params.pid}/#{type}/#{file.name}"
     rs.pipe res
 
@@ -68,32 +67,25 @@ exports.upload = (req, res, next) ->
     name = decodeURIComponent path.basename(req.header('x-file-name'))
     mime = tools.getFileMime path.extname name
     type = tools.getFileType mime
-
     unless mime
       return res.json
         success: false
         name: name
         error: 'Unsupported file type'
-
     ws = fs.createWriteStream "#{dir}/#{type}/#{name}",
       mode: cfg.FILE_PERMISSION
       flags: 'w'
     console.log 'upload'
-
     ws.on 'error', (err) ->
       console.log err
-
     ws.on 'drain', ->
       console.log 'drain'
       req.resume()
-
     ws.on 'close', ->
       console.log 'close'
-
     req.on 'data', (chunk) ->
       console.log 'chunk'
       ws.write chunk
-
     req.on 'end', ->
       ws.destroySoon()
       console.log 'end'
@@ -103,7 +95,6 @@ exports.upload = (req, res, next) ->
           canvasId: data.canvasId
           name: data.canvasName
           fileId: data.element.id
-
     req.on 'close', ->
       ws.destroy()
       return res.json

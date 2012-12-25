@@ -12,12 +12,12 @@ smtp = email.server.connect
 
 exports.sendRegMail = (user, fn) ->
   email = user.email
-  msg = "<html>You are successfuly registred at <a href=\"#{cfg.DOMAIN}\">#{cfg.DOMAIN}</a> with  #{user.provider}.<br><br>Registration info<br>login: #{email}<br>password: #{user.password}</html>"
+  msg = "<html>Welcome to Skwibl! You are successfuly registred at <a href=\"#{cfg.DOMAIN}\">#{cfg.DOMAIN}</a> with #{user.provider}.<br><br>Your account information: <br>login: #{email}<br>password: #{user.password}</html>"
   return smtp.send
-    text: 'enable html to see registration details'
+    text: "Welcome to Skwibl! You are successfuly registred at #{cfg.DOMAIN} with #{user.provider}. Your account information: login: #{email} password: #{user.password}"
     from: "#{cfg.DOMAIN} <#{cfg.SMTP_NOREPLY}>"
     to: "<#{email}>"
-    subject: 'Registration complete'
+    subject: 'Skwibl - registration complete'
     attachment: [
       data: msg
       alternative: on
@@ -27,12 +27,12 @@ exports.sendRegMail = (user, fn) ->
 
 exports.regNotify = (req, res, next, user, link) ->
   email = user.email
-  msg = "<html>You are about to register at <a href=\"#{cfg.DOMAIN}\">#{cfg.DOMAIN}</a><br>Follow the link below to continue<br><a href=\"#{cfg.DOMAIN}/confirm/#{link}\">#{cfg.DOMAIN}/confirm/#{link}</a><br> or just ignore this mail to cancel registration.<br><br>Registration info<br>login: #{email}<br>password: #{user.password}</html>"
+  msg = "<html>You are about to register at <a href=\"#{cfg.DOMAIN}\">#{cfg.DOMAIN}</a><br>To finish your registration, go to:<br><a href=\"#{cfg.DOMAIN}/confirm/#{link}\">#{cfg.DOMAIN}/confirm/#{link}</a><br>.<br><br>Your account information<br>Login: #{email}<br>Password: #{user.password}</html>"
   return smtp.send
-    text: 'enable html to continue registration'
+    text: "You are about to register at #{cfg.DOMAIN} To finish your registration, go to:#{cfg.DOMAIN}/confirm/#{link}. Your account information Login: #{email} Password: #{user.password}"
     from: "#{cfg.DOMAIN} <#{cfg.SMTP_NOREPLY}>"
     to: "<#{email}>"
-    subject: 'Confirm registration'
+    subject: 'Skwibl - confirm registration'
     attachment: [
       data: msg
       alternative: on
@@ -49,13 +49,12 @@ exports.regNotify = (req, res, next, user, link) ->
 exports.regPropose = (user, contact, link, fn) ->
   email = contact.email
   name = tools.getName user
-  msg = "<html>#{name} invites you to
-  <a href=\"#{cfg.DOMAIN}\">#{cfg.DOMAIN}</a><br>Follow the link below to continue<br><a href=\"  #{cfg.DOMAIN}/confirm/#{link}\">#{cfg.DOMAIN}/confirm/#{link}</a><br><br>Registration info<br>login: #{email}<br>password: #{contact.password}</html>"
+  msg = "<html>#{name} invites you to <a href=\"#{cfg.DOMAIN}\">#{cfg.DOMAIN}</a><br>To finish your registration, go to:<br><a href=\"#{cfg.DOMAIN}/confirm/#{link}\">#{cfg.DOMAIN}/confirm/#{link}</a><br><br>Registration info<br>login: #{email}<br>password: #{contact.password}</html>"
   return smtp.send
-    text: 'enable html to accept invitation'
+    text: "#{name} invites you to #{cfg.DOMAIN} To finish your registration, go to: #{cfg.DOMAIN}/confirm/#{link} Registration info login: #{email} password: #{contact.password}"
     from: "#{cfg.DOMAIN} <#{cfg.SMTP_NOREPLY}>"
     to: "<#{email}>"
-    subject: 'Confirm registration'
+    subject: 'Skwibl - confirm invitation'
     attachment: [
       data: msg
       alternative: on
@@ -69,10 +68,10 @@ exports.passwordSend = (req, res, user, next) ->
   email = user.email
   msg = "<html>Your registration info for <a href=\"#{cfg.DOMAIN}\">#{cfg.DOMAIN}</a> is<br>login: #{email}<br>password: #{user.password}</html>"
   return smtp.send
-    text: 'enable html to see registration details'
+    text: "Your registration info for #{cfg.DOMAIN}  is login: #{email} password: #{user.password}"
     from: "#{cfg.DOMAIN} <#{cfg.SMTP_NOREPLY}>"
     to: "<#{email}>"
-    subject: 'Confirm registration'
+    subject: 'Skwibl - password sent'
     attachment: [
       data: msg
       alternative: on
