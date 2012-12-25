@@ -12,7 +12,7 @@ smtp = email.server.connect
 
 exports.sendRegMail = (user, fn) ->
   email = user.email
-  msg = "<html>Welcome to Skwibl! You are successfuly registred at <a href=\"#{cfg.DOMAIN}\">#{cfg.DOMAIN}</a> with #{user.provider}.<br><br>Your account information: <br>login: #{email}<br>password: #{user.password}</html>"
+  msg = "<html>Welcome to Skwibl!<br><br>You are successfuly registred at <a href=\"#{cfg.DOMAIN}\">#{cfg.DOMAIN}</a> with #{user.provider}.<br><br>Your account information: <br>login: #{email}<br>password: #{user.password}</html>"
   return smtp.send
     text: "Welcome to Skwibl! You are successfuly registred at #{cfg.DOMAIN} with #{user.provider}. Your account information: login: #{email} password: #{user.password}"
     from: "#{cfg.DOMAIN} <#{cfg.SMTP_NOREPLY}>"
