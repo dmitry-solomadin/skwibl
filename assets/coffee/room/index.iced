@@ -23,6 +23,7 @@ $ ->
       $("#additionalInsSelect a").click ->
         $("#additionalInsDropdown").find("img").attr("src", $(@).find("img").attr("src"))
         $("#additionalInsDropdown").attr("data-tooltype", $(@).data("tooltype")).data("tooltype", $(@).data("tooltype"))
+        $("#additionalInsDropdown").attr("data-original-title", $(@).data("title")).data("original-title", $(@).data("title"))
 
       $('#colorSelect .color').click ->
         $('#colorSelect .color').removeClass('activen')

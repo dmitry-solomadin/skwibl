@@ -37,7 +37,7 @@ $ ->
 
       commentHeader.find(".comment-minimize").on "click", => @foldComment(commentMin)
       commentHeader.find(".comment-remove").on "click", => @removeComment(commentMin)
-      commentMin.on "mousedown", => @unfoldComment(commentMin)
+      commentMin.on "mousedown", => @unfoldComment(commentMin, false)
 
       commentMax.append(commentHeader)
       commentContent = $("<div class='comment-content'><div class='comment-content-inner'></div>" +
@@ -331,16 +331,20 @@ $ ->
     toggleComments: ->
       if $("#toggleComments").hasClass("active")
         @foldAll()
-        $("#toggleComments").removeClass("active").html("Show comments")
+        $("#toggleComments").removeClass("active").html("Show comments").attr("data-original-title", "Show all comments")
       else
         @unfoldAll()
-        $("#toggleComments").addClass("active").html("Hide comments")
+        $("#toggleComments").addClass("active").html("Hide comments").attr("data-original-title", "Hide all comments")
 
     foldAll: ->
-      @foldComment(element.commentMin) for element in opts.historytools.allHistory when element.commentMin
+      for savedOpt in room.savedOpts
+        @foldComment(element.commentMin) for element in savedOpt.historytools.allHistory when element.commentMin
 
     unfoldAll: ->
-      @unfoldComment(element.commentMin) for element in opts.historytools.allHistory when element.commentMin
+      for savedOpt in room.savedOpts
+        for element in savedOpt.historytools.allHistory when element.commentMin
+          skipUnfoldArrow = opts.canvasId isnt savedOpt.canvasId
+          @unfoldComment(element.commentMin, skipUnfoldArrow)
 
     foldComment: ($commentmin) ->
       $commentmin[0].$maximized.css("visibility", "hidden")
@@ -351,14 +355,16 @@ $ ->
 
       room.redrawWithThumb()
 
-    unfoldComment: ($commentmin) ->
+    unfoldComment: ($commentmin, skipUnfoldArrow) ->
       $commentmin[0].$maximized.css("visibility", "visible")
-      $commentmin[0].arrow.opacity = 1
-      $commentmin[0].arrow.isHidden = false
-      $commentmin[0].arrow.isFolded = false
 
-      # the comment position might have been changed.
-      @redrawArrow($commentmin)
+      unless skipUnfoldArrow
+        $commentmin[0].arrow.opacity = 1
+        $commentmin[0].arrow.isHidden = false
+        $commentmin[0].arrow.isFolded = false
+
+        # the comment position might have been changed.
+        @redrawArrow($commentmin)
 
       $commentmin.css("visibility", "hidden") if $commentmin[0].rect
 
@@ -557,7 +563,7 @@ $ ->
       room.canvas.findThumbByCanvasId(result.canvasId).click()
 
       comment = result.element
-      @unfoldComment comment.commentMin
+      @unfoldComment comment.commentMin, false
 
       commentText.effect("highlight", {}, 800);
 
