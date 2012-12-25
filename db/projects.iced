@@ -26,7 +26,7 @@ exports.setUp = (client, db) ->
       if not err and project
         return db.projects.getUsers pid, (err, users) ->
           project.users = users
-          return db.projects.getUnconfirmedUsers pid, users, (err, unconfirmedUsers) ->
+          return db.projects.getUnconfirmedUsers pid, (err, unconfirmedUsers) ->
             project.unconfirmedUsers = unconfirmedUsers
             return db.projects.getFiles pid, (err, files) ->
               project.files = files
@@ -63,7 +63,7 @@ exports.setUp = (client, db) ->
       return tools.asyncOpt fn, err, []
 
   # list of users that are not confirmed invitations
-  mod.getUnconfirmedUsers = (pid, confirmedUsers, fn) ->
+  mod.getUnconfirmedUsers = (pid, fn) ->
     client.zrange "projects:#{pid}:unconfirmed", 0, -1, 'WITHSCORES', (err, array) ->
       if not err and array and array.length
         users = []

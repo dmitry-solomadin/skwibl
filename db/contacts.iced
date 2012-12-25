@@ -49,7 +49,7 @@ exports.setUp = (client, db) ->
                 return tools.asyncOpt fn, null, no
       return tools.asyncOpt fn, null, no
 
-  mod.add = (pid, id) ->
+  mod.add = (pid, id, fn) ->
     # Get project members
     client.smembers "projects:#{pid}:users", (err, array) ->
       if not err and array and array.length
