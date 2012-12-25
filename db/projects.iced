@@ -141,7 +141,6 @@ exports.setUp = (client, db) ->
     db.projects.deleteActions pid, 'comment'
     db.projects.deleteInvitations pid
     dir = "./uploads/#{pid}"
-    fs.rmdir dir, tools.logError
     client.del "projects:#{pid}", fn
 
   mod.setProperties = (pid, properties, fn) ->
