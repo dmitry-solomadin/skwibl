@@ -11,7 +11,7 @@ exports.setUp = (client, db) ->
     action.owner = owner
     action.type = type
     action.canvasId = data.canvasId if data.canvasId
-    action.time = Date()
+    action.time = Date.now()
     action.data = JSON.stringify(data.element)
     return client.exists "actions:#{aid}", (err, val) ->
       client.hmset "actions:#{aid}", action

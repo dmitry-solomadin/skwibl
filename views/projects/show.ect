@@ -4,42 +4,63 @@
   <div class="projectHeader">
     <%= @project.name %>
   </div>
-  <div id="chatFilters" class="chatFilters">
-    <a href="#" data-tab="chat-tab" class="btn active small-btn">Chat</a>
-    <a href="#" data-tab="todo-tab" class="btn small-btn">Todo</a>
+  <div id="participants" class="participants">
+    <% for user in @users : %>
+    <% picture = if user.picture then user.picture else '/images/avatar.png' %>
+    <div class="chatUser" id="chatUser<%= user.id %>" data-uid="<%= user.id %>"
+         data-display-name="<%= user.displayName %>"
+         data-picture="<%= picture %>">
+      <img class="userAvatar tooltipize" src="<%= picture %>" width="48" title="<%= user.displayName %>"/>
+      <span class="chatUserStatus"></span>
+    </div>
+    <% end %>
+  </div>
+  <div id="chatFilters" class="btn-group chatFilters">
+    <button data-tab="chat-tab" class="btn btn-large active">Chat</button>
+    <button data-tab="todo-tab" class="btn btn-large">Todo</button>
+    <button data-tab="changelog-tab" class="btn btn-large">Change Log</button>
   </div>
   <div class="chatInner">
-    <div class="conversation">
-      <div id="conversation-inner" class="conversation-inner">
-        <div class="tab-content" id="chat-tab">
+    <div class="tab-content" id="chat-tab">
+      <div class="filter-box">
+        <div id="conversation-inner" class="filter-box-inner">
           <% for message in @chatMessages : %>
-          <div>
-            <b><%= "#{message.owner.displayName}:" %></b>
-            <%= JSON.parse(message.data).msg %>
-          </div>
+            <% picture = if message.owner.picture then message.owner.picture else '/images/avatar.png' %>
+            <div class="chat-message">
+              <div class="message-left-part">
+                <div class="image">
+                  <img class="userAvatar" src="<%= picture %>" width="24"/>
+                </div>
+                <div class="message">
+                  <b class="messageAuthor"><%= "#{message.owner.displayName}:" %></b>
+                  <span class="messageText"><%= JSON.parse(message.data).msg %></span>
+                </div>
+              </div>
+              <div class="timestamp">
+                <% parsedTime = parseFloat(message.time) %>
+                <%= @moment(parsedTime).format("HH:mm") if parsedTime %>
+              </div>
+              <div style="clear:both;"></div>
+            </div>
           <% end %>
         </div>
-        <div class="tab-content" id="todo-tab" style="display: none;">
-          Todo list: mark comment as todo to add tasks
+      </div>
+      <div class="conversation-controls" id="conversation-controls">
+        <div>
+          <textarea class="chattext" id="chattext" placeholder="Type your message..."></textarea>
         </div>
+        <input class="btn btn-large btn-primary fr" type="button" id="chatsend" value="Send"/>
       </div>
     </div>
-    <div class="conversation-controls">
-      <div id="participants" class="participants">
-        <% for user in @users : %>
-        <% picture = if user.picture then user.picture else '/images/avatar.png' %>
-        <div class="chatUser" id="chatUser<%= user.id %>" data-uid="<%= user.id %>"
-             data-display-name="<%= user.displayName %>"
-             data-picture="<%= picture %>">
-          <img class="userAvatar tooltipize" src="<%= picture %>" width="48" title="<%= user.displayName %>"/>
-          <span class="chatUserStatus"></span>
-        </div>
-        <% end %>
+    <div class="tab-content filter-box" id="todo-tab" style="display: none;">
+      <div id="todo-tab-inner" class="filter-box-inner">
+        Todo list: mark comment as todo to add tasks
       </div>
-      <div>
-        <textarea class="chattext" id="chattext" placeholder="Type your message..."></textarea>
+    </div>
+    <div class="tab-content filter-box" id="changelog-tab" style="display: none;">
+      <div id="changelog-tab-inner" class="filter-box-inner">
+        Changelog is yet to be implemented.
       </div>
-      <input class="btn btn-large btn-primary fr" type="button" id="chatsend" value="Send"/>
     </div>
   </div>
 </div>
@@ -53,7 +74,8 @@
     <div class="canvasFooterTop">
       <div id="nameChanger">
         <% hasName = @canvases[0].name and @canvases[0].name.trim().length > 0 %>
-        <span id="canvasName" class="canvasName tooltipize <%= 'noname' unless hasName %>" data-delay="500" title="Click to change name">
+        <span id="canvasName" class="canvasName tooltipize <%= 'noname' unless hasName %>" data-delay="500"
+              title="Click to change name">
           <%= if hasName then @canvases[0].name else "blank name" %>
         </span>
         <span id="canvasNameInputDiv" style="display: none">
@@ -64,46 +86,49 @@
       <div id="smallCanvasPreviewsWrap">
         <div id="smallCanvasPreviews">
           <% for canvas, i in @canvases : %>
-            <div class="smallCanvasPreview tooltipize <%- 'previewSelected' if i is 0 %>" title="<%= canvas.name %>"
-                 data-cid="<%= canvas.id %>" data-name="<%= canvas.name %>" <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>></div>
-          <% end %>
+          <div class="smallCanvasPreview tooltipize <%- 'previewSelected' if i is 0 %>" title="<%= canvas.name %>"
+               data-cid="<%= canvas.id %>" data-name="<%= canvas.name %>"
+          <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
         </div>
-      </div>
-
-      <a id="canvasFolder" class="btn skwibl_image_btn canvasFolder" href="#" onclick="App.room.canvas.foldPreviews(this); return false;">
-        <img src="/images/room/fold-down.png">
-      </a>
-      <div id="file-uploader" class="canvasUpload fr"></div>
-    </div>
-    <div class="canvasFooterBottom">
-      <div id="canvasSelectDiv" class="canvasSelectDiv">
-        <% for canvas, i in @canvases : %>
-          <% for element in canvas.elements : %>
-            <input class="canvasElement<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(element) %>"/>
-          <% end %>
-          <% console.log canvas.comments %>
-          <% for comment in canvas.comments : %>
-            <input class="canvasComment<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(comment) %>"/>
-            <% for text in comment.texts : %>
-              <input class="commentTexts<%= comment.elementId %>" type="hidden" value="<%= JSON.stringify(text) %>"/>
-            <% end %>
-          <% end %>
-          <div class="canvasPreviewDiv">
-            <a href="#" class="<%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.id %>" data-name="<%= canvas.name %>"
-              <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
-              <canvas width="80" height="60"></canvas>
-            </a>
-            <img class="canvasRemoveImg" src="/images/room/remove.png"
-                 onclick="App.room.canvas.delete(this, true); return false;">
-            <img class="canvasDownloadImg" src="/images/room/download.png"
-                 onclick="App.room.canvas.download(this); return false;">
-            <img class="canvasReorderImg" src="/images/room/reorder.png"
-                 onclick="App.room.canvas.reorder(this); return false;">
-          </div>
         <% end %>
       </div>
     </div>
+
+    <a id="canvasFolder" class="btn skwibl_image_btn canvasFolder" href="#"
+       onclick="App.room.canvas.foldPreviews(this); return false;">
+      <img src="/images/room/fold-down.png">
+    </a>
+
+    <div id="file-uploader" class="canvasUpload fr"></div>
   </div>
+  <div class="canvasFooterBottom">
+    <div id="canvasSelectDiv" class="canvasSelectDiv">
+      <% for canvas, i in @canvases : %>
+        <% for element in canvas.elements : %>
+          <input class="canvasElement<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(element) %>"/>
+        <% end %>
+        <% for comment in canvas.comments : %>
+          <input class="canvasComment<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(comment) %>"/>
+          <% for text in comment.texts : %>
+            <input class="commentTexts<%= comment.elementId %>" type="hidden" value="<%= JSON.stringify(text) %>"/>
+          <% end %>
+        <% end %>
+        <div class="canvasPreviewDiv">
+          <a href="#" class="<%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.id %>" data-name="<%= canvas.name %>"
+          <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
+          <canvas width="80" height="60"></canvas>
+          </a>
+          <img class="canvasRemoveImg" src="/images/room/remove.png"
+               onclick="App.room.canvas.delete(this, true); return false;">
+          <img class="canvasDownloadImg" src="/images/room/download.png"
+               onclick="App.room.canvas.download(this); return false;">
+          <img class="canvasReorderImg" src="/images/room/reorder.png"
+               onclick="App.room.canvas.reorder(this); return false;">
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
 </div>
 
 <%- include './projects/invite/popup.ect' %>
