@@ -1,5 +1,5 @@
 
-db = require '../db'
+cfg = require '../config'
 
 exports.currentUser = (id) ->
   return id is this.req.user.id if id
@@ -16,3 +16,6 @@ exports.flashWarning = ->
 
 exports.errorMessages = ->
   return this.req.flash 'objectErrors'
+
+exports.isProduction = ->
+  return cfg.ENVIRONMENT is 'production'

@@ -35,35 +35,39 @@
 <link href="/js/jplayer/skin/pink.flag/jplayer.pink.flag.css" rel="stylesheet" type="text/css"/>
 <!-- jplayer end-->
 
-<!-- general scripts start -->
-<script type="text/javascript" src="/js/app.js"></script>
-<script type="text/javascript" src="/js/jplayerAPI.js"></script>
-<script type="text/javascript" src="/js/notificator.js"></script>
-<script type="text/javascript" src="/js/util.js"></script>
-<script type="text/javascript" src="/js/errors.js"></script>
-<!-- general scripts end -->
+<% if @isProduction : %>
+  <!-- general production script -->
+  <script type="text/javascript" src="/js/skwibl.min.js"></script>
+<% else : %>
+  <!-- general scripts start -->
+  <script type="text/javascript" src="/js/app.js"></script>
+  <script type="text/javascript" src="/js/jplayerAPI.js"></script>
+  <script type="text/javascript" src="/js/notificator.js"></script>
+  <script type="text/javascript" src="/js/util.js"></script>
+  <script type="text/javascript" src="/js/errors.js"></script>
+  <!-- general scripts end -->
 
-<!-- pages start -->
-<script type="text/javascript" src="/js/home.js"></script>
-<script type="text/javascript" src="/js/projects.js"></script>
-<script type="text/javascript" src="/js/activities.js"></script>
-<!-- pages end -->
+  <!-- pages start -->
+  <script type="text/javascript" src="/js/home.js"></script>
+  <script type="text/javascript" src="/js/projects.js"></script>
+  <script type="text/javascript" src="/js/activities.js"></script>
+  <!-- pages end -->
 
-<!-- chat start -->
-<script type="text/javascript" src="/js/chat.js"></script>
-<!-- chat end -->
+  <!-- chat start -->
+  <script type="text/javascript" src="/js/chat.js"></script>
+  <!-- chat end -->
 
-<!-- room start -->
-<script type="text/javascript" src="/js/room/comments.js"></script>
-<script type="text/javascript" src="/js/room/socket_helper.js"></script>
-<script type="text/javascript" src="/js/room/history.js"></script>
-<script type="text/javascript" src="/js/room/items.js"></script>
-<script type="text/javascript" src="/js/room/canvas.js"></script>
-<script type="text/javascript" src="/js/room/helper.js"></script>
-<script type="text/javascript" src="/js/room/index.js"></script>
-<!-- room end -->
+  <!-- room start -->
+  <script type="text/javascript" src="/js/room/comments.js"></script>
+  <script type="text/javascript" src="/js/room/socket_helper.js"></script>
+  <script type="text/javascript" src="/js/room/history.js"></script>
+  <script type="text/javascript" src="/js/room/items.js"></script>
+  <script type="text/javascript" src="/js/room/canvas.js"></script>
+  <script type="text/javascript" src="/js/room/helper.js"></script>
+  <script type="text/javascript" src="/js/room/index.js"></script>
+  <!-- room end -->
 
-<!-- profile start -->
-<script type="text/javascript" src="/js/profile.js"></script>
-<!-- profile end -->
-
+  <!-- profile start -->
+  <script type="text/javascript" src="/js/profile.js"></script>
+  <!-- profile end -->
+<% end %>

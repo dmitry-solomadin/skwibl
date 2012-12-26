@@ -48,6 +48,12 @@ DEBUG_CMD="node --debug $DYN.js & node-inspector &"
 ## redis flush command
 FLUSH_REDIS_CMD='redis-cli flushall'
 
+## tools file (to uncomment gc)
+TOOLS_FILE='./tools/tools.iced'
+
+## application script name
+APP_NAME='./vendor/js/skwibl'
+
 ## usage string
 USAGE="Usage: $0 -a -b -c -d -e -i -p -r -s -u -h \n\n
       -a --dynamic Start dynamic server \n
@@ -90,6 +96,7 @@ function clean {
   find ./smtp -name "*.js" -delete
   find ./sockets -name "*.js" -delete
   find ./tools -name "*.js" -delete
+  rm -f $APP_NAME.js $APP_NAME.min.js $APP_NAME.min.js.gz
 }
 
 function buildWatch {
@@ -163,7 +170,6 @@ function connect {
 ## deploy procedure
 function deploy {
   echo "deploing"
-  TOOLS_FILE="./tools/tools.iced"
   mv $TOOLS_FILE $TOOLS_FILE.save
   sed 's/#  / /g' $TOOLS_FILE.save  > $TOOLS_FILE
   $COFFEE -I none -c -o $JS_OUTPUT_DIR $COFFEE_DIR &
@@ -171,7 +177,11 @@ function deploy {
   find ./assets/coffee -name "*.js" -delete
   rm -f $TOOLS_FILE
   mv $TOOLS_FILE.save $TOOLS_FILE
-  sshpass -p $PASSWORD rsync ./pass.rsync -rvuzl ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee" --exclude "*.iced" --exclude "vendor/socket.io/socket.io.js" --exclude "./uploads/*"
+  find ./assets/js -name "*.js" -exec cat {} >> $APP_NAME.js \;
+  uglifyjs $APP_NAME.js -c -o $APP_NAME.min.js
+  gzip -9 $APP_NAME.min.js -c > $APP_NAME.min.js.gz
+  rm -f $APP_NAME.js $APP_NAME.min.js
+  sshpass -p $PASSWORD rsync ./pass.rsync -rvuzl ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee" --exclude "*.iced" --exclude "./assets/js" --exclude "./uploads/*"
 }
 
 ## debug procedure
