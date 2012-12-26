@@ -236,9 +236,13 @@ $ ->
         return 1
 
       badge = $("<span class='userBadge label-#{getUserIndex(uid)}'>#{App.chat.getUserById(uid).displayName}</span>")
+      left = x + opts.pandx
+      top = y + opts.pandy + parseInt($("#header").height())
+      badgePos = room.applyReverseCurrentScale(new Point(left, top))
       badge.css
-        left: x + opts.pandx
-        top: y + opts.pandy + parseInt($("#header").height())
+        left: badgePos.x
+        top: badgePos.y
+
       $("body").append(badge)
 
       fadeOutBadge = -> $(badge).fadeOut('fast')
