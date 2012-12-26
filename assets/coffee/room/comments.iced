@@ -303,7 +303,7 @@ $ ->
           room.history.add({actionType: "remove", tool: tool, eligible: true})
 
         for commentText in $commentmin[0].$maximized.find(".comment-text")
-          $("#todo-tab").find("#" + commentText.id).remove()
+          $("#todo-tab-inner").find("#" + commentText.id).remove()
         @recalcTasksCount()
 
         room.socket.emit("commentRemove", $commentmin.elementId)
@@ -482,7 +482,7 @@ $ ->
       comment.slideUp "fast", =>
         $(comment).remove()
 
-        $("#todo-tab").find("#commentText#{elementId}").remove()
+        $("#todo-tab-inner").find("#commentText#{elementId}").remove()
         @recalcTasksCount()
 
         @initHideCommentsBlock commentContent if $(commentContent).parent().data("hidden") is "true"
@@ -519,13 +519,13 @@ $ ->
       room.socket.emit "reopenTodo", elementId if emit
 
     addTodo: (commentText) ->
-      if $("#todo-tab").children().length == 0
+      if $("#todo-tab-inner").children().length == 0
         # if it's the first comment added let's prepare todolist structure
-        $("#todo-tab").html("")
-        $("#todo-tab").append(
+        $("#todo-tab-inner").html("")
+        $("#todo-tab-inner").append(
           "<div class='openTab' onclick='App.room.comments.viewOpen()'>0 open</div>
            <div class='resolvedTab' onclick='App.room.comments.viewResolved()'>0 resolved</div>")
-        $("#todo-tab").append("<div class='openList'></div><div class='resolvedList'></div>")
+        $("#todo-tab-inner").append("<div class='openList'></div><div class='resolvedList'></div>")
 
       commentText = commentText.clone()
       commentText.css("cursor", "pointer")
@@ -533,11 +533,11 @@ $ ->
       commentText.on 'click', =>
         @highlightComment commentText.data("element-id")
 
-      $("#todo-tab").find("#" + commentText[0].id).remove()
+      $("#todo-tab-inner").find("#" + commentText[0].id).remove()
       if commentText.hasClass("resolved")
-        $("#todo-tab").find(".resolvedList").append(commentText)
+        $("#todo-tab-inner").find(".resolvedList").append(commentText)
       else
-        $("#todo-tab").find(".openList").append(commentText)
+        $("#todo-tab-inner").find(".openList").append(commentText)
       commentText.show()
       #it may be hidden in the main view.
 

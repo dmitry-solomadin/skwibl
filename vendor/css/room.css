@@ -439,11 +439,28 @@ body.room {
 }
 
 .chatFilters {
-    padding: 7px 10px 0 10px;
+    padding: 7px 9px 0 10px;
 }
 
 .chatFilters .btn {
     margin-left: 0 !important;
+    font-size: 14px;
+    padding: 8px 0;
+    width: 91px;
+    box-shadow: none;
+    border: 1px solid #c5c5c5;
+    border-bottom: none;
+}
+
+.chatFilters .btn:first-child {
+    border-bottom-left-radius: 0;
+    border-right: none;
+}
+
+.chatFilters .btn:last-child {
+    border-bottom-right-radius: 0;
+    border-left: none;
+    width: 94px;
 }
 
 .chat {
@@ -461,11 +478,66 @@ body.room {
 }
 
 .chatInner {
-    padding: 10px;
+    padding: 0 10px 10px 10px;
     width: 300px;
     height: 100%;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
+}
+
+.tab-content {
+    height: 100%;
+}
+
+#todo-tab.filter-box {
+    margin-bottom: -195px;
+    padding-bottom: 195px;
+}
+
+#changelog-tab.filter-box {
+    margin-bottom: -195px;
+    padding-bottom: 195px;
+}
+
+.chat-message {
+    margin-bottom: 7px;
+    line-height: 14px;
+}
+
+.chat-message .message {
+    vertical-align: top;
+}
+
+.chat-message .message-left-part {
+    float:left;
+    width: 235px;
+}
+
+.chat-message .timestamp {
+    float:left;
+    margin-left: 2px;
+    font-size: 10px;
+    color: #808080;
+}
+
+.chat-message .image {
+    float:left;
+    margin-right: 3px;
+}
+
+#conversation-inner {
+    color: #202020;
+    font-family: 'Lucida Sans Unicode', sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+#conversation-inner b {
+    font-size: 12px;
+    letter-spacing: -1px;
+}
+
+#conversation-inner i {
+    font-size: 12px;
 }
 
 .chat .conversation-controls {
@@ -474,20 +546,26 @@ body.room {
     z-index: 2;
 }
 
-.chat .conversation {
+.chat .conversation-controls textarea {
+    border: 1px solid #c5c5c5;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.chat .filter-box {
     height: 100%;
-    margin-bottom: -340px;
+    margin-bottom: -355px;
     position: relative;
     z-index: 1;
-    padding-bottom: 350px;
+    padding-bottom: 365px;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
 
-.chat .conversation-inner {
+.chat .filter-box-inner {
     height: 100%;
     background: white;
-    border: 1px solid #e1e1e1;
+    border: 1px solid #c5c5c5;
     overflow: auto;
     padding: 5px;
     box-sizing: border-box;
@@ -504,7 +582,7 @@ body.room {
     background: #fff;
     padding: 5px;
     border: 1px solid #e1e1e1;
-    margin-bottom: 5px;
+    margin: 5px 10px 5px 10px;
     height: 48px;
 }
 
@@ -536,6 +614,15 @@ body.room {
 .participants .userAvatar {
     display: inline-block;
     margin-left: 10px;
+}
+
+.participants .chatUser:first-child .userAvatar {
+    margin-left: 0;
+}
+
+.participants .chatUser:first-child .chatUserStatus {
+    left: 42px;
+    top: 42px;
 }
 
 .canvasNameInput {

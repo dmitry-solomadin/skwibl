@@ -23,11 +23,12 @@ $ ->
           @sendMessage()
           false
 
-      $("#chatFilters a").click ->
-        $("#chatFilters a").removeClass("active")
+      $("#chatFilters button").click ->
+        tab = $(@).data('tab')
+        $("#chatFilters button").removeClass("active")
         $(@).addClass("active")
-        $("#conversation-inner .tab-content").hide()
-        $("##{$(@).data('tab')}").show()
+        $(".tab-content").hide()
+        $("#" + tab).show()
 
       $("#chat").data("visible", "true")
 
@@ -70,10 +71,17 @@ $ ->
 
     addMessage: (uid, message) ->
       user = @getUserById(uid)
-      $('#conversation-inner #chat-tab').append("<div><b>#{user.displayName}:</b> #{message}</div>")
+
+      chatMessage = $(".chat-message:first").clone()
+      chatMessage.find(".messageAuthor").html(user.displayName + ":")
+      chatMessage.find(".messageText").html(message)
+      chatMessage.find(".image img").attr("src", user.picture)
+      chatMessage.find(".timestamp").html(moment(new Date().getTime()).format("HH:mm"))
+
+      $('#conversation-inner').append(chatMessage)
 
     addTechMessage: (message) ->
-      $('#conversation-inner #chat-tab').append("<div>#{message}</div>")
+      $('#conversation-inner').append("<div>#{message}</div>")
 
     changeUserStatus: (uid, online) ->
       chatStatus = $("#chatUser#{uid}").find(".chatUserStatus")

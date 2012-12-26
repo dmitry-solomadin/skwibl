@@ -11,7 +11,7 @@ exports.setUp = (client, db) ->
     action.owner = owner
     action.type = type
     action.canvasId = data.canvasId if data.canvasId
-    action.time = Date()
+    action.time = Date.now()
     action.data = JSON.stringify(data.element)
     return client.exists "actions:#{aid}", (err, val) ->
       client.hmset "actions:#{aid}", action
@@ -20,6 +20,7 @@ exports.setUp = (client, db) ->
         client.rpush "canvases:#{data.canvasId}:#{type}", aid if data.canvasId
         if type is 'comment'
           client.incr "actions:#{data.canvasId}:next", (err, cid) ->
+            console.log aid, cid
             action.number = cid
             action.newAction = true # this won't go into db, just a marker for top level code
             client.hset "actions:#{aid}", "number", cid
@@ -72,22 +73,22 @@ exports.setUp = (client, db) ->
     client.lrange "canvases:#{cid}:#{type}", 0, -1, (err, array) ->
       return tools.asyncOpt fn, null, [] if not array or not array.length
       if not err
-        actions = []
+        fetchedActions = []
         return tools.asyncParallel array, (aid) ->
           client.hgetall "actions:#{aid}", (err, action) ->
-            action = JSON.parse(action.data)
-            action.number = action.number
+            fetchedAction = JSON.parse(action.data)
+            fetchedAction.number = action.number
             return tools.asyncOpt fn, err, [] if err
             if type is 'comment'
               return db.comments.index action.elementId, (err, texts) ->
-                action.texts = texts
-                actions.push action
+                fetchedAction.texts = texts
+                fetchedActions.push fetchedAction
                 tools.asyncDone array, ->
-                  tools.asyncOpt fn, null, actions
+                  tools.asyncOpt fn, null, fetchedActions
             else
-              actions.push action
+              fetchedActions.push fetchedAction
               tools.asyncDone array, ->
-                tools.asyncOpt fn, null, actions
+                tools.asyncOpt fn, null, fetchedActions
       return tools.asyncOpt fn, err, []
 
   return mod
