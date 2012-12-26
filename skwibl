@@ -54,6 +54,9 @@ TOOLS_FILE='./tools/tools.iced'
 ## application script name
 APP_NAME='./vendor/js/skwibl'
 
+## library script name
+LIB_NAME='./vendor/js/lib'
+
 ## usage string
 USAGE="Usage: $0 -a -b -c -d -e -i -p -r -s -u -h \n\n
       -a --dynamic Start dynamic server \n
@@ -96,6 +99,8 @@ function clean {
   find ./smtp -name "*.js" -delete
   find ./sockets -name "*.js" -delete
   find ./tools -name "*.js" -delete
+  rm -f $LIB_NAME.js $LIB_NAME.min.js $LIB_NAME.min.js.gz
+  rm -f ./vendor/js/Jplayer.swf
   rm -f $APP_NAME.js $APP_NAME.min.js $APP_NAME.min.js.gz
 }
 
@@ -177,11 +182,15 @@ function deploy {
   find ./assets/coffee -name "*.js" -delete
   rm -f $TOOLS_FILE
   mv $TOOLS_FILE.save $TOOLS_FILE
+  find ./vendor/js/dev -name "*.js" -exec cat {} >> $LIB_NAME.js \;
+  uglifyjs $LIB_NAME.js -c -o $LIB_NAME.min.js
+  gzip -9 $LIB_NAME.min.js -c > $LIB_NAME.min.js.gz
+  cp ./vendor/js/dev/Jplayer.swf ./vendor/js/Jplayer.swf
   find ./assets/js -name "*.js" -exec cat {} >> $APP_NAME.js \;
   uglifyjs $APP_NAME.js -c -o $APP_NAME.min.js
   gzip -9 $APP_NAME.min.js -c > $APP_NAME.min.js.gz
   rm -f $APP_NAME.js $APP_NAME.min.js
-  sshpass -p $PASSWORD rsync ./pass.rsync -rvuzl ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee" --exclude "*.iced" --exclude "./assets/js" --exclude "./uploads/*"
+  sshpass -p $PASSWORD rsync ./pass.rsync -rvuzl ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee" --exclude "*.iced" --exclude "./assets" --exclude "./uploads/*" --exclude "./vendor/dev"
 }
 
 ## debug procedure

@@ -46,7 +46,7 @@ exports.setUp = (logger) ->
     app.set 'view engine', 'ect'
     app.use express.logger stream: logStream
     app.enable 'trust proxy'
-    app.use express.favicon "#{assetsDir}/images/butterfly-tiny.png"
+    app.use express.favicon "#{vendorDir}/images/butterfly-tiny.png"
     app.set 'view options', {layout: false}
     app.use express.bodyParser()
     app.use express.methodOverride()

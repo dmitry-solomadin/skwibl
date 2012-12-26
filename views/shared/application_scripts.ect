@@ -16,36 +16,31 @@
   App.room = {};
 </script>
 
-<script src="/socket.io/socket.io.js"></script>
+<% if @currentUser() : %>
+  <script src="/socket.io/socket.io.js"></script>
+<% end %>
 
-<!-- plugins start -->
-<script src="/js/jquery.js"></script>
-<script src="/js/jquery-ui-highlight.js"></script>
-<script src="/js/jquery.hotkeys.js"></script>
-<script src="/js/bootstrap.js"></script>
-<script src="/js/fileuploader.js"></script>
-<script src="/js/paper.js"></script>
-<script src="/js/moment.min.js"></script>
-<script src="/js/jquery.easing.js"></script>
-<!-- plugins end -->
-
-<!-- jplayer start-->
-<script type="text/javascript" src="/js/jplayer/jquery.jplayer/jquery.jplayer.js"></script>
-<script type="text/javascript" src="/js/jplayer/add-on/jplayer.playlist.js"></script>
-<link href="/js/jplayer/skin/pink.flag/jplayer.pink.flag.css" rel="stylesheet" type="text/css"/>
-<!-- jplayer end-->
-
-<% if @isProduction : %>
-  <!-- general production script -->
+<% if @isProduction() : %>
+  <script type="text/javascript" src="/js/lib.min.js"></script>
   <script type="text/javascript" src="/js/skwibl.min.js"></script>
 <% else : %>
-  <!-- general scripts start -->
-  <script type="text/javascript" src="/js/app.js"></script>
-  <script type="text/javascript" src="/js/jplayerAPI.js"></script>
-  <script type="text/javascript" src="/js/notificator.js"></script>
-  <script type="text/javascript" src="/js/util.js"></script>
-  <script type="text/javascript" src="/js/errors.js"></script>
-  <!-- general scripts end -->
+
+  <!-- plugins start -->
+  <script src="/js/dev/jquery.js"></script>
+  <script src="/js/dev/jquery-ui-highlight.js"></script>
+  <script src="/js/dev/jquery.hotkeys.js"></script>
+  <script src="/js/dev/bootstrap.js"></script>
+  <script src="/js/dev/fileuploader.js"></script>
+  <script src="/js/dev/paper.js"></script>
+  <script src="/js/dev/moment.js"></script>
+  <script src="/js/dev/jquery.easing.js"></script>
+  <!-- plugins end -->
+
+  <!-- jplayer start-->
+  <script type="text/javascript" src="/js/dev/jquery.jplayer.js"></script>
+  <!--<script type="text/javascript" src="/js/jplayer/add-on/jplayer.playlist.js"></script>-->
+  <link href="/css/jplayer.css" rel="stylesheet" type="text/css"/>
+  <!-- jplayer end-->
 
   <!-- pages start -->
   <script type="text/javascript" src="/js/home.js"></script>
@@ -70,4 +65,13 @@
   <!-- profile start -->
   <script type="text/javascript" src="/js/profile.js"></script>
   <!-- profile end -->
+
+  <!-- general scripts start -->
+  <script type="text/javascript" src="/js/app.js"></script>
+  <script type="text/javascript" src="/js/jplayerAPI.js"></script>
+  <script type="text/javascript" src="/js/notificator.js"></script>
+  <script type="text/javascript" src="/js/util.js"></script>
+  <script type="text/javascript" src="/js/errors.js"></script>
+  <!-- general scripts end -->
+
 <% end %>
