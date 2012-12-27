@@ -48,7 +48,8 @@
     "iced-coffee-script": "*"
   },
   "devDependencies": {
-    "node-inspector": "0.2.x"
+    "node-inspector": "0.2.x",
+    "uglify-js": "*"
   },
   "engine": {
     "node": "0.8.x"

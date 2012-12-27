@@ -193,7 +193,7 @@ function deploy {
   find ./vendor/js/dev/plugins/ -name "*.js" -exec cat {} >> $LIB_NAME.js \;
   find ./assets/js -name "*.js" -exec cat {} >> $CLIENT_NAME.js \;
   cat $LIB_NAME.js $SOCKETIO_SCRIPT $CLIENT_NAME.js > $APP_NAME.js
-  uglifyjs $APP_NAME.js -c -o $APP_NAME.min.js
+  node_modules/uglify-js/bin/uglifyjs $APP_NAME.js -c -o $APP_NAME.min.js
   gzip -9 $APP_NAME.min.js -c > $APP_NAME.min.js.gz
   rm -f $LIB_NAME.js $LIB_NAME.min.js
   rm -f $CLIENT_NAME.js $CLIENT_NAME.min.js
