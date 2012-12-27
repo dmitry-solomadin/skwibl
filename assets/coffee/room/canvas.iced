@@ -262,7 +262,7 @@ $ ->
 
     subtractScale: -> @setScale(opts.currentScale - 0.1);
 
-    getViewportAdjustX: -> if App.chat.isVisible() == "true" then 300 else 0
+    getViewportAdjustX: -> if App.chat.isVisible() then 300 else 0
 
     getViewportAdjustY: -> $("#canvasFooter").height()
 

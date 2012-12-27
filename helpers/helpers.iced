@@ -20,9 +20,6 @@ exports.isProduction = ->
   return cfg.ENVIRONMENT is 'production'
 
 exports.splitComments = (messages) ->
-  # rangeEnd is always the end of yesterday
-  now = Date.now()
-
   yesterday = @moment().subtract("days", 1).endOf("day")
   today = @moment()
 
@@ -37,10 +34,11 @@ exports.splitComments = (messages) ->
   uniqueDates = {}
   for message in messages
     messageTime = @moment parseFloat(message.time)
+    endOfDayMessageTime = @moment(parseFloat(message.time)).endOf("day")
 
-    message.date = messageTime.format("DD-MM-YYYY")
-    timeDiff = messageTime.diff(today, "days")
-    switch timeDiff
+    message.date = messageTime.format("MMM DD, YYYY")
+    dayDiff = Math.abs endOfDayMessageTime.diff(today.endOf("day"), "days")
+    switch dayDiff
       when 0 then prettyName = "Today"
       when 1 then prettyName = "Yesterday"
     uniqueDates[message.date] =

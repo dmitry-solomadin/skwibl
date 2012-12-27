@@ -4,7 +4,7 @@
     <span class="label <%- 'label-info' if @activity.status is 'new' %>"><%= @activity.status %></span>
     Invite to project
     <span class="datetext">
-      <%= @moment(parseFloat(@activity.time)).format("DD-MM-YYYY HH:mm") %>
+      <%= @moment(parseFloat(@activity.time)).format("MMM DD, YYYY HH:mm") %>
     </span>
   </h4>
 

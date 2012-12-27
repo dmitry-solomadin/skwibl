@@ -1,7 +1,7 @@
 <div class="header-foldable" id="header-foldable">
   <a class="brand" href="/">Skwibl</a>
 
-  <span style="float:right">
+  <span style="float:right;">
     <a href="#inviteModal" class="btn skwibl_image_btn tooltipize" title="Invite new participant" data-delay="1000"
        data-placement="bottom" data-toggle="modal">
       <img src="/images/room/invite.png">
@@ -9,6 +9,7 @@
     <a class="btn skwibl_image_btn tooltipize" title="Toggle chat" data-delay="1000" data-placement="bottom"
        href="#" onclick="App.chat.fold(this); return false;">
       <img src="/images/room/fold.png">
+      <div class="chat-badge-wrapper"><span id="chatBadge" class="badge chat-badge badge-info">0</span></div>
     </a>
   </span>
 </div>

@@ -328,7 +328,7 @@ body.room {
 }
 
 .comment-content-actions {
-    padding: 0 10px 10px 10px;
+    padding: 0 5px 10px 5px;
 }
 
 .comment-content-inner {
@@ -424,6 +424,7 @@ body.room {
     padding-top: 7px;
     padding-bottom: 8px;
     width: 279px;
+    overflow: visible !important;
 }
 
 .header-foldable > span {
@@ -439,14 +440,14 @@ body.room {
 }
 
 .chatFilters {
-    padding: 7px 9px 0 10px;
+    padding: 7px 4px 0 5px;
 }
 
 .chatFilters .btn {
     margin-left: 0 !important;
     font-size: 14px;
-    padding: 8px 0;
-    width: 91px;
+    padding: 6px 0;
+    width: 95px;
     box-shadow: none;
     border: 1px solid #c5c5c5;
     border-bottom: none;
@@ -460,7 +461,7 @@ body.room {
 .chatFilters .btn:last-child {
     border-bottom-right-radius: 0;
     border-left: none;
-    width: 94px;
+    width: 96px;
 }
 
 .chat {
@@ -478,7 +479,7 @@ body.room {
 }
 
 .chatInner {
-    padding: 0 10px 10px 10px;
+    padding: 0 5px 10px 5px;
     width: 300px;
     height: 100%;
     box-sizing: border-box;
@@ -527,11 +528,11 @@ body.room {
 
 .chat-message .message-left-part {
     float:left;
-    width: 235px;
+    width: 230px;
 }
 
 .chat-message .timestamp {
-    float:left;
+    float:right;
     margin-left: 2px;
     font-size: 10px;
     color: #808080;
@@ -593,13 +594,14 @@ body.room {
     width: 100%;
     height: 120px;
     box-sizing: border-box;
+    -moz-box-sizing: border-box;
 }
 
 .participants {
     background: #fff;
     padding: 5px;
     border: 1px solid #e1e1e1;
-    margin: 5px 10px 5px 10px;
+    margin: 5px;
     height: 48px;
 }
 
@@ -718,6 +720,21 @@ body.room {
     font-size: 12px;
     box-shadow: 1px 1px 2px #A0A0A0;
     z-index: 99;
+}
+
+.chat-badge {
+    position: absolute;
+    top: -32px;
+    left: 18px;
+    padding: 2px 6px 2px !important;
+    height: 11px;
+    display: none;
+}
+
+.chat-badge-wrapper {
+    position: relative;
+    float:left;
+    display: inline-block;
 }
 
 /* LABELS */

@@ -39,13 +39,12 @@ $ ->
       picture = if user.picture then user.picture else '/images/avatar.png'
 
       $("#participants").append("<div class='chatUser' id='chatUser#{user.id}' data-uid='#{user.id}'
-                        data-display-name='#{user.displayName}' data-picture='#{picture}'>
-                        <img class='userAvatar tooltipize' src='#{picture}' width='48' title='#{user.displayName}'/>
-                        <span class='chatUserStatus'></span>
-                        </div>")
+                              data-display-name='#{user.displayName}' data-picture='#{picture}'>
+                              <img class='userAvatar tooltipize' src='#{picture}' width='48' title='#{user.displayName}'/>
+                              <span class='chatUserStatus'></span>
+                              </div>")
 
-    isVisible: ->
-      $("#chat").data("visible")
+    isVisible: -> if $("#chat").data("visible") is "true" then true else false
 
     fold: (link) ->
       $("#chat").data("visible", "false")
@@ -65,15 +64,23 @@ $ ->
       $(".canvasFooterInner").animate({width: $(window).width() - 300}, -> $(".canvasFooterInner").css(width: "100%"))
 
       $(link).attr("onclick", "App.chat.fold(this); return false;").find("img").attr("src", "/images/room/fold.png")
+      @clearBadgeCount()
+      @scrollToTheBottom()
 
     getUserById: (uid) ->
       for user in @users
         return user if `user.id == uid`
 
+    addBadgeCount: -> $("#chatBadge").show().html(parseInt($("#chatBadge").html()) + 1)
+
+    clearBadgeCount: -> $("#chatBadge").hide().html("0")
+
     addMessage: (uid, message) ->
+      @addBadgeCount() unless @isVisible()
+
       user = @getUserById(uid)
 
-      chatMessage = $(".messageTemplate").clone().show()
+      chatMessage = $(".messageTemplate").clone().removeClass("messageTemplate").show()
       chatMessage.find(".messageAuthor").html(user.displayName + ":")
       chatMessage.find(".messageText").html(message)
       chatMessage.find(".image img").attr("src", user.picture)
@@ -82,7 +89,7 @@ $ ->
       # let's see if we would need to scroll to the bottom after adding the message
       # we need to scroll if the adding user is current or the chat hasn't been scrolled
       conversation = $("#conversation-inner")
-      scrollToTheBottom = ` uid == $("#uid").val() ` or conversation[0].scrollTop is conversation[0].scrollHeight
+      scrollToTheBottom = ` uid == $("#uid").val() ` or (conversation[0].scrollTop + conversation.innerHeight()) is conversation[0].scrollHeight
 
       $('#conversation-inner .today').append(chatMessage)
 

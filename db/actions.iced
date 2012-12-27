@@ -55,7 +55,7 @@ exports.setUp = (client, db) ->
     client.hgetall "actions:#{aid}", fn
 
   mod.getProjectActions = (pid, type, fn) ->
-    client.lrange "projects:#{pid}:#{type}", -cfg.ACTIONS_BUFFER_SIZE, -1, (err, array) ->
+    client.lrange "projects:#{pid}:#{type}", 0, -1, (err, array) ->
       if not err and array and array.length
         actions = []
         return tools.asyncParallel array, (aid) ->

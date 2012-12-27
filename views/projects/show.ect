@@ -24,6 +24,7 @@
     <div class="tab-content" id="chat-tab">
       <div class="filter-box">
         <div id="conversation-inner" class="filter-box-inner">
+          <% console.log @chatMessages %>
           <% commentInfo = @splitComments @chatMessages %>
           <% timeRanges = commentInfo.timeRanges %>
           <% uniqueDates = commentInfo.uniqueDates %>
