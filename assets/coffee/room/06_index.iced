@@ -133,6 +133,7 @@ $ ->
     onMouseDrag: (canvas, event) ->
       event.point = @applyCurrentScale(event.point)
       event.delta = @applyCurrentScale(event.delta)
+      event.downPoint = @applyCurrentScale(event.downPoint)
 
       deltaPoint = event.downPoint.subtract(event.point)
 

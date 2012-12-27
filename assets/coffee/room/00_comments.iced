@@ -20,16 +20,18 @@ $ ->
         COMMENT_SHIFT_X = 75
         COMMENT_SHIFT_Y = 55
 
+      reversedCoord = room.applyReverseCurrentScale(new Point(x, y))
+
       commentMin = $("<div class='comment-minimized'></div>")
       commentMin.addClass("vis-hidden") if rect
-      commentMin.css(left: x, top: y, borderColor: color).data("color", color)
+      commentMin.css(left: reversedCoord.x, top: reversedCoord.y, borderColor: color).data("color", color)
 
       @setNumber commentMin, number
 
       commentMax = $("<div class='comment-maximized'></div>")
       commentMax.css(borderColor: color)
-      max_x = if max then max.x else x + COMMENT_SHIFT_X
-      max_y = if max then max.y else y + COMMENT_SHIFT_Y
+      max_x = if max then max.x else reversedCoord.x + COMMENT_SHIFT_X
+      max_y = if max then max.y else reversedCoord.y + COMMENT_SHIFT_Y
       commentMax.css(left: max_x, top: max_y)
       commentHeader = $("<div class='comment-header'>" +
       "<div class='fr'><span class='comment-minimize'></span><span class='comment-remove'></span></div>" +
@@ -89,6 +91,17 @@ $ ->
         commentMax.find(".comment-reply").val("")
         $(commentMax).find(".edit-cancel").hide()
 
+      commentMax[0].coords = ->
+        left = $(this).position().left
+        top = $(this).position().top
+        height = $(this).height()
+        width = $(this).width()
+
+        xtl: left, ytl: top
+        xtr: left + width, ytr: top
+        xbl: left, ybl: top + height
+        xbr: left + width, ybr: top + height
+
       commentMin[0].$maximized = commentMax
 
       if rect
@@ -98,19 +111,14 @@ $ ->
       $("#room-content").prepend(commentMin)
       $("#room-content").prepend(commentMax)
 
-      bp = @getArrowBindPoint(commentMin, commentMax.position().left + (commentMax.width() / 2),
-      commentMax.position().top + (commentMax.height() / 2))
-      zone = @getZone(commentMax.position().left, commentMax.position().top,
-      bp.x, bp.y, commentMax.width(), commentMax.height())
-
-      coords = @getArrowCoords(commentMin, zone)
+      coords = @getArrowCoords commentMin
       path = new Path()
       path.strokeColor = color
       path.strokeWidth = "1"
       path.fillColor = "#FCFCFC"
-      path.add(new Point(coords.x0, coords.y0))
-      path.add(new Point(coords.x1, coords.y1))
-      path.add(new Point(coords.x2, coords.y2))
+      path.add new Point(coords.x0, coords.y0)
+      path.add new Point(coords.x1, coords.y1)
+      path.add new Point(coords.x2, coords.y2)
       path.closed = true
       paper.project.activeLayer.addChild(path)
 
@@ -118,8 +126,14 @@ $ ->
 
       commentMin
 
-    getZone: (left, top, x0, y0, w, h) ->
-      c = @getCommentCoords(left, top, w, h)
+    getZone: (commentMin) ->
+      bp = @getArrowBindPoint commentMin
+      rect = commentMin[0].rect
+
+      x0 = if rect then bp.x else bp.x / opts.currentScale
+      y0 = if rect then bp.y else bp.y / opts.currentScale
+
+      c = commentMin[0].$maximized[0].coords()
 
       c.xtl = c.xtl / opts.currentScale
       c.ytl = c.ytl / opts.currentScale
@@ -198,22 +212,33 @@ $ ->
 
       x1: x1, y1: y1, x2: x2, y2: y2
 
-    getArrowCoords: ($commentMin, zone) ->
+    getArrowCoords: ($commentMin) ->
       commentMax = $commentMin[0].$maximized
+      rect = $commentMin[0].rect
 
+      zone = @getZone $commentMin
       return null if zone == 5
 
       w = commentMax.width()
       h = commentMax.height()
-      c = @getCommentCoords(commentMax.position().left, commentMax.position().top, w, h)
+      c = commentMax[0].coords()
 
-      bp = @getArrowBindPoint($commentMin, c.xtl + (w / 2), c.ytl + (h / 2))
-      pos = @getArrowPos(zone, c, w, h)
+      bp = @getArrowBindPoint($commentMin)
+      pos = @getArrowPos zone, c, w, h
 
-      x0: bp.x, y0: bp.y, x1: pos.x1, y1: pos.y1, x2: pos.x2, y2: pos.y2
+      x0: if rect then bp.x else bp.x / opts.currentScale
+      y0: if rect then bp.y else bp.y / opts.currentScale
+      x1: pos.x1 / opts.currentScale
+      y1: pos.y1 / opts.currentScale
+      x2: pos.x2 / opts.currentScale
+      y2: pos.y2 / opts.currentScale
 
-    getArrowBindPoint: ($commentMin, cmX, cmY) ->
+    getArrowBindPoint: ($commentMin) ->
       rect = $commentMin[0].rect
+
+      $maximized = $commentMin[0].$maximized
+      cmX = $maximized.position().left + ($maximized.width() / 2)
+      cmY = $maximized.position().top + ($maximized.height() / 2)
 
       if not rect
         return {x: $commentMin.position().left + ($commentMin.width() / 2),
@@ -227,8 +252,8 @@ $ ->
         rect.ybl = rect.bounds.y + rect.bounds.height
         rect.xbr = rect.bounds.x + rect.bounds.width
         rect.ybr = rect.bounds.y + rect.bounds.height
-        rect.center = new Point((rect.bounds.x + (rect.bounds.width / 2)) * room.opts.currentScale,
-        (rect.bounds.y + (rect.bounds.height / 2)) * room.opts.currentScale)
+        rect.center = new Point((rect.bounds.x + (rect.bounds.width / 2)) * opts.currentScale,
+        (rect.bounds.y + (rect.bounds.height / 2)) * opts.currentScale)
 
         if cmX <= rect.center.x and cmY <= rect.center.y
           return x: rect.xtl, y: rect.ytl
@@ -242,13 +267,10 @@ $ ->
         return null
 
     redrawArrow: ($commentMin) ->
-      commentMax = $commentMin[0].$maximized
       rect = $commentMin[0].rect
       arrow = $commentMin[0].arrow
 
-      cmx = commentMax.position().left + (commentMax.width() / 2)
-      cmy = commentMax.position().top + (commentMax.height() / 2)
-      bp = @getArrowBindPoint($commentMin, cmx, cmy)
+      bp = @getArrowBindPoint $commentMin
 
       if rect
         # rebind comment-minimized
@@ -257,11 +279,7 @@ $ ->
 
       return if arrow.isHidden
 
-      bpx = if rect then bp.x else bp.x / room.opts.currentScale
-      bpy = if rect then bp.y else bp.y / room.opts.currentScale
-      zone = @getZone(commentMax.position().left, commentMax.position().top, bpx, bpy, commentMax.width(), commentMax.height())
-
-      coords = @getArrowCoords($commentMin, zone)
+      coords = @getArrowCoords $commentMin
 
       if coords == null
         arrow.opacity = 0
@@ -269,12 +287,12 @@ $ ->
       else
         arrow.opacity = 1
 
-      arrow.segments[0].point.x = if rect then coords.x0 else coords.x0 / opts.currentScale
-      arrow.segments[0].point.y = if rect then coords.y0 else coords.y0 / opts.currentScale
-      arrow.segments[1].point.x = coords.x1 / opts.currentScale
-      arrow.segments[1].point.y = coords.y1 / opts.currentScale
-      arrow.segments[2].point.x = coords.x2 / opts.currentScale
-      arrow.segments[2].point.y = coords.y2 / opts.currentScale
+      arrow.segments[0].point.x = coords.x0
+      arrow.segments[0].point.y = coords.y0
+      arrow.segments[1].point.x = coords.x1
+      arrow.segments[1].point.y = coords.y1
+      arrow.segments[2].point.x = coords.x2
+      arrow.segments[2].point.y = coords.y2
 
       room.redraw()
 
