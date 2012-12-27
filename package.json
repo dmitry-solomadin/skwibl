@@ -41,14 +41,13 @@
     "hiredis": "*",
     "redis": "0.7.2",
     "lodash": "*",
-    "coffee-script": "*",
     "moment": "*",
     "winston": "*",
-    "validator": "*",
-    "iced-coffee-script": "*"
+    "validator": "*"
   },
   "devDependencies": {
-    "node-inspector": "0.2.x"
+    "iced-coffee-script": "*",
+    "uglify-js": "2.x.x"
   },
   "engine": {
     "node": "0.8.x"
