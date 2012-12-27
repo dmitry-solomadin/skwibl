@@ -5,6 +5,7 @@
 <link href="/css/project.css" rel="stylesheet">
 <link href="/css/room.css" rel="stylesheet">
 <link href="/css/jquery-ui.css" rel="stylesheet">
+<link href="/css/jplayer.css" rel="stylesheet" type="text/css"/>
 
 <script type="text/javascript">
   window.copt = {
@@ -16,24 +17,19 @@
   App.room = {};
 </script>
 
-<% if @currentUser() : %>
-  <script src="/socket.io/socket.io.js"></script>
-<% end %>
-
 <% if @isProduction() : %>
-  <script type="text/javascript" src="/js/lib.min.js"></script>
   <script type="text/javascript" src="/js/skwibl.min.js"></script>
 <% else : %>
 
   <!-- plugins start -->
   <script src="/js/dev/jquery.js"></script>
-  <script src="/js/dev/jquery-ui-highlight.js"></script>
-  <script src="/js/dev/jquery.hotkeys.js"></script>
-  <script src="/js/dev/bootstrap.js"></script>
-  <script src="/js/dev/fileuploader.js"></script>
-  <script src="/js/dev/paper.js"></script>
-  <script src="/js/dev/moment.js"></script>
-  <script src="/js/dev/jquery.easing.js"></script>
+  <script src="/js/dev/plugins/paper.js"></script>
+  <script src="/js/dev/plugins/jquery-ui-highlight.js"></script>
+  <script src="/js/dev/plugins/jquery.hotkeys.js"></script>
+  <script src="/js/dev/plugins/bootstrap.js"></script>
+  <script src="/js/dev/plugins/fileuploader.js"></script>
+  <script src="/js/dev/plugins/moment.js"></script>
+  <script src="/js/dev/plugins/jquery.easing.js"></script>
   <!-- plugins end -->
 
   <!-- general scripts start -->
@@ -45,9 +41,8 @@
   <!-- general scripts end -->
 
   <!-- jplayer start-->
-  <script type="text/javascript" src="/js/dev/jquery.jplayer.js"></script>
+  <script type="text/javascript" src="/js/dev/plugins/jquery.jplayer.js"></script>
   <!--<script type="text/javascript" src="/js/jplayer/add-on/jplayer.playlist.js"></script>-->
-  <link href="/css/jplayer.css" rel="stylesheet" type="text/css"/>
   <!-- jplayer end-->
 
   <!-- pages start -->

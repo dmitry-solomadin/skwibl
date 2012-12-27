@@ -57,6 +57,12 @@ APP_NAME='./vendor/js/skwibl'
 ## library script name
 LIB_NAME='./vendor/js/lib'
 
+## client script name
+CLIENT_NAME='./vendor/js/client'
+
+## socket.io script location
+SOCKETIO_SCRIPT='./node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js'
+
 ## usage string
 USAGE="Usage: $0 -a -b -c -d -e -i -p -r -s -u -h \n\n
       -a --dynamic Start dynamic server \n
@@ -99,9 +105,10 @@ function clean {
   find ./smtp -name "*.js" -delete
   find ./sockets -name "*.js" -delete
   find ./tools -name "*.js" -delete
-  rm -f $LIB_NAME.js $LIB_NAME.min.js $LIB_NAME.min.js.gz
-  rm -f ./vendor/js/Jplayer.swf
+  rm -f $LIB_NAME.js $LIB_NAME.min.js
+  rm -f $CLIENT_NAME.js $CLIENT_NAME.min.js
   rm -f $APP_NAME.js $APP_NAME.min.js $APP_NAME.min.js.gz
+  rm -f ./vendor/js/Jplayer.swf
 }
 
 function buildWatch {
@@ -177,20 +184,22 @@ function deploy {
   echo "deploing"
   mv $TOOLS_FILE $TOOLS_FILE.save
   sed 's/#  / /g' $TOOLS_FILE.save  > $TOOLS_FILE
-  $COFFEE -I none -c -o $JS_OUTPUT_DIR $COFFEE_DIR &
+  $COFFEE -I none -c -o $JS_OUTPUT_DIR $COFFEE_DIR
   find ./ -name "*.coffee" -o -name "*.iced" -exec $COFFEE -I none -cb {} \;
   find ./assets/coffee -name "*.js" -delete
   rm -f $TOOLS_FILE
   mv $TOOLS_FILE.save $TOOLS_FILE
-  find ./vendor/js/dev -name "*.js" -exec cat {} >> $LIB_NAME.js \;
-  uglifyjs $LIB_NAME.js -c -o $LIB_NAME.min.js
-  gzip -9 $LIB_NAME.min.js -c > $LIB_NAME.min.js.gz
-  cp ./vendor/js/dev/Jplayer.swf ./vendor/js/Jplayer.swf
-  find ./assets/js -name "*.js" -exec cat {} >> $APP_NAME.js \;
+  cat ./vendor/js/dev/jquery.js >> $LIB_NAME.js
+  find ./vendor/js/dev/plugins/ -name "*.js" -exec cat {} >> $LIB_NAME.js \;
+  find ./assets/js -name "*.js" -exec cat {} >> $CLIENT_NAME.js \;
+  cat $LIB_NAME.js $SOCKETIO_SCRIPT $CLIENT_NAME.js > $APP_NAME.js
   uglifyjs $APP_NAME.js -c -o $APP_NAME.min.js
   gzip -9 $APP_NAME.min.js -c > $APP_NAME.min.js.gz
+  rm -f $LIB_NAME.js $LIB_NAME.min.js
+  rm -f $CLIENT_NAME.js $CLIENT_NAME.min.js
   rm -f $APP_NAME.js $APP_NAME.min.js
-  sshpass -p $PASSWORD rsync ./pass.rsync -rvuzl ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee" --exclude "*.iced" --exclude "./assets" --exclude "./uploads/*" --exclude "./vendor/dev"
+  cp ./vendor/js/dev/plugins/Jplayer.swf ./vendor/js/Jplayer.swf
+  sshpass -p $PASSWORD rsync ./pass.rsync -rvuzl ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee" --exclude "*.iced" --exclude "assets" --exclude "uploads/*" --exclude "vendor/js/dev"
 }
 
 ## debug procedure
@@ -208,11 +217,6 @@ function update {
 }
 
 case "$1" in
-  -w|--dynamicWatch)
-    init
-    buildWatch
-    startDyn
-    exit 0;;
   -a|--dynamic)
     init
     build
@@ -255,6 +259,11 @@ case "$1" in
     exit 0;;
   -u|--update)
     update
+    exit 0;;
+  -w|--dynamicWatch)
+    init
+    buildWatch
+    startDyn
     exit 0;;
   -h|--help)
     echo -e $USAGE
