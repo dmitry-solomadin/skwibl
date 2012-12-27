@@ -42,9 +42,6 @@ NODE_CMD='node --nouse-idle-notification --expose-gc'
 ## coffee execution command
 COFFEE_OPT='--nodejs "--nouse-idle-notification --expose-gc"'
 
-## node debug command for dynamic server
-DEBUG_CMD="node --debug $DYN.js & node-inspector &"
-
 ## redis flush command
 FLUSH_REDIS_CMD='redis-cli flushall'
 
@@ -55,12 +52,11 @@ TOOLS_FILE='./tools/tools.iced'
 SOCKETIO_SCRIPT='./node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js'
 
 ## usage string
-USAGE="Usage: $0 -a -b -c -d -e -i -p -r -s -u -h \n\n
+USAGE="Usage: $0 -a -b -c -d -i -p -r -s -u -h \n\n
       -a --dynamic Start dynamic server \n
       -b --build Build the project \n
       -c --clean Clean the project auxiliary files \n
       -d --deploy Deploy the project \n
-      -e --debug Run skwibl in debug mode \n
       -i --init Init the project \n
       -o --connect Connect to the production skwibl service through ssh \n
       -p --product Run skwibl in production mode \n
@@ -183,12 +179,6 @@ function deploy {
   sshpass -p $PASSWORD rsync ./pass.rsync -rvuzl ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee" --exclude "*.iced" --exclude "assets" --exclude "uploads/*" --exclude "vendor/js/dev"
 }
 
-## debug procedure
-function debug {
-  echo "debugg starting"
-  eval $DEBUG_CMD
-}
-
 ## update procedure
 function update {
   echo "updating"
@@ -216,10 +206,6 @@ case "$1" in
     deploy
     clean
     exit 0;;
-  -e|--debug)
-    init
-    build
-    debug;;
   -i|--init)
     init
     exit 0;;
