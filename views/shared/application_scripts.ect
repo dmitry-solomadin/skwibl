@@ -35,7 +35,7 @@
 <link href="/js/jplayer/skin/pink.flag/jplayer.pink.flag.css" rel="stylesheet" type="text/css"/>
 <!-- jplayer end-->
 
-<% if @isProduction : %>
+<% if @isProduction() : %>
   <!-- general production script -->
   <script type="text/javascript" src="/js/skwibl.min.js"></script>
 <% else : %>

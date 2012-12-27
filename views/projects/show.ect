@@ -24,23 +24,60 @@
     <div class="tab-content" id="chat-tab">
       <div class="filter-box">
         <div id="conversation-inner" class="filter-box-inner">
-          <% for message in @chatMessages : %>
-            <% picture = if message.owner.picture then message.owner.picture else '/images/avatar.png' %>
-            <div class="chat-message">
-              <div class="message-left-part">
-                <div class="image">
-                  <img class="userAvatar" src="<%= picture %>" width="24"/>
+          <% timeRanges = @splitComments @chatMessages %>
+
+          <% for timeRange, index in timeRanges : %>
+            <% continue if index is 0 %>
+            <% if timeRange.messages.length > 0 : %>
+              <% hasEarlierMessages = true %>
+              <div class="earlierMessagesHeader">View Earlier Messages</div>
+              <% break %>
+            <% end %>
+          <% end %>
+
+          <div class="earlierMessagesDiv">
+            <% innerIndex = 0 %>
+            <% for timeRange, index in timeRanges : %>
+              <% continue if index is 0 or timeRange.messages.length is 0 %>
+              <% unless innerIndex is 0 : %>
+                <span class="pipe">|</span>
+              <% end %>
+              <a class="showRangeLink" href="#" onclick="App.chat.showMessageRange(this)"
+                 data-range-id="<%= timeRange.id %>"><%= timeRange.name %></a>
+
+              <% innerIndex++ %>
+            <% end %>
+            <% if hasEarlierMessages : %>
+              <span class="pipe">|</span>
+              <a class="showRangeLink" href="#" onclick="App.chat.showMessageRange(this)"
+                 data-range-id="all">All</a>
+            <% end %>
+          </div>
+
+          <% for timeRange, index in timeRanges.reverse() : %>
+            <% isToday = index is (timeRanges.length - 1) %>
+            <% continue if timeRange.messages.length is 0 and not isToday %>
+            <div class="timeRange <%= timeRange.id %> <%= 'hide' unless isToday %>">
+              <div class="timeRangeHeader"><%= timeRange.name %></div>
+              <% for message in timeRange.messages : %>
+                <% picture = if message.owner.picture then message.owner.picture else '/images/avatar.png' %>
+                <div class="chat-message">
+                  <div class="message-left-part">
+                    <div class="image">
+                      <img class="userAvatar" src="<%= picture %>" width="24" height="24"/>
+                    </div>
+                    <div class="message">
+                      <b class="messageAuthor"><%= "#{message.owner.displayName}:" %></b>
+                      <span class="messageText"><%= JSON.parse(message.data).msg %></span>
+                    </div>
+                  </div>
+                  <div class="timestamp" data-timestamp="<%= message.time %>">
+                    <% parsedTime = parseFloat(message.time) %>
+                    <%= @moment(parsedTime).format("HH:mm") if parsedTime %>
+                  </div>
+                  <div style="clear:both;"></div>
                 </div>
-                <div class="message">
-                  <b class="messageAuthor"><%= "#{message.owner.displayName}:" %></b>
-                  <span class="messageText"><%= JSON.parse(message.data).msg %></span>
-                </div>
-              </div>
-              <div class="timestamp">
-                <% parsedTime = parseFloat(message.time) %>
-                <%= @moment(parsedTime).format("HH:mm") if parsedTime %>
-              </div>
-              <div style="clear:both;"></div>
+              <% end %>
             </div>
           <% end %>
         </div>
