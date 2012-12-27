@@ -17,12 +17,14 @@ exports.errorMessages = ->
   return this.req.flash 'objectErrors'
 
 exports.isProduction = ->
-  console.log "QHWEKQWEJKQWELKWQJEKLJQWE", cfg.ENVIRONMENT
   return cfg.ENVIRONMENT is 'production'
 
 exports.splitComments = (messages) ->
   # rangeEnd is always the end of yesterday
+  now = Date.now()
+
   yesterday = @moment().subtract("days", 1).endOf("day")
+  today = @moment()
 
   timeRanges = [
     { name: "Today", id: "today", start: @moment(), messages: [] },
@@ -32,15 +34,28 @@ exports.splitComments = (messages) ->
     { name: "1 month", id: "month1", start: @moment().subtract("months", 1).startOf("day"), messages: [] }
   ]
 
+  uniqueDates = {}
   for message in messages
+    messageTime = @moment parseFloat(message.time)
+
+    message.date = messageTime.format("DD-MM-YYYY")
+    timeDiff = messageTime.diff(today, "days")
+    switch timeDiff
+      when 0 then prettyName = "Today"
+      when 1 then prettyName = "Yesterday"
+    uniqueDates[message.date] =
+      enabled: true
+      prettyName: prettyName
+
     for timeRange in timeRanges
-      messageTime = @moment(parseFloat(message.time)).unix()
-      if messageTime > yesterday.unix()
+      messageUnixTime = messageTime.unix()
+      if messageUnixTime > yesterday.unix()
         timeRanges[0].messages.push message
-        break;
+        break
 
-      if yesterday.unix() > messageTime > timeRange.start.unix()
+      if yesterday.unix() > messageUnixTime > timeRange.start.unix()
         timeRange.messages.push message
-        break;
+        break
 
-  timeRanges
+  timeRanges: timeRanges
+  uniqueDates: uniqueDates

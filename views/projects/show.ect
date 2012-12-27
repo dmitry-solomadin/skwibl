@@ -24,7 +24,9 @@
     <div class="tab-content" id="chat-tab">
       <div class="filter-box">
         <div id="conversation-inner" class="filter-box-inner">
-          <% timeRanges = @splitComments @chatMessages %>
+          <% commentInfo = @splitComments @chatMessages %>
+          <% timeRanges = commentInfo.timeRanges %>
+          <% uniqueDates = commentInfo.uniqueDates %>
 
           <% for timeRange, index in timeRanges : %>
             <% continue if index is 0 %>
@@ -54,29 +56,20 @@
             <% end %>
           </div>
 
+          <div class="messageTemplate hide">
+            <%- include './projects/_chat_message.ect', moment: @moment %>
+          </div>
+
           <% for timeRange, index in timeRanges.reverse() : %>
             <% isToday = index is (timeRanges.length - 1) %>
             <% continue if timeRange.messages.length is 0 and not isToday %>
             <div class="timeRange <%= timeRange.id %> <%= 'hide' unless isToday %>">
-              <div class="timeRangeHeader"><%= timeRange.name %></div>
               <% for message in timeRange.messages : %>
-                <% picture = if message.owner.picture then message.owner.picture else '/images/avatar.png' %>
-                <div class="chat-message">
-                  <div class="message-left-part">
-                    <div class="image">
-                      <img class="userAvatar" src="<%= picture %>" width="24" height="24"/>
-                    </div>
-                    <div class="message">
-                      <b class="messageAuthor"><%= "#{message.owner.displayName}:" %></b>
-                      <span class="messageText"><%= JSON.parse(message.data).msg %></span>
-                    </div>
-                  </div>
-                  <div class="timestamp" data-timestamp="<%= message.time %>">
-                    <% parsedTime = parseFloat(message.time) %>
-                    <%= @moment(parsedTime).format("HH:mm") if parsedTime %>
-                  </div>
-                  <div style="clear:both;"></div>
-                </div>
+                <% if uniqueDates[message.date].enabled : %>
+                  <% uniqueDates[message.date].enabled = false %>
+                  <div class="timeRangeHeader"><%= uniqueDates[message.date].prettyName || message.date %></div>
+                <% end %>
+              <%- include './projects/_chat_message.ect', message: message, moment: @moment %>
               <% end %>
             </div>
           <% end %>

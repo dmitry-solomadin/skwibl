@@ -1,0 +1,17 @@
+<% picture = if @message and @message.owner.picture then @message.owner.picture else '/images/avatar.png' %>
+<div class="chat-message">
+  <div class="message-left-part">
+    <div class="image">
+      <img class="userAvatar" src="<%= picture %>" width="24" height="24"/>
+    </div>
+    <div class="message">
+      <b class="messageAuthor"><%= "#{@message.owner.displayName}:" if @message %></b>
+      <span class="messageText"><%= JSON.parse(@message.data).msg if @message %></span>
+    </div>
+  </div>
+  <div class="timestamp">
+    <% parsedTime = parseFloat(@message.time) if @message %>
+    <%= @moment(parsedTime).format("HH:mm") if parsedTime %>
+  </div>
+  <div style="clear:both;"></div>
+</div>

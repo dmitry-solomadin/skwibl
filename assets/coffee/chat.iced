@@ -73,12 +73,11 @@ $ ->
     addMessage: (uid, message) ->
       user = @getUserById(uid)
 
-      chatMessage = $(".chat-message:first").clone()
+      chatMessage = $(".messageTemplate").clone().show()
       chatMessage.find(".messageAuthor").html(user.displayName + ":")
       chatMessage.find(".messageText").html(message)
       chatMessage.find(".image img").attr("src", user.picture)
       chatMessage.find(".timestamp").html(moment(new Date().getTime()).format("HH:mm"))
-
 
       # let's see if we would need to scroll to the bottom after adding the message
       # we need to scroll if the adding user is current or the chat hasn't been scrolled
