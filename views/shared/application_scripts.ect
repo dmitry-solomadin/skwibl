@@ -20,6 +20,7 @@
 <% if @isProduction() : %>
   <script type="text/javascript" src="/js/skwibl.min.js"></script>
 <% else : %>
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
 
   <!-- plugins start -->
   <script src="/js/dev/jquery.js"></script>
@@ -58,9 +59,9 @@
   <!-- room start -->
   <script type="text/javascript" src="/js/room/comments.js"></script>
   <script type="text/javascript" src="/js/room/socket_helper.js"></script>
-  <script type="text/javascript" src="/js/room/history.js"></script>
-  <script type="text/javascript" src="/js/room/items.js"></script>
-  <script type="text/javascript" src="/js/room/canvas.js"></script>
+  <script type="text/javascript" src="/js/room/00_history.js"></script>
+  <script type="text/javascript" src="/js/room/02_items.js"></script>
+  <script type="text/javascript" src="/js/room/01_canvas.js"></script>
   <script type="text/javascript" src="/js/room/helper.js"></script>
   <script type="text/javascript" src="/js/room/index.js"></script>
   <!-- room end -->
@@ -68,5 +69,4 @@
   <!-- profile start -->
   <script type="text/javascript" src="/js/profile.js"></script>
   <!-- profile end -->
-
 <% end %>
