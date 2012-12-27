@@ -2,8 +2,8 @@
 
 <% if @activities.length : %>
   <div id="activities">
-    <% for @activity in @activities : %>
-      <%- include './activities/activity.ect' %>
+    <% for activity in @activities : %>
+      <%- include './activities/_activity.ect', activity: activity, moment: @moment %>
     <% end %>
   </div>
 <% else : %>

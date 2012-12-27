@@ -31,6 +31,7 @@ $ ->
         $("#" + tab).show()
 
       $("#chat").data("visible", "true")
+      @scrollToTheBottom()
 
     addNewUser: (user) ->
       @users.push user
@@ -38,10 +39,10 @@ $ ->
       picture = if user.picture then user.picture else '/images/avatar.png'
 
       $("#participants").append("<div class='chatUser' id='chatUser#{user.id}' data-uid='#{user.id}'
-            data-display-name='#{user.displayName}' data-picture='#{picture}'>
-            <img class='userAvatar tooltipize' src='#{picture}' width='48' title='#{user.displayName}'/>
-            <span class='chatUserStatus'></span>
-            </div>")
+                        data-display-name='#{user.displayName}' data-picture='#{picture}'>
+                        <img class='userAvatar tooltipize' src='#{picture}' width='48' title='#{user.displayName}'/>
+                        <span class='chatUserStatus'></span>
+                        </div>")
 
     isVisible: ->
       $("#chat").data("visible")
@@ -72,16 +73,26 @@ $ ->
     addMessage: (uid, message) ->
       user = @getUserById(uid)
 
-      chatMessage = $(".chat-message:first").clone()
+      chatMessage = $(".messageTemplate").clone().show()
       chatMessage.find(".messageAuthor").html(user.displayName + ":")
       chatMessage.find(".messageText").html(message)
       chatMessage.find(".image img").attr("src", user.picture)
       chatMessage.find(".timestamp").html(moment(new Date().getTime()).format("HH:mm"))
 
-      $('#conversation-inner').append(chatMessage)
+      # let's see if we would need to scroll to the bottom after adding the message
+      # we need to scroll if the adding user is current or the chat hasn't been scrolled
+      conversation = $("#conversation-inner")
+      scrollToTheBottom = ` uid == $("#uid").val() ` or conversation[0].scrollTop is conversation[0].scrollHeight
+
+      $('#conversation-inner .today').append(chatMessage)
+
+      @scrollToTheBottom() if scrollToTheBottom
+
+    scrollToTheBottom: ->
+      $("#conversation-inner").scrollTop($("#conversation-inner")[0].scrollHeight)
 
     addTechMessage: (message) ->
-      $('#conversation-inner').append("<div>#{message}</div>")
+      $('#conversation-inner .today').append("<div>#{message}</div>")
 
     changeUserStatus: (uid, online) ->
       chatStatus = $("#chatUser#{uid}").find(".chatUserStatus")
@@ -108,6 +119,18 @@ $ ->
         @users.splice(index, 1) if ` user.id == uid `
 
       $("#chatUser#{uid}").remove()
+
+    showMessageRange: (showRangeLink) ->
+      rangeId = $(showRangeLink).data("range-id")
+
+      if rangeId is 'all'
+        $(".timeRange").show()
+        $(".showRangeLink, .pipe").hide()
+      else
+        $("." + rangeId).show().next(".timeRange").show()
+        $(showRangeLink).hide().next(".pipe:first").hide()
+        $(showRangeLink).prevAll(".showRangeLink, .pipe").hide()
+      $(".earlierMessagesHeader").html("No Earlier Messages") if $(".showRangeLink:visible").length is 0
 
     initSockets: ->
       @chatIO = io.connect('/chat', window.copt)
