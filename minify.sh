@@ -13,13 +13,15 @@ JS_NAME='./vendor/js/skwibl'
 CSS_NAME='./vendor/css/skwibl'
 
 ## list of js files
-JS_LIST=`cat views/shared/application_scripts.ect | grep -o '\/js.*\.js' | tail -n +2 | sed 's/\/js\/dev/\.\/vendor\/js\/dev/' | sed 's/\/js/\.\/assets\/js/' | sed 's/\/socket\.io/\.\/node_modules\/socket\.io\/node_modules\/socket\.io-client\/dist/'`
+JS_LIST=`cat views/shared/application_scripts.ect | grep -o '\/js.*\.js' | sed 's/\/js\/dev/\.\/vendor\/js\/dev/' | sed 's/\/js/\.\/assets\/js/' | sed 's/\/socket\.io/\.\/node_modules\/socket\.io\/node_modules\/socket\.io-client\/dist/'`
 
 ## list of css files
 CSS_LIST=`cat views/shared/application_scripts.ect | grep -o '\/css.*\.css' | sed 's/^/\.\/vendor/'`
 
 for SCRIPT in $JS_LIST; do
-  cat $SCRIPT >> $JS_NAME.js
+  if [[ $SCRIPT != *'/skwibl.min.js' ]]; then
+    cat $SCRIPT >> $JS_NAME.js
+  fi
 done
 
 $UGLIFYJS $JS_NAME.js -c -o $JS_NAME.min.js
@@ -30,7 +32,9 @@ rm -f $JS_NAME.js $JS_NAME.min.js
 cp ./vendor/js/dev/plugins/Jplayer.swf ./vendor/js/Jplayer.swf
 
 for CSS in $CSS_LIST; do
-  cat $CSS >> $CSS_NAME.css
+  if [[ $CSS != *'/skwibl-min.css' ]]; then
+    cat $CSS >> $CSS_NAME.css
+  fi
 done
 
 $CLEANCSS -e --s0 -o $CSS_NAME-min.css $CSS_NAME.css
