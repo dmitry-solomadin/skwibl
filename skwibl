@@ -95,6 +95,7 @@ function clean {
   find ./tools -name "*.js" -delete
   rm -f ./vendor/js/skwibl.js ./vendor/js/skwibl.min.js ./vendor/js/skwibl.min.js.gz
   rm -f ./vendor/js/Jplayer.swf
+  rm -f ./vendor/css/skwibl.css ./vendor/css/skwibl-min.css ./vendor/css/skwibl-min.css.gz
 }
 
 function buildWatch {
@@ -176,7 +177,7 @@ function deploy {
   rm -f $TOOLS_FILE
   mv $TOOLS_FILE.save $TOOLS_FILE
   ./minify.sh
-  sshpass -p $PASSWORD rsync ./pass.rsync -rvuzl ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee" --exclude "*.iced" --exclude "assets" --exclude "uploads/*" --exclude "vendor/js/dev"
+  sshpass -p $PASSWORD rsync ./pass.rsync -rvuzl ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee" --exclude "*.iced" --exclude "assets" --exclude "uploads/*" --exclude "vendor/js/dev" --exclude "vendor/socket.io" --exclude "vendor/css/dev"
 }
 
 ## update procedure

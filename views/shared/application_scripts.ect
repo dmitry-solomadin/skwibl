@@ -1,11 +1,3 @@
-<link href="/css/bootstrap.css" rel="stylesheet">
-<link href="/css/bootstrap-responsive.css" rel="stylesheet">
-<link href="/css/app.css" rel="stylesheet">
-<link href="/css/mainpage.css" rel="stylesheet">
-<link href="/css/project.css" rel="stylesheet">
-<link href="/css/room.css" rel="stylesheet">
-<link href="/css/jquery-ui.css" rel="stylesheet">
-<link href="/css/jplayer.css" rel="stylesheet" type="text/css"/>
 
 <script type="text/javascript">
   window.copt = {
@@ -18,21 +10,32 @@
 </script>
 
 <% if @isProduction() : %>
+  <link href="/css/skwibl-min.css" rel="stylesheet" type="text/css">
   <script type="text/javascript" src="/js/skwibl.min.js"></script>
 <% else : %>
+
+  <link href="/css/dev/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="/css/dev/bootstrap-responsive.css" rel="stylesheet" type="text/css">
+  <link href="/css/dev/app.css" rel="stylesheet" type="text/css">
+  <link href="/css/dev/mainpage.css" rel="stylesheet" type="text/css">
+  <link href="/css/dev/project.css" rel="stylesheet" type="text/css">
+  <link href="/css/dev/room.css" rel="stylesheet" type="text/css">
+  <link href="/css/dev/jquery-ui.css" rel="stylesheet" type="text/css">
+  <link href="/css/dev/jplayer.css" rel="stylesheet" type="text/css"/>
+
   <script type="text/javascript" src="/socket.io/socket.io.js"></script>
 
   <!-- plugins start -->
-  <script src="/js/dev/jquery.js"></script>
-  <script src="/js/dev/plugins/paper.js"></script>
-  <script src="/js/dev/plugins/jquery-ui-highlight.js"></script>
-  <script src="/js/dev/plugins/jquery.hotkeys.js"></script>
-  <script src="/js/dev/plugins/bootstrap.js"></script>
-  <script src="/js/dev/plugins/fileuploader.js"></script>
-  <script src="/js/dev/plugins/moment.js"></script>
-  <script src="/js/dev/plugins/jquery.easing.js"></script>
-  <script type="text/javascript" src="/js/dev/plugins/jquery.jplayer.js"></script>
-  <script type="text/javascript" src="/js/dev/plugins/jquery.jplayer.js"></script>
+  <script type="text/javascript" src="/js/dev/jquery.js"></script>
+  <script type="text/javascript" src="/js/dev/paper.js"></script>
+  <script type="text/javascript" src="/js/dev/jquery-ui-highlight.js"></script>
+  <script type="text/javascript" src="/js/dev/jquery.hotkeys.js"></script>
+  <script type="text/javascript" src="/js/dev/bootstrap.js"></script>
+  <script type="text/javascript" src="/js/dev/fileuploader.js"></script>
+  <script type="text/javascript" src="/js/dev/moment.js"></script>
+  <script type="text/javascript" src="/js/dev/jquery.easing.js"></script>
+  <script type="text/javascript" src="/js/dev/jquery.jplayer.js"></script>
+  <script type="text/javascript" src="/js/dev/jquery.jplayer.js"></script>
   <!-- plugins end -->
 
   <!-- general scripts start -->
