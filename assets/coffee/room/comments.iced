@@ -12,7 +12,7 @@ $ ->
         dashArray: [8, 3]
 
     create: (x, y, rect, max, color, number) ->
-      color = if color then color else sharedOpts.color
+      color = color or sharedOpts.color
       COMMENT_SHIFT_X = 75
       COMMENT_SHIFT_Y = -135
 
@@ -217,7 +217,7 @@ $ ->
       rect = $commentMin[0].rect
 
       zone = @getZone $commentMin
-      return null if zone == 5
+      return null if zone is 5
 
       w = commentMax.width()
       h = commentMax.height()
@@ -240,7 +240,7 @@ $ ->
       cmX = $maximized.position().left + ($maximized.width() / 2)
       cmY = $maximized.position().top + ($maximized.height() / 2)
 
-      if not rect
+      unless rect
         return {x: $commentMin.position().left + ($commentMin.width() / 2),
         y: $commentMin.position().top + ($commentMin.height() / 2)}
       else
@@ -281,7 +281,7 @@ $ ->
 
       coords = @getArrowCoords $commentMin
 
-      if coords == null
+      unless coords
         arrow.opacity = 0
         return
       else
@@ -339,7 +339,7 @@ $ ->
 
       $commentmin[0].$maximized.show()
 
-      if not folded
+      unless folded
         $commentmin[0].arrow.opacity = 1
         $commentmin[0].arrow.isHidden = false
 
@@ -389,9 +389,9 @@ $ ->
       room.redrawWithThumb()
 
     addCommentText: (commentMin, commentText) ->
-      return if $.trim(commentText.text).length == 0
+      return unless $.trim(commentText.text).length
 
-      emit = if commentText.elementId then false else true
+      emit = commentText.elementId?
       elementId = commentText.elementId or room.generateId()
       owner = commentText.owner or $("#uid").val()
       time = commentText.time or new Date().getTime()
@@ -402,8 +402,8 @@ $ ->
       commentsCount = commentContent.children().length
 
       hiddenCommentsCount = commentsCount - 2
-      showCommentsText = "Show #{commentsCount - 2} previous #{if hiddenCommentsCount == 1 then 'comment' else 'comments'}"
-      if commentsCount == 3
+      showCommentsText = "Show #{commentsCount - 2} previous #{if hiddenCommentsCount is 1 then 'comment' else 'comments'}"
+      if commentsCount is 3
         $(commentContent).parent().data("hidden", "true")
         commentContent.parent().prepend "<div class='comment-show-comments'>#{showCommentsText}</div>"
 
@@ -423,7 +423,7 @@ $ ->
       showCommentsDiv = $(commentContent).parent().find(".comment-show-comments")
       showCommentsDiv.html(showCommentsText) if showCommentsDiv[0]
 
-      isCommentOwner = ` owner == $("#uid").val() `
+      isCommentOwner = "#{owner}" is "#{$("#uid").val()}"
 
       commentContent.append(
         "<div id='commentText#{elementId}' class='comment-text' data-comment-id='#{commentMin.elementId}'
@@ -468,7 +468,7 @@ $ ->
     initHideCommentsBlock: (commentContent) ->
       commentsCount = commentContent.children().length
       hiddenCommentsCount = commentsCount - 3
-      showCommentsText = "Show #{commentsCount - 3} previous #{if hiddenCommentsCount == 1 then 'comment' else 'comments'}"
+      showCommentsText = "Show #{commentsCount - 3} previous #{if hiddenCommentsCount is 1 then 'comment' else 'comments'}"
       $(commentContent).parent().find(".comment-show-comments").html(showCommentsText)
       for comment, index in commentContent.children()
         if commentsCount - index > 3
@@ -537,7 +537,7 @@ $ ->
       room.socket.emit "reopenTodo", elementId if emit
 
     addTodo: (commentText) ->
-      if $("#todo-tab-inner").children().length == 0
+      unless $("#todo-tab-inner").children().length
         # if it's the first comment added let's prepare todolist structure
         $("#todo-tab-inner").html("")
         $("#todo-tab-inner").append(
@@ -602,7 +602,7 @@ $ ->
       room.redrawWithThumb()
 
     setNumber: (commentMin, newNumber) ->
-      commentMin.html("X") if not newNumber
+      commentMin.html("X") unless newNumber
 
       intNumber = parseInt newNumber
       if intNumber >= 1000

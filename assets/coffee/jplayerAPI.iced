@@ -44,5 +44,3 @@ $ ->
       additionalSeekBar = jplayerContainer.find(".jp-additional-seek-bar")
 
   App.jplayerAPI = api
-
-

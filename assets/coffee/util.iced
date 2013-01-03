@@ -9,7 +9,7 @@ $ ->
     addHoverCount = -> updateHoverCount(1)
     removeHoverCount = ->
       updateHoverCount(-1)
-      offTrigger = -> settings.offTrigger() if trigger[0].hovercount == 0
+      offTrigger = -> settings.offTrigger() unless trigger[0].hovercount
       setTimeout offTrigger, 100
 
     if settings.live
@@ -35,7 +35,7 @@ $ ->
     $(document).on "mousemove", (e) =>
       return unless @hasClass "draggable"
 
-      if not @data("pdx")
+      unless @data("pdx")
         @data("pdx", e.clientX)
         @data("pdy", e.clientY)
       else
@@ -78,4 +78,4 @@ $ ->
 
 window.isMac = -> return /Mac/.test(navigator.userAgent)
 
-window.currentPage = (template) -> return $("#currentTemplate").val() == template
+window.currentPage = (template) -> return $("#currentTemplate").val() is template

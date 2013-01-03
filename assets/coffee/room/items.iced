@@ -8,16 +8,16 @@ $ ->
     # ITEMS MANIPULATION
 
     create: (tool, settings) ->
-      settings = {} unless settings
+      settings = settings or {}
       opts.tool = tool unless settings.justCreate
 
       tool.strokeJoin = "round"
 
-      opts.tool.strokeColor = if settings.color then settings.color else sharedOpts.color
-      opts.tool.strokeWidth = if settings.width then settings.width else opts.defaultWidth
-      opts.tool.fillColor = settings.fillColor if settings.fillColor
-      opts.tool.opacity = if settings.opacity then settings.opacity else opts.opacity
-      opts.tool.dashArray = if settings.dashArray then settings.dashArray else undefined
+      opts.tool.strokeColor = settings.color or sharedOpts.color
+      opts.tool.strokeWidth = settings.width or opts.defaultWidth
+      opts.tool.fillColor = settings.fillColor
+      opts.tool.opacity = settings.opacity or opts.opacity
+      opts.tool.dashArray = settings.dashArray
 
     removeSelected: ->
       @remove @selected(), true if @selected()
@@ -34,19 +34,18 @@ $ ->
       if @selected()
         @selected().translate(deltaPoint)
         @selected().selectionRect.translate(deltaPoint) if @selected().selectionRect
-        room.redraw()
 
     unselectIfSelected: (elementId) ->
-      if @selected() and @selected().selectionRect and @selected().elementId == elementId
+      if @selected() and @selected().selectionRect and @selected().elementId is elementId
         @unselect()
 
     unselect: ->
-      @selected().selectionRect.remove() if @selected() and @selected().selectionRect
+      @selected()?.selectionRect?.remove()
       @setSelected(null)
 
     pan: (dx, dy) ->
-      opts.pandx = opts.pandx + dx
-      opts.pandy = opts.pandy + dy
+      opts.pandx += dx
+      opts.pandy += dy
 
       for element in opts.historytools.allHistory
         if element.commentMin
@@ -60,20 +59,19 @@ $ ->
     # ITEMS SELECT
 
     testSelect: (point) ->
-      selectTimeDelta = if opts.selectTime then new Date().getTime() - opts.selectTime else undefined
+      selectTimeDelta = Date.now() - opts.selectTime if opts.selectTime
 
-      opts.selectTime = new Date().getTime()
+      opts.selectTime = Date.now()
       alreadySelected = @selected() and @selected().selectionRect
       selected = false
 
       # Select scalers or remove buttton has highest priority.
       if alreadySelected
-        if room.helper.elementInArrayContainsPoint(@selected().selectionRect.scalers, point) ||
-        (@selected().selectionRect.removeButton && @selected().selectionRect.removeButton.bounds.contains(point))
+        if room.helper.elementInArrayContainsPoint(@selected().selectionRect.scalers, point) or (@selected().selectionRect.removeButton and @selected().selectionRect.removeButton.bounds.contains(point))
           selected = true
 
       # Already selected item has next highest priority if time between selectes was big.
-      selected = true if selectTimeDelta > 750 and alreadySelected and @selected().selectionRect.bounds.contains(point)
+      selected = selectTimeDelta > 750 and alreadySelected and @selected().selectionRect.bounds.contains(point)
 
       unless selected
         previousSelectedTool = @selected()
@@ -85,7 +83,7 @@ $ ->
             selected = true
 
           if selectTimeDelta < 750 and @selected() and previousSelectedTool
-            if @selected().id == previousSelectedTool.id then continue else break
+            if @selected().id is previousSelectedTool.id then continue else break
 
       @setSelected(null) unless selected
 
@@ -170,7 +168,7 @@ $ ->
       sy = scaleFactors.sy
 
       transformMatrix = new Matrix().scale(sx, sy, scalePoint)
-      return if transformMatrix._d == 0 or transformMatrix._a == 0
+      return unless sx and sy#if transformMatrix._d == 0 or transformMatrix._a == 0
 
       if @selected().arrow
         @selected().arrow.scale(sx, sy, scalePoint)
@@ -183,17 +181,14 @@ $ ->
       @selected().selectionRect = @createSelectionRectangle()
 
     getScaleFactors: (item, zx, zy, dx, dy) ->
-      item = if item.arrow then item.arrow else item
+      item = item.arrow or item
       w = item.bounds.width
       h = item.bounds.height
 
-      return sx: Math.abs((w - dx) / w), sy: Math.abs((h - dy) / h) if zx == -1 and zy == -1
-      return sx: Math.abs((w + dx) / w), sy: Math.abs((h - dy) / h) if zx == 1 and zy == -1
-      return sx: Math.abs((w - dx) / w), sy: Math.abs((h + dy) / h) if zx == -1 and zy == 1
-      return sx: Math.abs((w + dx) / w), sy: Math.abs((h + dy) / h) if zx == 1 and zy == 1
+      return sx: Math.abs(1 + zx*dx/w), sy: Math.abs(1 + zy*dy/h)
 
     getReflectZone: (item, x, y) ->
-      itemToScale = if item.arrow then item.arrow else item
+      itemToScale = item.arrow or item
 
       return null if itemToScale.bounds.contains(x, y)
       # preserve zone
@@ -216,13 +211,13 @@ $ ->
       dzx = zone.zx + item.scaleZone.zx
       dzy = zone.zy + item.scaleZone.zy
 
-      if dzx == 0 and dzy == 0 and w < 3 and h < 3
+      if dzx is 0 and dzy is 0 and w < 3 and h < 3
         itemToScale.scale(-1, -1)
         return zone
-      else if dzx == 0 and dzy != 0 and w < 3
+      else if dzx is 0 and dzy isnt 0 and w < 3
         itemToScale.scale(-1, 1)
         return zone
-      else if dzy == 0 and dzx != 0 and h < 3
+      else if dzy is 0 and dzx isnt 0 and h < 3
         itemToScale.scale(1, -1)
         return zone
       else
@@ -232,7 +227,7 @@ $ ->
     createUserBadge: (uid, x, y) ->
       getUserIndex = (uid) ->
         for user, index in App.chat.users
-          return (index + 1) if ` user.id == uid `
+          return (index + 1) if "#{user.id}" is "#{uid}"
         return 1
 
       badge = $("<span class='userBadge label-#{getUserIndex(uid)}'>#{App.chat.getUserById(uid).displayName}</span>")
@@ -249,12 +244,12 @@ $ ->
       setTimeout fadeOutBadge, 2000
 
     isItemEmpty: (item) ->
-      return false if not item.segments
       return true unless item
-      return true if item.segments.length is 1
+      return false unless item.segments
+      return item.segments.length is 1
       if item.segments.length is 2
         segmentsAreEqual = item.segments[0].point.x is item.segments[1].point.x and item.segments[0].point.y is item.segments[1].point.y
-        return true if segmentsAreEqual
+        return segmentsAreEqual
       return false
 
     insertFirst: (item) ->

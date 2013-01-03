@@ -35,11 +35,10 @@ $ ->
       badge = $("#activityBadge")
       badge.html(newCount)
 
-      if newCount is 0
+      unless newCount
         badge.removeClass("badge-info")
       else
         badge.addClass("badge-info") unless badge.hasClass("badge-info")
 
 
   App.activities = new Activities
-

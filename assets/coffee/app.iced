@@ -5,7 +5,7 @@ $ ->
         data = {}
         $(this).find("input").each(-> data[$(@).attr("name")] = $(@).val())
 
-        onsuccess = if $(this).data("process-submit") then $(this).data("process-submit") else -> $("#main-content").html(content)
+        onsuccess = $(this).data("process-submit") or -> $("#main-content").html(content)
 
         $.ajax
           url:$(this).attr("action")
@@ -26,5 +26,3 @@ $ ->
   app.initRemote()
 
   App = app
-
-

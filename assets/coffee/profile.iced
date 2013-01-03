@@ -16,5 +16,3 @@ $ ->
         console.log status
 
   App.userProfile = new UserProfile
-
-

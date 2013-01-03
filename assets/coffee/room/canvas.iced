@@ -70,7 +70,7 @@ $ ->
               room.helper.findById(raster.id).remove()
 
             @updateThumb(cid)
-            if (room.canvas.getThumbs().length - 1) == index
+            if (room.canvas.getThumbs().length - 1) is index
               @onLoadingFinished()
         else
           @onLoadingFinished() unless isAnyFilePresent
@@ -89,7 +89,7 @@ $ ->
       createItem = (index, vertical) ->
         path = new Path()
         path.strokeColor = "#c7c7c7"
-        path.opacity = if index % each == 0 then "0.26" else "0.12"
+        path.opacity = if index % each is 0 then "0.26" else "0.12"
         path.strokeWidth = "1"
         if vertical
           startX = wFreq * index
@@ -238,7 +238,7 @@ $ ->
     setScale: (scale, prevScale) ->
       $("#scaleAmount").html "#{parseInt(scale * 100)}%"
 
-      previousScale = prevScale || opts.currentScale
+      previousScale = prevScale or opts.currentScale
 
       finalScale = scale / previousScale
       opts.currentScale = scale
@@ -247,7 +247,7 @@ $ ->
 
       paper.project.activeLayer.transform(transformMatrix)
 
-      if not prevScale
+      unless prevScale
         for element in opts.historytools.allHistory
           if element.commentMin
             element.commentMin.css({top: element.commentMin.position().top * finalScale,
@@ -293,7 +293,7 @@ $ ->
       $("#canvasFooter").animate(height: 37, 500, 'easeInBack', ->
         $("#canvasFolder").removeClass("canvasFolderDown").find("img").attr("src", "/images/room/unfold-up.png"))
 
-      if $("#smallCanvasPreviewsWrap").css('position') == "relative"
+      if $("#smallCanvasPreviewsWrap").css('position') is "relative"
         $("#nameChanger").animate(left: 0, 500, 'linear')
       else
         $("#nameChanger").animate(left: $("#smallCanvasPreviews").outerWidth(true) + 20, 500, 'linear')
@@ -304,7 +304,7 @@ $ ->
     unfoldPreviews: ->
       $("#canvasFolder").addClass("canvasFolderDown")
 
-      if $("#smallCanvasPreviewsWrap").css('position') == "relative"
+      if $("#smallCanvasPreviewsWrap").css('position') is "relative"
         $("#nameChanger").animate(left: -$("#nameChanger").position().left, 500, 'linear')
       else
         $("#nameChanger").animate(left: 0, 500, 'linear')
@@ -316,7 +316,7 @@ $ ->
 
     requestAddEmpty: ->
       thumbs = @getThumbs()
-      initializeFirst = thumbs.length == 1 and not $(thumbs[0]).data("initialized")
+      initializeFirst = thumbs.length is 1 and not $(thumbs[0]).data("initialized")
 
       if initializeFirst
         $.post "/canvases/initializeFirst", {pid: $("#pid").val()}, (data, status, xhr) =>

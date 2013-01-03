@@ -36,7 +36,7 @@ $ ->
     addNewUser: (user) ->
       @users.push user
 
-      picture = if user.picture then user.picture else '/images/avatar.png'
+      picture = user.picture or '/images/avatar.png'
 
       $("#participants").append("<div class='chatUser' id='chatUser#{user.id}' data-uid='#{user.id}'
                               data-display-name='#{user.displayName}' data-picture='#{picture}'>
@@ -44,7 +44,7 @@ $ ->
                               <span class='chatUserStatus'></span>
                               </div>")
 
-    isVisible: -> if $("#chat").data("visible") is "true" then true else false
+    isVisible: -> if $("#chat").data("visible") is "true"
 
     fold: ->
       $("#chat").data("visible", "false")
@@ -69,7 +69,7 @@ $ ->
 
     getUserById: (uid) ->
       for user in @users
-        return user if `user.id == uid`
+        return user if "#{user.id}" is "#{uid}"
 
     addBadgeCount: -> $("#chatBadge").show().html(parseInt($("#chatBadge").html()) + 1)
 
@@ -84,12 +84,12 @@ $ ->
       chatMessage.find(".messageAuthor").html(user.displayName + ":")
       chatMessage.find(".messageText").html(message)
       chatMessage.find(".image img").attr("src", user.picture)
-      chatMessage.find(".timestamp").html(moment(new Date().getTime()).format("HH:mm"))
+      chatMessage.find(".timestamp").html(moment(Date.now()).format("HH:mm"))
 
       # let's see if we would need to scroll to the bottom after adding the message
       # we need to scroll if the adding user is current or the chat hasn't been scrolled
       conversation = $("#conversation-inner")
-      scrollToTheBottom = ` uid == $("#uid").val() ` or (conversation[0].scrollTop + conversation.innerHeight()) is conversation[0].scrollHeight
+      scrollToTheBottom = "#{uid}" is "#{$("#uid").val()}" or (conversation[0].scrollTop + conversation.innerHeight()) is conversation[0].scrollHeight
 
       $('#conversation-inner .today').append(chatMessage)
 
@@ -116,14 +116,14 @@ $ ->
 
       $('#chattext').val("")
 
-      return if $.trim(chatMessage.element.msg).length == 0
+      return unless $.trim(chatMessage.element.msg).length
 
       App.chat.addMessage($("#uid")[0].value, chatMessage.element.msg)
       App.chat.chatIO.emit("message", chatMessage)
 
     removeUser: (uid) ->
       for user, index in @users
-        @users.splice(index, 1) if ` user.id == uid `
+        @users.splice(index, 1) if "#{user.id}" is "#{uid}"
 
       $("#chatUser#{uid}").remove()
 
@@ -137,7 +137,7 @@ $ ->
         $("." + rangeId).show().next(".timeRange").show()
         $(showRangeLink).hide().next(".pipe:first").hide()
         $(showRangeLink).prevAll(".showRangeLink, .pipe").hide()
-      $(".earlierMessagesHeader").html("No Earlier Messages") if $(".showRangeLink:visible").length is 0
+      $(".earlierMessagesHeader").html("No Earlier Messages") unless $(".showRangeLink:visible").length
 
     initSockets: ->
       @chatIO = io.connect('/chat', window.copt)
@@ -145,13 +145,13 @@ $ ->
       @chatIO.on 'message', (data) => @addMessage(data.id, data.message.element.msg)
 
       @chatIO.on 'userRemoved', (uid) =>
-        if ` uid == $("#uid").val() `
+        if "#{uid}" is "#{$("#uid").val()}"
           window.location.reload()
         else
           @removeUser uid
 
       @chatIO.on 'enter', (user) =>
-        @addNewUser user if not @getUserById user.id
+        @addNewUser user unless @getUserById user.id
 
         @changeUserStatus user.id, true
         @addTechMessage("<i>#{user.displayName} entered the project</i>")
@@ -164,4 +164,3 @@ $ ->
       @chatIO.on 'onlineUsers', (uids) => @changeUserStatus(uid, true) for uid in uids
 
   App.chat = new Chat
-

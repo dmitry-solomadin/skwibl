@@ -63,7 +63,7 @@ USAGE="Usage: $0 -a -b -c -d -i -p -r -s -u -h \n\n
       -r --reset Reset the project \n
       -s --socket Start socket server \n
       -u --update Update project dependencies \n
-      -w --dynamicWatch Start dynamic server and watch client files for changes \n\n
+      -w --dynamicWatch Watch client files for changes \n\n
       -h --help This prompt \n"
 
 ## patch procedure
@@ -191,7 +191,7 @@ function update {
 case "$1" in
   -a|--dynamic)
     init
-    build
+#     build
     startDyn
     exit 0;;
   -b|--build)
@@ -231,7 +231,7 @@ case "$1" in
   -w|--dynamicWatch)
     init
     buildWatch
-    startDyn
+#     startDyn
     exit 0;;
   -h|--help)
     echo -e $USAGE

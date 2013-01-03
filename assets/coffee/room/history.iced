@@ -2,12 +2,12 @@ $ ->
   class RoomHistory
 
     prev: ->
-      return if room.opts.historyCounter == 0
+      return unless room.opts.historyCounter
 
       executePrevHistory = (item, reverse) =>
-        if item.actionType == "remove"
+        if item.actionType is "remove"
           executePrevHistory(item.tool, true)
-        else if item.actionType == "clear"
+        else if item.actionType is "clear"
           $(item.tools).each -> executePrevHistory(@, true)
         else if item.commentMin
           if reverse
@@ -31,16 +31,16 @@ $ ->
         executePrevHistory(item)
         room.redrawWithThumb()
 
-      if opts.historyCounter == 0
+      unless opts.historyCounter
         $("#undoLink").addClass("disabled")
 
     next: ->
-      return if opts.historyCounter == opts.historytools.eligibleHistory.length
+      return if opts.historyCounter is opts.historytools.eligibleHistory.length
 
       executeNextHistory = (item, reverse) =>
-        if item.actionType == "remove"
+        if item.actionType is "remove"
           executeNextHistory(item.tool, true)
-        else if item.actionType == "clear"
+        else if item.actionType is "clear"
           $(item.tools).each -> executeNextHistory(@, true)
         else if item.commentMin
           if reverse
@@ -64,20 +64,20 @@ $ ->
         opts.historyCounter = opts.historyCounter + 1
         room.redrawWithThumb()
 
-      if opts.historyCounter == opts.historytools.eligibleHistory.length
+      if opts.historyCounter is opts.historytools.eligibleHistory.length
         $("#redoLink").addClass("disabled")
 
     # get all tools that are visible and have special marker
     getSelectableTools: ->
       selectableTools = []
       for tool in opts.historytools.allHistory
-        selectableTools.push(tool) if tool.opacity != 0
+        selectableTools.push(tool) if tool.opacity
 
       selectableTools
 
     add: (tool) ->
-      tool = if tool then tool else opts.tool
-      if opts.historyCounter != opts.historytools.eligibleHistory.length # rewrite history
+      tool = tool or opts.tool
+      if opts.historyCounter isnt opts.historytools.eligibleHistory.length # rewrite history
         opts.historytools.eligibleHistory = opts.historytools.eligibleHistory.slice(0, room.opts.historyCounter)
 
       opts.historytools.eligibleHistory.push(tool) if tool.eligible

@@ -25,7 +25,7 @@ $ ->
 
       $(document).on "click.login", (event) ->
         target = event.target
-        return if target.id == "loginBlock" or target.id == "signInButton" or $(target).closest("#loginBlock")[0]
+        return if target.id is "loginBlock" or target.id is "signInButton" or $(target).closest("#loginBlock")[0]
         $("#loginBlock").animate
           top: $("#header").height() - 500, 400
 
@@ -53,12 +53,10 @@ $ ->
 
     processLogin: (data) ->
       $("#loginError").html("")
-      if data == "OK"
+      if data is "OK"
         window.location = "/"
       else
         $("#loginError")[0].className = "textError"
         $("#loginError").html(data.message)
 
   App.Home = new Home
-
-

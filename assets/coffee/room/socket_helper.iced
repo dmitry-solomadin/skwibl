@@ -34,15 +34,15 @@ $ ->
 
     addOrUpdateComment: (data) ->
       # adjust position if canvas was panned
-      if opts.pandx isnt 0 or opts.pandy isnt 0
-        data.min.x = data.min.x + opts.pandx
-        data.min.y = data.min.y + opts.pandy
-        data.max.x = data.max.x + opts.pandx
-        data.max.y = data.max.y + opts.pandy
+      if opts.pandx or opts.pandy
+        data.min.x += opts.pandx
+        data.min.y += opts.pandy
+        data.max.x += opts.pandx
+        data.max.y += opts.pandy
 
         if data.rect
-          data.rect.x = data.rect.x + opts.pandx
-          data.rect.y = data.rect.y + opts.pandy
+          data.rect.x += opts.pandx
+          data.rect.y += opts.pandy
 
       # adjust position if canvas was sacled
       minPos = room.applyReverseCurrentScale(new Point(data.min.x, data.min.y))
@@ -110,17 +110,17 @@ $ ->
       room.redrawWithThumb()
 
     addOrUpdateElement: (element) ->
-      if opts.pandx isnt 0 or opts.pandy isnt 0
+      if opts.pandx or opts.pandy
         for segment in element.segments
-          segment.x = segment.x + opts.pandx
-          segment.y = segment.y + opts.pandy
+          segment.x += opts.pandx
+          segment.y += opts.pandy
 
       foundPath = room.helper.findByElementId(element.elementId)
       if foundPath
         room.items.unselectIfSelected(foundPath.elementId)
         foundPath.removeSegments()
         $(element.segments).each ->
-          foundPath.addSegment(room.socketHelper.createSegment(@.x, @.y, @.ix, @.iy, @.ox, @.oy))
+          foundPath.addSegment(room.socketHelper.createSegment(@x, @y, @ix, @iy, @ox, @oy))
 
         foundPath.opacity = 1
 
@@ -149,7 +149,7 @@ $ ->
     createElementFromData: (data) ->
       path = new Path()
       $(data.segments).each ->
-        path.addSegment(room.socketHelper.createSegment(@.x, @.y, @.ix, @.iy, @.ox, @.oy))
+        path.addSegment(room.socketHelper.createSegment(@x, @y, @ix, @iy, @ox, @oy))
       path.closed = data.closed
       path.elementId = data.elementId
 
@@ -169,7 +169,7 @@ $ ->
           strokeColor: elementToSend.strokeColor.toCssString()
           strokeWidth: elementToSend.strokeWidth
           opacity: elementToSend.opacity
-          isArrow: if elementToSend.arrow then true else false
+          isArrow: elementToSend.arrow?
 
       segments = if elementToSend.arrow then elementToSend.arrow.segments else elementToSend.segments
       for segment in segments

@@ -39,7 +39,7 @@ $ ->
         firstFile = false
         data.formData = params
 
-    reverseOpacity: (elem) -> if elem.opacity == 0 then elem.opacity = 1 else elem.opacity = 0
+    reverseOpacity: (elem) -> elem.opacity = 1 - elem.opacity
 
     notifyComment: -> App.notificator.notify("Drag to comment an area.")
 
@@ -62,8 +62,8 @@ $ ->
       return null unless id
 
       for element in opts.historytools.allHistory
-        return element if element.commentMin and ` element.commentMin.elementId == id `
-        return element if ` element.elementId == id `
+        return element if element.commentMin and "#{element.commentMin.elementId}" is "#{id}"
+        return element if "#{element.elementId}" is "#{id}"
       return null
 
     findByElementIdAllCanvases: (id) ->
@@ -73,9 +73,9 @@ $ ->
         for element in savedOpt.historytools.allHistory
           if element.commentMin
             console.log element.commentMin.elementId
-            if element.commentMin and ` element.commentMin.elementId == id `
+            if element.commentMin and "#{element.commentMin.elementId}" is "#{id}"
               return canvasId: savedOpt.canvasId, element: element
-          if ` element.elementId == id `
+          if "#{element.elementId}" is "#{id}"
             return canvasId: savedOpt.canvasId, element: element
 
       return null

@@ -2,7 +2,7 @@ $ ->
   class Room
     constructor: ->
       @opts = {}
-      @savedOpts = new Array
+      @savedOpts = []
       @sharedOpts =
         tooltype: 'line'
         color: '#404040'
@@ -68,8 +68,8 @@ $ ->
       window.opts = @opts
       $.extend(@opts, @defaultOpts)
       @opts.historytools =
-        eligibleHistory: new Array
-        allHistory: new Array
+        eligibleHistory: []
+        allHistory: []
       @opts.canvasId = canvasId
       @savedOpts.push(@opts)
 
@@ -87,16 +87,17 @@ $ ->
       canvas.css({cursor: "default"})
 
       selectedTool = @items.selected()
-      if selectedTool?.selectionRect?
-        if selectedTool.selectionRect.bottomRightScaler.bounds.contains(event.point)
+      rect = selectedTool?.selectionRect
+      if rect
+        if rect.bottomRightScaler.bounds.contains(event.point)
           canvas.css(cursor: "se-resize")
-        else if selectedTool.selectionRect.topLeftScaler.bounds.contains(event.point)
+        else if rect.topLeftScaler.bounds.contains(event.point)
           canvas.css(cursor: "nw-resize")
-        else if selectedTool.selectionRect.topRightScaler.bounds.contains(event.point)
+        else if rect.topRightScaler.bounds.contains(event.point)
           canvas.css(cursor: "ne-resize")
-        else if selectedTool.selectionRect.bottomLeftScaler.bounds.contains(event.point)
+        else if rect.bottomLeftScaler.bounds.contains(event.point)
           canvas.css(cursor: "sw-resize")
-        else if selectedTool.selectionRect.removeButton and selectedTool.selectionRect.removeButton.bounds.contains(event.point)
+        else if rect.removeButton and rect.removeButton.bounds.contains(event.point)
           canvas.css(cursor: "pointer")
 
     onMouseDown: (canvas, event) ->
@@ -104,7 +105,7 @@ $ ->
 
       $("#removeSelected").addClass("disabled")
 
-      @items.selected().selectionRect.remove() if @items.selected() && @items.selected().selectionRect
+      @items.selected()?.selectionRect?.remove()
 
       @opts.tool = null
 
@@ -201,7 +202,7 @@ $ ->
           @opts.tool.add(event.point)
           @opts.tool.simplify(10)
         when "comment"
-          commentRect = if @opts.tool and @opts.tool.isCommentRect then @opts.tool else null
+          commentRect = if @opts.tool and @opts.tool.isCommentRect then @opts.tool
           commentMin = @comments.create(event.point.x, event.point.y, commentRect)
           commentRect.commentMin = commentMin if commentRect
 
@@ -231,7 +232,7 @@ $ ->
             else
               @socket.emit "elementUpdate", @socketHelper.prepareElementToSend(selectedItem)
 
-      @sharedOpts.tooltype = "select" if tooltype == 'comment'
+      @sharedOpts.tooltype = "select" if tooltype is 'comment'
 
       @canvas.updateSelectedThumb()
 
@@ -264,7 +265,7 @@ $ ->
     applyReverseCurrentScale: (point) ->
       point.transform(new Matrix(@opts.currentScale, 0, 0, @opts.currentScale, 0, 0))
 
-    generateId: -> $("#uid").val() + new Date().getTime()
+    generateId: -> $("#uid").val() + Date.now()
 
     redraw: ->
       paper.view.draw()
@@ -281,7 +282,7 @@ $ ->
 
   # paper.install(window) causes errors upon defining getters for 'project', so we use this code
   for key of paper
-    window[key] = paper[key] if not /^(version|_id|load)/.test(key) and not window[key]?
+    window[key] = paper[key] unless /^(version|_id|load)/.test(key) or window[key]?
 
   paper.setup($('#copyCanvas')[0]);
   paper.setup($('#myCanvas')[0]);
