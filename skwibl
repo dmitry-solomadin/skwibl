@@ -42,40 +42,28 @@ NODE_CMD='node --nouse-idle-notification --expose-gc'
 ## coffee execution command
 COFFEE_OPT='--nodejs "--nouse-idle-notification --expose-gc"'
 
-## node debug command for dynamic server
-DEBUG_CMD="node --debug $DYN.js & node-inspector &"
-
 ## redis flush command
 FLUSH_REDIS_CMD='redis-cli flushall'
 
 ## tools file (to uncomment gc)
 TOOLS_FILE='./tools/tools.iced'
 
-## application script name
-APP_NAME='./vendor/js/skwibl'
-
-## library script name
-LIB_NAME='./vendor/js/lib'
-
-## client script name
-CLIENT_NAME='./vendor/js/client'
-
 ## socket.io script location
 SOCKETIO_SCRIPT='./node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js'
 
 ## usage string
-USAGE="Usage: $0 -a -b -c -d -e -i -p -r -s -u -h \n\n
+USAGE="Usage: $0 -a -b -c -d -i -p -r -s -u -h \n\n
       -a --dynamic Start dynamic server \n
       -b --build Build the project \n
       -c --clean Clean the project auxiliary files \n
       -d --deploy Deploy the project \n
-      -e --debug Run skwibl in debug mode \n
       -i --init Init the project \n
       -o --connect Connect to the production skwibl service through ssh \n
       -p --product Run skwibl in production mode \n
       -r --reset Reset the project \n
       -s --socket Start socket server \n
-      -u --update Update project dependencies \n\n
+      -u --update Update project dependencies \n
+      -w --dynamicWatch Start dynamic server and watch client files for changes \n\n
       -h --help This prompt \n"
 
 ## patch procedure
@@ -105,10 +93,9 @@ function clean {
   find ./smtp -name "*.js" -delete
   find ./sockets -name "*.js" -delete
   find ./tools -name "*.js" -delete
-  rm -f $LIB_NAME.js $LIB_NAME.min.js
-  rm -f $CLIENT_NAME.js $CLIENT_NAME.min.js
-  rm -f $APP_NAME.js $APP_NAME.min.js $APP_NAME.min.js.gz
+  rm -f ./vendor/js/skwibl.js ./vendor/js/skwibl.min.js ./vendor/js/skwibl.min.js.gz
   rm -f ./vendor/js/Jplayer.swf
+  rm -f ./vendor/css/skwibl.css ./vendor/css/skwibl-min.css ./vendor/css/skwibl-min.css.gz
 }
 
 function buildWatch {
@@ -189,23 +176,8 @@ function deploy {
   find ./assets/coffee -name "*.js" -delete
   rm -f $TOOLS_FILE
   mv $TOOLS_FILE.save $TOOLS_FILE
-  cat ./vendor/js/dev/jquery.js >> $LIB_NAME.js
-  find ./vendor/js/dev/plugins/ -name "*.js" -exec cat {} >> $LIB_NAME.js \;
-  find ./assets/js -name "*.js" -exec cat {} >> $CLIENT_NAME.js \;
-  cat $LIB_NAME.js $SOCKETIO_SCRIPT $CLIENT_NAME.js > $APP_NAME.js
-  node_modules/uglify-js/bin/uglifyjs $APP_NAME.js -c -o $APP_NAME.min.js
-  gzip -9 $APP_NAME.min.js -c > $APP_NAME.min.js.gz
-  rm -f $LIB_NAME.js $LIB_NAME.min.js
-  rm -f $CLIENT_NAME.js $CLIENT_NAME.min.js
-  rm -f $APP_NAME.js $APP_NAME.min.js
-  cp ./vendor/js/dev/plugins/Jplayer.swf ./vendor/js/Jplayer.swf
-  sshpass -p $PASSWORD rsync ./pass.rsync -rvuzl ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee" --exclude "*.iced" --exclude "assets" --exclude "uploads/*" --exclude "vendor/js/dev"
-}
-
-## debug procedure
-function debug {
-  echo "debugg starting"
-  eval $DEBUG_CMD
+  ./minify.sh
+  sshpass -p $PASSWORD rsync ./pass.rsync -rvuzl ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee" --exclude "*.iced" --exclude "assets" --exclude "uploads/*" --exclude "vendor/js/dev" --exclude "vendor/socket.io" --exclude "vendor/css/dev"
 }
 
 ## update procedure
@@ -235,10 +207,6 @@ case "$1" in
     deploy
     clean
     exit 0;;
-  -e|--debug)
-    init
-    build
-    debug;;
   -i|--init)
     init
     exit 0;;
