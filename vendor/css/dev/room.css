@@ -488,10 +488,6 @@ body.room {
     overflow: visible !important;
 }
 
-.header-foldable.headerChatFolded {
-    width: 200px;
-}
-
 .header-foldable > span {
     padding-right: 5px;
 }

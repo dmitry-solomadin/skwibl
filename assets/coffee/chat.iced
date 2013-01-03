@@ -48,8 +48,7 @@ $ ->
 
     fold: ->
       $("#chat").data("visible", "false")
-      $("#chat").animate(left: -305)
-      $("#header-foldable").animate(width: 200)
+      $("#chat").animate({left: -305}, {queue: false})
       $("#canvasFooter").animate(paddingLeft: 0)
       $(".canvasFooterInner").animate({width: $(window).width()}, -> $(".canvasFooterInner").css(width: "100%"))
 
@@ -58,8 +57,6 @@ $ ->
     unfold: ->
       $("#chat").data("visible", "true")
       $("#chat").animate(left: 0)
-      $("#header-foldable").data("width", $("#header-foldable").width())
-      $("#header-foldable").animate(width: 280)
       $("#canvasFooter").animate(paddingLeft: 300)
       $(".canvasFooterInner").animate({width: $(window).width() - 300}, -> $(".canvasFooterInner").css(width: "100%"))
 
