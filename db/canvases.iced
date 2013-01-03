@@ -4,15 +4,16 @@ exports.setUp = (client, db) ->
   mod = {}
 
   mod.add = (pid, file, time, fn) ->
-    client.incr 'canvases:next', (err, cid) ->
-      unless err
-        canvas =
-          id: cid
-          createdAt: Date.now()
-          project: pid
-        canvas.time = time if time
-        return client.scard "projects:#{pid}:canvases", (err, count) ->
+    return client.scard "projects:#{pid}:canvases", (err, count) ->
+      return client.incr 'canvases:next', (err, cid) ->
+        unless err
+          canvas =
+            id: cid
+            createdAt: Date.now()
+            project: pid
+          canvas.time = time if time
           canvas.file = file.id if file
+          canvas.initialized = true if count > 0
           if file and file.name.trim().length > 0
             canvas.name = file.name
           else
@@ -20,6 +21,11 @@ exports.setUp = (client, db) ->
           client.hmset "canvases:#{cid}", canvas
           client.sadd "projects:#{pid}:canvases", cid
           return tools.asyncOpt fn, null, canvas
+        return tools.asyncOpt fn, err, null
+
+  mod.initFirst = (pid, fn) ->
+    return client.smembers "projects:#{pid}:canvases", (err, canvasIds) ->
+      client.hset "canvases:#{canvasIds[0]}", "initialized", "true"
       return tools.asyncOpt fn, err, null
 
   mod.get = (cid, fn) ->

@@ -15,7 +15,9 @@ exports.setUp = (client, db) ->
         owner: owner
       if cid
         client.hmset "files:#{fid}", file
-        db.canvases.setProperties cid, file: fid
+        db.canvases.setProperties cid,
+          initialized: true
+          file: fid
         client.sadd "projects:#{pid}:files", fid
         return tools.asyncOpt fn, null, canvasId: cid, element: file
       client.hmset "files:#{fid}", file

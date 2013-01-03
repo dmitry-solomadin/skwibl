@@ -18,6 +18,20 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'MyriadPro';
+    src: url('/css/fonts/myriadpro-regular.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'MyriadPro-SemiBold';
+    src: url('/css/fonts/myriadpro-semibold.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
 
 }

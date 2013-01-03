@@ -1,6 +1,8 @@
-<input id="pid" type="hidden" value="<%= @pid %>">
+<input id="pid" type="hidden" value="<%= @pid %>" xmlns="http://www.w3.org/1999/html">
 
-<div id="chat" class="chat">
+<% canvasInitialized = @canvases[0].initialized %>
+
+<div id="chat" class="chat <%= 'chatFolded' unless canvasInitialized %>">
   <div class="projectHeader">
     <%= @project.name %>
   </div>
@@ -24,7 +26,6 @@
     <div class="tab-content" id="chat-tab">
       <div class="filter-box">
         <div id="conversation-inner" class="filter-box-inner">
-          <% console.log @chatMessages %>
           <% commentInfo = @splitComments @chatMessages %>
           <% timeRanges = commentInfo.timeRanges %>
           <% uniqueDates = commentInfo.uniqueDates %>
@@ -96,13 +97,43 @@
   </div>
 </div>
 
-<canvas id="myCanvas" resize="true"></canvas>
+<canvas id="myCanvas" resize="true" style="<%= 'display:none' unless canvasInitialized %>"></canvas>
+<div id="commentsDiv" style="<%= 'display:none' unless canvasInitialized %>"></div>
 <canvas id="copyCanvas" resize="true" style="display: none;"></canvas>
-<div id="dummyAnimation" style="display: none;"></div>
+<div id="canvasInitDivWrapper" class="canvasInitDivWrapper" style="<%= 'display:none' if canvasInitialized %>">
+  <div class="canvasInitDiv">
+    <div class="canvasInitHeader">Upload images from</div>
 
-<div id="canvasFooter" class="canvasFooter">
+    <span class="btn fileinput-button">
+      My computer
+
+      <input id="fileupload" type="file" name="files[]" multiple>
+    </span><br>
+    <a class="btn disabled tooltipize" data-placement="bottom" title="This feature is comming soon">Dropbox</a><br>
+    <a class="btn disabled tooltipize" data-placement="bottom" title="This feature is comming soon">Google Drive</a><br>
+    <div class="canvasInitHeader">or</div>
+    <a href="#" class="btn" data-loading="Creating..." data-prevText="Create empty canvas"
+       onclick="App.room.canvas.requestAddEmpty(); return false;">Create empty canvas</a>
+
+    <a id="cancelInitLink" class="cancelInit hide" href="#"
+        onclick="App.room.hideSplashScreen(); return false;">Cancel</a>
+  </div>
+</div>
+
+<div id="canvasFooter" class="canvasFooter <%= 'canvasFooterFolded chatFoldedPreviews' unless canvasInitialized %>">
   <div class="canvasFooterInner">
     <div class="canvasFooterTop">
+      <div id="smallCanvasPreviewsWrap">
+        <div id="smallCanvasPreviews">
+          <% for canvas, i in @canvases : %>
+          <div class="smallCanvasPreview tooltipize <%- 'previewSelected' if i is 0 %>" title="<%= canvas.name %>"
+               data-cid="<%= canvas.id %>" data-name="<%= canvas.name %>"
+               data-initialized="<%= canvas.initialized %>"
+          <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
+          </div>
+          <% end %>
+        </div>
+      </div>
       <div id="nameChanger">
         <% hasName = @canvases[0].name and @canvases[0].name.trim().length > 0 %>
         <span id="canvasName" class="canvasName tooltipize <%= 'noname' unless hasName %>" data-delay="500"
@@ -114,23 +145,21 @@
           <a id="canvasNameSave" class="btn small-btn canvasNameSave">Save</a>
         </span>
       </div>
-      <div id="smallCanvasPreviewsWrap">
-        <div id="smallCanvasPreviews">
-          <% for canvas, i in @canvases : %>
-          <div class="smallCanvasPreview tooltipize <%- 'previewSelected' if i is 0 %>" title="<%= canvas.name %>"
-               data-cid="<%= canvas.id %>" data-name="<%= canvas.name %>"
-          <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
-        </div>
-        <% end %>
-      </div>
-    </div>
 
-    <a id="canvasFolder" class="btn skwibl_image_btn canvasFolder" href="#"
-       onclick="App.room.canvas.foldPreviews(this); return false;">
-      <img src="/images/room/fold-down.png">
+    <% if canvasInitialized : %>
+      <% foldFunc = "App.room.canvas.foldPreviews(); return false;" %>
+      <% foldImg = "/images/room/fold-down.png" %>
+    <% else : %>
+      <% foldFunc = "App.room.canvas.unfoldPreviews(); return false;" %>
+      <% foldImg = "/images/room/unfold-up.png" %>
+    <% end %>
+    <a id="canvasFolder" class="btn skwibl_image_btn canvasFolder" href="#" onclick="<%= foldFunc %>">
+      <img src="<%= foldImg %>">
     </a>
-
-    <div id="file-uploader" class="canvasUpload fr"></div>
+    <a class="btn small-btn btn-success pull-right" onclick="App.room.showSplashScreen(true)">
+      <i class="icon-plus-sign"></i>
+      New
+    </a>
   </div>
   <div class="canvasFooterBottom">
     <div id="canvasSelectDiv" class="canvasSelectDiv">
@@ -146,6 +175,7 @@
         <% end %>
         <div class="canvasPreviewDiv">
           <a href="#" class="<%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.id %>" data-name="<%= canvas.name %>"
+             data-initialized="<%= canvas.initialized %>"
           <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
           <canvas width="80" height="60"></canvas>
           </a>

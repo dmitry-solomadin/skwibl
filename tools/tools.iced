@@ -2,6 +2,7 @@
 cluster = require 'cluster'
 os = require 'os'
 fs = require 'fs'
+mkdirp = require 'mkdirp'
 crypto = require 'crypto'
 validator = require 'validator'
 generatePassword = require 'password-generator'
@@ -66,9 +67,20 @@ exports.getFileMime = (ext) ->
     return image
   return video
 
+exports.isMimeSupported = (mimeToTest) ->
+  for mimeBucket in cfg.MIME
+    for ext of mimeBucket
+      mime = mimeBucket[ext]
+      return true if mime == mimeToTest
+  return false
+
 exports.getFileType = (mime) ->
   return null if not mime
   return mime.split('/')[0]
+
+exports.mkdirp = (dirname) ->
+  unless fs.existsSync dirname
+    mkdirp.sync dirname
 
 exports.include = (dir, fn) ->
   for name in fs.readdirSync(dir)

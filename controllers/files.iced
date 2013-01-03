@@ -41,76 +41,83 @@ exports.file = (req, res) ->
 #
 exports.add = (req, res) ->
 
-#
-# POST
-# delete file
-#
+  #
+  # POST
+  # delete file
+  #
 exports.delete = (req, res) ->
 
-#
-# POST
-# Update file
-#
+  #
+  # POST
+  # Update file
+  #
 exports.update = (req, res) ->
 
-#
-# POST
-# Upload file
-#
+  #
+  # POST
+  # Upload file
+  # We actually send two post request from the client but the method supports also sending multiple files in on form request
 exports.upload = (req, res, next) ->
-  #TODO implement upload continue
-  if req.xhr
-    pid = req.query.pid
-    cid = req.query.cid
-    dir = "./uploads/#{pid}"
-    size = req.header 'x-file-size'
-    name = decodeURIComponent path.basename(req.header('x-file-name'))
-    mime = tools.getFileMime path.extname name
-    type = tools.getFileType mime
-    unless mime
-      return res.json
-        success: false
-        name: name
-        error: 'Unsupported file type'
-    ws = fs.createWriteStream "#{dir}/#{type}/#{name}",
-      mode: cfg.FILE_PERMISSION
-      flags: 'w'
-    console.log 'upload'
-    ws.on 'error', (err) ->
-      console.log err
-    ws.on 'drain', ->
-      console.log 'drain'
-      req.resume()
-    ws.on 'close', ->
-      console.log 'close'
-    req.on 'data', (chunk) ->
-      console.log 'chunk'
-      ws.write chunk
-    req.on 'end', ->
-      ws.destroySoon()
-      console.log 'end'
-      return db.files.add req.user.id, cid, pid, name, mime, (err, data) ->
-        return res.json
-          success: yes
-          canvasId: data.canvasId
-          name: data.canvasName
-          fileId: data.element.id
-    req.on 'close', ->
-      ws.destroy()
-      return res.json
-        success: no
-        name: name
-  else
-    form = new formidable.IncomingForm()
-    form.uploadDir = "#{dir}/#{type}/"
-    form.keepExtensions = yes
-    form.parse req, (err, fields, files) ->
-      return db.files.add req.user.id, cid, pid, name, mime, (err, file) ->
-        return res.json
-          success: true
-          id: file.id
-          name: name
+  tmpDir = "./uploads/tmp"
+  tools.mkdirp tmpDir
 
+  fileCount = 0
+  files = []
+  finish = ->
+    fileCount--
+    if fileCount is 0
+      savedFiles = []
+      tools.asyncParallel files, (file) ->
+        db.files.add req.user.id, req.cid, req.pid, file.name, file.mime, (err, savedFile) ->
+          savedFiles.push savedFile
+          return tools.asyncDone files, ->
+            return res.json savedFiles
+
+  form = new formidable.IncomingForm()
+  form.uploadDir = tmpDir
+
+  form.on 'field', (name, value)->
+    req[name] = value
+  form.on 'fileBegin', ->
+    console.log "fileBegin"
+  form.on 'file', (name, file) ->
+    fileCount++
+    files.push file
+
+    pid = req.pid
+    cid = req.cid
+
+    size = file.length
+    # todo cfg.minFileSize and cfg.maxFileSize are not yet defined.
+    if cfg.minFileSize and cfg.minFileSize > size
+      fs.unlink file.path
+      return
+    if cfg.maxFileSize and size > cfg.maxFileSize
+      fs.unlink file.path
+      return
+
+    mime = file.mime
+    type = tools.getFileType mime
+
+    unless tools.isMimeSupported mime
+      fs.unlink file.path
+      return
+
+    uploadDir = "./uploads/#{pid}/#{type}"
+
+    tools.mkdirp uploadDir
+
+    fs.rename file.path, "#{uploadDir}/#{file.name}", (err) ->
+      console.log "unexpected error. implement manual copy process" if err
+      return finish()
+  form.on 'aborted', ->
+    console.log "abort"
+  form.on 'error', (err) ->
+    console.log "error: ", err
+  form.on 'end', ->
+    console.log "end"
+
+  form.parse req
 #
 # GET
 # Dropbox files

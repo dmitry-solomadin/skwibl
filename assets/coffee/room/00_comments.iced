@@ -108,8 +108,8 @@ $ ->
         commentMin[0].rect = rect
         rect.commentMin = commentMin
 
-      $("#room-content").prepend(commentMin)
-      $("#room-content").prepend(commentMax)
+      $("#commentsDiv").prepend(commentMin)
+      $("#commentsDiv").prepend(commentMax)
 
       coords = @getArrowCoords commentMin
       path = new Path()
@@ -546,6 +546,7 @@ $ ->
         $("#todo-tab-inner").append("<div class='openList'></div><div class='resolvedList'></div>")
 
       commentText = commentText.clone()
+      commentText[0].id = commentText[0].id + "cloned"
       commentText.css("cursor", "pointer")
       commentText.find(".editCommentTextLink, .removeCommentTextLink").remove()
       commentText.on 'click', =>

@@ -44,11 +44,12 @@ exports.setUp = (logger) ->
       root: viewsDir
     }).render
     app.set 'view engine', 'ect'
-    app.use express.logger stream: logStream
+    app.use express.logger stream: logStream, format: 'dev'
     app.enable 'trust proxy'
     app.use express.favicon "#{vendorDir}/images/butterfly-tiny.png"
     app.set 'view options', {layout: false}
-    app.use express.bodyParser()
+    app.use express.json()
+    app.use express.urlencoded()
     app.use express.methodOverride()
     app.use express.cookieParser()
     app.use express.session {
@@ -58,7 +59,7 @@ exports.setUp = (logger) ->
     }
     app.use passport.initialize()
     app.use passport.session()
-
+    app.use '/file/upload', (req, res, next) -> ctrls.files.upload(req, res, next)
     app.use (req, res, next) ->
       res.locals.req = req
       next()

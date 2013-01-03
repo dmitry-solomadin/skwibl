@@ -237,6 +237,27 @@ $ ->
 
     # Misc methods
 
+    showSplashScreen: (hidePanels) ->
+      return if $("#canvasInitDivWrapper:visible")[0]
+
+      $("#canvasInitDivWrapper").show()
+      $("#myCanvas").hide()
+      $("#commentsDiv").hide()
+      $("#cancelInitLink").show()
+
+      App.chat.fold()
+      App.room.canvas.foldPreviews()
+
+    hideSplashScreen: (showPanels) ->
+      return unless $("#canvasInitDivWrapper:visible")[0]
+
+      $("#canvasInitDivWrapper").hide()
+      $("#myCanvas").show()
+      $("#commentsDiv").show()
+
+      App.chat.unfold()
+      App.room.canvas.unfoldPreviews()
+
     applyCurrentScale: (point) ->
       point.transform(new Matrix(1 / @opts.currentScale, 0, 0, 1 / @opts.currentScale, 0, 0))
 

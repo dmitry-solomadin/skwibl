@@ -13,7 +13,8 @@ exports.configure = (app, passport) ->
   app.post '/files/update', ctrls.mid.isAuth, ctrls.files.update
 
   #TODO change to work with mid.isMember (be ready to listen req.data event understand how to use req.pause() properly)
-  app.post '/file/upload', ctrls.mid.isAuth, ctrls.files.upload
+  #Todo add isAuth to express.iced
+  #app.post '/file/upload', ctrls.mid.isAuth, ctrls.files.upload
 
   app.get '/files/:pid', ctrls.mid.isAuth, ctrls.files.project
 

@@ -8,6 +8,51 @@ body.room {
     font-size: 0;
 }
 
+.canvasInitDivWrapper {
+    font-family: 'MyriadPro';
+    width: 100%;
+    height: 100%;
+    padding: 50px 0 210px 0;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    background: url('/images/room/linen.png');
+}
+
+.canvasInitDiv {
+    height: 315px;
+    border-radius: 10px;
+    box-shadow: black 0 0 15px;
+    width: 400px;
+    margin: 0px auto;
+    background: white;
+    border: 1px solid gray;
+    padding: 20px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    background: white;
+    text-align: center;
+}
+
+.cancelInit {
+    float: right;
+    font-size: 16px;
+}
+
+.canvasInitDiv .btn {
+    margin-bottom: 15px;
+    font-size: 22px;
+    width: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    color: #404040;
+}
+
+.canvasInitHeader {
+    font-size: 24px;
+    margin-bottom: 12px;
+    color: #505050;
+}
+
 .color {
     cursor: pointer;
     display: inline-block;
@@ -220,6 +265,22 @@ body.room {
     height: 108px;
 }
 
+.canvasFooterFolded {
+    height: 37px;
+}
+
+.canvasFooterFolded #smallCanvasPreviews {
+    left: 0;
+}
+
+.canvasFooterFolded #smallCanvasPreviewsWrap {
+    position: relative;
+}
+
+.canvasFooterFolded #nameChanger{
+    padding-left: 15px;
+}
+
 .canvasFooterInner {
     width: 100%;
 }
@@ -427,6 +488,10 @@ body.room {
     overflow: visible !important;
 }
 
+.header-foldable.headerChatFolded {
+    width: 200px;
+}
+
 .header-foldable > span {
     padding-right: 5px;
 }
@@ -478,6 +543,18 @@ body.room {
     z-index: 199;
 }
 
+.chatFolded {
+    left: -305px;
+}
+
+.chatFoldedHeader {
+
+}
+
+.chatFoldedPreviews {
+    padding-left: 0;
+}
+
 .chatInner {
     padding: 0 5px 10px 5px;
     width: 300px;
@@ -527,26 +604,25 @@ body.room {
 }
 
 .chat-message .message-left-part {
-    float:left;
+    float: left;
     width: 230px;
 }
 
 .chat-message .timestamp {
-    float:right;
+    float: right;
     margin-left: 2px;
     font-size: 10px;
     color: #808080;
 }
 
 .chat-message .image {
-    float:left;
+    float: left;
     margin-right: 3px;
 }
 
 #conversation-inner {
     color: #202020;
-    font-family: 'Lucida Sans Unicode', sans-serif;
-    -webkit-font-smoothing: antialiased;
+    font-family: 'MyriadPro', sans-serif;
 }
 
 #conversation-inner b {
@@ -674,13 +750,13 @@ body.room {
 #smallCanvasPreviews {
     float: left;
     left: -500px;
-    position: relative;
     margin-left: 10px;
+    position: relative;
+    top: -2px;
 }
 
 #smallCanvasPreviewsWrap {
     position: absolute;
-    top: 1px;
 }
 
 .smallCanvasPreview {
@@ -733,8 +809,36 @@ body.room {
 
 .chat-badge-wrapper {
     position: relative;
-    float:left;
+    float: left;
     display: inline-block;
+}
+
+.fileinput-button {
+    position: relative;
+}
+
+.fileinput-button input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    filter: alpha(opacity=0);
+    transform: translate(-300px, 0) scale(4);
+    font-size: 23px;
+    direction: ltr;
+    cursor: pointer;
+}
+
+[class^="icon-"],
+[class*=" icon-"] {
+    background-image: url("/images/glyphicons-halflings.png");
+}
+
+.icon-white {
+    background-image: url("/images/glyphicons-halflings-white.png");
 }
 
 /* LABELS */

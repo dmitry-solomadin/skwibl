@@ -21,31 +21,23 @@ $ ->
       $(document).bind 'keydown.shift_down', => room.items.translateSelected(new Point(0, 1))
 
     initUploader: ->
-      App.room.uploader = new qq.FileUploader
-        element: $('#file-uploader')[0]
-        action: '/file/upload'
-        title_uploader: 'Upload'
-        failed: 'Failed'
-        multiple: true
-        cancel: 'Cancel'
-        debug: false
-        params:
+      $('#fileupload').fileupload
+        dataType: 'json'
+        url: '/file/upload'
+        done: (e, data) ->
+          console.log data.result
+          for file in data.result
+            room.canvas.handleUpload {canvasId: file.canvasId, fileId: file.element.id, name: file.canvasName}, true
+
+      firstFile = true
+      $('#fileupload').bind 'fileuploadsubmit', (e, data) ->
+        params =
           pid: $("#pid").val()
-        onSubmit: (id, fileName) =>
-          params =
-            pid: $("#pid").val()
-          # we only add cid for the first canvas.
-          params.cid = App.room.canvas.getSelected().data("cid") unless opts.image
-
-          room.uploader.setParams params
-
-          $(room.uploader._listElement).css('dispaly', 'none')
-        onComplete: (id, fileName, responseJSON) =>
-          $(room.uploader._listElement).css('dispaly', 'none')
-
-          room.canvas.handleUpload(responseJSON.canvasId, responseJSON.fileId, responseJSON.name, true)
-
-      $(".qq-upload-button").addClass("btn btn-success small-btn")
+        # we only add cid for the first canvas.
+        console.log not room.canvas.isSelectedInitialized() and firstFile
+        params.cid = App.room.canvas.getSelected().data("cid") if not room.canvas.isSelectedInitialized() and firstFile
+        firstFile = false
+        data.formData = params
 
     reverseOpacity: (elem) -> if elem.opacity == 0 then elem.opacity = 1 else elem.opacity = 0
 

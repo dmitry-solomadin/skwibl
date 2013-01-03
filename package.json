@@ -45,7 +45,8 @@
     "moment": "*",
     "winston": "*",
     "validator": "*",
-    "iced-coffee-script": "*"
+    "iced-coffee-script": "*",
+    "mkdirp": "*"
   },
   "devDependencies": {
     "node-inspector": "0.2.x",

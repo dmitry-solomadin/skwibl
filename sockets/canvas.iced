@@ -107,9 +107,16 @@ exports.configure = (sio) ->
       socket.on 'fileAdded', (data, cb) ->
         socket.broadcast.to(socket.project).emit "fileAdded",
           id: id
-          canvasId: data.canvasId
-          fileId: data.fileId
-          name: data.name
+          canvasData: data
+
+      socket.on 'canvasAdded', (data, cb) ->
+        socket.broadcast.to(socket.project).emit "canvasAdded",
+          id: id
+          canvasData: data
+
+      socket.on 'initializeFirstCanvas', (data, cb) ->
+        socket.broadcast.to(socket.project).emit "initializeFirstCanvas",
+          id: id
 
       socket.on 'switchCanvas', (msg, cb) ->
         socket.broadcast.to(socket.project).emit 'switchCanvas',

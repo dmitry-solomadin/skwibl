@@ -46,16 +46,16 @@ $ ->
 
     isVisible: -> if $("#chat").data("visible") is "true" then true else false
 
-    fold: (link) ->
+    fold: ->
       $("#chat").data("visible", "false")
       $("#chat").animate(left: -305)
       $("#header-foldable").animate(width: 200)
       $("#canvasFooter").animate(paddingLeft: 0)
       $(".canvasFooterInner").animate({width: $(window).width()}, -> $(".canvasFooterInner").css(width: "100%"))
 
-      $(link).attr("onclick", "App.chat.unfold(this); return false;").find("img").attr("src", "/images/room/unfold.png")
+      $("#chatFolder").attr("onclick", "App.chat.unfold(this); return false;").find("img").attr("src", "/images/room/unfold.png")
 
-    unfold: (link) ->
+    unfold: ->
       $("#chat").data("visible", "true")
       $("#chat").animate(left: 0)
       $("#header-foldable").data("width", $("#header-foldable").width())
@@ -63,7 +63,7 @@ $ ->
       $("#canvasFooter").animate(paddingLeft: 300)
       $(".canvasFooterInner").animate({width: $(window).width() - 300}, -> $(".canvasFooterInner").css(width: "100%"))
 
-      $(link).attr("onclick", "App.chat.fold(this); return false;").find("img").attr("src", "/images/room/fold.png")
+      $("#chatFolder").attr("onclick", "App.chat.fold(this); return false;").find("img").attr("src", "/images/room/fold.png")
       @clearBadgeCount()
       @scrollToTheBottom()
 
