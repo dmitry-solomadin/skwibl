@@ -55,6 +55,7 @@ exports.configure = (sio) ->
         db.actions.delete elementId
 
       socket.on 'commentText', (data, cb) ->
+        console.log "comemnt text"
         socket.broadcast.to(socket.project).emit 'commentText',
           id: id
           element: data

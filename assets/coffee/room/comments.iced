@@ -391,7 +391,7 @@ $ ->
     addCommentText: (commentMin, commentText) ->
       return if $.trim(commentText.text).length is 0
 
-      emit = commentText.elementId?
+      emit = true if not commentText.elementId
       elementId = commentText.elementId or room.generateId()
       owner = commentText.owner or $("#uid").val()
       time = commentText.time or new Date().getTime()
@@ -428,6 +428,7 @@ $ ->
       commentContent.append(
         "<div id='commentText#{elementId}' class='comment-text' data-comment-id='#{commentMin.elementId}'
            data-element-id='#{elementId}' data-owner='#{owner}' data-time='#{time}'>
+             <div class='comment-ribbon-wrapper'><div class='comment-ribbon comment-ribbon-blue'>todo</div></div>
              <div class='comment-avatar'><img src='#{user.picture}' width='32'/></div>
              <div class='comment-heading'>
                  <div class='comment-author'>#{user.displayName}</div>
@@ -450,6 +451,7 @@ $ ->
 
         if commentText.resolved
           commentTextDiv.find(".comment-actions").prepend("<a href='#' class='resolve-link' onclick='App.room.comments.reopenTodo(#{elementId}, true); return false;'>reopen</a>")
+          commentTextDiv.find(".comment-ribbon").removeClass("comment-ribbon-blue").addClass("comment-ribbon-green").html("resolved")
           commentTextDiv.addClass("resolved")
         else
           commentTextDiv.find(".comment-actions").prepend("<a href='#' class='resolve-link' onclick='App.room.comments.resolveTodo(#{elementId}, true); return false;'>resolve</a>")
@@ -519,6 +521,7 @@ $ ->
     resolveTodo: (elementId, emit) ->
       comment = $("#commentText#{elementId}")
       comment.addClass("resolved")
+      comment.find(".comment-ribbon").removeClass("comment-ribbon-blue").addClass("comment-ribbon-green").html("resolved")
       comment.find(".resolve-link").replaceWith("<a href='#' class='resolve-link'
         onclick='App.room.comments.reopenTodo(#{elementId}, true); return false;'>reopen</a>")
 
@@ -529,6 +532,7 @@ $ ->
     reopenTodo: (elementId, emit) ->
       comment = $("#commentText#{elementId}")
       comment.removeClass("resolved")
+      comment.find(".comment-ribbon").addClass("comment-ribbon-blue").removeClass("comment-ribbon-green").html("todo")
       comment.find(".resolve-link").replaceWith("<a href='#' class='resolve-link'
        onclick='App.room.comments.resolveTodo(#{elementId}, true); return false;'>resolve</a>")
 

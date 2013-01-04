@@ -277,7 +277,7 @@ body.room {
     position: relative;
 }
 
-.canvasFooterFolded #nameChanger{
+.canvasFooterFolded #nameChanger {
     padding-left: 15px;
 }
 
@@ -398,6 +398,8 @@ body.room {
 }
 
 .comment-text {
+    position: relative;
+    overflow: hidden;
     padding: 8px 10px;
     border-bottom: 1px solid #e3e3e3;
     color: #202020;
@@ -405,13 +407,12 @@ body.room {
     padding-bottom: 3px;
 }
 
-.comment-text.todo {
-    background: #f5f5f5;
-    font-size: 12px;
+.comment-text .comment-ribbon-wrapper {
+    display: none;
 }
 
-.comment-text.todo.resolved {
-    background: #f5fff5;
+.comment-text.todo .comment-ribbon-wrapper {
+    display: block;
 }
 
 .the-comment-text {
@@ -821,7 +822,7 @@ body.room {
     opacity: 0;
     width: 100%;
     height: 100%;
-    filter: alpha(opacity=0);
+    filter: alpha(opacity = 0);
     transform: translate(-300px, 0) scale(4);
     font-size: 23px;
     direction: ltr;
@@ -836,6 +837,60 @@ body.room {
 .icon-white {
     background-image: url("/images/glyphicons-halflings-white.png");
 }
+
+/* COMMENT RIBBONS */
+
+.comment-ribbon-wrapper {
+    width: 85px;
+    height: 85px;
+    overflow: hidden;
+    position: absolute;
+    top: -10px;
+    right: -10px;
+}
+
+.comment-ribbon {
+    font: bold 11px Sans-Serif;
+    color: #6a6340;
+    text-align: center;
+    text-shadow: rgba(255, 255, 255, 0.5) 0px 1px 0px;
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    position: relative;
+    padding: 4px 0;
+    left: -7px;
+    top: 22px;
+    width: 120px;
+    -webkit-box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3);
+}
+
+.comment-ribbon-green {
+    background-color: #BFDC7A;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#BFDC7A), to(#8EBF45));
+    background-image: -webkit-linear-gradient(top, #BFDC7A, #8EBF45);
+    background-image: -moz-linear-gradient(top, #BFDC7A, #8EBF45);
+    background-image: -ms-linear-gradient(top, #BFDC7A, #8EBF45);
+    background-image: -o-linear-gradient(top, #BFDC7A, #8EBF45);
+}
+
+.comment-ribbon-blue {
+    background-color: #08C;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#08C), to(#05C));
+    background-image: -webkit-linear-gradient(top, #08C, #05C);
+    background-image: -moz-linear-gradient(top, #08C, #05C);
+    background-image: -ms-linear-gradient(top, #08C, #05C);
+    background-image: -o-linear-gradient(top, #08C, #05C);
+    color: #fff;
+    -webkit-box-shadow: 0px 0px 1px rgb(0, 0, 0);
+    -moz-box-shadow: 0px 0px 1px rgb(0, 0, 0);
+    box-shadow: 0px 0px 1px rgb(0, 0, 0);
+}
+
+/* COMMENT RIBBONS END */
 
 /* LABELS */
 
