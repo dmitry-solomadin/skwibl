@@ -44,7 +44,7 @@ $ ->
                               <span class='chatUserStatus'></span>
                               </div>")
 
-    isVisible: -> if $("#chat").data("visible") is "true"
+    isVisible: -> $("#chat").data("visible") is "true"
 
     fold: ->
       $("#chat").data("visible", "false")
