@@ -238,7 +238,7 @@ $ ->
 
     # Misc methods
 
-    showSplashScreen: (hidePanels) ->
+    showSplashScreen: () ->
       return if $("#canvasInitDivWrapper:visible")[0]
 
       $("#canvasInitDivWrapper").show()
@@ -249,7 +249,7 @@ $ ->
       App.chat.fold()
       App.room.canvas.foldPreviews()
 
-    hideSplashScreen: (showPanels) ->
+    hideSplashScreen: () ->
       return unless $("#canvasInitDivWrapper:visible")[0]
 
       $("#canvasInitDivWrapper").hide()
