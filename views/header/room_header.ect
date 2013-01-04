@@ -100,8 +100,9 @@
   </span>
 
   <span id="scaleDiv" class="dropdown scaleDiv">
-    <a class="btn small-btn plusButton tooltipize" title="Zoom In"
-       data-placement="bottom" data-delay="1000" href="#" onclick="App.room.canvas.addScale(); return false;">+</a>
+    <a class="btn small-btn minusButton tooltipize" title="Zoom out"
+       data-placement="bottom" data-delay="1000" href="#"
+       onclick="App.room.canvas.subtractScale(); return false;">&ndash;</a>
     <button id="scaleAmount" class="btn toolTypeChanger scaleAmount tooltipize" title="Current scale"
             data-placement="bottom" data-delay="1000" data-tooltype="arrow">
       100%
@@ -109,9 +110,8 @@
     <button class="btn dropdown-toggle scaleDropdownCaret" data-toggle="dropdown">
       <span class="caret"></span>
     </button>
-    <a class="btn small-btn minusButton tooltipize" title="Zoom out"
-       data-placement="bottom" data-delay="1000" href="#"
-       onclick="App.room.canvas.subtractScale(); return false;">&ndash;</a>
+    <a class="btn small-btn plusButton tooltipize" title="Zoom In"
+       data-placement="bottom" data-delay="1000" href="#" onclick="App.room.canvas.addScale(); return false;">+</a>
     <ul class="dropdown-menu">
       <li><a href="#" data-scale="0.5">50%</a></li>
       <li><a href="#" data-scale="0.75">75%</a></li>
