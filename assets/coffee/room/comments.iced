@@ -389,7 +389,7 @@ $ ->
       room.redrawWithThumb()
 
     addCommentText: (commentMin, commentText) ->
-      return unless $.trim(commentText.text).length
+      return if $.trim(commentText.text).length is 0
 
       emit = commentText.elementId?
       elementId = commentText.elementId or room.generateId()
@@ -537,7 +537,7 @@ $ ->
       room.socket.emit "reopenTodo", elementId if emit
 
     addTodo: (commentText) ->
-      unless $("#todo-tab-inner").children().length
+      if $("#todo-tab-inner").children().length is 0
         # if it's the first comment added let's prepare todolist structure
         $("#todo-tab-inner").html("")
         $("#todo-tab-inner").append(

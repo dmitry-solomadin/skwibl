@@ -2,7 +2,7 @@ $ ->
   class RoomHistory
 
     prev: ->
-      return unless room.opts.historyCounter
+      return if room.opts.historyCounter is 0
 
       executePrevHistory = (item, reverse) =>
         if item.actionType is "remove"
@@ -31,7 +31,7 @@ $ ->
         executePrevHistory(item)
         room.redrawWithThumb()
 
-      unless opts.historyCounter
+      if opts.historyCounter is 0
         $("#undoLink").addClass("disabled")
 
     next: ->
@@ -71,7 +71,7 @@ $ ->
     getSelectableTools: ->
       selectableTools = []
       for tool in opts.historytools.allHistory
-        selectableTools.push(tool) if tool.opacity
+        selectableTools.push(tool) if tool.opacity isnt 0
 
       selectableTools
 

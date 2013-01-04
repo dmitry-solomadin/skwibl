@@ -113,7 +113,7 @@ $ ->
 
       $('#chattext').val("")
 
-      return unless $.trim(chatMessage.element.msg).length
+      return if $.trim(chatMessage.element.msg).length is 0
 
       App.chat.addMessage($("#uid")[0].value, chatMessage.element.msg)
       App.chat.chatIO.emit("message", chatMessage)
@@ -134,7 +134,7 @@ $ ->
         $("." + rangeId).show().next(".timeRange").show()
         $(showRangeLink).hide().next(".pipe:first").hide()
         $(showRangeLink).prevAll(".showRangeLink, .pipe").hide()
-      $(".earlierMessagesHeader").html("No Earlier Messages") unless $(".showRangeLink:visible").length
+      $(".earlierMessagesHeader").html("No Earlier Messages") if $(".showRangeLink:visible").length is 0
 
     initSockets: ->
       @chatIO = io.connect('/chat', window.copt)

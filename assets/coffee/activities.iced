@@ -35,7 +35,7 @@ $ ->
       badge = $("#activityBadge")
       badge.html(newCount)
 
-      unless newCount
+      if newCount is 0
         badge.removeClass("badge-info")
       else
         badge.addClass("badge-info") unless badge.hasClass("badge-info")

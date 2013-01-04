@@ -9,7 +9,7 @@ $ ->
     addHoverCount = -> updateHoverCount(1)
     removeHoverCount = ->
       updateHoverCount(-1)
-      offTrigger = -> settings.offTrigger() unless trigger[0].hovercount
+      offTrigger = -> settings.offTrigger() if trigger[0].hovercount is 0
       setTimeout offTrigger, 100
 
     if settings.live

@@ -282,7 +282,7 @@ $ ->
 
   # paper.install(window) causes errors upon defining getters for 'project', so we use this code
   for key of paper
-    window[key] = paper[key] unless /^(version|_id|load)/.test(key) or window[key]?
+    window[key] = paper[key] if not /^(version|_id|load)/.test(key) and not window[key]?
 
   paper.setup($('#copyCanvas')[0]);
   paper.setup($('#myCanvas')[0]);
