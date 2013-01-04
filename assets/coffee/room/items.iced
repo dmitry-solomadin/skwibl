@@ -168,7 +168,7 @@ $ ->
       sy = scaleFactors.sy
 
       transformMatrix = new Matrix().scale(sx, sy, scalePoint)
-      return unless sx and sy#if transformMatrix._d == 0 or transformMatrix._a == 0
+      return if transformMatrix._d == 0 or transformMatrix._a == 0
 
       if @selected().arrow
         @selected().arrow.scale(sx, sy, scalePoint)
