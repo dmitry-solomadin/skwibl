@@ -111,29 +111,22 @@ $ ->
 
     onMouseMove: (canvas, event) ->
       event.point = @applyCurrentScale(event.point)
-
-      canvas.css({cursor: "default"})
-
-      selectedTool = @items.selected()
-      rect = selectedTool?.selectionRect
+      canvas.css cursor: "default"
+      rect = @items.sel?.selectionRect
       if rect
-        if rect.bottomRightScaler.bounds.contains(event.point)
-          canvas.css(cursor: "se-resize")
-        else if rect.topLeftScaler.bounds.contains(event.point)
-          canvas.css(cursor: "nw-resize")
-        else if rect.topRightScaler.bounds.contains(event.point)
-          canvas.css(cursor: "ne-resize")
-        else if rect.bottomLeftScaler.bounds.contains(event.point)
-          canvas.css(cursor: "sw-resize")
-        else if rect.removeButton and rect.removeButton.bounds.contains(event.point)
-          canvas.css(cursor: "pointer")
+        scalers = rect.scalers
+        for sc of scalers
+          if scalers[sc].bounds.contains(event.point)
+            canvas.css cursor: "#{sc}-resize"
+        if rect.removeButton and rect.removeButton.bounds.contains(event.point)
+          canvas.css cursor: "pointer"
 
     onMouseDown: (canvas, event) ->
       event.point = @applyCurrentScale(event.point)
 
       $("#removeSelected").addClass("disabled")
 
-      @items.selected()?.selectionRect?.remove()
+      @items.sel?.selectionRect?.remove()
 
       @opts.tool = null
 
@@ -153,7 +146,7 @@ $ ->
           @opts.tool.lineStart = event.point
         when "select"
           @items.testSelect(event.point)
-          @items.drawSelectRect(event.point)
+          @items.drawSelRect(event.point)
 
       switch @sharedOpts.tooltype
         when 'line', 'highligher', 'arrow', 'circle', 'rectangle', 'comment', 'straightline'
@@ -212,11 +205,11 @@ $ ->
         when 'pan'
           @items.pan(event.delta.x, event.delta.y)
         when 'select'
-          scalersSelected = @items.selected()?.scalersSelected
+          scalersSelected = @items.sel?.scalersSelected
           if scalersSelected then @items.sacleSelected(event) else @items.translateSelected(event.delta)
 
           # redraw comment arrow if there is one.
-          @comments.redrawArrow(@items.selected().commentMin) if @items.selected().commentMin
+          @comments.redrawArrow(@items.sel.commentMin) if @items.sel.commentMin
 
     onMouseUp: (canvas, event) ->
       event.point = @applyCurrentScale(event.point)
@@ -253,7 +246,7 @@ $ ->
           commentMin.elementId = @generateId()
           @socket.emit("commentUpdate", @socketHelper.prepareCommentToSend(commentMin))
         when 'select'
-          selectedItem = @items.selected()
+          selectedItem = @items.sel
           if selectedItem
             if selectedItem.commentMin # if the dragged element is comment rectangle
               @socket.emit "commentUpdate", @socketHelper.prepareCommentToSend(selectedItem.commentMin)

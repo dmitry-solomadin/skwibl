@@ -41,7 +41,7 @@ $ ->
 
     notifyComment: -> App.notificator.notify("Drag to comment an area.")
 
-    elementInArrayContainsPoint: (array, point) ->
+    containsPoint: (array, point) ->
       for element in array
         return element if element.bounds.contains point
       return null

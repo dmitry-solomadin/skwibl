@@ -57,6 +57,9 @@ exports.SESSION_DURATION = 7200 # two hours
 
 # exports.CONFIRM_EXPIRE = 604800 # one week
 
+exports.UPLOADS = './uploads'
+exports.UPLOADS_TMP = './uploads/tmp'
+
 exports.DIRECTORY_PERMISION = 0o751 # rwxr-x--x
 exports.FILE_PERMISSION = 0o640 # rw-r-----
 
