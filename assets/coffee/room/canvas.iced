@@ -4,13 +4,11 @@ $ ->
   # INITIALIZATION START
 
     init: ->
-      initialized = @getSelected().data("initialized")
-
       @initElements()
       @initComments()
       @initThumbnails()
 
-      #@initBackground()
+    #@initBackground()
 
     initElements: ->
       selectedCid = @getSelectedCanvasId()
@@ -159,34 +157,28 @@ $ ->
         $("#canvasName").addClass("noname")
         $("#canvasName").html("blank name")
 
-    delete: (deleteLink, emit) ->
+    onDeleteClick: (deleteLink) ->
       if confirm "Are you sure? This will delete all canvas content."
         cid = $(deleteLink).parent().find("a").data("cid")
-        @destroy cid, emit
+        @destroy cid, true
 
     destroy: (cid, emit) ->
       optsToRemove = @findCanvasOptsById(cid)
 
-      for element, index in optsToRemove.historytools.allHistory
-        if element.isImage
-          optsToRemove.historytools.allHistory.splice(index, 1)
-          optsToRemove.image = null
-          element.remove()
-          break
-
       if @getThumbs().length > 1
         @findThumbByCanvasId(cid).parent().remove()
         @findMiniThumbByCanvasId(cid).remove()
-        @selectThumb($("#canvasSelectDiv div:first a"))
-        room.savedOpts.splice(room.savedOpts.indexOf(optsToRemove), 1)
+        @selectThumb $("#canvasSelectDiv div:first a")
+        room.savedOpts.splice room.savedOpts.indexOf(optsToRemove), 1
         room.setOpts @findCanvasOptsById(@getSelectedCanvasId())
+      else
+        @deinitializeFirst()
 
-      if emit
-        room.socket.emit "removeCanvas", canvasId: cid
+      room.socket.emit "removeCanvas", canvasId: cid if emit
 
+    #hides elements and emits canvas cleared event
     clear: (emit) ->
-      room.history.add
-        actionType: "clear", tools: room.history.getSelectableTools(), eligible: true
+      room.history.add actionType: "clear", tools: room.history.getSelectableTools(), eligible: true if emit
       for element in opts.historytools.allHistory
         element.opacity = 0 if not element.actionType and not element.isImage
         room.comments.hideComment(element.commentMin) if element.commentMin
@@ -194,12 +186,9 @@ $ ->
       room.items.unselect()
       room.redrawWithThumb()
 
-      selectedCanvasId = @getSelectedCanvasId()
+      room.socket.emit "eraseCanvas", canvasId: @getSelectedCanvasId() if emit
 
-      if emit
-        room.socket.emit "eraseCanvas", canvasId: selectedCanvasId
-
-    # used upon eraseCanvas event
+    #removes elements for inner purposes
     erase: ->
       for element in opts.historytools.allHistory
         element.remove() unless element.actionType
@@ -311,14 +300,15 @@ $ ->
       else
         $("#nameChanger").animate(left: 0, 500)
 
-      $("#canvasFooter").animate height: 108, {duration: 500, easing:'easeOutBack', queue: false}, ->
+      $("#canvasFooter").animate height: 108, {duration: 500, easing: 'easeOutBack', queue: false}, ->
         $("#canvasFolder").removeClass("canvasFolderDown").find("img").attr("src", "/images/room/fold-down.png")
       $("#smallCanvasPreviews").animate(left: -500, 500)
       $("#canvasFolder").attr("onclick", "App.room.canvas.foldPreviews(this); return false;")
 
     requestAddEmpty: ->
       thumbs = @getThumbs()
-      initializeFirst = thumbs.length is 1 and not $(thumbs[0]).data("initialized")
+      initialized = "#{$(thumbs[0]).data("initialized")}" == "true"
+      initializeFirst = thumbs.length is 1 and not initialized
 
       if initializeFirst
         $.post "/canvases/initializeFirst", {pid: $("#pid").val()}, (data, status, xhr) =>
@@ -328,9 +318,13 @@ $ ->
           @addEmpty canvasId: data.id, name: data.name, true
 
     initializeFirst: (emit) ->
-      room.hideSplashScreen true
+      room.hideSplashScreen()
       $(@getThumbs()[0]).attr("data-initialized", "true").data("initialized", "true")
       room.socket.emit "initializeFirstCanvas" if emit
+
+    deinitializeFirst: () ->
+      room.showSplashScreen()
+      $(@getThumbs()[0]).attr("data-initialized", "false").data("initialized", "false")
 
     addEmpty: (canvasData) ->
       @addNewThumbAndSelect canvasData
@@ -463,6 +457,7 @@ $ ->
       return if $(anchor).hasClass("canvasSelected")
 
       $("#canvasSelectDiv a").removeClass("canvasSelected")
+      $(anchor).addClass("canvasSelected")
 
       cid = $(anchor).data("cid")
       canvasOpts = @findCanvasOptsById(cid)
@@ -471,11 +466,9 @@ $ ->
 
       @erase()
       previousScale = opts.currentScale
-      room.setOpts(canvasOpts)
+      room.setOpts canvasOpts
       @restore(true, false)
       @setScale opts.currentScale, previousScale
-
-      $(anchor).addClass("canvasSelected")
 
       $(".smallCanvasPreview").removeClass("previewSelected")
       $(@findMiniThumbByCanvasId(cid)).addClass("previewSelected")

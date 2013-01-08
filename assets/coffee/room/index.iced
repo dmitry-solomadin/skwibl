@@ -67,10 +67,11 @@ $ ->
 
     initDropbox: ->
       $("#dropboxChoose").on "click", ->
+        link = @
         if Dropbox?
           Dropbox.choose
             success: (files) ->
-              $(@).attr("disabled","disabled").html("Loading your images...")
+              $(link).attr("disabled","disabled").html("Loading your images...")
 
               linkInfos = []
               for file in files
@@ -257,13 +258,13 @@ $ ->
 
     # Misc methods
 
-    showSplashScreen: () ->
+    showSplashScreen: (showCancelLink = true) ->
       return if $("#canvasInitDivWrapper:visible")[0]
 
       $("#canvasInitDivWrapper").show()
       $("#myCanvas").hide()
       $("#commentsDiv").hide()
-      $("#cancelInitLink").show()
+      $("#cancelInitLink").show() if showCancelLink
 
       App.chat.fold()
       App.room.canvas.foldPreviews()

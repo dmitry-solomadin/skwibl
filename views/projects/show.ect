@@ -3,7 +3,7 @@
 
 <input id="pid" type="hidden" value="<%= @pid %>" xmlns="http://www.w3.org/1999/html">
 
-<% canvasInitialized = @canvases[0].initialized %>
+<% canvasInitialized = "#{@canvases[0].initialized}" == "true" %>
 
 <div id="chat" class="chat <%= 'chatFolded' unless canvasInitialized %>">
   <div class="projectHeader">
@@ -182,7 +182,7 @@
           <canvas width="80" height="60"></canvas>
           </a>
           <img class="canvasRemoveImg" src="/images/room/remove.png"
-               onclick="App.room.canvas.delete(this, true); return false;">
+               onclick="App.room.canvas.onDeleteClick(this, true); return false;">
           <img class="canvasDownloadImg" src="/images/room/download.png"
                onclick="App.room.canvas.download(this); return false;">
           <img class="canvasReorderImg" src="/images/room/reorder.png"
