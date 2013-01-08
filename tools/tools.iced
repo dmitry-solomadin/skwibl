@@ -2,7 +2,6 @@
 cluster = require 'cluster'
 os = require 'os'
 fs = require 'fs'
-mkdirp = require 'mkdirp'
 crypto = require 'crypto'
 validator = require 'validator'
 generatePassword = require 'password-generator'
@@ -77,10 +76,6 @@ exports.isMimeSupported = (mimeToTest) ->
 exports.getFileType = (mime) ->
   return null if not mime
   return mime.split('/')[0]
-
-exports.mkdirp = (dirname) ->
-  unless fs.existsSync dirname
-    mkdirp.sync dirname
 
 exports.include = (dir, fn) ->
   for name in fs.readdirSync(dir)

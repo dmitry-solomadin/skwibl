@@ -1,8 +1,6 @@
-fs = require 'fs'
 
 tools = require '../tools'
 cfg = require '../config'
-
 smtp = require '../smtp'
 
 exports.setUp = (client, db) ->
@@ -78,10 +76,6 @@ exports.setUp = (client, db) ->
   mod.add = (uid, name, fn) ->
     client.incr 'projects:next', (err, val) ->
       if not err
-        dir = "./uploads/#{val}"
-        fs.mkdir dir, cfg.DIRECTORY_PERMISSION, (err) ->
-          fs.mkdir "#{dir}/video", cfg.DIRECTORY_PERMISSION
-          fs.mkdir "#{dir}/image", cfg.DIRECTORY_PERMISSION
         project = {}
         project.id = val
         project.name = name

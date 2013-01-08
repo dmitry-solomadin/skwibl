@@ -8,6 +8,8 @@ $ ->
     # ITEMS MANIPULATION
 
     create: (tool, settings) ->
+      #TODO change behavior to remove this method it creates nothing
+      console.log 'create'
       settings = settings or {}
       opts.tool = tool unless settings.justCreate
 
@@ -20,167 +22,174 @@ $ ->
       opts.tool.dashArray = settings.dashArray
 
     removeSelected: ->
-      @remove @selected(), true if @selected()
+      console.log 'remove selected'
+      #TODO merge with remove
+      @remove @sel, true if @sel
 
     remove: (item, historize) ->
-      room.history.add({actionType: "remove", tool: item, eligible: true}) if historize
-
+      console.log 'remove'
+      room.history.add(
+        actionType: "remove"
+        tool: item
+        eligible: true) if historize
       item.opacity = 0
       room.socket.emit("elementRemove", item.elementId)
       @unselectIfSelected item.elementId
       room.redrawWithThumb()
 
     translateSelected: (deltaPoint) ->
-      if @selected()
-        @selected().translate(deltaPoint)
-        @selected().selectionRect.translate(deltaPoint) if @selected().selectionRect
+      console.log 'translate selected'
+      if @sel
+        @sel.translate(deltaPoint)
+        @sel.selectionRect?.translate(deltaPoint)
 
     unselectIfSelected: (elementId) ->
-      if @selected() and @selected().selectionRect and @selected().elementId is elementId
+      console.log 'unselect if selected'
+      #TODO merge with unselect
+      rect = @sel?.selectionRect
+      if rect and @sel.elementId is elementId
         @unselect()
 
     unselect: ->
-      @selected()?.selectionRect?.remove()
+      console.log 'unselect'
+      @sel?.selectionRect?.remove()
       @setSelected(null)
 
     pan: (dx, dy) ->
+      #TODO move history logic out of this method
+      console.log 'pan'
       opts.pandx += dx
       opts.pandy += dy
+      for el in opts.historytools.allHistory
+        if el.commentMin
+          room.comments.translate(el.commentMin, dx, dy)
+        else if not el.actionType and el.translate
+          el.translate(new Point(dx, dy))
 
-      for element in opts.historytools.allHistory
-        if element.commentMin
-          room.comments.translate(element.commentMin, dx, dy)
-        else if not element.actionType and element.translate
-          element.translate(new Point(dx, dy))
-
-    selected: -> opts.selectedTool
-    setSelected: (selectedTool)-> opts.selectedTool = selectedTool
+    setSelected: (item)-> @sel = item
 
     # ITEMS SELECT
 
     testSelect: (point) ->
+      console.log 'test sel'
       selectTimeDelta = Date.now() - opts.selectTime if opts.selectTime
-
       opts.selectTime = Date.now()
-      alreadySelected = @selected() and @selected().selectionRect
+      rect = @sel?.selectionRect
+      isSelected = rect?
       selected = false
-
-      # Select scalers or remove buttton has highest priority.
-      if alreadySelected
-        if room.helper.elementInArrayContainsPoint(@selected().selectionRect.scalers, point) or (@selected().selectionRect.removeButton and @selected().selectionRect.removeButton.bounds.contains(point))
+      # Select scalers or remove button has highest priority.
+      if isSelected
+        if rect.removeButton?.bounds.contains(point) or room.helper.containsPoint(rect.scalers, point)
           selected = true
-
       # Already selected item has next highest priority if time between selectes was big.
-      selected = selectTimeDelta > 750 and alreadySelected and @selected().selectionRect.bounds.contains(point)
-
+      selected = selectTimeDelta > 750 and isSelected and rect.bounds.contains(point)
       unless selected
-        previousSelectedTool = @selected()
-        for element in room.history.getSelectableTools()
-          continue if element.isImage or element.actionType
-
-          if element.bounds.contains(point)
-            @setSelected(element)
+        prevSel = @sel
+        for el in room.history.getSelectableTools()
+          continue if el.isImage or el.actionType
+          if el.bounds.contains(point)
+            @setSelected(el)
             selected = true
-
-          if selectTimeDelta < 750 and @selected() and previousSelectedTool
-            if @selected().id is previousSelectedTool.id then continue else break
-
+          if selectTimeDelta < 750 and @sel and prevSel
+            if @sel.id is prevSel.id then continue else break
       @setSelected(null) unless selected
 
-    drawSelectRect: (point) ->
-      if @selected()
-        @selected().selectionRect = @createSelectionRectangle()
+    drawSelRect: (point) ->
+      console.log 'draw sel'
+      if @sel
+        @sel.selectionRect = @createSelRect()
         $("#removeSelected").removeClass("disabled")
-
-        @selected().scalersSelected = true
-        if @selected().selectionRect.topLeftScaler.bounds.contains(point)
-          @selected().scaleZone = {zx: -1, zy: -1, point: @selected().bounds.bottomRight}
-        else if @selected().selectionRect.bottomRightScaler.bounds.contains(point)
-          @selected().scaleZone = {zx: 1, zy: 1, point: @selected().bounds.topLeft}
-        else if @selected().selectionRect.topRightScaler.bounds.contains(point)
-          @selected().scaleZone = {zx: 1, zy: -1, point: @selected().bounds.bottomLeft}
-        else if @selected().selectionRect.bottomLeftScaler.bounds.contains(point)
-          @selected().scaleZone = {zx: -1, zy: 1, point: @selected().bounds.topRight}
+        rect = @sel.selectionRect
+        bounds = @sel.bounds
+        @sel.scalersSelected = true
+        if rect.scalers.nw.bounds.contains(point)
+          @sel.scaleZone =
+            zx: -1
+            zy: -1
+            point: bounds.bottomRight
+        else if rect.scalers.se.bounds.contains(point)
+          @sel.scaleZone =
+            zx: 1
+            zy: 1
+            point: bounds.topLeft
+        else if rect.scalers.ne.bounds.contains(point)
+          @sel.scaleZone =
+            zx: 1
+            zy: -1
+            point: bounds.bottomLeft
+        else if rect.scalers.sw.bounds.contains(point)
+          @sel.scaleZone =
+            zx: -1
+            zy: 1
+            point: bounds.topRight
         else
-          @selected().scalersSelected = false
-
-        if @selected().selectionRect.removeButton and @selected().selectionRect.removeButton.bounds.contains(point)
+          @sel.scalersSelected = false
+        if rect.removeButton?.bounds.contains(point)
           @removeSelected()
 
-    createSelectionRectangle: ->
-      bounds = @selected().bounds
-      addBound = parseInt(@selected().strokeWidth / 2)
-
-      selectRect = new Path.Rectangle(bounds.x - addBound, bounds.y - addBound,
+    createSelRect: ->
+      console.log 'create sel'
+      bounds = @sel.bounds
+      addBound = parseInt(@sel.strokeWidth / 2)
+      selRect = new Path.Rectangle(bounds.x - addBound, bounds.y - addBound,
       bounds.width + (addBound * 2), bounds.height + (addBound * 2))
-
-      width = 8
-      halfWidth = width / 2
-      topLeftScaler = new Path.Oval(new Rectangle(bounds.x - addBound - halfWidth,
-      bounds.y - addBound - halfWidth, width, width))
-      bottomRightScaler = new Path.Oval(new Rectangle(bounds.x + bounds.width + addBound - halfWidth,
-      bounds.y + bounds.height + addBound - halfWidth, width, width))
-      topRightScaler = new Path.Oval(new Rectangle(bounds.x + bounds.width + addBound - halfWidth,
-      bounds.y - addBound - halfWidth, width, width))
-      bottomLeftScaler = new Path.Oval(new Rectangle(bounds.x - addBound - halfWidth,
-      bounds.y + bounds.height + addBound - halfWidth, width, width))
-
-      unless @selected().commentMin
+      #TODO move constants to options
+      width = 4
+      outstend = 12
+      selDash = [3, 3]
+      nw = new Path.Circle(new Point(bounds.x - addBound, bounds.y - addBound), width)
+      se = new Path.Circle(new Point(bounds.x + bounds.width + addBound, bounds.y + bounds.height + addBound), width)
+      ne = new Path.Circle(new Point(bounds.x + bounds.width + addBound, bounds.y - addBound), width)
+      sw = new Path.Circle(new Point(bounds.x - addBound, bounds.y + bounds.height + addBound), width)
+      unless @sel.commentMin
         removeButton = new Raster(@removeImg)
-        removeButton.position = new Point(selectRect.bounds.x + selectRect.bounds.width + 12, selectRect.bounds.y - 12)
-
-      selectionRectGroup = new Group([selectRect, topLeftScaler, bottomRightScaler, topRightScaler, bottomLeftScaler])
-
-      selectionRectGroup.theRect = selectRect
-      selectionRectGroup.topLeftScaler = topLeftScaler
-      selectionRectGroup.bottomRightScaler = bottomRightScaler
-      selectionRectGroup.topRightScaler = topRightScaler
-      selectionRectGroup.bottomLeftScaler = bottomLeftScaler
-      selectionRectGroup.scalers = [topLeftScaler, bottomRightScaler, topRightScaler, bottomLeftScaler]
-
-      unless @selected().commentMin
-        selectionRectGroup.removeButton = removeButton
-        selectionRectGroup.addChild(removeButton)
-
-      dashArray = [3, 3]
-      @create(selectRect, {color: "#a0a0aa", width: 0.5, opacity: 1, dashArray: dashArray})
-      @create(topLeftScaler, {color: "#202020", width: 1, opacity: 1, fillColor: "white"})
-      @create(bottomRightScaler, {color: "#202020", width: 1, opacity: 1, fillColor: "white"})
-      @create(topRightScaler, {color: "#202020", width: 1, opacity: 1, fillColor: "white"})
-      @create(bottomLeftScaler, {color: "#202020", width: 1, opacity: 1, fillColor: "white"})
-
-      @create(removeButton) unless @selected().commentMin
-
-      return selectionRectGroup
+        removeButton.position = new Point(selRect.bounds.x + selRect.bounds.width + outstend, selRect.bounds.y - outstend)
+      selGroup = new Group([selRect, nw, se, ne, sw])
+      selGroup.theRect = selRect
+      selGroup.scalers =
+        nw: nw
+        se: se
+        ne: ne
+        sw: sw
+      unless @sel.commentMin
+        selGroup.removeButton = removeButton
+        selGroup.addChild(removeButton)
+      @create(selRect, {color: "#a0a0aa", width: 0.5, opacity: 1, dashArray: selDash})
+      for key, scaler of selGroup.scalers
+        @create(scaler, {color: "#202020", width: 1, opacity: 1, fillColor: "white"})
+      @create(removeButton) unless @sel.commentMin
+      return selGroup
 
     # ITEMS SCALE
 
     sacleSelected: (event) ->
-      scaleZone = @getReflectZone(@selected(), event.point.x, event.point.y)
-      if scaleZone then @selected().scaleZone = scaleZone else scaleZone = @selected().scaleZone
+      console.log 'scale selected'
+      scaleZone = @getReflectZone(@sel, event.point.x, event.point.y)
+      if scaleZone then @sel.scaleZone = scaleZone else scaleZone = @sel.scaleZone
 
       zx = scaleZone.zx
       zy = scaleZone.zy
       scalePoint = scaleZone.point
 
-      scaleFactors = @getScaleFactors(@selected(), zx, zy, event.delta.x, event.delta.y)
+      scaleFactors = @getScaleFactors(@sel, zx, zy, event.delta.x, event.delta.y)
       sx = scaleFactors.sx
       sy = scaleFactors.sy
 
       transformMatrix = new Matrix().scale(sx, sy, scalePoint)
-      return if transformMatrix._d == 0 or transformMatrix._a == 0
+      return unless sx and sy
 
-      if @selected().arrow
-        @selected().arrow.scale(sx, sy, scalePoint)
-        @selected().drawTriangle()
+      if @sel.arrow
+        @sel.arrow.scale(sx, sy, scalePoint)
+        @sel.drawTriangle()
       else
-        @selected().transform(transformMatrix)
+        @sel.transform(transformMatrix)
 
       # redraw selection rect
-      @selected().selectionRect.remove()
-      @selected().selectionRect = @createSelectionRectangle()
+      @sel.selectionRect.remove()
+      @sel.selectionRect = @createSelRect()
 
     getScaleFactors: (item, zx, zy, dx, dy) ->
+      console.log 'get scale factors'
       item = item.arrow or item
       w = item.bounds.width
       h = item.bounds.height
@@ -188,6 +197,7 @@ $ ->
       return sx: Math.abs(1 + zx*dx/w), sy: Math.abs(1 + zy*dy/h)
 
     getReflectZone: (item, x, y) ->
+      console.log 'get reflect zone'
       itemToScale = item.arrow or item
 
       return null if itemToScale.bounds.contains(x, y)
@@ -225,11 +235,11 @@ $ ->
 
     # ITEMS MISC
     createUserBadge: (uid, x, y) ->
+      console.log 'create user badge'
       getUserIndex = (uid) ->
         for user, index in App.chat.users
           return (index + 1) if "#{user.id}" is "#{uid}"
         return 1
-
       badge = $("<span class='userBadge label-#{getUserIndex(uid)}'>#{App.chat.getUserById(uid).displayName}</span>")
       left = x + opts.pandx
       top = y + opts.pandy + parseInt($("#header").height())
@@ -237,25 +247,28 @@ $ ->
       badge.css
         left: badgePos.x
         top: badgePos.y
-
       $("body").append(badge)
-
       fadeOutBadge = -> $(badge).fadeOut('fast')
       setTimeout fadeOutBadge, 2000
 
     isItemEmpty: (item) ->
+      console.log 'is item empty'
+      #TODO this is strange code
       return true unless item
       return false unless item.segments
       return item.segments.length is 1
+      #TODO next code is dead
       if item.segments.length is 2
         segmentsAreEqual = item.segments[0].point.x is item.segments[1].point.x and item.segments[0].point.y is item.segments[1].point.y
         return segmentsAreEqual
       return false
 
     insertFirst: (item) ->
+      console.log 'insert first'
       paper.project.activeLayer.insertChild(0, item)
 
     drawArrow: (arrowLine) ->
+      console.log 'draw arrow'
       arrowGroup = new Group([arrowLine])
       arrowGroup.arrow = arrowLine
       arrowGroup.drawTriangle = => @drawArrowTriangle arrowGroup
@@ -263,24 +276,30 @@ $ ->
       @create(triangle)
       arrowGroup
 
-    drawArrowTriangle: (element) ->
-      vector = new Point(element.arrow.lastSegment.point.x - element.arrow.segments[0].point.x, element.arrow.lastSegment.point.y - element.arrow.segments[0].point.y)
+    drawArrowTriangle: (group) ->
+      console.log 'draw arrow triangle'
+      arrow = group.arrow
+      arrowLastX = arrow.lastSegment.point.x
+      arrowLastY = arrow.lastSegment.point.y
+      arrowFirstX = arrow.segments[0].point.x
+      arrowFirstY = arrow.segments[0].point.y
+      triangle = group.triangle
+      vector = new Point(arrowLastX - arrowFirstX, arrowLastY - arrowFirstY)
       vector = vector.normalize(10)
-      vrplus = vector.rotate(135)
-      vrminus = vector.rotate(-135)
-      if element.triangle
-        element.triangle.segments[0].point = new Point(element.arrow.lastSegment.point.x + vrplus.x, element.arrow.lastSegment.point.y + vrplus.y)
-        element.triangle.segments[1].point = element.arrow.lastSegment.point
-        element.triangle.segments[2].point = new Point(element.arrow.lastSegment.point.x + vrminus.x, element.arrow.lastSegment.point.y + vrminus.y)
+      vPlus = vector.rotate(135)
+      vMinus = vector.rotate(-135)
+      if triangle
+        triangle.segments[0].point = new Point(arrowLastX + vPlus.x, arrowLastY + vPlus.y)
+        triangle.segments[1].point = arrow.lastSegment.point
+        triangle.segments[2].point = new Point(arrowLastX + vMinus.x, arrowLastY + vMinus.y)
       else
         triangle = new Path([
-          new Point(element.arrow.lastSegment.point.x + vrplus.x, element.arrow.lastSegment.point.y + vrplus.y)
-          element.arrow.lastSegment.point
-          new Point(element.arrow.lastSegment.point.x + vrminus.x, element.arrow.lastSegment.point.y + vrminus.y)
+          new Point(arrowLastX + vPlus.x, arrowLastY + vPlus.y)
+          arrow.lastSegment.point
+          new Point(arrowLastX + vMinus.x, arrowLastY + vMinus.y)
         ])
-        element.triangle = triangle
-        element.addChild(triangle)
-
-      element.triangle
+        group.triangle = triangle
+        group.addChild(triangle)
+      group.triangle
 
   App.room.items = new RoomItems

@@ -71,7 +71,7 @@ $ ->
     getSelectableTools: ->
       selectableTools = []
       for tool in opts.historytools.allHistory
-        selectableTools.push(tool) if tool.opacity isnt 0
+        selectableTools.push(tool) if tool.opacity
 
       selectableTools
 

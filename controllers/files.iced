@@ -58,12 +58,9 @@ exports.update = (req, res) ->
   # Upload file
   # We actually send two post request from the client but the method supports also sending multiple files in on form request
 exports.upload = (req, res, next) ->
-  tmpDir = "./uploads/tmp"
-  tools.mkdirp tmpDir
-
   fileCount = 0
   files = []
-  finish = ->
+  end = ->
     fileCount--
     if fileCount is 0
       savedFiles = []
@@ -72,10 +69,8 @@ exports.upload = (req, res, next) ->
           savedFiles.push savedFile
           return tools.asyncDone files, ->
             return res.json savedFiles
-
   form = new formidable.IncomingForm()
-  form.uploadDir = tmpDir
-
+  form.uploadDir = cfg.UPLOADS_TMP
   form.on 'field', (name, value)->
     req[name] = value
   form.on 'fileBegin', ->
@@ -83,10 +78,8 @@ exports.upload = (req, res, next) ->
   form.on 'file', (name, file) ->
     fileCount++
     files.push file
-
     pid = req.pid
     cid = req.cid
-
     size = file.length
     # todo cfg.minFileSize and cfg.maxFileSize are not yet defined.
     if cfg.minFileSize and cfg.minFileSize > size
@@ -95,29 +88,23 @@ exports.upload = (req, res, next) ->
     if cfg.maxFileSize and size > cfg.maxFileSize
       fs.unlink file.path
       return
-
     mime = file.mime
     type = tools.getFileType mime
-
     unless tools.isMimeSupported mime
       fs.unlink file.path
       return
-
-    uploadDir = "./uploads/#{pid}/#{type}"
-
-    tools.mkdirp uploadDir
-
+    uploadDir = "#{cfg.UPLOADS}/#{pid}/#{type}"
     fs.rename file.path, "#{uploadDir}/#{file.name}", (err) ->
       console.log "unexpected error. implement manual copy process" if err
-      return finish()
+      return end()
   form.on 'aborted', ->
     console.log "abort"
   form.on 'error', (err) ->
     console.log "error: ", err
   form.on 'end', ->
     console.log "end"
-
   form.parse req
+
 #
 # GET
 # Dropbox files

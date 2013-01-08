@@ -16,7 +16,10 @@ COFFEE_DIR='assets/coffee/'
 JS_OUTPUT_DIR='assets/js'
 
 ## uploads dir
-UPLOADS_DIR='uploads'
+UPLOADS='uploads'
+
+## uploads temp dir
+UPLOADS_TMP='uploads/tmp'
 
 ## patches dir
 PATCHES_DIR='patches'
@@ -40,7 +43,7 @@ TMP_TEMPLATE='~'
 NODE_CMD='node --nouse-idle-notification --expose-gc'
 
 ## coffee execution command
-COFFEE_OPT='--nodejs "--nouse-idle-notification --expose-gc"'
+COFFEE_OPT='--nodejs "--nouse-idle-notification" --nodejs "--expose-gc"'
 
 ## redis flush command
 FLUSH_REDIS_CMD='redis-cli flushall'
@@ -117,8 +120,8 @@ function build_deploy {
 ## init procedure
 function init {
   echo "init project directories"
-  if [ ! -e $UPLOADS_DIR ]; then
-    mkdir $UPLOADS_DIR
+  if [ ! -e $UPLOADS ]; then
+    mkdir -p $UPLOADS_TMP
   fi
 }
 
@@ -126,7 +129,7 @@ function init {
 function reset {
   echo "resetting"
   rm -rf $MODULES_DIR
-  rm -rf $UPLOADS_DIR
+  rm -rf $UPLOADS
   # Uncomment next line when switch to coffee
 #   rm -f $JS_OUTPUT_DIR/*.*
   eval $FLUSH_REDIS_CMD

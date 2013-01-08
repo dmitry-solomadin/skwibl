@@ -391,10 +391,10 @@ $ ->
     addCommentText: (commentMin, commentText) ->
       return if $.trim(commentText.text).length is 0
 
-      emit = true if not commentText.elementId
+      emit = not commentText.elementId?
       elementId = commentText.elementId or room.generateId()
       owner = commentText.owner or $("#uid").val()
-      time = commentText.time or new Date().getTime()
+      time = commentText.time or Date.now()
       commentContent = commentMin[0].$maximized.find(".comment-content-inner")
 
       user = App.chat.getUserById owner
