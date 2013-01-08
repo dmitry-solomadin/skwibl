@@ -31,6 +31,20 @@ body.room {
     -moz-box-sizing: border-box;
     background: white;
     text-align: center;
+    position: relative;
+}
+
+.canvasInitDiv .progressWrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin-top: 120px;
+}
+
+.canvasInitDiv .progressWrap .progress {
+    width: 300px;
+    margin: 0 auto;
 }
 
 .cancelInit {
@@ -476,7 +490,7 @@ body.room {
     text-align: center;
     color: #6a6340;
     font: bold 14px Sans-Serif;
-    text-shadow: rgba(255,255,255, 0.5) 0 1px 0;
+    text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;
     border-radius: 2px;
     cursor: pointer;
     background: #BFDC7A;
@@ -793,7 +807,7 @@ body.room {
     float: right;
 }
 
-.canvasFolderDown img {
+.canvasFolderTrans img {
     -webkit-transition: all 0.5s;
     -moz-transition: all 0.5s;
     transition: all 0.5s;
@@ -811,6 +825,15 @@ body.room {
     font-size: 12px;
     box-shadow: 1px 1px 2px #A0A0A0;
     z-index: 99;
+}
+
+.chatFolderTrans img {
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    transition: all 0.5s;
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 
 .chat-badge {

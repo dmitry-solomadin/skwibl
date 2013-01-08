@@ -280,9 +280,9 @@ $ ->
       $(thumb).find(".canvasRemoveImg, .canvasDownloadImg, .canvasReorderImg").hide()
 
     foldPreviews: ->
-      $("#canvasFolder").addClass("canvasFolderDown")
-      $("#canvasFooter").animate({height: 37}, {queue: false}, ->
-        $("#canvasFolder").removeClass("canvasFolderDown").find("img").attr("src", "/images/room/unfold-up.png"))
+      $("#canvasFolder").addClass("canvasFolderTrans")
+      $("#canvasFooter").animate {height: 37}, queue: false, complete: ->
+        $("#canvasFolder").removeClass("canvasFolderTrans").find("img").attr("src", "/images/room/unfold-up.png")
 
       if $("#smallCanvasPreviewsWrap").css('position') is "relative"
         $("#nameChanger").animate(left: 0, 500)
@@ -293,15 +293,16 @@ $ ->
       $("#canvasFolder").attr("onclick", "App.room.canvas.unfoldPreviews(this); return false;")
 
     unfoldPreviews: ->
-      $("#canvasFolder").addClass("canvasFolderDown")
+      $("#canvasFolder").addClass("canvasFolderTrans")
 
       if $("#smallCanvasPreviewsWrap").css('position') is "relative"
         $("#nameChanger").animate(left: -$("#nameChanger").position().left, 500)
       else
         $("#nameChanger").animate(left: 0, 500)
 
-      $("#canvasFooter").animate height: 108, {duration: 500, easing: 'easeOutBack', queue: false}, ->
-        $("#canvasFolder").removeClass("canvasFolderDown").find("img").attr("src", "/images/room/fold-down.png")
+      $("#canvasFooter").animate {height: 108}, duration: 500, easing: 'easeOutBack', queue: false, complete: ->
+        $("#canvasFolder").removeClass("canvasFolderTrans").find("img").attr("src", "/images/room/fold-down.png")
+
       $("#smallCanvasPreviews").animate(left: -500, 500)
       $("#canvasFolder").attr("onclick", "App.room.canvas.foldPreviews(this); return false;")
 

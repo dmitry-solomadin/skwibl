@@ -71,7 +71,9 @@ $ ->
         if Dropbox?
           Dropbox.choose
             success: (files) ->
-              $(link).attr("disabled","disabled").html("Loading your images...")
+              $("#canvasInitButtons").fadeOut()
+              $("#loadingProgressWrap").fadeIn()
+              $("#loadingProgressWrap .bar").css("width", "100%")
 
               linkInfos = []
               for file in files
@@ -80,7 +82,9 @@ $ ->
                 linkInfos.push linkInfo
 
               $.post '/file/uploadDropbox', {pid: $("#pid").val(), linkInfos: linkInfos}, (data, status, xhr) =>
-                $(@).removeAttr("disabled").html("Dropbox")
+                $("#canvasInitButtons").show()
+                $("#loadingProgressWrap").hide()
+
                 for file in data
                   App.room.canvas.handleUpload {canvasId: file.canvasId, fileId: file.element.id, name: file.canvasName}, true
             cancel: -> console.log "cancel hit"

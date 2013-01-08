@@ -41,6 +41,10 @@ body {
     -moz-box-sizing: content-box;
 }
 
+.font-normal {
+    font-family: 'MyriadPro';
+}
+
 .navbar .btn {
     padding-top: 8px;
     padding-bottom: 7px;
