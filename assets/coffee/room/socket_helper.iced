@@ -94,7 +94,7 @@ $ ->
 
     socketRemoveElement: (elementId) ->
       room.helper.findAndRemoveByElementId(elementId).remove()
-      room.items.unselectIfSelected(elementId)
+      room.items.unselect(elementId)
       room.redrawWithThumb()
 
     socketRemoveComment: (elementId) ->
@@ -106,7 +106,7 @@ $ ->
       commentMin[0].rect.remove() if commentMin[0].rect
       commentMin.remove()
 
-      room.items.unselectIfSelected(elementId)
+      room.items.unselect(elementId)
       room.redrawWithThumb()
 
     addOrUpdateElement: (element) ->
@@ -117,7 +117,7 @@ $ ->
 
       foundPath = room.helper.findByElementId(element.elementId)
       if foundPath
-        room.items.unselectIfSelected(foundPath.elementId)
+        room.items.unselect(foundPath.elementId)
         foundPath.removeSegments()
         $(element.segments).each ->
           foundPath.addSegment(room.socketHelper.createSegment(@x, @y, @ix, @iy, @ox, @oy))

@@ -21,39 +21,29 @@ $ ->
       opts.tool.opacity = settings.opacity or opts.opacity
       opts.tool.dashArray = settings.dashArray
 
-    removeSelected: ->
-      console.log 'remove selected'
-      #TODO merge with remove
-      @remove @sel, true if @sel
-
-    remove: (item, historize) ->
+    remove: (historize = true, item = @sel) ->
       console.log 'remove'
+      return unless item
       room.history.add(
         actionType: "remove"
         tool: item
         eligible: true) if historize
       item.opacity = 0
       room.socket.emit("elementRemove", item.elementId)
-      @unselectIfSelected item.elementId
+      @unselect item.elementId
       room.redrawWithThumb()
 
-    translateSelected: (deltaPoint) ->
+    translate: (delta, item = @sel) ->
       console.log 'translate selected'
-      if @sel
-        @sel.translate(deltaPoint)
-        @sel.selectionRect?.translate(deltaPoint)
+      return unless item
+      item.translate(delta)
+      item.selectionRect?.translate(delta)
 
-    unselectIfSelected: (elementId) ->
-      console.log 'unselect if selected'
-      #TODO merge with unselect
+    unselect: (id = @sel?.elementId) ->
       rect = @sel?.selectionRect
-      if rect and @sel.elementId is elementId
-        @unselect()
-
-    unselect: ->
-      console.log 'unselect'
-      @sel?.selectionRect?.remove()
-      @setSelected(null)
+      if rect and @sel.elementId is id
+        rect.remove()
+        @setSelected(null)
 
     pan: (dx, dy) ->
       #TODO move history logic out of this method
@@ -66,6 +56,7 @@ $ ->
         else if not el.actionType and el.translate
           el.translate(new Point(dx, dy))
 
+    #TODO consider how to make this setter an action - select
     setSelected: (item)-> @sel = item
 
     # ITEMS SELECT
@@ -125,7 +116,7 @@ $ ->
         else
           @sel.scalersSelected = false
         if rect.removeButton?.bounds.contains(point)
-          @removeSelected()
+          @remove()
 
     createSelRect: ->
       console.log 'create sel'
@@ -251,13 +242,12 @@ $ ->
       fadeOutBadge = -> $(badge).fadeOut('fast')
       setTimeout fadeOutBadge, 2000
 
-    isItemEmpty: (item) ->
+    isEmpty: (item) ->
       console.log 'is item empty'
       #TODO this is strange code
       return true unless item
       return false unless item.segments
-      return item.segments.length is 1
-      #TODO next code is dead
+      return true if item.segments.length is 1
       if item.segments.length is 2
         segmentsAreEqual = item.segments[0].point.x is item.segments[1].point.x and item.segments[0].point.y is item.segments[1].point.y
         return segmentsAreEqual

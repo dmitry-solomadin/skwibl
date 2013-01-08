@@ -21,7 +21,7 @@ $ ->
             item.opacity = 1
             room.socket.emit "elementUpdate", room.socketHelper.prepareElementToSend item
           else
-            room.items.remove item, false
+            room.items.remove false, item
 
       $("#redoLink").removeClass("disabled")
 
@@ -51,7 +51,7 @@ $ ->
             room.socket.emit "commentUpdate", room.socketHelper.prepareCommentToSend item.commentMin
         else
           if reverse
-            room.items.remove item, false
+            room.items.remove false, item
           else
             item.opacity = 1
             room.socket.emit "elementUpdate", room.socketHelper.prepareElementToSend item

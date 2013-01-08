@@ -68,7 +68,7 @@ exports.setUp = (logger) ->
     app.use express.static assetsDir
     app.use express.static vendorDir
     app.use ctrls.aux.notFound
-    #   app.use(ctrls.error);
+#     app.use(ctrls.aux.error);
 
   app.locals = {}
 

@@ -178,10 +178,10 @@ $ ->
           @items.pan(event.delta.x, event.delta.y)
         when 'select'
           scalersSelected = @items.sel?.scalersSelected
-          if scalersSelected then @items.sacleSelected(event) else @items.translateSelected(event.delta)
+          if scalersSelected then @items.sacleSelected(event) else @items.translate(event.delta)
 
           # redraw comment arrow if there is one.
-          @comments.redrawArrow(@items.sel.commentMin) if @items.sel.commentMin
+          @comments.redrawArrow(@items.sel.commentMin) if @items.sel?.commentMin
 
     onMouseUp: (canvas, event) ->
       event.point = @applyCurrentScale(event.point)
@@ -202,7 +202,7 @@ $ ->
       switch tooltype
         when 'straightline', 'arrow', 'circle', 'rectangle', 'line', 'highligher'
           # Check if the item is empty then there is no need to save it on the server.
-          unless @items.isItemEmpty(@opts.tool)
+          unless @items.isEmpty(@opts.tool)
             @opts.tool.eligible = true
             @history.add()
 

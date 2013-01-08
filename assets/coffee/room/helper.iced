@@ -9,16 +9,16 @@ $ ->
         $(document).bind 'keydown.ctrl_z', => room.history.prev()
         $(document).bind 'keydown.ctrl_shift_z', => room.history.next()
 
-      $(document).bind 'keydown.del', => room.items.removeSelected()
-      $(document).bind 'keydown.backspace', => room.items.removeSelected()
-      $(document).bind 'keydown.left', => room.items.translateSelected(new Point(-5, 0))
-      $(document).bind 'keydown.up', => room.items.translateSelected(new Point(0, -5))
-      $(document).bind 'keydown.right', => room.items.translateSelected(new Point(5, 0))
-      $(document).bind 'keydown.down', => room.items.translateSelected(new Point(0, 5))
-      $(document).bind 'keydown.shift_left', => room.items.translateSelected(new Point(-1, 0))
-      $(document).bind 'keydown.shift_up', => room.items.translateSelected(new Point(0, -1))
-      $(document).bind 'keydown.shift_right', => room.items.translateSelected(new Point(1, 0))
-      $(document).bind 'keydown.shift_down', => room.items.translateSelected(new Point(0, 1))
+      $(document).bind 'keydown.del', => room.items.remove()
+      $(document).bind 'keydown.backspace', => room.items.remove()
+      $(document).bind 'keydown.left', => room.items.translate(new Point(-5, 0))
+      $(document).bind 'keydown.up', => room.items.translate(new Point(0, -5))
+      $(document).bind 'keydown.right', => room.items.translate(new Point(5, 0))
+      $(document).bind 'keydown.down', => room.items.translate(new Point(0, 5))
+      $(document).bind 'keydown.shift_left', => room.items.translate(new Point(-1, 0))
+      $(document).bind 'keydown.shift_up', => room.items.translate(new Point(0, -1))
+      $(document).bind 'keydown.shift_right', => room.items.translate(new Point(1, 0))
+      $(document).bind 'keydown.shift_down', => room.items.translate(new Point(0, 1))
 
     initUploader: ->
       $('#fileupload').fileupload

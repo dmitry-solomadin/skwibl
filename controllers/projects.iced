@@ -1,7 +1,9 @@
-db = require '../db'
+
 fs = require 'fs'
 
+db = require '../db'
 tools = require '../tools'
+cfg = require '../config'
 
 #
 # GET
@@ -64,12 +66,12 @@ exports.add = (req, res) ->
   if not req.body.name or req.body.name is ''
     tools.addError req, 'Please, enter project name.', 'projectName'
     return res.redirect '/projects/new'
-  dir = "#{cfg.UPLOADS}/#{val}"
-  fs.mkdir dir, cfg.DIRECTORY_PERMISSION, (err) ->
-    fs.mkdir "#{dir}/video", cfg.DIRECTORY_PERMISSION
-    fs.mkdir "#{dir}/image", cfg.DIRECTORY_PERMISSION
   db.projects.add req.user.id, req.body.name, (err, project) ->
     unless err
+      dir = "#{cfg.UPLOADS}/#{project.id}"
+      fs.mkdir dir, cfg.DIRECTORY_PERMISSION, (err) ->
+        fs.mkdir "#{dir}/video", cfg.DIRECTORY_PERMISSION
+        fs.mkdir "#{dir}/image", cfg.DIRECTORY_PERMISSION
       if req.body.inviteeEmails and req.body.inviteeEmails isnt ''
         return db.projects.inviteEmail project.id, req.user.id, req.body.inviteeEmails, (err, user) ->
           if err
