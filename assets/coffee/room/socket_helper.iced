@@ -80,7 +80,7 @@ $ ->
         styleObject = $.extend({color: comment.color}, room.comments.COMMENT_RECT_DEFAULT_STYLE)
         room.items.init rect, styleObject
 
-      commentMin = room.comments.create(comment.min.x, comment.min.y, rect, comment.max, comment.color, comment.number)
+      commentMin = room.comments.create(comment.min.x, comment.min.y, rect, comment.min, comment.max, comment.color, comment.number)
       commentMin.elementId = comment.elementId
 
       if rect
