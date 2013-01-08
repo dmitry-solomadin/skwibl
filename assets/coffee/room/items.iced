@@ -7,19 +7,18 @@ $ ->
 
     # ITEMS MANIPULATION
 
-    create: (tool, settings) ->
-      #TODO change behavior to remove this method it creates nothing
-      console.log 'create'
+    init: (tool, settings) ->
       settings = settings or {}
-      opts.tool = tool unless settings.justCreate
 
       tool.strokeJoin = "round"
+      tool.strokeColor = settings.color or sharedOpts.color
+      tool.strokeWidth = settings.width or opts.defaultWidth
+      tool.fillColor = settings.fillColor
+      tool.opacity = settings.opacity or opts.opacity
+      tool.dashArray = settings.dashArray
 
-      opts.tool.strokeColor = settings.color or sharedOpts.color
-      opts.tool.strokeWidth = settings.width or opts.defaultWidth
-      opts.tool.fillColor = settings.fillColor
-      opts.tool.opacity = settings.opacity or opts.opacity
-      opts.tool.dashArray = settings.dashArray
+      #buffer item for creation process
+      @created = tool unless settings.noBuffer
 
     remove: (historize = true, item = @sel) ->
       console.log 'remove'

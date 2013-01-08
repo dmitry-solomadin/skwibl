@@ -24,9 +24,11 @@ $ ->
           unless cid is selectedCid
             room.helper.findById(path.id).remove()
 
-          path.strokeColor = element.strokeColor
-          path.strokeWidth = element.strokeWidth
-          path.opacity = element.opacity
+          room.items.init path,
+            color: element.strokeColor
+            width: element.strokeWidth
+            opacity: element.opacity
+            noBuffer: true
 
           path.eligible = false
           room.history.add(path)

@@ -76,7 +76,7 @@ $ ->
       selectableTools
 
     add: (tool) ->
-      tool = tool or opts.tool
+      tool = tool or room.items.created
       if opts.historyCounter isnt opts.historytools.eligibleHistory.length # rewrite history
         opts.historytools.eligibleHistory = opts.historytools.eligibleHistory.slice(0, room.opts.historyCounter)
 

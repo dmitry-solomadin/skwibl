@@ -78,7 +78,7 @@ $ ->
         rect = new Path.RoundRectangle(comment.rect.x, comment.rect.y, comment.rect.w, comment.rect.h, 8, 8)
 
         styleObject = $.extend({color: comment.color}, room.comments.COMMENT_RECT_DEFAULT_STYLE)
-        room.items.create(rect, styleObject)
+        room.items.init rect, styleObject
 
       commentMin = room.comments.create(comment.min.x, comment.min.y, rect, comment.max, comment.color, comment.number)
       commentMin.elementId = comment.elementId
@@ -129,7 +129,7 @@ $ ->
       else
         path = @createElementFromData(element)
 
-        room.items.create path,
+        room.items.init path,
           color: element.strokeColor
           width: element.strokeWidth
           opacity: element.opacity
