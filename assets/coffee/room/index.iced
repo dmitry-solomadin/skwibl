@@ -66,14 +66,12 @@ $ ->
       false
 
     initDropbox: ->
-
-
       $("#dropboxChoose").on "click", ->
         if Dropbox?
-          $(@).attr("disabled","disabled").html("Loading your images...")
-
           Dropbox.choose
             success: (files) ->
+              $(@).attr("disabled","disabled").html("Loading your images...")
+
               linkInfos = []
               for file in files
                 linkInfo = link: file.link
