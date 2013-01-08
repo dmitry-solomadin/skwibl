@@ -1,3 +1,6 @@
+<script type="text/javascript" src="https://www.dropbox.com/static/api/1/dropbox.js"
+        id="dropboxjs" data-app-key="btskqrr7wnr3k20"></script>
+
 <input id="pid" type="hidden" value="<%= @pid %>" xmlns="http://www.w3.org/1999/html">
 
 <% canvasInitialized = @canvases[0].initialized %>
@@ -109,11 +112,10 @@
 
       <input id="fileupload" type="file" name="files[]" multiple>
     </span><br>
-    <a class="btn disabled tooltipize" data-placement="bottom" title="This feature is comming soon">Dropbox</a><br>
+    <a href="#" id="dropboxChoose" class="btn">Dropbox</a><br>
     <a class="btn disabled tooltipize" data-placement="bottom" title="This feature is comming soon">Google Drive</a><br>
     <div class="canvasInitHeader">or</div>
-    <a href="#" class="btn" data-loading="Creating..." data-prevText="Create empty canvas"
-       onclick="App.room.canvas.requestAddEmpty(); return false;">Create empty canvas</a>
+    <a href="#" class="btn" onclick="App.room.canvas.requestAddEmpty(); return false;">Create empty canvas</a>
 
     <a id="cancelInitLink" class="cancelInit hide" href="#"
         onclick="App.room.hideSplashScreen(); return false;">Cancel</a>

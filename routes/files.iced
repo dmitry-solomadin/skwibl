@@ -16,6 +16,8 @@ exports.configure = (app, passport) ->
   #Todo add isAuth to express.iced
   #app.post '/file/upload', ctrls.mid.isAuth, ctrls.files.upload
 
+  app.post '/file/uploadDropbox', ctrls.mid.isAuth, ctrls.files.uploadDropbox
+
   app.get '/files/:pid', ctrls.mid.isAuth, ctrls.files.project
 
   app.get '/files/:pid/:fid', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.mid.isFileInProject, ctrls.files.file

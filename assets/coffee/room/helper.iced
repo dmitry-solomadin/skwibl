@@ -25,7 +25,6 @@ $ ->
         dataType: 'json'
         url: '/file/upload'
         done: (e, data) ->
-          console.log data.result
           for file in data.result
             room.canvas.handleUpload {canvasId: file.canvasId, fileId: file.element.id, name: file.canvasName}, true
 
@@ -34,8 +33,7 @@ $ ->
         params =
           pid: $("#pid").val()
         # we only add cid for the first canvas.
-        console.log not room.canvas.isSelectedInitialized() and firstFile
-        params.cid = App.room.canvas.getSelected().data("cid") if not room.canvas.isSelectedInitialized() and firstFile
+        params.cid = App.room.canvas.getSelectedCanvasId() if not room.canvas.isSelectedInitialized() and firstFile
         firstFile = false
         data.formData = params
 

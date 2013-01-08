@@ -56,7 +56,9 @@ exports.update = (req, res) ->
   #
   # POST
   # Upload file
-  # We actually send two post request from the client but the method supports also sending multiple files in on form request
+  #
+  # We actually send multiple post requests from the client but the method supports
+  # sending multiple files in one post request
 exports.upload = (req, res, next) ->
   tmpDir = "./uploads/tmp"
   tools.mkdirp tmpDir
@@ -76,7 +78,7 @@ exports.upload = (req, res, next) ->
   form = new formidable.IncomingForm()
   form.uploadDir = tmpDir
 
-  form.on 'field', (name, value)->
+  form.on 'field', (name, value) ->
     req[name] = value
   form.on 'fileBegin', ->
     console.log "fileBegin"
@@ -118,6 +120,32 @@ exports.upload = (req, res, next) ->
     console.log "end"
 
   form.parse req
+
+exports.uploadDropbox = (req, res) ->
+  fileCount = req.body.linkInfos.length
+  pid = req.body.pid
+
+  finish = ->
+    fileCount--
+    if fileCount is 0
+      savedFiles = []
+      tools.asyncParallel req.body.linkInfos, (linkInfo) ->
+        db.files.add req.user.id, linkInfo.cid, pid, linkInfo.name, linkInfo.mime, (err, savedFile) ->
+          savedFiles.push savedFile
+          return tools.asyncDone req.body.linkInfos, ->
+            return res.json savedFiles
+
+  for linkInfo in req.body.linkInfos
+    linkInfo.name = path.basename linkInfo.link
+    linkInfo.mime = tools.getFileMime path.extname linkInfo.name
+    linkInfo.type = tools.getFileType linkInfo.mime
+
+    uploadDir = "./uploads/#{pid}/#{linkInfo.type}"
+    filePath = "#{uploadDir}/#{linkInfo.name}"
+    r = request(linkInfo.link + "?dl=1")
+    r.on "end", -> finish()
+    r.pipe fs.createWriteStream(filePath)
+
 #
 # GET
 # Dropbox files

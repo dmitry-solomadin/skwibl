@@ -34,6 +34,8 @@ $ ->
 
       $("#scaleDiv .dropdown-menu a").on "click", -> App.room.canvas.setScale($(@).data('scale'))
 
+      @initDropbox()
+
       @canvas.initNameChanger()
 
       $(document).on "click", "#canvasSelectDiv a", ->
@@ -62,6 +64,32 @@ $ ->
       canvas.onmousedown = -> return false
 
       false
+
+    initDropbox: ->
+
+
+      $("#dropboxChoose").on "click", ->
+        if Dropbox?
+          $(@).attr("disabled","disabled").html("Loading your images...")
+
+          Dropbox.choose
+            success: (files) ->
+              linkInfos = []
+              for file in files
+                linkInfo = link: file.link
+                linkInfo.cid = App.room.canvas.getSelectedCanvasId() if not App.room.canvas.isSelectedInitialized()
+                linkInfos.push linkInfo
+
+              $.post '/file/uploadDropbox', {pid: $("#pid").val(), linkInfos: linkInfos}, (data, status, xhr) =>
+                $(@).removeAttr("disabled").html("Dropbox")
+                for file in data
+                  App.room.canvas.handleUpload {canvasId: file.canvasId, fileId: file.element.id, name: file.canvasName}, true
+            cancel: -> console.log "cancel hit"
+        else
+          alert "Can't reach Dropbox API. Check your internet connection."
+
+      script = $("<script type='text/javascript' src='https://www.dropbox.com/static/api/1/dropbox.js' id='dropbox' data-app-key='btskqrr7wnr3k20'></script>")
+      $("body").append(script)
 
     initOpts: (canvasId) ->
       @opts = {}
