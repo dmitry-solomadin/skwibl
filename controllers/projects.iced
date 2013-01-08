@@ -172,7 +172,7 @@ exports.confirm = (req, res) ->
     return res.send yes if err
     return db.activities.getDataActivity data.aid, (err, activity) ->
       return res.send yes if err
-      return res.render './activities/activity',
+      return res.render './activities/_activity',
         activity: activity
 
 #
