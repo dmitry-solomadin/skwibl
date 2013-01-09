@@ -21,6 +21,8 @@ $ ->
       $(document).bind 'keydown.shift_down', => room.items.translate(new Point(0, 1))
 
     initUploader: ->
+      isPrjInitialized = room.canvas.isFirstInitialized()
+
       $('#fileupload').fileupload
         dataType: 'json'
         url: '/file/upload'
@@ -28,12 +30,38 @@ $ ->
           for file in data.result
             room.canvas.handleUpload {canvasId: file.canvasId, fileId: file.element.id, name: file.canvasName}, true
 
+          $("#canvasInitButtons").show()
+          $("#loadingProgressWrap").hide()
+
+      if not isPrjInitialized
+        $('#fileupload').bind 'fileuploadstart', (e, data) ->
+          $("#canvasInitButtons").fadeOut()
+          $("#loadingProgressWrap .bar").css("width", "0%")
+          $("#loadingProgressWrap").fadeIn()
+
+        percents = {}
+        $('#fileupload').bind 'fileuploadprogress', (e, data) ->
+          percents["#{data.files[0].id}"] = data.total * (data.files[0].percentInTotal) / data.loaded
+
+          percentTotal = 0
+          for percentId of percents
+            percentPart = percents[percentId]
+            percentTotal += percentPart
+
+          $("#loadingProgressWrap .bar").css("width", "#{percentTotal}%")
+
       firstFile = true
+      id = 1
       $('#fileupload').bind 'fileuploadsubmit', (e, data) ->
+        overallSize = 0
+        overallSize += file.size for file in data.originalFiles
+        data.files[0].percentInTotal = (data.files[0].size * 100 / overallSize).toFixed(2)
+        data.files[0].id = id
+        id++
         params =
           pid: $("#pid").val()
         # we only add cid for the first canvas.
-        params.cid = App.room.canvas.getSelectedCanvasId() if not room.canvas.isSelectedInitialized() and firstFile
+        params.cid = App.room.canvas.getSelectedCanvasId() if not isPrjInitialized and firstFile
         firstFile = false
         data.formData = params
 

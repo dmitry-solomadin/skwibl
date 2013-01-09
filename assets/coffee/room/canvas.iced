@@ -333,7 +333,7 @@ $ ->
       room.socket.emit "canvasAdded", canvasData
 
     handleUpload: (canvasData, emit) ->
-      if @isSelectedInitialized()
+      if @isFirstInitialized()
         room.hideSplashScreen true
         @addNewThumbAndSelect canvasData
       else
@@ -436,7 +436,7 @@ $ ->
 
     getSelectedCanvasId: -> @getSelected().data("cid")
 
-    isSelectedInitialized: -> @getSelected().data("initialized")
+    isFirstInitialized: -> $(@getThumbs()[0]).data("initialized")
 
     getSelected: -> $(".canvasSelected")
 
