@@ -13,7 +13,7 @@ JS_NAME='./vendor/js/skwibl'
 CSS_NAME='./vendor/css/skwibl'
 
 ## list of js files
-JS_LIST=`cat views/shared/application_scripts.ect | grep -o '\/js.*\.js' | sed 's/\/js\/dev/\.\/vendor\/js\/dev/' | sed 's/\/js/\.\/assets\/js/' | sed 's/\/socket\.io/\.\/node_modules\/socket\.io\/node_modules\/socket\.io-client\/dist/'`
+JS_LIST=`cat views/shared/application_scripts.ect | grep -o '\/js.*\.js' | sed 's/\/js/\.\/assets\/js/' | sed 's/\.\/assets\/js\/dev/\.\/vendor\/js\/dev/' | sed 's/\/socket\.io/\.\/node_modules\/socket\.io\/node_modules\/socket\.io-client\/dist/'`
 
 ## list of css files
 CSS_LIST=`cat views/shared/application_scripts.ect | grep -o '\/css.*\.css' | sed 's/^/\.\/vendor/'`
