@@ -7,26 +7,24 @@ $ ->
 
     # ITEMS MANIPULATION
 
-    create: (tool, settings) ->
-      #TODO change behavior to remove this method it creates nothing
-#       console.log 'create'
+
+    init: (item, settings) ->
       settings = settings or {}
-      opts.tool = tool unless settings.justCreate
-
-      tool.strokeJoin = "round"
-
-      opts.tool.strokeColor = settings.color or sharedOpts.color
-      opts.tool.strokeWidth = settings.width or opts.defaultWidth
-      opts.tool.fillColor = settings.fillColor
-      opts.tool.opacity = settings.opacity or opts.opacity
-      opts.tool.dashArray = settings.dashArray
+      item.strokeJoin = "round"
+      item.strokeColor = settings.color or sharedOpts.color
+      item.strokeWidth = settings.width or opts.defaultWidth
+      item.fillColor = settings.fillColor
+      item.opacity = settings.opacity or opts.opacity
+      item.dashArray = settings.dashArray
+      #buffer item for creation process
+      @created = item unless settings.noBuffer
 
     remove: (historize = true, item = @sel) ->
       console.log 'remove'
       return unless item
       room.history.add(
         actionType: "remove"
-        tool: item
+        tool: item#TODO change tool to item
         eligible: true) if historize
       item.opacity = 0
       room.socket.emit("elementRemove", item.elementId)

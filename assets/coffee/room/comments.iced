@@ -11,7 +11,7 @@ $ ->
         opacity: 0.75
         dashArray: [8, 3]
 
-    create: (x, y, rect, max, color, number) ->
+    create: (x, y, rect, min, max, color, number) ->
       color = color or sharedOpts.color
       COMMENT_SHIFT_X = 75
       COMMENT_SHIFT_Y = -135
@@ -21,10 +21,12 @@ $ ->
         COMMENT_SHIFT_Y = 55
 
       reversedCoord = room.applyReverseCurrentScale(new Point(x, y))
+      min_x = if min then min.x else reversedCoord.x
+      min_y = if min then min.y else reversedCoord.y
 
       commentMin = $("<div class='comment-minimized'></div>")
       commentMin.addClass("vis-hidden") if rect
-      commentMin.css(left: reversedCoord.x, top: reversedCoord.y, borderColor: color).data("color", color)
+      commentMin.css(left: min_x, top: min_y, borderColor: color).data("color", color)
 
       @setNumber commentMin, number
 

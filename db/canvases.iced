@@ -62,6 +62,7 @@ exports.setUp = (client, db) ->
             if canvases.length <= 1
               db.canvases.clear cid
               client.hdel "canvases:#{cid}", "file"
+              client.hset "canvases:#{cid}", "initialized", "false"
               tools.asyncOpt fn, null, null
             else
               client.srem "projects:#{canvas.project}:canvases", cid

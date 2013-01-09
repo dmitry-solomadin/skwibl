@@ -47,20 +47,24 @@ $ ->
     isVisible: -> $("#chat").data("visible") is "true"
 
     fold: ->
+      $("#chatFolder").addClass("chatFolderTrans")
       $("#chat").data("visible", "false")
-      $("#chat").animate({left: -305}, {queue: false})
+      $("#chat").animate {left: -305}, queue: false, complete: ->
+        $("#chatFolder").removeClass("chatFolderTrans").find("img").attr("src", "/images/room/unfold.png")
       $("#canvasFooter").animate(paddingLeft: 0)
       $(".canvasFooterInner").animate({width: $(window).width()}, -> $(".canvasFooterInner").css(width: "100%"))
 
-      $("#chatFolder").attr("onclick", "App.chat.unfold(this); return false;").find("img").attr("src", "/images/room/unfold.png")
+      $("#chatFolder").attr("onclick", "App.chat.unfold(this); return false;")
 
     unfold: ->
+      $("#chatFolder").addClass("chatFolderTrans")
       $("#chat").data("visible", "true")
-      $("#chat").animate(left: 0)
+      $("#chat").animate {left: 0}, queue: false, complete: ->
+        $("#chatFolder").removeClass("chatFolderTrans").find("img").attr("src", "/images/room/fold.png")
       $("#canvasFooter").animate(paddingLeft: 300)
       $(".canvasFooterInner").animate({width: $(window).width() - 300}, -> $(".canvasFooterInner").css(width: "100%"))
 
-      $("#chatFolder").attr("onclick", "App.chat.fold(this); return false;").find("img").attr("src", "/images/room/fold.png")
+      $("#chatFolder").attr("onclick", "App.chat.fold(this); return false;")
       @clearBadgeCount()
       @scrollToTheBottom()
 

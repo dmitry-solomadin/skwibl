@@ -66,14 +66,15 @@ $ ->
       false
 
     initDropbox: ->
-
-
       $("#dropboxChoose").on "click", ->
+        link = @
         if Dropbox?
-          $(@).attr("disabled","disabled").html("Loading your images...")
-
           Dropbox.choose
             success: (files) ->
+              $("#canvasInitButtons").fadeOut()
+              $("#loadingProgressWrap").fadeIn()
+              $("#loadingProgressWrap .bar").css("width", "100%")
+
               linkInfos = []
               for file in files
                 linkInfo = link: file.link
@@ -81,7 +82,9 @@ $ ->
                 linkInfos.push linkInfo
 
               $.post '/file/uploadDropbox', {pid: $("#pid").val(), linkInfos: linkInfos}, (data, status, xhr) =>
-                $(@).removeAttr("disabled").html("Dropbox")
+                $("#canvasInitButtons").show()
+                $("#loadingProgressWrap").hide()
+
                 for file in data
                   App.room.canvas.handleUpload {canvasId: file.canvasId, fileId: file.element.id, name: file.canvasName}, true
             cancel: -> console.log "cancel hit"
@@ -128,22 +131,22 @@ $ ->
 
       @items.sel?.selectionRect?.remove()
 
-      @opts.tool = null
+      @items.created = null
 
       switch @sharedOpts.tooltype
         when 'line'
-          @items.create(new Path())
+          @items.init new Path()
         when 'highligher'
-          @items.create(new Path(), {color: @sharedOpts.color, width: 15, opacity: 0.7})
+          @items.init new Path(), {color: @sharedOpts.color, width: 15, opacity: 0.7}
         when 'straightline'
-          @items.create(new Path())
-          @opts.tool.add(event.point) for [0..1]
+          @items.init new Path()
+          @items.created.add(event.point) for [0..1]
         when 'arrow'
           arrow = new Path()
           arrow.arrow = arrow
-          @items.create(arrow)
-          @opts.tool.add(event.point) for [0..1]
-          @opts.tool.lineStart = event.point
+          @items.init(arrow)
+          @items.created.add(event.point) for [0..1]
+          @items.created.lineStart = event.point
         when "select"
           @items.testSelect(event.point)
           @items.drawSelRect(event.point)
@@ -161,19 +164,19 @@ $ ->
 
       switch @sharedOpts.tooltype
         when 'line'
-          @opts.tool.add(event.point)
-          @opts.tool.smooth()
+          @items.created.add(event.point)
+          @items.created.smooth()
         when 'highligher'
-          @opts.tool.add(event.point)
-          @opts.tool.smooth()
+          @items.created.add(event.point)
+          @items.created.smooth()
         when 'circle'
           rectangle = new Rectangle(event.point.x, event.point.y, deltaPoint.x, deltaPoint.y)
-          @items.create(new Path.Oval(rectangle))
-          @opts.tool.removeOnDrag()
+          @items.init new Path.Oval(rectangle)
+          @items.created.removeOnDrag()
         when 'rectangle'
           rectangle = new Rectangle(event.point.x, event.point.y, deltaPoint.x, deltaPoint.y)
-          @items.create(new Path.Rectangle(rectangle))
-          @opts.tool.removeOnDrag()
+          @items.init new Path.Rectangle(rectangle)
+          @items.created.removeOnDrag()
         when 'comment'
           if deltaPoint.x < 0 and deltaPoint.y < 0
             x = event.downPoint.x
@@ -190,17 +193,17 @@ $ ->
           @comments.COMMENT_RECTANGLE_ROUNDNESS, @comments.COMMENT_RECTANGLE_ROUNDNESS)
           rectangle.isCommentRect = true
           styleObject = $.extend({}, @comments.COMMENT_RECT_DEFAULT_STYLE)
-          @items.create(rectangle, styleObject)
-          @opts.tool.removeOnDrag()
+          @items.init rectangle, styleObject
+          @items.created.removeOnDrag()
         when 'straightline'
-          @opts.tool.lastSegment.point = event.point
+          @items.created.lastSegment.point = event.point
         when 'arrow'
-          arrowLine = @opts.tool.arrow
+          arrowLine = @items.created.arrow
           arrowLine.lastSegment.point = event.point
 
           arrowGroup = @items.drawArrow(arrowLine)
 
-          @opts.tool = arrowGroup
+          @items.created = arrowGroup
           arrowGroup.triangle.removeOnDrag()
         when 'pan'
           @items.pan(event.delta.x, event.delta.y)
@@ -217,28 +220,28 @@ $ ->
 
       switch tooltype
         when 'line'
-          @opts.tool.add(event.point)
-          @opts.tool.simplify(10)
+          @items.created.add(event.point)
+          @items.created.simplify(10)
         when 'highligher'
-          @opts.tool.add(event.point)
-          @opts.tool.simplify(10)
+          @items.created.add(event.point)
+          @items.created.simplify(10)
         when "comment"
-          commentRect = if @opts.tool and @opts.tool.isCommentRect then @opts.tool
+          commentRect = if @items.created and @items.created.isCommentRect then @items.created
           commentMin = @comments.create(event.point.x, event.point.y, commentRect)
           commentRect.commentMin = commentMin if commentRect
 
       switch tooltype
         when 'straightline', 'arrow', 'circle', 'rectangle', 'line', 'highligher'
           # Check if the item is empty then there is no need to save it on the server.
-          unless @items.isEmpty(@opts.tool)
-            @opts.tool.eligible = true
+          unless @items.isEmpty(@items.created)
+            @items.created.eligible = true
             @history.add()
 
-            @opts.tool.elementId = @generateId()
-            @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@opts.tool))
+            @items.created.elementId = @generateId()
+            @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@items.created))
         when "comment"
           if commentRect
-            @opts.tool.eligible = true
+            @items.created.eligible = true
             @history.add()
           else
             @history.add(actionType: "comment", commentMin: commentMin, eligible: true)
@@ -259,13 +262,13 @@ $ ->
 
     # Misc methods
 
-    showSplashScreen: () ->
+    showSplashScreen: (showCancelLink = true) ->
       return if $("#canvasInitDivWrapper:visible")[0]
 
       $("#canvasInitDivWrapper").show()
       $("#myCanvas").hide()
       $("#commentsDiv").hide()
-      $("#cancelInitLink").show()
+      $("#cancelInitLink").show() if showCancelLink
 
       App.chat.fold()
       App.room.canvas.foldPreviews()

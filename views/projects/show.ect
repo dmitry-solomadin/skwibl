@@ -3,7 +3,7 @@
 
 <input id="pid" type="hidden" value="<%= @pid %>" xmlns="http://www.w3.org/1999/html">
 
-<% canvasInitialized = @canvases[0].initialized %>
+<% canvasInitialized = "#{@canvases[0].initialized}" == "true" %>
 
 <div id="chat" class="chat <%= 'chatFolded' unless canvasInitialized %>">
   <div class="projectHeader">
@@ -34,30 +34,30 @@
           <% uniqueDates = commentInfo.uniqueDates %>
 
           <% for timeRange, index in timeRanges : %>
-            <% continue if index is 0 %>
-            <% if timeRange.messages.length > 0 : %>
-              <% hasEarlierMessages = true %>
-              <div class="earlierMessagesHeader">View Earlier Messages</div>
-              <% break %>
-            <% end %>
+          <% continue if index is 0 %>
+          <% if timeRange.messages.length > 0 : %>
+          <% hasEarlierMessages = true %>
+          <div class="earlierMessagesHeader">View Earlier Messages</div>
+          <% break %>
+          <% end %>
           <% end %>
 
           <div class="earlierMessagesDiv">
             <% innerIndex = 0 %>
             <% for timeRange, index in timeRanges : %>
-              <% continue if index is 0 or timeRange.messages.length is 0 %>
-              <% unless innerIndex is 0 : %>
-                <span class="pipe">|</span>
-              <% end %>
-              <a class="showRangeLink" href="#" onclick="App.chat.showMessageRange(this)"
-                 data-range-id="<%= timeRange.id %>"><%= timeRange.name %></a>
+            <% continue if index is 0 or timeRange.messages.length is 0 %>
+            <% unless innerIndex is 0 : %>
+            <span class="pipe">|</span>
+            <% end %>
+            <a class="showRangeLink" href="#" onclick="App.chat.showMessageRange(this)"
+               data-range-id="<%= timeRange.id %>"><%= timeRange.name %></a>
 
-              <% innerIndex++ %>
+            <% innerIndex++ %>
             <% end %>
             <% if hasEarlierMessages : %>
-              <span class="pipe">|</span>
-              <a class="showRangeLink" href="#" onclick="App.chat.showMessageRange(this)"
-                 data-range-id="all">All</a>
+            <span class="pipe">|</span>
+            <a class="showRangeLink" href="#" onclick="App.chat.showMessageRange(this)"
+               data-range-id="all">All</a>
             <% end %>
           </div>
 
@@ -66,17 +66,17 @@
           </div>
 
           <% for timeRange, index in timeRanges.reverse() : %>
-            <% isToday = index is (timeRanges.length - 1) %>
-            <% continue if timeRange.messages.length is 0 and not isToday %>
-            <div class="timeRange <%= timeRange.id %> <%= 'hide' unless isToday %>">
-              <% for message in timeRange.messages : %>
-                <% if uniqueDates[message.date].enabled : %>
-                  <% uniqueDates[message.date].enabled = false %>
-                  <div class="timeRangeHeader"><%= uniqueDates[message.date].prettyName || message.date %></div>
-                <% end %>
-              <%- include './projects/_chat_message.ect', message: message, moment: @moment %>
-              <% end %>
-            </div>
+          <% isToday = index is (timeRanges.length - 1) %>
+          <% continue if timeRange.messages.length is 0 and not isToday %>
+          <div class="timeRange <%= timeRange.id %> <%= 'hide' unless isToday %>">
+            <% for message in timeRange.messages : %>
+            <% if uniqueDates[message.date].enabled : %>
+            <% uniqueDates[message.date].enabled = false %>
+            <div class="timeRangeHeader"><%= uniqueDates[message.date].prettyName || message.date %></div>
+            <% end %>
+            <%- include './projects/_chat_message.ect', message: message, moment: @moment %>
+            <% end %>
+          </div>
           <% end %>
         </div>
       </div>
@@ -104,21 +104,32 @@
 <div id="commentsDiv" style="<%= 'display:none' unless canvasInitialized %>"></div>
 <canvas id="copyCanvas" resize="true" style="display: none;"></canvas>
 <div id="canvasInitDivWrapper" class="canvasInitDivWrapper" style="<%= 'display:none' if canvasInitialized %>">
-  <div class="canvasInitDiv">
-    <div class="canvasInitHeader">Upload images from</div>
+  <div class="canvasInitDiv ">
+    <div id="canvasInitButtons">
+      <div class="canvasInitHeader">Upload images from</div>
 
-    <span class="btn fileinput-button">
-      My computer
+      <span class="btn font-normal fileinput-button">
+        My computer
+        <input id="fileupload" type="file" name="files[]" multiple>
+      </span><br>
+      <a href="#" id="dropboxChoose" class="btn font-normal">Dropbox</a><br>
+      <a class="btn font-normal disabled tooltipize" data-placement="bottom" title="This feature is comming soon">Google
+        Drive</a><br>
 
-      <input id="fileupload" type="file" name="files[]" multiple>
-    </span><br>
-    <a href="#" id="dropboxChoose" class="btn">Dropbox</a><br>
-    <a class="btn disabled tooltipize" data-placement="bottom" title="This feature is comming soon">Google Drive</a><br>
-    <div class="canvasInitHeader">or</div>
-    <a href="#" class="btn" onclick="App.room.canvas.requestAddEmpty(); return false;">Create empty canvas</a>
+      <div class="canvasInitHeader">or</div>
+      <a href="#" class="btn font-normal" onclick="App.room.canvas.requestAddEmpty(); return false;">Create empty
+        canvas</a>
 
-    <a id="cancelInitLink" class="cancelInit hide" href="#"
-        onclick="App.room.hideSplashScreen(); return false;">Cancel</a>
+      <a id="cancelInitLink" class="cancelInit hide" href="#"
+         onclick="App.room.hideSplashScreen(); return false;">Cancel</a>
+    </div>
+
+    <div class="progressWrap" id="loadingProgressWrap" style="display: none">
+      <div class="canvasInitHeader">Loading your images...</div>
+      <div class="progress progress-striped active">
+        <div class="bar" style="width: 100%;"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -132,12 +143,12 @@
                data-cid="<%= canvas.id %>" data-name="<%= canvas.name %>"
                data-initialized="<%= canvas.initialized %>"
           <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
-          </div>
-          <% end %>
         </div>
+        <% end %>
       </div>
-      <div id="nameChanger">
-        <% hasName = @canvases[0].name and @canvases[0].name.trim().length > 0 %>
+    </div>
+    <div id="nameChanger">
+      <% hasName = @canvases[0].name and @canvases[0].name.trim().length > 0 %>
         <span id="canvasName" class="canvasName tooltipize <%= 'noname' unless hasName %>" data-delay="500"
               title="Click to change name">
           <%= if hasName then @canvases[0].name else "blank name" %>
@@ -146,14 +157,14 @@
           <input id="canvasNameInput" class="canvasNameInput" type="text"/>
           <a id="canvasNameSave" class="btn small-btn canvasNameSave">Save</a>
         </span>
-      </div>
+    </div>
 
     <% if canvasInitialized : %>
-      <% foldFunc = "App.room.canvas.foldPreviews(); return false;" %>
-      <% foldImg = "/images/room/fold-down.png" %>
+    <% foldFunc = "App.room.canvas.foldPreviews(); return false;" %>
+    <% foldImg = "/images/room/fold-down.png" %>
     <% else : %>
-      <% foldFunc = "App.room.canvas.unfoldPreviews(); return false;" %>
-      <% foldImg = "/images/room/unfold-up.png" %>
+    <% foldFunc = "App.room.canvas.unfoldPreviews(); return false;" %>
+    <% foldImg = "/images/room/unfold-up.png" %>
     <% end %>
     <a id="canvasFolder" class="btn skwibl_image_btn canvasFolder" href="#" onclick="<%= foldFunc %>">
       <img src="<%= foldImg %>">
@@ -166,28 +177,28 @@
   <div class="canvasFooterBottom">
     <div id="canvasSelectDiv" class="canvasSelectDiv">
       <% for canvas, i in @canvases : %>
-        <% for element in canvas.elements : %>
-          <input class="canvasElement<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(element) %>"/>
-        <% end %>
-        <% for comment in canvas.comments : %>
-          <input class="canvasComment<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(comment) %>"/>
-          <% for text in comment.texts : %>
-            <input class="commentTexts<%= comment.elementId %>" type="hidden" value="<%= JSON.stringify(text) %>"/>
-          <% end %>
-        <% end %>
-        <div class="canvasPreviewDiv">
-          <a href="#" class="<%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.id %>" data-name="<%= canvas.name %>"
-             data-initialized="<%= canvas.initialized %>"
-          <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
-          <canvas width="80" height="60"></canvas>
-          </a>
-          <img class="canvasRemoveImg" src="/images/room/remove.png"
-               onclick="App.room.canvas.delete(this, true); return false;">
-          <img class="canvasDownloadImg" src="/images/room/download.png"
-               onclick="App.room.canvas.download(this); return false;">
-          <img class="canvasReorderImg" src="/images/room/reorder.png"
-               onclick="App.room.canvas.reorder(this); return false;">
-        </div>
+      <% for element in canvas.elements : %>
+      <input class="canvasElement<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(element) %>"/>
+      <% end %>
+      <% for comment in canvas.comments : %>
+      <input class="canvasComment<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(comment) %>"/>
+      <% for text in comment.texts : %>
+      <input class="commentTexts<%= comment.elementId %>" type="hidden" value="<%= JSON.stringify(text) %>"/>
+      <% end %>
+      <% end %>
+      <div class="canvasPreviewDiv">
+        <a href="#" class="<%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.id %>" data-name="<%= canvas.name %>"
+           data-initialized="<%= canvas.initialized %>"
+        <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
+        <canvas width="80" height="60"></canvas>
+        </a>
+        <img class="canvasRemoveImg" src="/images/room/remove.png"
+             onclick="App.room.canvas.onDeleteClick(this, true); return false;">
+        <img class="canvasDownloadImg" src="/images/room/download.png"
+             onclick="App.room.canvas.download(this); return false;">
+        <img class="canvasReorderImg" src="/images/room/reorder.png"
+             onclick="App.room.canvas.reorder(this); return false;">
+      </div>
       <% end %>
     </div>
   </div>

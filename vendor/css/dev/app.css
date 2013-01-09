@@ -25,7 +25,7 @@ body {
 .btn {
     margin-left: 3px;
     color: #202020;
-    font: 17px 'MyriadPro';
+    font: 17px 'MyriadPro-SemiBold';
     -webkit-font-smoothing: antialiased;
     -moz-font-smoothing:antialiased;
     font-smoothing:antialiased;
@@ -39,6 +39,10 @@ body {
     box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.3), inset -1px -1px 0 rgba(0, 0, 0, 0.1);
     box-sizing: content-box;
     -moz-box-sizing: content-box;
+}
+
+.font-normal {
+    font-family: 'MyriadPro';
 }
 
 .navbar .btn {
