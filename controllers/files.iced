@@ -135,7 +135,7 @@ exports.uploadDropbox = (req, res) ->
 #
 # GET
 # Dropbox files
-#
+#TODO this method WIP it should connect dropbox from the server side
 exports.dropbox = (req, res) ->
   db.auth.getConnection req.user.id, 'dropbox', (err, connection) ->
     if not err and connection

@@ -7,25 +7,24 @@ $ ->
 
     # ITEMS MANIPULATION
 
-    init: (tool, settings) ->
+
+    init: (item, settings) ->
       settings = settings or {}
-
-      tool.strokeJoin = "round"
-      tool.strokeColor = settings.color or sharedOpts.color
-      tool.strokeWidth = settings.width or opts.defaultWidth
-      tool.fillColor = settings.fillColor
-      tool.opacity = settings.opacity or opts.opacity
-      tool.dashArray = settings.dashArray
-
+      item.strokeJoin = "round"
+      item.strokeColor = settings.color or sharedOpts.color
+      item.strokeWidth = settings.width or opts.defaultWidth
+      item.fillColor = settings.fillColor
+      item.opacity = settings.opacity or opts.opacity
+      item.dashArray = settings.dashArray
       #buffer item for creation process
-      @created = tool unless settings.noBuffer
+      @created = item unless settings.noBuffer
 
     remove: (historize = true, item = @sel) ->
       console.log 'remove'
       return unless item
       room.history.add(
         actionType: "remove"
-        tool: item
+        tool: item#TODO change tool to item
         eligible: true) if historize
       item.opacity = 0
       room.socket.emit("elementRemove", item.elementId)
@@ -118,7 +117,7 @@ $ ->
           @remove()
 
     createSelRect: ->
-      console.log 'create sel'
+#       console.log 'create sel'
       bounds = @sel.bounds
       addBound = parseInt(@sel.strokeWidth / 2)
       selRect = new Path.Rectangle(bounds.x - addBound, bounds.y - addBound,
@@ -152,76 +151,33 @@ $ ->
 
     # ITEMS SCALE
 
-    sacleSelected: (event) ->
-      console.log 'scale selected'
-      scaleZone = @getReflectZone(@sel, event.point.x, event.point.y)
-      if scaleZone then @sel.scaleZone = scaleZone else scaleZone = @sel.scaleZone
-
-      zx = scaleZone.zx
-      zy = scaleZone.zy
-      scalePoint = scaleZone.point
-
-      scaleFactors = @getScaleFactors(@sel, zx, zy, event.delta.x, event.delta.y)
-      sx = scaleFactors.sx
-      sy = scaleFactors.sy
-
-      transformMatrix = new Matrix().scale(sx, sy, scalePoint)
+    #TODO move center calculation out of the function.
+    #TODO reconsider arrow object
+    scale: (event, item = @sel) ->
+      return unless item
+      delta = event.delta
+      point = event.point
+      pos = item.position
+      corner = new Point(point.x - delta.x, point.y - delta.y)
+      center = new Point(2*pos.x - corner.x, 2*pos.y - corner.y)
+      @create(new Path.Circle(center, 10))
+      w = point.x - center.x
+      h = point.y - center.y
+      return if -3 < w < 3 or -3 < h < 3
+      sx = 1 + delta.x/w
+      sy = 1 + delta.y/h
+      transformMatrix = new Matrix().scale(sx, sy, center)
       return unless sx and sy
-
+      #TODO this code is unclear
       if @sel.arrow
-        @sel.arrow.scale(sx, sy, scalePoint)
+        @sel.arrow.scale(sx, sy, center)
         @sel.drawTriangle()
       else
         @sel.transform(transformMatrix)
-
       # redraw selection rect
+      #TODO it should be scaled not removed
       @sel.selectionRect.remove()
       @sel.selectionRect = @createSelRect()
-
-    getScaleFactors: (item, zx, zy, dx, dy) ->
-      console.log 'get scale factors'
-      item = item.arrow or item
-      w = item.bounds.width
-      h = item.bounds.height
-
-      return sx: Math.abs(1 + zx*dx/w), sy: Math.abs(1 + zy*dy/h)
-
-    getReflectZone: (item, x, y) ->
-      console.log 'get reflect zone'
-      itemToScale = item.arrow or item
-
-      return null if itemToScale.bounds.contains(x, y)
-      # preserve zone
-
-      w = itemToScale.bounds.width
-      h = itemToScale.bounds.height
-      center = new Point(itemToScale.bounds.topLeft.x + (w / 2), itemToScale.bounds.topLeft.y + (h / 2))
-      cx = center.x
-      cy = center.y
-
-      if x <= cx and y <= cy
-        zone = {zx: -1, zy: -1, point: itemToScale.bounds.bottomRight}
-      else if x >= cx and y <= cy
-        zone = {zx: 1, zy: -1, point: itemToScale.bounds.bottomLeft}
-      else if x <= cx and y >= cy
-        zone = {zx: -1, zy: 1, point: itemToScale.bounds.topRight}
-      else if x >= cx and y >= cy
-        zone = {zx: 1, zy: 1, point: itemToScale.bounds.topLeft}
-
-      dzx = zone.zx + item.scaleZone.zx
-      dzy = zone.zy + item.scaleZone.zy
-
-      if dzx is 0 and dzy is 0 and w < 3 and h < 3
-        itemToScale.scale(-1, -1)
-        return zone
-      else if dzx is 0 and dzy isnt 0 and w < 3
-        itemToScale.scale(-1, 1)
-        return zone
-      else if dzy is 0 and dzx isnt 0 and h < 3
-        itemToScale.scale(1, -1)
-        return zone
-      else
-        return null
 
     # ITEMS MISC
     createUserBadge: (uid, x, y) ->
