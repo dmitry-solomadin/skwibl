@@ -143,10 +143,10 @@ $ ->
       unless @sel.commentMin
         selGroup.removeButton = removeButton
         selGroup.addChild(removeButton)
-      @create(selRect, {color: "#a0a0aa", width: 0.5, opacity: 1, dashArray: selDash})
+      @init(selRect, {color: "#a0a0aa", width: 0.5, opacity: 1, dashArray: selDash})
       for key, scaler of selGroup.scalers
-        @create(scaler, {color: "#202020", width: 1, opacity: 1, fillColor: "white"})
-      @create(removeButton) unless @sel.commentMin
+        @init(scaler, {color: "#202020", width: 1, opacity: 1, fillColor: "white"})
+      @init(removeButton) unless @sel.commentMin
       return selGroup
 
     # ITEMS SCALE
@@ -160,14 +160,12 @@ $ ->
       pos = item.position
       corner = new Point(point.x - delta.x, point.y - delta.y)
       center = new Point(2*pos.x - corner.x, 2*pos.y - corner.y)
-      @create(new Path.Circle(center, 10))
       w = point.x - center.x
       h = point.y - center.y
       return if -3 < w < 3 or -3 < h < 3
       sx = 1 + delta.x/w
       sy = 1 + delta.y/h
       transformMatrix = new Matrix().scale(sx, sy, center)
-      return unless sx and sy
       #TODO this code is unclear
       if @sel.arrow
         @sel.arrow.scale(sx, sy, center)
@@ -218,7 +216,7 @@ $ ->
       arrowGroup.arrow = arrowLine
       arrowGroup.drawTriangle = => @drawArrowTriangle arrowGroup
       triangle = arrowGroup.drawTriangle()
-      @create(triangle)
+      @init(triangle)
       arrowGroup
 
     drawArrowTriangle: (group) ->
