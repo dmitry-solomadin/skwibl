@@ -12,12 +12,16 @@ JS_NAME='./vendor/js/skwibl'
 ## application style name
 CSS_NAME='./vendor/css/skwibl'
 
+## socket.io script
+SOCKETIO='./node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js'
+
 ## list of js files
-JS_LIST=`cat views/shared/application_scripts.ect | grep -o '\/js.*\.js' | sed 's/\/js/\.\/assets\/js/' | sed 's/\.\/assets\/js\/dev/\.\/vendor\/js\/dev/' | sed 's/\/socket\.io/\.\/node_modules\/socket\.io\/node_modules\/socket\.io-client\/dist/'`
+JS_LIST=`cat views/shared/application_scripts.ect | grep -o '\/js.*\.js' | sed 's/\/js/\.\/assets\/js/' | sed 's/\.\/assets\/js\/dev/\.\/vendor\/js\/dev/'`
 
 ## list of css files
 CSS_LIST=`cat views/shared/application_scripts.ect | grep -o '\/css.*\.css' | sed 's/^/\.\/vendor/'`
 
+cat $SOCKETIO >> $JS_NAME.js
 for SCRIPT in $JS_LIST; do
   if [[ $SCRIPT != *'/skwibl.min.js' ]]; then
     cat $SCRIPT >> $JS_NAME.js
@@ -29,7 +33,7 @@ gzip -9 $JS_NAME.min.js -c > $JS_NAME.min.js.gz
 
 rm -f $JS_NAME.js $JS_NAME.min.js
 
-cp ./vendor/js/dev/plugins/Jplayer.swf ./vendor/js/Jplayer.swf
+cp ./vendor/js/dev/Jplayer.swf ./vendor/js/Jplayer.swf
 
 for CSS in $CSS_LIST; do
   if [[ $CSS != *'/skwibl-min.css' ]]; then
