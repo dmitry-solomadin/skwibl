@@ -78,7 +78,7 @@ $ ->
               linkInfos = []
               for file in files
                 linkInfo = link: file.link
-                linkInfo.cid = App.room.canvas.getSelectedCanvasId() if not App.room.canvas.isSelectedInitialized()
+                linkInfo.cid = App.room.canvas.getSelectedCanvasId() if not App.room.canvas.isFirstInitialized()
                 linkInfos.push linkInfo
 
               $.post '/file/uploadDropbox', {pid: $("#pid").val(), linkInfos: linkInfos}, (data, status, xhr) =>
@@ -233,7 +233,7 @@ $ ->
       switch tooltype
         when 'straightline', 'arrow', 'circle', 'rectangle', 'line', 'highligher'
           # Check if the item is empty then there is no need to save it on the server.
-          unless @items.isEmpty(@items.created)
+          unless @items.isEmpty @items.created
             @items.created.eligible = true
             @history.add()
 
@@ -244,7 +244,7 @@ $ ->
             @items.created.eligible = true
             @history.add()
           else
-            @history.add(actionType: "comment", commentMin: commentMin, eligible: true)
+            @history.add actionType: "comment", commentMin: commentMin, eligible: true
 
           commentMin.elementId = @generateId()
           @socket.emit("commentUpdate", @socketHelper.prepareCommentToSend(commentMin))
