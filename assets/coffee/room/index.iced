@@ -115,8 +115,8 @@ $ ->
       rect = @items.sel?.selectionRect
       if rect
         scalers = rect.scalers
-        for sc of scalers
-          if scalers[sc].bounds.contains(event.point)
+        for sc, scaler of scalers
+          if scaler.bounds.contains(event.point)
             canvas.css cursor: "#{sc}-resize"
         if rect.removeButton and rect.removeButton.bounds.contains(event.point)
           canvas.css cursor: "pointer"
@@ -206,7 +206,7 @@ $ ->
           @items.pan(event.delta.x, event.delta.y)
         when 'select'
           scalersSelected = @items.sel?.scalersSelected
-          if scalersSelected then @items.sacleSelected(event) else @items.translate(event.delta)
+          if scalersSelected then @items.scale(event) else @items.translate(event.delta)
 
           # redraw comment arrow if there is one.
           @comments.redrawArrow(@items.sel.commentMin) if @items.sel?.commentMin
