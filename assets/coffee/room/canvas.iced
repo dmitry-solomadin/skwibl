@@ -112,12 +112,12 @@ $ ->
       for thumb, index in @getThumbs()
         cid = $(thumb).data("cid")
         fid = $(thumb).data("fid")
-        opts = @findCanvasOptsById(cid)
+        opts = @findOptsById(cid)
         if opts then room.setOpts(opts) else room.initOpts(cid)
 
         fn(cid, fid, index)
 
-      selectedOpts = @findCanvasOptsById(selectedCid)
+      selectedOpts = @findOptsById(selectedCid)
       room.setOpts(selectedOpts)
 
     onLoadingFinished: ->
@@ -163,15 +163,17 @@ $ ->
         @destroy cid, true
 
     destroy: (cid, emit) ->
-      optsToRemove = @findCanvasOptsById(cid)
+      optsToRemove = @findOptsById(cid)
 
       if @getThumbs().length > 1
         @findThumbByCanvasId(cid).parent().remove()
         @findMiniThumbByCanvasId(cid).remove()
         @selectThumb $("#canvasSelectDiv div:first a")
         room.savedOpts.splice room.savedOpts.indexOf(optsToRemove), 1
-        room.setOpts @findCanvasOptsById(@getSelectedCanvasId())
+        room.setOpts @findOptsById(@getSelectedCanvasId())
       else
+        @erase()
+        room.savedOpts = []
         @deinitializeFirst()
 
       room.socket.emit "removeCanvas", canvasId: cid if emit
@@ -208,7 +210,7 @@ $ ->
     flushCanvasIntoCopy: (cid) ->
       @activateCopyCanvas()
       prevOpts = room.getOpts()
-      room.setOpts(@findCanvasOptsById(cid))
+      room.setOpts(@findOptsById(cid))
       @clearCopyCanvas()
       @restore(false, true)
       room.redraw()
@@ -308,8 +310,7 @@ $ ->
 
     requestAddEmpty: ->
       thumbs = @getThumbs()
-      initialized = "#{$(thumbs[0]).data("initialized")}" == "true"
-      initializeFirst = thumbs.length is 1 and not initialized
+      initializeFirst = thumbs.length is 1 and not @isFirstInitialized()
 
       if initializeFirst
         $.post "/canvases/initializeFirst", {pid: $("#pid").val()}, (data, status, xhr) =>
@@ -319,13 +320,17 @@ $ ->
           @addEmpty canvasId: data.id, name: data.name, true
 
     initializeFirst: (emit) ->
+      @erase()
+      firstThumb = $(@getThumbs()[0])
       room.hideSplashScreen()
-      $(@getThumbs()[0]).attr("data-initialized", "true").data("initialized", "true")
+      firstThumb.attr("data-initialized", "true").data("initialized", "true")
       room.socket.emit "initializeFirstCanvas" if emit
 
     deinitializeFirst: () ->
+      firstThumb = $(@getThumbs()[0])
       room.showSplashScreen()
-      $(@getThumbs()[0]).attr("data-initialized", "false").data("initialized", "false")
+      room.initOpts firstThumb.data("cid") #initialiaze new empty opts
+      firstThumb.attr("data-initialized", "false").data("initialized", "false")
 
     addEmpty: (canvasData) ->
       @addNewThumbAndSelect canvasData
@@ -339,7 +344,7 @@ $ ->
       else
         @initializeFirst false
 
-      img = @addImage canvasData.fileId, (raster, executeLoadImage) =>
+      @addImage canvasData.fileId, (raster, executeLoadImage) =>
         executeLoadImage()
 
         @updateThumb parseInt(canvasData.canvasId)
@@ -400,7 +405,7 @@ $ ->
       if selectedCanvasId isnt canvasId
         @activateCopyCanvas()
         prevOpts = room.getOpts()
-        room.setOpts(@findCanvasOptsById(canvasId))
+        room.setOpts @findOptsById(canvasId)
         @clearCopyCanvas()
         @restore(false, false)
 
@@ -436,7 +441,7 @@ $ ->
 
     getSelectedCanvasId: -> @getSelected().data("cid")
 
-    isFirstInitialized: -> $(@getThumbs()[0]).data("initialized")
+    isFirstInitialized: -> "#{$(@getThumbs()[0]).data("initialized")}" == "true"
 
     getSelected: -> $(".canvasSelected")
 
@@ -461,7 +466,7 @@ $ ->
       $(anchor).addClass("canvasSelected")
 
       cid = $(anchor).data("cid")
-      canvasOpts = @findCanvasOptsById(cid)
+      canvasOpts = @findOptsById(cid)
 
       alert("No canvas opts by given canvasId=" + cid) unless canvasOpts
 
@@ -479,9 +484,6 @@ $ ->
       room.socket.emit("switchCanvas", cid) if emit
       room.redraw()
 
-    findCanvasOptsById: (canvasId) ->
-      for savedOpt in room.savedOpts
-        return savedOpt if savedOpt.canvasId is canvasId
-      return null
+    findOptsById: (canvasId) -> return savedOpt for savedOpt in room.savedOpts when savedOpt.canvasId is canvasId
 
   App.room.canvas = new RoomCanvas

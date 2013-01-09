@@ -21,27 +21,41 @@ $ ->
       $(document).bind 'keydown.shift_down', => room.items.translate(new Point(0, 1))
 
     initUploader: ->
-      isPrjInitialized = room.canvas.isFirstInitialized()
+      percents = {}
+      firstFile = true
+      id = 1
+      results = []
 
       $('#fileupload').fileupload
         dataType: 'json'
         url: '/file/upload'
         done: (e, data) ->
-          for file in data.result
-            room.canvas.handleUpload {canvasId: file.canvasId, fileId: file.element.id, name: file.canvasName}, true
+          results.push data.result[0]
+          if results.length is data.originalFiles.length
+            showButtons = ->
+              $("#canvasInitButtons").show()
+              $("#loadingProgressWrap").hide()
+            showButtons()
+            # on local machine files sometimes uploaded before fadeOut is finished so we ensure that buttons will be displayed
+            setTimeout showButtons, 500
 
-          $("#canvasInitButtons").show()
-          $("#loadingProgressWrap").hide()
+            for file in results
+              room.canvas.handleUpload {canvasId: parseInt(file.canvasId), fileId: file.element.id, name: file.canvasName}, true
 
-      if not isPrjInitialized
-        $('#fileupload').bind 'fileuploadstart', (e, data) ->
+            firstFile = true
+            id = 1
+            results = []
+            percents = {}
+
+      $('#fileupload').bind 'fileuploadstart', (e, data) ->
+        if not room.canvas.isFirstInitialized()
           $("#canvasInitButtons").fadeOut()
           $("#loadingProgressWrap .bar").css("width", "0%")
           $("#loadingProgressWrap").fadeIn()
 
-        percents = {}
-        $('#fileupload').bind 'fileuploadprogress', (e, data) ->
-          percents["#{data.files[0].id}"] = data.total * (data.files[0].percentInTotal) / data.loaded
+      $('#fileupload').bind 'fileuploadprogress', (e, data) ->
+        if not room.canvas.isFirstInitialized()
+          percents["#{data.files[0].id}"] = data.loaded * (data.files[0].percentInTotal) / data.total
 
           percentTotal = 0
           for percentId of percents
@@ -50,8 +64,6 @@ $ ->
 
           $("#loadingProgressWrap .bar").css("width", "#{percentTotal}%")
 
-      firstFile = true
-      id = 1
       $('#fileupload').bind 'fileuploadsubmit', (e, data) ->
         overallSize = 0
         overallSize += file.size for file in data.originalFiles
@@ -61,9 +73,10 @@ $ ->
         params =
           pid: $("#pid").val()
         # we only add cid for the first canvas.
-        params.cid = App.room.canvas.getSelectedCanvasId() if not isPrjInitialized and firstFile
+        params.cid = App.room.canvas.getSelectedCanvasId() if not room.canvas.isFirstInitialized() and firstFile
         firstFile = false
         data.formData = params
+
 
     reverseOpacity: (elem) -> elem.opacity = 1 - elem.opacity
 
