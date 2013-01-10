@@ -471,6 +471,7 @@ $ ->
       alert("No canvas opts by given canvasId=" + cid) unless canvasOpts
 
       @erase()
+      room.items.unselect()
       previousScale = opts.currentScale
       room.setOpts canvasOpts
       @restore(true, false)
