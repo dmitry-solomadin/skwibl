@@ -61,9 +61,9 @@ $ ->
           isAnyFilePresent = true
           break
 
-      @forEachThumbInContext (cid, fid, index) =>
+      @forEachThumbInContext (cid, fid, posX, posY, index) =>
         if fid
-          @addImage fid, (raster, executeLoadImage) =>
+          @addImage fid, posX, posY, (raster, executeLoadImage) =>
             executeLoadImage()
 
             if cid isnt selectedCid and opts.image and opts.image.id isnt raster.id
@@ -112,10 +112,12 @@ $ ->
       for thumb, index in @getThumbs()
         cid = $(thumb).data("cid")
         fid = $(thumb).data("fid")
+        posX = $(thumb).data("pos-x")
+        posY = $(thumb).data("pos-y")
         opts = @findOptsById(cid)
         if opts then room.setOpts(opts) else room.initOpts(cid)
 
-        fn(cid, fid, index)
+        fn cid, fid, posX, posY, index
 
       selectedOpts = @findOptsById(selectedCid)
       room.setOpts(selectedOpts)
@@ -125,6 +127,8 @@ $ ->
       if window.location.hash
         commentTextId = window.location.hash.match(/tsl=(\d+)/)[1]
         room.comments.highlightComment(commentTextId)
+
+      @center()
 
     initNameChanger: ->
       $("#canvasName").on "click", ->
@@ -329,7 +333,8 @@ $ ->
     deinitializeFirst: () ->
       firstThumb = $(@getThumbs()[0])
       room.showSplashScreen()
-      room.initOpts firstThumb.data("cid") #initialiaze new empty opts
+      room.initOpts firstThumb.data("cid")
+      #initialiaze new empty opts
       firstThumb.attr("data-initialized", "false").data("initialized", "false")
 
     addEmpty: (canvasData) ->
@@ -344,14 +349,14 @@ $ ->
       else
         @initializeFirst false
 
-      @addImage canvasData.fileId, (raster, executeLoadImage) =>
+      @addImage canvasData.fileId, canvasData.posX, canvasData.posY, (raster, executeLoadImage) =>
         executeLoadImage()
 
         @updateThumb parseInt(canvasData.canvasId)
 
       room.socket.emit("fileAdded", canvasData) if emit
 
-    addImage: (fileId, loadWrap) ->
+    addImage: (fileId, posX, posY, loadWrap) ->
       src = "/files/#{$("#pid").val()}/#{fileId}"
       image = $("<img class='hide' src='#{src}'>")
       $("body").append(image)
@@ -369,16 +374,30 @@ $ ->
       onload = ->
         img.size.width = image.width()
         img.size.height = image.height()
-        img.position = paper.view.center
+        img.position = new Point(posX, posY)
         img.setImage(image[0])
 
       $(image).on "load", -> if loadWrap then loadWrap(img, -> onload()) else onload()
 
       img
 
+    # canvas is centered on image
+    center: ->
+      # do not center user if the moved the canvas by himself
+      if opts.image and not opts.pandx and not opts.pandy
+        centerX = paper.view.center.x
+        centerY = paper.view.center.y
+        imageX = opts.image.position.x
+        imageY = opts.image.position.y
+
+        if centerX isnt imageX or centerY isnt imageY
+          room.items.pan centerX - imageX, centerY - imageY
+
+
     addNewThumb: (canvasData) ->
       thumb = $("#canvasSelectDiv div:first").clone()
-      thumb.find("a").attr("data-cid", canvasData.canvasId).attr("data-fid", canvasData.fileId).attr("data-name", canvasData.name)
+      thumb.find("a").attr("data-cid", canvasData.canvasId).attr("data-fid", canvasData.fileId)
+        .attr("data-name", canvasData.name).attr("data-pos-x", canvasData.posX).attr("data-pos-y", canvasData.posY)
       $("#canvasSelectDiv").append(thumb)
 
     addNewMiniThumb: (canvasData) ->
@@ -481,6 +500,8 @@ $ ->
       $(@findMiniThumbByCanvasId(cid)).addClass("previewSelected")
 
       $("#canvasName").html($(anchor).data("name"))
+
+      @center()
 
       room.socket.emit("switchCanvas", cid) if emit
       room.redraw()

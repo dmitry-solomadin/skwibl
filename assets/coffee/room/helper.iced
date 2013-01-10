@@ -40,7 +40,14 @@ $ ->
             setTimeout showButtons, 500
 
             for file in results
-              room.canvas.handleUpload {canvasId: parseInt(file.canvasId), fileId: file.element.id, name: file.canvasName}, true
+              console.log "file", file
+              room.canvas.handleUpload
+                canvasId: parseInt(file.canvasId)
+                fileId: file.element.id
+                name: file.canvasName
+                posX: file.element.posX
+                posY: file.element.posY
+              , true
 
             firstFile = true
             id = 1
@@ -70,6 +77,8 @@ $ ->
         id++
         params =
           pid: $("#pid").val()
+          posX: paper.view.center.x
+          posY: paper.view.center.y
         # we only add cid for the first canvas.
         params.cid = App.room.canvas.getSelectedCanvasId() if not room.canvas.isFirstInitialized() and firstFile
         firstFile = false

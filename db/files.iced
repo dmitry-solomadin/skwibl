@@ -5,7 +5,7 @@ exports.setUp = (client, db) ->
 
   mod = {}
 
-  mod.add = (owner, cid, pid, name, mime, fn) ->
+  mod.add = (owner, cid, pid, name, mime, posX, posY, fn) ->
     return client.incr 'files:next', (err, fid) ->
       return tools.asyncOpt(fn, err, null) if err
       file =
@@ -13,6 +13,8 @@ exports.setUp = (client, db) ->
         name: name
         mime: mime
         owner: owner
+        posX: posX
+        posY: posY
       if cid
         client.hmset "files:#{fid}", file
         db.canvases.setProperties cid,

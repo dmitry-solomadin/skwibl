@@ -67,7 +67,7 @@ exports.upload = (req, res, next) ->
     if fileCount is 0
       savedFiles = []
       tools.asyncParallel files, (file) ->
-        db.files.add req.user.id, req.cid, req.pid, file.name, file.mime, (err, savedFile) ->
+        db.files.add req.user.id, req.cid, req.pid, file.name, file.mime, req.posX, req.posY, (err, savedFile) ->
           savedFiles.push savedFile
           return tools.asyncDone files, ->
             return res.json savedFiles
@@ -110,13 +110,15 @@ exports.upload = (req, res, next) ->
 exports.uploadDropbox = (req, res) ->
   fileCount = req.body.linkInfos.length
   pid = req.body.pid
+  posX = req.body.posX
+  posY = req.body.posY
 
   finish = ->
     fileCount--
     if fileCount is 0
       savedFiles = []
       tools.asyncParallel req.body.linkInfos, (linkInfo) ->
-        db.files.add req.user.id, linkInfo.cid, pid, linkInfo.name, linkInfo.mime, (err, savedFile) ->
+        db.files.add req.user.id, linkInfo.cid, pid, linkInfo.name, linkInfo.mime, posX, posY, (err, savedFile) ->
           savedFiles.push savedFile
           return tools.asyncDone req.body.linkInfos, ->
             return res.json savedFiles

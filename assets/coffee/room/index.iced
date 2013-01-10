@@ -82,12 +82,20 @@ $ ->
                 linkInfo.cid = App.room.canvas.getSelectedCanvasId() if not App.room.canvas.isFirstInitialized()
                 linkInfos.push linkInfo
 
-              $.post '/file/uploadDropbox', {pid: $("#pid").val(), linkInfos: linkInfos}, (data, status, xhr) =>
+              posX = paper.view.center.x
+              posY = paper.view.center.y
+              $.post '/file/uploadDropbox', {pid: $("#pid").val(), linkInfos: linkInfos, posX: posX, posY: posY}, (data, status, xhr) =>
                 $("#canvasInitButtons").show()
                 $("#loadingProgressWrap").hide()
 
                 for file in data
-                  App.room.canvas.handleUpload {canvasId: file.canvasId, fileId: file.element.id, name: file.canvasName}, true
+                  App.room.canvas.handleUpload
+                    canvasId: file.canvasId
+                    fileId: file.element.id
+                    name: file.canvasName
+                    posX: file.element.posX
+                    posY: file.element.posY
+                  , true
             cancel: -> console.log "cancel hit"
         else
           alert "Can't reach Dropbox API. Check your internet connection."
