@@ -131,10 +131,6 @@ body.mainpage {
 
 .tour_item span {
     -webkit-font-smoothing: antialiased;
-    -moz-font-smoothing:antialiased;
-    font-smoothing:antialiased;
-    text-rendering:optimizeLegibility;
-    font-smooth:always;
 }
 
 .tour_item_head {
