@@ -20,7 +20,6 @@ exports.setUp = (client, db) ->
         client.rpush "canvases:#{data.canvasId}:#{type}", aid if data.canvasId
         if type is 'comment'
           client.incr "actions:#{data.canvasId}:next", (err, cid) ->
-            console.log aid, cid
             action.number = cid
             action.newAction = true # this won't go into db, just a marker for top level code
             client.hset "actions:#{aid}", "number", cid

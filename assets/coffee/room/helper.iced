@@ -48,21 +48,19 @@ $ ->
             percents = {}
 
       $('#fileupload').bind 'fileuploadstart', (e, data) ->
-        if not room.canvas.isFirstInitialized()
-          $("#canvasInitButtons").fadeOut()
-          $("#loadingProgressWrap .bar").css("width", "0%")
-          $("#loadingProgressWrap").fadeIn()
+        $("#canvasInitButtons").fadeOut()
+        $("#loadingProgressWrap .bar").css("width", "0%")
+        $("#loadingProgressWrap").fadeIn()
 
       $('#fileupload').bind 'fileuploadprogress', (e, data) ->
-        if not room.canvas.isFirstInitialized()
-          percents["#{data.files[0].id}"] = data.loaded * (data.files[0].percentInTotal) / data.total
+        percents["#{data.files[0].id}"] = data.loaded * (data.files[0].percentInTotal) / data.total
 
-          percentTotal = 0
-          for percentId of percents
-            percentPart = percents[percentId]
-            percentTotal += percentPart
+        percentTotal = 0
+        for percentId of percents
+          percentPart = percents[percentId]
+          percentTotal += percentPart
 
-          $("#loadingProgressWrap .bar").css("width", "#{percentTotal}%")
+        $("#loadingProgressWrap .bar").css("width", "#{percentTotal}%")
 
       $('#fileupload').bind 'fileuploadsubmit', (e, data) ->
         overallSize = 0
