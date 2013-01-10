@@ -1,5 +1,17 @@
 /* GENERAL START */
 
+h2 {
+    font-family: 'MyriadPro-Light';
+    font-weight: normal;
+    font-size: 46px;
+    line-height: 58px;
+}
+
+h3, h4, h5, h6 {
+    font-family: 'MyriadPro';
+    font-weight: normal;
+}
+
 html {
     height: 100%;
 }
@@ -23,12 +35,13 @@ body {
 }
 
 .btn {
+    -webkit-font-smoothing: antialiased;
     margin-left: 3px;
     color: #202020;
     font: 17px 'MyriadPro-Bold';
-    line-height: 19px;
+    line-height: 18px;
     vertical-align: bottom;
-    padding-top: 8px;
+    padding-top: 7px;
     padding-bottom: 7px;
     border-color: #c5c6c6 #838484 #777777 #bababa;
     box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.3), inset -1px -1px 0 rgba(0, 0, 0, 0.1);
@@ -41,15 +54,15 @@ body {
 }
 
 .navbar .btn {
-    padding-top: 8px;
+    padding-top: 7px;
     padding-bottom: 7px;
 }
 
 .small-btn {
-    padding: 4px 5px!important;
+    padding: 4px !important;
     font: 14px 'MyriadPro-SemiBold';
     -webkit-font-smoothing: antialiased;
-    line-height: 20px !important;
+    line-height: 19px !important;
     height: 18px;
 }
 
@@ -94,8 +107,7 @@ body {
 }
 
 .btn .icon-plus-sign {
-    position: relative;
-    top: -1px;
+    margin-top: 2px;
 }
 
 .btn.btn-success:hover,

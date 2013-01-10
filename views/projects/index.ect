@@ -17,7 +17,7 @@
         <% end %>
       </div>
       <div>
-        <h5>Participants:</h5>
+        <h4>Participants:</h4>
         <% for user in project.users : %>
           <img src="<%= if user.picture then user.picture else '/images/avatar.png' %>"
                class="tooltipize" width="32" title="<%= user.displayName %>" data-placement="bottom"/>
