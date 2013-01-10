@@ -57,6 +57,7 @@ $ ->
       @helper.initUploader()
       @helper.initHotkeys()
       @canvas.init()
+      @comments.assignBringToFront()
 
       # disable canvas text selection for cursor change
       canvas = $("#myCanvas")[0]

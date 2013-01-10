@@ -298,6 +298,15 @@ $ ->
 
       room.redraw()
 
+    assignBringToFront: ->
+      $(document).on "mousedown", "#commentsDiv .comment-maximized", ->
+        maxZIndex = 1
+        for comment in $(".comment-maximized:visible")
+          commentZIndex = $(comment).css("z-index")
+          maxZIndex = commentZIndex if commentZIndex > maxZIndex
+
+        $(@).css("z-index", parseInt(maxZIndex) + 1)
+
     translate: (commentMin, dx, dy) ->
       commentMin.css
         top: commentMin.position().top + (dy * opts.currentScale)
