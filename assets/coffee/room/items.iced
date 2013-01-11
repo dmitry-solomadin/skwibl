@@ -24,7 +24,7 @@ $ ->
       return unless item
       room.history.add(
         actionType: "remove"
-        tool: item#TODO change tool to item
+        tool: item #TODO change tool to item
         eligible: true) if historize
       item.opacity = 0
       room.socket.emit("elementRemove", item.elementId)
@@ -43,16 +43,16 @@ $ ->
         rect.remove()
         @setSelected(null)
 
-    pan: (dx, dy) ->
+    pan: (delta) ->
       #TODO move history logic out of this method
       console.log 'pan'
-      opts.pandx += dx
-      opts.pandy += dy
+      opts.pandx += delta.x
+      opts.pandy += delta.y
       for el in opts.historytools.allHistory
         if el.commentMin
-          room.comments.translate(el.commentMin, dx, dy)
+          room.comments.translate el.commentMin, delta
         else if not el.actionType and el.translate
-          el.translate(new Point(dx, dy))
+          el.translate delta
 
     #TODO consider how to make this setter an action - select
     setSelected: (item)-> @sel = item

@@ -140,9 +140,7 @@
         <div id="smallCanvasPreviews">
           <% for canvas, i in @canvases : %>
           <div class="smallCanvasPreview tooltipize <%- 'previewSelected' if i is 0 %>" title="<%= canvas.name %>"
-               data-cid="<%= canvas.id %>">
-          <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
-        </div>
+               data-cid="<%= canvas.id %>"></div>
         <% end %>
       </div>
     </div>

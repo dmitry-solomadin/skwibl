@@ -128,7 +128,8 @@ $ ->
         commentTextId = window.location.hash.match(/tsl=(\d+)/)[1]
         room.comments.highlightComment(commentTextId)
 
-      @center()
+      @centerOnImage()
+      room.redraw()
 
     initNameChanger: ->
       $("#canvasName").on "click", ->
@@ -232,6 +233,11 @@ $ ->
 
         room.comments.showComment(element.commentMin) if element.commentMin and withComments
 
+    getFitToImage: ->
+      w = paper.project.view.viewSize.width / opts.image.width
+      h = paper.project.view.viewSize.height / opts.image.height
+      if h < w then h else w
+
     setScale: (scale, prevScale) ->
       $("#scaleAmount").html "#{parseInt(scale * 100)}%"
 
@@ -241,7 +247,6 @@ $ ->
       opts.currentScale = scale
 
       transformMatrix = new Matrix(finalScale, 0, 0, finalScale, 0, 0)
-
       paper.project.activeLayer.transform(transformMatrix)
 
       unless prevScale
@@ -254,6 +259,11 @@ $ ->
             commentMax.css({top: commentMax.position().top * finalScale, left: commentMax.position().left * finalScale})
 
             room.comments.redrawArrow(element.commentMin)
+
+      scaledCenter = opts.scaledCenter or paper.view.center
+      newScaledCenter = room.applyCurrentScale paper.view.center
+      opts.scaledCenter = newScaledCenter
+      room.items.pan new Point(newScaledCenter.x - scaledCenter.x, newScaledCenter.y - scaledCenter.y)
 
       room.redraw()
 
@@ -374,25 +384,23 @@ $ ->
       onload = ->
         img.size.width = image.width()
         img.size.height = image.height()
-        img.position = new Point(posX, posY)
+        img.position = new Point parseInt(posX), parseInt(posY)
         img.setImage(image[0])
 
       $(image).on "load", -> if loadWrap then loadWrap(img, -> onload()) else onload()
 
       img
 
-    # canvas is centered on image
-    center: ->
+    centerOnImage: ->
       # do not center user if the moved the canvas by himself
-      if opts.image and not opts.pandx and not opts.pandy
+      if opts.image and ((not opts.pandx and not opts.pandy) or force)
         centerX = paper.view.center.x
         centerY = paper.view.center.y
         imageX = opts.image.position.x
         imageY = opts.image.position.y
 
         if centerX isnt imageX or centerY isnt imageY
-          room.items.pan centerX - imageX, centerY - imageY
-
+          room.items.pan new Point(centerX - imageX, centerY - imageY)
 
     addNewThumb: (canvasData) ->
       thumb = $("#canvasSelectDiv div:first").clone()
@@ -427,6 +435,10 @@ $ ->
         room.setOpts @findOptsById(canvasId)
         @clearCopyCanvas()
         @restore(false, false)
+      else
+        prevPandx = opts.pandx
+        prevPandy = opts.pandy
+        @centerOnImage true
 
       thumb = @findThumbByCanvasId(canvasId).find("canvas")
       thumbContext = thumb[0].getContext('2d')
@@ -450,6 +462,10 @@ $ ->
 
       transformMatrix = new Matrix(opts.currentScale / sy, 0, 0, opts.currentScale / sy, 0, 0)
       paper.project.activeLayer.transform(transformMatrix)
+
+      if selectedCanvasId is canvasId
+        room.items.pan new Point(prevPandx - opts.pandx, prevPandy - opts.pandy)
+
       room.redraw()
 
       if prevOpts
@@ -501,7 +517,7 @@ $ ->
 
       $("#canvasName").html($(anchor).data("name"))
 
-      @center()
+      @centerOnImage()
 
       room.socket.emit("switchCanvas", cid) if emit
       room.redraw()

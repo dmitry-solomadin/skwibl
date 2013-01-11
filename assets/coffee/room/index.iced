@@ -32,7 +32,11 @@ $ ->
 
         $(".colorSelected").css("background", sharedOpts.color)
 
-      $("#scaleDiv .dropdown-menu a").on "click", -> App.room.canvas.setScale($(@).data('scale'))
+      $("#scaleDiv .dropdown-menu a").on "click", ->
+        scaleAmout = $(@).data('scale')
+        if scaleAmout is "fitToImage"
+          scaleAmout = App.room.canvas.getFitToImage()
+        App.room.canvas.setScale scaleAmout
 
       @initDropbox()
 
@@ -215,7 +219,7 @@ $ ->
           @items.created = arrowGroup
           arrowGroup.triangle.removeOnDrag()
         when 'pan'
-          @items.pan(event.delta.x, event.delta.y)
+          @items.pan event.delta
         when 'select'
           scalersSelected = @items.sel?.scalersSelected
           if scalersSelected then @items.scale(event) else @items.translate(event.delta)
@@ -334,4 +338,5 @@ $ ->
   App.room.init(App.room.canvas.getSelectedCanvasId())
 
   # resizing canvas
-  paper.view.setViewSize(Rectangle.create(0, 0, $("body").width(), $("body").height()).getSize())
+  newViewSize = Rectangle.create(0, 0, $("body").width(), $("body").height()).getSize()
+  prj.view.setViewSize newViewSize for prj in paper.projects

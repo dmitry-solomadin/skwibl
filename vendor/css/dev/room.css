@@ -1,5 +1,8 @@
 body.room {
     padding-top: 55px;
+    padding-bottom: 0;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
 }
 
 #room-controls {

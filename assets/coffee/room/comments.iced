@@ -20,7 +20,7 @@ $ ->
         COMMENT_SHIFT_X = 75
         COMMENT_SHIFT_Y = 55
 
-      reversedCoord = room.applyReverseCurrentScale(new Point(x, y))
+      reversedCoord = room.applyReverseCurrentScale new Point(x, y)
       min_x = if min then min.x else reversedCoord.x
       min_y = if min then min.y else reversedCoord.y
 
@@ -99,10 +99,17 @@ $ ->
         height = $(this).height()
         width = $(this).width()
 
-        xtl: left, ytl: top
-        xtr: left + width, ytr: top
-        xbl: left, ybl: top + height
-        xbr: left + width, ybr: top + height
+        tl = room.applyCurrentScale new Point(left, top)
+        tr = room.applyCurrentScale new Point(left + width, top)
+        bl = room.applyCurrentScale new Point(left, top + height)
+        br = room.applyCurrentScale new Point(left + width, top + height)
+        wh = room.applyCurrentScale new Point(width, height)
+
+        xtl: tl.x, ytl: tl.y
+        xtr: tr.x, ytr: tr.y
+        xbl: bl.x, ybl: bl.y
+        xbr: br.x, ybr: br.y
+        w: wh.x, h: wh.y
 
       commentMin[0].$maximized = commentMax
 
@@ -130,45 +137,25 @@ $ ->
 
     getZone: (commentMin) ->
       bp = @getArrowBindPoint commentMin
-      rect = commentMin[0].rect
-
-      x0 = if rect then bp.x else bp.x / opts.currentScale
-      y0 = if rect then bp.y else bp.y / opts.currentScale
-
       c = commentMin[0].$maximized[0].coords()
 
-      c.xtl = c.xtl / opts.currentScale
-      c.ytl = c.ytl / opts.currentScale
-      c.xtr = c.xtr / opts.currentScale
-      c.ytr = c.ytr / opts.currentScale
-      c.xbl = c.xbl / opts.currentScale
-      c.ybl = c.ybl / opts.currentScale
-      c.xbr = c.xbr / opts.currentScale
-      c.ybr = c.ybr / opts.currentScale
+      return 1 if bp.x <= c.xtl and bp.y <= c.ytl
+      return 2 if bp.x > c.xtl and bp.x < c.xtr and bp.y < c.ytl
+      return 3 if bp.x >= c.xtr and bp.y <= c.ytr
+      return 4 if bp.x < c.xtl and bp.y < c.ybl and bp.y > c.ytl
+      return 5 if bp.x >= c.xtl and bp.x <= c.xtr and bp.y <= c.ybl and bp.y >= c.ytl
+      return 6 if bp.x > c.xtr and bp.y < c.ybr and bp.y > c.ytr
+      return 7 if bp.x <= c.xbl and bp.y >= c.ybl
+      return 8 if bp.x > c.xbl and bp.x < c.xbr and bp.y > c.ybl
+      return 9 if bp.x >= c.xbr and bp.y >= c.ybr
 
-      return 1 if x0 <= c.xtl and y0 <= c.ytl
-      return 2 if x0 > c.xtl and x0 < c.xtr and y0 < c.ytl
-      return 3 if x0 >= c.xtr and y0 <= c.ytr
-      return 4 if x0 < c.xtl and y0 < c.ybl and y0 > c.ytl
-      return 5 if x0 >= c.xtl and x0 <= c.xtr and y0 <= c.ybl and y0 >= c.ytl
-      return 6 if x0 > c.xtr and y0 < c.ybr and y0 > c.ytr
-      return 7 if x0 <= c.xbl and y0 >= c.ybl
-      return 8 if x0 > c.xbl and x0 < c.xbr and y0 > c.ybl
-      return 9 if x0 >= c.xbr and y0 >= c.ybr
-
-    getCommentCoords: (left, top, width, height) ->
-      xtl: left, ytl: top
-      xtr: left + width, ytr: top
-      xbl: left, ybl: top + height
-      xbr: left + width, ybr: top + height
-
-    getArrowPos: (zone, c, w, h) ->
+    getArrowPos: (zone, c) ->
       x1 = 0
       y1 = 0
       x2 = 0
       y2 = 0
-      w2 = w / 2
-      h2 = h / 2
+      w2 = c.w / 2
+      h2 = c.h / 2
 
       switch zone
         when 1
@@ -216,78 +203,54 @@ $ ->
 
     getArrowCoords: ($commentMin) ->
       commentMax = $commentMin[0].$maximized
-      rect = $commentMin[0].rect
 
       zone = @getZone $commentMin
       return null if zone is 5
 
-      w = commentMax.width()
-      h = commentMax.height()
+      bp = @getArrowBindPoint $commentMin
       c = commentMax[0].coords()
+      pos = @getArrowPos zone, c
 
-      bp = @getArrowBindPoint($commentMin)
-      pos = @getArrowPos zone, c, w, h
-
-      x0: if rect then bp.x else bp.x / opts.currentScale
-      y0: if rect then bp.y else bp.y / opts.currentScale
-      x1: pos.x1 / opts.currentScale
-      y1: pos.y1 / opts.currentScale
-      x2: pos.x2 / opts.currentScale
-      y2: pos.y2 / opts.currentScale
+      x0: bp.x, y0: bp.y
+      x1: pos.x1, y1: pos.y1
+      x2: pos.x2, y2: pos.y2
 
     getArrowBindPoint: ($commentMin) ->
       rect = $commentMin[0].rect
 
-      $maximized = $commentMin[0].$maximized
-      cmX = $maximized.position().left + ($maximized.width() / 2)
-      cmY = $maximized.position().top + ($maximized.height() / 2)
+      if rect
+        c = $commentMin[0].$maximized[0].coords()
+        cmX = c.xtl + (c.w / 2)
+        cmY = c.ytl + (c.h / 2)
 
-      unless rect
-        return {x: $commentMin.position().left + ($commentMin.width() / 2),
-        y: $commentMin.position().top + ($commentMin.height() / 2)}
-      else
-        rect.xtl = rect.bounds.x
-        rect.ytl = rect.bounds.y
-        rect.xtr = rect.bounds.x + rect.bounds.width
-        rect.ytr = rect.bounds.y
-        rect.xbl = rect.bounds.x
-        rect.ybl = rect.bounds.y + rect.bounds.height
-        rect.xbr = rect.bounds.x + rect.bounds.width
-        rect.ybr = rect.bounds.y + rect.bounds.height
-        rect.center = new Point((rect.bounds.x + (rect.bounds.width / 2)) * opts.currentScale,
-        (rect.bounds.y + (rect.bounds.height / 2)) * opts.currentScale)
+        b = rect.bounds
 
-        if cmX <= rect.center.x and cmY <= rect.center.y
-          return x: rect.xtl, y: rect.ytl
-        else if cmX >= rect.center.x and cmY <= rect.center.y
-          return x: rect.xtr, y: rect.ytr
-        else if cmX <= rect.center.x and cmY >= rect.center.y
-          return x: rect.xbl, y: rect.ybr
-        else if cmX >= rect.center.x and cmY >= rect.center.y
-          return x: rect.xbr, y: rect.ybr
+        if cmX <= b.center.x and cmY <= b.center.y
+          return x: b.topLeft.x, y: b.topLeft.y
+        else if cmX >= b.center.x and cmY <= b.center.y
+          return x: b.topRight.x, y: b.topRight.y
+        else if cmX <= b.center.x and cmY >= b.center.y
+          return x: b.bottomLeft.x, y: b.bottomLeft.y
+        else if cmX >= b.center.x and cmY >= b.center.y
+          return x: b.bottomRight.x, y: b.bottomRight.y
 
         return null
+      else
+        x = $commentMin.position().left + ($commentMin.width() / 2)
+        y = $commentMin.position().top + ($commentMin.height() / 2)
+        room.applyCurrentScale new Point(x, y)
 
     redrawArrow: ($commentMin) ->
-      rect = $commentMin[0].rect
       arrow = $commentMin[0].arrow
-
-      bp = @getArrowBindPoint $commentMin
-
-      if rect
-        # rebind comment-minimized
-        $commentMin.css({left: (bp.x * opts.currentScale) - ($commentMin.width() / 2),
-        top: (bp.y * opts.currentScale) - ($commentMin.height() / 2)})
-
       return if arrow.isHidden
 
       coords = @getArrowCoords $commentMin
 
-      unless coords
+      if coords
+        arrow.opacity = 1
+      else
         arrow.opacity = 0
         return
-      else
-        arrow.opacity = 1
 
       arrow.segments[0].point.x = coords.x0
       arrow.segments[0].point.y = coords.y0
@@ -307,16 +270,17 @@ $ ->
 
         $(@).css("z-index", parseInt(maxZIndex) + 1)
 
-    translate: (commentMin, dx, dy) ->
+    translate: (commentMin, delta) ->
+      unscaledD = room.applyReverseCurrentScale delta
       commentMin.css
-        top: commentMin.position().top + (dy * opts.currentScale)
-        left: commentMin.position().left + (dx * opts.currentScale)
-      commentMin[0].arrow.translate(new Point(dx, dy))
+        top: commentMin.position().top + unscaledD.y
+        left: commentMin.position().left + unscaledD.x
+      commentMin[0].arrow.translate delta
       maximized = commentMin[0].$maximized
       maximized.css
-        top: maximized.position().top + (dy * opts.currentScale)
-        left: maximized.position().left + (dx * opts.currentScale)
-      commentMin[0].rect.translate(new Point(dx, dy)) if commentMin[0].rect
+        top: maximized.position().top + unscaledD.y
+        left: maximized.position().left + unscaledD.x
+      commentMin[0].rect.translate delta if commentMin[0].rect
 
     removeComment: ($commentmin) ->
       if confirm("Are you sure?")
@@ -613,7 +577,7 @@ $ ->
       diffX = canvasX - commentX - (commentWidth / 2)
       diffY = canvasY - commentY - (commentHeight / 2)
 
-      room.items.pan(diffX, diffY)
+      room.items.pan new Point(diffX, diffY)
       room.redrawWithThumb()
 
     setNumber: (commentMin, newNumber) ->
