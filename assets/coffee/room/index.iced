@@ -221,8 +221,8 @@ $ ->
         when 'pan'
           @items.pan event.delta
         when 'select'
-          scalersSelected = @items.sel?.scalersSelected
-          if scalersSelected then @items.scale(event) else @items.translate(event.delta)
+          scalerSelected = @items.sel?.selectedScaler?
+          if scalerSelected then @items.scale(event) else @items.translate(event.delta)
 
           # redraw comment arrow if there is one.
           @comments.redrawArrow(@items.sel.commentMin) if @items.sel?.commentMin

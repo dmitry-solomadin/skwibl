@@ -393,7 +393,7 @@ $ ->
 
     centerOnImage: ->
       # do not center user if the moved the canvas by himself
-      if opts.image and ((not opts.pandx and not opts.pandy) or force)
+      if opts.image and not opts.pandx and not opts.pandy
         centerX = paper.view.center.x
         centerY = paper.view.center.y
         imageX = opts.image.position.x
