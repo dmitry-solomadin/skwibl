@@ -151,16 +151,16 @@ $ ->
       zx = if event.point.x - @sel.center.x > 0 then 1 else -1
       zy = if event.point.y - @sel.center.y > 0 then 1 else -1
 
-      dzx = if @sel.pzx != zx then -1 else 1
-      dzy = if @sel.pzy != zy then -1 else 1
-
+      # zone change
       if @sel.pzx != zx or @sel.pzy != zy
-        @sel.pzx = zx
-        @sel.pzy = zy
+        dzx = @sel.pzx * zx
+        dzy = @sel.pzy * zy
         ssx = if dzx == -1 then 0.00001 else 1
         ssy = if dzy == -1 then 0.00001 else 1
         @scaleInternal @sel, ssx, ssy
         @scaleInternal @sel, dzx, dzy
+        @sel.pzx = zx
+        @sel.pzy = zy
 
       w = @sel.bounds.width
       h = @sel.bounds.height
