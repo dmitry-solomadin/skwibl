@@ -94,6 +94,12 @@ $ ->
         for sn, scaler of rect.scalers
           if scaler.bounds.contains point
             @sel.selectedScaler = scaler
+            p = @sel.bounds[scaler.name]
+            @sel.center = new Point(2*@sel.position.x - p.x, 2*@sel.position.y - p.y)
+            @sel.oldPoint = point
+            @sel.pzx = if point.x - @sel.center.x > 0 then 1 else -1
+            @sel.pzy = if point.y - @sel.center.y > 0 then 1 else -1
+            break
 
         if rect.removeButton?.bounds.contains(point)
           @remove()
@@ -113,11 +119,10 @@ $ ->
       se = new Path.Circle(new Point(bounds.x + bounds.width + addBound, bounds.y + bounds.height + addBound), width)
       ne = new Path.Circle(new Point(bounds.x + bounds.width + addBound, bounds.y - addBound), width)
       sw = new Path.Circle(new Point(bounds.x - addBound, bounds.y + bounds.height + addBound), width)
-
-      nw.zone = {zx: -1, zy: -1, xb: bounds.right, yb: bounds.bottom, opposite: "bottomRight", oppositeScaler: se}
-      se.zone = {zx: 1, zy: 1, xb: bounds.left, yb: bounds.top, opposite: "topLeft", oppositeScaler: nw}
-      ne.zone = {zx: 1, zy: -1, xb: bounds.left, yb: bounds.bottom, opposite: "bottomLeft", oppositeScaler: sw}
-      sw.zone = {zx: -1, zy: 1, xb: bounds.right, yb: bounds.top, opposite: "topRight", oppositeScaler: ne}
+      nw.name = "topLeft"
+      se.name = "bottomRight"
+      ne.name = "topRight"
+      sw.name = "bottomLeft"
 
       unless @sel.commentMin
         removeButton = new Raster(@removeImg)
@@ -143,52 +148,49 @@ $ ->
     scale: (event) ->
       return unless @sel
 
-      selectedScaler = @sel.selectedScaler
-      zx = selectedScaler.zone.zx
-      zy = selectedScaler.zone.zy
+      zx = if event.point.x - @sel.center.x > 0 then 1 else -1
+      zy = if event.point.y - @sel.center.y > 0 then 1 else -1
 
-      # item x and y bounds, crossing this bounds will affect in zone change
-      xb = selectedScaler.zone.xb
-      yb = selectedScaler.zone.yb
+      dzx = if @sel.pzx != zx then -1 else 1
+      dzy = if @sel.pzy != zy then -1 else 1
 
-      # Delta zone. -1 indicates that zone (x/y) has changed +1 indicates that zone (x/y) left unchanged
-      dzx = if (zx > 0 and event.point.x < xb) or (zx < 0 and event.point.x > xb) then -1 else 1
-      dzy = if (zy > 0 and event.point.y < yb) or (zy < 0 and event.point.y > yb) then -1 else 1
-
-      unless dzx == 1 and dzy == 1
-        # calculate new zone
-        nzx = zx * dzx
-        nzy = zy * dzy
-
-        # find right scaler by zone
-        for sn, scaler of @sel.selectionRect.scalers
-          if scaler.zone.zx == nzx and scaler.zone.zy == nzy
-            @sel.selectedScaler = scaler
-            break
-
-        ssx = if dzx == -1 then -0.00001 else 1
-        ssy = if dzy == -1 then -0.00001 else 1
-
-        #Make sure that no matter has fast user mouse moves we make the item small as possible before reflecting it
-        @scaleInternal @sel, ssx, ssy, selectedScaler.zone.opposite
-        #Reflect the item
-        @scaleInternal @sel, dzx, dzy, @sel.selectedScaler.zone.opposite
+      if @sel.pzx != zx or @sel.pzy != zy
+        @sel.pzx = zx
+        @sel.pzy = zy
+        ssx = if dzx == -1 then 0.00001 else 1
+        ssy = if dzy == -1 then 0.00001 else 1
+        @scaleInternal @sel, ssx, ssy
+        @scaleInternal @sel, dzx, dzy
 
       w = @sel.bounds.width
       h = @sel.bounds.height
 
-      sx = Math.abs(1 + zx * event.delta.x / w)
-      sy = Math.abs(1 + zy * event.delta.y / h)
-      return unless sx and sy
+      sx = Math.abs(1 + @sel.pzx * event.delta.x / w)
+      sy = Math.abs(1 + @sel.pzy * event.delta.y / h)
 
-      @scaleInternal @sel, sx, sy, @sel.selectedScaler.zone.opposite
+      @scaleInternal @sel, sx, sy
 
       # redraw selection rect, we do not scale it because we need selectRect strokeWidth to stay unchanged
       @sel.selectionRect.remove()
       @sel.selectionRect = @createSelRect()
 
-    scaleInternal: (item, sx, sy, anchorPointName) ->
-      anchorPoint = if item.arrow then item.arrow.bounds[anchorPointName] else item.bounds[anchorPointName]
+    ###oldPoint = @sel.oldPoint
+    delta = new Point(event.point.x - oldPoint.x, event.point.y - oldPoint.y)
+
+    w = event.point.x - @sel.center.x
+    h = event.point.y - @sel.center.y
+
+    if -3 < w < 3 or -3 < h < 3
+      return
+    else
+      @sel.oldPoint = event.point
+
+    sx = 1 + delta.x / w
+    sy = 1 + delta.y / h###
+
+    # todo fix for arrow
+    scaleInternal: (item, sx, sy) ->
+      anchorPoint = if item.arrow then item.arrow.center else item.center
       transformMatrix = new Matrix().scale(sx, sy, anchorPoint)
       if item.arrow
         item.arrow.transform transformMatrix
