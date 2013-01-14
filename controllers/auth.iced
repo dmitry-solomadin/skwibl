@@ -166,7 +166,14 @@ exports.facebook = (passport) ->
 # Facebook authentication callback
 #
 exports.facebookCb = (passport) ->
-  return passport.authenticate 'facebook', failureRedirect: '/'
+  return passport.authenticate 'facebook', display: "popup", failureRedirect:"/"
+
+#
+# GET
+# Facebook authentication callback success
+#
+exports.facebookCbSuccess = (req, res) ->
+  return res.render "users/facebook_redirect"
 
 #
 # POST

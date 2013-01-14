@@ -59,4 +59,9 @@ $ ->
         $("#loginError")[0].className = "textError"
         $("#loginError").html(data.message)
 
-  App.Home = new Home
+    facebookAuth: ->
+      win = window
+      window.onFacebookSuccess = -> win.location.reload()
+      window.open "/auth/facebook", "", "width=1000,height=600,left=100,top=100,resizable=yes,scrollbars=yes,status=yes"
+
+    App.Home = new Home
