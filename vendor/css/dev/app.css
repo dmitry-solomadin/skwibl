@@ -266,6 +266,13 @@ body {
     box-shadow: #aaa 1px 1px 3px;
 }
 
+.caret-top {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 0;
+    border-bottom: 4px solid #000;
+}
+
 /* MISC START */
 
 .fr {

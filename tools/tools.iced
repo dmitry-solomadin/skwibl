@@ -116,6 +116,9 @@ exports.asyncParallel = (array, fn) ->
         fn val, index
     )(el, index)
 
+exports.asyncContinue = (array, fn) ->
+  exports.asyncDone array fn
+
 exports.asyncDone = (array, fn) ->
   --array.left
   process.nextTick(fn) if array.left is 0

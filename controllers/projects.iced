@@ -63,6 +63,13 @@ exports.download = (req, res) ->
 # Add new project
 #
 exports.add = (req, res) ->
+  onDone = (err, pid) ->
+    if err
+      req.flash 'warning', 'Project was created but there was some problems with sending invites.'
+    else
+      req.flash 'message', 'Project was created invites were sent.'
+    return res.redirect "/projects/#{pid}"
+
   if not req.body.name or req.body.name is ''
     tools.addError req, 'Please, enter project name.', 'projectName'
     return res.redirect '/projects/new'
@@ -72,13 +79,15 @@ exports.add = (req, res) ->
       fs.mkdir dir, cfg.DIRECTORY_PERMISSION, (err) ->
         fs.mkdir "#{dir}/video", cfg.DIRECTORY_PERMISSION
         fs.mkdir "#{dir}/image", cfg.DIRECTORY_PERMISSION
-      if req.body.inviteeEmails and req.body.inviteeEmails isnt ''
-        return db.projects.inviteEmail project.id, req.user.id, req.body.inviteeEmails, (err, user) ->
-          if err
-            req.flash 'warning', 'Project was created but there was some problems with sending invites.'
-          else
-            req.flash 'message', 'Project was created invites were sent.'
-          return res.redirect "/projects/#{project.id}"
+      inviteeEmails = req.body.inviteeEmails.trim()
+      if inviteeEmails and inviteeEmails isnt ''
+        inviteeEmails = inviteeEmails.split(",")
+        return tools.asyncParallel inviteeEmails, (inviteeEmail) ->
+          inviteeEmail = inviteeEmail.trim()
+          unless tools.isEmail inviteeEmail
+            return tools.asyncDone inviteeEmails, onDone err, project.id
+          return db.projects.inviteEmail project.id, req.user.id, inviteeEmail, (err, user) ->
+            return tools.asyncDone inviteeEmails, -> onDone err, project.id
       req.flash 'message', 'Project was created'
       return res.redirect "/projects/#{project.id}"
     return res.redirect '/projects/new'
