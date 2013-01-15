@@ -1,5 +1,6 @@
 tools = require '../tools'
 cfg = require '../config'
+smtp = require '../smtp'
 announce = require('socket.io-announce') {namespace: '/activities'}
 
 exports.setUp = (client, db) ->
@@ -7,20 +8,24 @@ exports.setUp = (client, db) ->
   mod = {}
 
   # type is 'projectInvite' or ...
-  mod.add = (pid, owner, type, uid, fn) ->
+  mod.add = (pid, ownerId, type, uid, fn) ->
     client.incr 'activities:next', (err, aid) ->
       if not err
         activity = {}
         activity.id = aid
         activity.project = pid
-        activity.owner = owner
+        activity.owner = ownerId
         activity.type = type
         activity.time = Date.now()
         activity.status = 'new'
         activity.inviting = uid
         client.hmset "activities:#{aid}", activity
-        client.rpush "users:#{owner}:activities", aid
-        announce.in("activities#{owner}").emit 'new'
+        client.rpush "users:#{ownerId}:activities", aid
+        announce.in("activities#{ownerId}").emit 'new'
+        db.projects.findById pid, (err, project) ->
+          db.users.findById uid, (err, invitor) ->
+            db.users.findById ownerId, (err, owner) ->
+              smtp.prjInviteActivity owner, invitor, project
         return tools.asyncOpt fn, null, activity
       return tools.asyncOpt fn, err, null
 

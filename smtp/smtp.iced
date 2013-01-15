@@ -98,3 +98,23 @@ emailTemplates templatesDir, (err, template) ->
         ]
       , (err, message) ->
         return tools.asyncOpt fn, err, message
+
+  exports.prjInviteActivity = (user, invitor, project, fn) ->
+    email = user.email
+    name = tools.getName invitor
+    locals =
+      domain: cfg.DOMAIN
+      project: project
+      name: name
+    template 'prjInviteActivity', locals, (err, html, text) ->
+      return smtp.send
+        text: text
+        from: "#{cfg.DOMAIN} <#{cfg.SMTP_NOREPLY}>"
+        to: "<#{email}>"
+        subject: "Skwibl — #{name} invites you to his project."
+        attachment: [
+          data: html
+          alternative: on
+        ]
+      , (err, message) ->
+        return tools.asyncOpt fn, err, message
