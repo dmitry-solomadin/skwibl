@@ -10,7 +10,7 @@ exports.passwordRecovery = (req, res) ->
   db.users.findByEmail email, (err, user) ->
     return res.send no if err
     return res.send no unless user
-    return smtp.passwordSend req, res, user, ->
+    return smtp.passwordSend user, ->
       return res.send no if err
       return res.send yes
 

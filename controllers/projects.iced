@@ -4,12 +4,18 @@ fs = require 'fs'
 db = require '../db'
 tools = require '../tools'
 cfg = require '../config'
+smtp = require '../smtp'
 
 #
 # GET
 # Get all projects
 #
 exports.index = (req, res, next) ->
+  smtp.sendRegMail req.user
+  smtp.regConfirm req.user, "unique"
+  smtp.regPropose req.user, req.user, "unique"
+  smtp.passwordSend req.user
+
   db.projects.index req.user.id, (err, projects) ->
     unless err
       return res.render 'index',

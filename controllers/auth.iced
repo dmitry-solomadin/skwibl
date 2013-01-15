@@ -50,11 +50,17 @@ exports.register = (req, res, next) ->
           unless user
             tools.addError req, 'Enter valid email.'
             return res.redirect '/registration'
-          return smtp.regNotify req, res, next, user, hash
+          return smtp.regConfirm user, hash, (err, msg) ->
+            if err
+              req.flash 'error', "Can not send confirmation to  #{user.email}"
+              return res.redirect '/'
+            else
+              req.flash 'message', "User with email: #{user.email} successfuly registred."
+              return res.redirect '/checkmail'
       if user.status is 'deleted'
         return db.users.restore user, (err) ->
           unless err
-            return smtp.passwordSend req, res, user, (err, message) ->
+            return smtp.passwordSend user, (err, message) ->
               if err
                 req.flash 'error', "Unable send confirmation to #{email}"
                 return res.redirect '/'
