@@ -30,7 +30,6 @@ exports.setUp = (client, db) ->
     action.data = JSON.stringify(element)
     console.log data
     return client.exists "actions:#{aid}", (err, val) ->
-<<<<<<< HEAD
       number = parseInt data.number if val and data.number
       action.number = number unless isNaN number
       if type is 'comment' and not val
