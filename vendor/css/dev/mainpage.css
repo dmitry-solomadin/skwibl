@@ -10,28 +10,6 @@
     width: 960px;
 }
 
-@font-face {
-    font-family: 'MyriadPro-Bold';
-    src: url('/css/fonts/myriadpro-bold.eot');
-    src: url('/css/fonts/myriadpro-bold.eot?#iefix') format('embedded-opentype'), url('/css/fonts/myriadpro-bold.woff') format('woff'), url('/css/fonts/myriadpro-bold.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'MyriadPro';
-    src: url('/css/fonts/myriadpro-regular.otf');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'MyriadPro-SemiBold';
-    src: url('/css/fonts/myriadpro-semibold.otf');
-    font-weight: normal;
-    font-style: normal;
-}
-
 body {
 
 }
@@ -62,8 +40,18 @@ body.mainpage {
     vertical-align: top;
 }
 
+.beta {
+    font-size: 16px;
+    font-family: serif;
+    position: relative;
+    top: -19px;
+    left: 3px;
+    color: #606060;
+}
+
 .logo img {
     vertical-align: top;
+    width: 149px;
 }
 
 .header_btns {
@@ -73,10 +61,7 @@ body.mainpage {
 
 .header_btns .btn {
     width: 113px;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    padding-top: 11px !important;
-    padding-bottom: 9px !important;
+    padding: 10px 0 !important;
 }
 
 .banner_bg {
@@ -131,10 +116,6 @@ body.mainpage {
 
 .tour_item span {
     -webkit-font-smoothing: antialiased;
-    -moz-font-smoothing:antialiased;
-    font-smoothing:antialiased;
-    text-rendering:optimizeLegibility;
-    font-smooth:always;
 }
 
 .tour_item_head {

@@ -120,7 +120,7 @@ function build_deploy {
 ## init procedure
 function init {
   echo "init project directories"
-  if [ ! -e $UPLOADS ]; then
+  if [ ! -e $UPLOADS_TMP ]; then
     mkdir -p $UPLOADS_TMP
   fi
 }

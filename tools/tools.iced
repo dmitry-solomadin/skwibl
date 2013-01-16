@@ -116,6 +116,9 @@ exports.asyncParallel = (array, fn) ->
         fn val, index
     )(el, index)
 
+exports.asyncContinue = (array, fn) ->
+  exports.asyncDone array fn
+
 exports.asyncDone = (array, fn) ->
   --array.left
   process.nextTick(fn) if array.left is 0
@@ -127,11 +130,11 @@ exports.startCluster = (stop, start) ->
   if cluster.isMaster
     cluster.fork() while numCPUs--
     cluster.on 'exit', (worker, code, signal) ->
-#       clearInterval t
+      clearInterval t
       stop worker, code, signal
   else
-#     fn = -> gc()
-#     t = setInterval fn, cfg.GC_INTERVAL
+    fn = -> gc()
+    t = setInterval fn, cfg.GC_INTERVAL
     start cluster
 
 exports.addError = (req, text, id) ->

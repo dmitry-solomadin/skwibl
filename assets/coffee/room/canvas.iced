@@ -61,9 +61,9 @@ $ ->
           isAnyFilePresent = true
           break
 
-      @forEachThumbInContext (cid, fid, index) =>
+      @forEachThumbInContext (cid, fid, posX, posY, index) =>
         if fid
-          @addImage fid, (raster, executeLoadImage) =>
+          @addImage fid, posX, posY, (raster, executeLoadImage) =>
             executeLoadImage()
 
             if cid isnt selectedCid and opts.image and opts.image.id isnt raster.id
@@ -112,12 +112,14 @@ $ ->
       for thumb, index in @getThumbs()
         cid = $(thumb).data("cid")
         fid = $(thumb).data("fid")
-        opts = @findCanvasOptsById(cid)
+        posX = $(thumb).data("pos-x")
+        posY = $(thumb).data("pos-y")
+        opts = @findOptsById(cid)
         if opts then room.setOpts(opts) else room.initOpts(cid)
 
-        fn(cid, fid, index)
+        fn cid, fid, posX, posY, index
 
-      selectedOpts = @findCanvasOptsById(selectedCid)
+      selectedOpts = @findOptsById(selectedCid)
       room.setOpts(selectedOpts)
 
     onLoadingFinished: ->
@@ -125,6 +127,9 @@ $ ->
       if window.location.hash
         commentTextId = window.location.hash.match(/tsl=(\d+)/)[1]
         room.comments.highlightComment(commentTextId)
+
+      @centerOnImage()
+      room.redraw()
 
     initNameChanger: ->
       $("#canvasName").on "click", ->
@@ -163,15 +168,17 @@ $ ->
         @destroy cid, true
 
     destroy: (cid, emit) ->
-      optsToRemove = @findCanvasOptsById(cid)
+      optsToRemove = @findOptsById(cid)
 
       if @getThumbs().length > 1
         @findThumbByCanvasId(cid).parent().remove()
         @findMiniThumbByCanvasId(cid).remove()
         @selectThumb $("#canvasSelectDiv div:first a")
         room.savedOpts.splice room.savedOpts.indexOf(optsToRemove), 1
-        room.setOpts @findCanvasOptsById(@getSelectedCanvasId())
+        room.setOpts @findOptsById(@getSelectedCanvasId())
       else
+        @erase()
+        room.savedOpts = []
         @deinitializeFirst()
 
       room.socket.emit "removeCanvas", canvasId: cid if emit
@@ -208,7 +215,7 @@ $ ->
     flushCanvasIntoCopy: (cid) ->
       @activateCopyCanvas()
       prevOpts = room.getOpts()
-      room.setOpts(@findCanvasOptsById(cid))
+      room.setOpts(@findOptsById(cid))
       @clearCopyCanvas()
       @restore(false, true)
       room.redraw()
@@ -226,6 +233,11 @@ $ ->
 
         room.comments.showComment(element.commentMin) if element.commentMin and withComments
 
+    getFitToImage: ->
+      w = paper.project.view.viewSize.width / opts.image.width
+      h = paper.project.view.viewSize.height / opts.image.height
+      if h < w then h else w
+
     setScale: (scale, prevScale) ->
       $("#scaleAmount").html "#{parseInt(scale * 100)}%"
 
@@ -235,7 +247,6 @@ $ ->
       opts.currentScale = scale
 
       transformMatrix = new Matrix(finalScale, 0, 0, finalScale, 0, 0)
-
       paper.project.activeLayer.transform(transformMatrix)
 
       unless prevScale
@@ -248,6 +259,11 @@ $ ->
             commentMax.css({top: commentMax.position().top * finalScale, left: commentMax.position().left * finalScale})
 
             room.comments.redrawArrow(element.commentMin)
+
+      scaledCenter = opts.scaledCenter or paper.view.center
+      newScaledCenter = room.applyCurrentScale paper.view.center
+      opts.scaledCenter = newScaledCenter
+      room.items.pan new Point(newScaledCenter.x - scaledCenter.x, newScaledCenter.y - scaledCenter.y)
 
       room.redraw()
 
@@ -308,8 +324,7 @@ $ ->
 
     requestAddEmpty: ->
       thumbs = @getThumbs()
-      initialized = "#{$(thumbs[0]).data("initialized")}" == "true"
-      initializeFirst = thumbs.length is 1 and not initialized
+      initializeFirst = thumbs.length is 1 and not @isFirstInitialized()
 
       if initializeFirst
         $.post "/canvases/initializeFirst", {pid: $("#pid").val()}, (data, status, xhr) =>
@@ -319,13 +334,18 @@ $ ->
           @addEmpty canvasId: data.id, name: data.name, true
 
     initializeFirst: (emit) ->
+      @erase()
+      firstThumb = $(@getThumbs()[0])
       room.hideSplashScreen()
-      $(@getThumbs()[0]).attr("data-initialized", "true").data("initialized", "true")
+      firstThumb.attr("data-initialized", "true").data("initialized", "true")
       room.socket.emit "initializeFirstCanvas" if emit
 
     deinitializeFirst: () ->
+      firstThumb = $(@getThumbs()[0])
       room.showSplashScreen()
-      $(@getThumbs()[0]).attr("data-initialized", "false").data("initialized", "false")
+      room.initOpts firstThumb.data("cid")
+      #initialiaze new empty opts
+      firstThumb.attr("data-initialized", "false").data("initialized", "false")
 
     addEmpty: (canvasData) ->
       @addNewThumbAndSelect canvasData
@@ -339,14 +359,14 @@ $ ->
       else
         @initializeFirst false
 
-      img = @addImage canvasData.fileId, (raster, executeLoadImage) =>
+      @addImage canvasData.fileId, canvasData.posX, canvasData.posY, (raster, executeLoadImage) =>
         executeLoadImage()
 
         @updateThumb parseInt(canvasData.canvasId)
 
       room.socket.emit("fileAdded", canvasData) if emit
 
-    addImage: (fileId, loadWrap) ->
+    addImage: (fileId, posX, posY, loadWrap) ->
       src = "/files/#{$("#pid").val()}/#{fileId}"
       image = $("<img class='hide' src='#{src}'>")
       $("body").append(image)
@@ -364,16 +384,28 @@ $ ->
       onload = ->
         img.size.width = image.width()
         img.size.height = image.height()
-        img.position = paper.view.center
+        img.position = new Point parseInt(posX), parseInt(posY)
         img.setImage(image[0])
 
       $(image).on "load", -> if loadWrap then loadWrap(img, -> onload()) else onload()
 
       img
 
+    centerOnImage: ->
+      # do not center user if the moved the canvas by himself
+      if opts.image and not opts.pandx and not opts.pandy
+        centerX = paper.view.center.x
+        centerY = paper.view.center.y
+        imageX = opts.image.position.x
+        imageY = opts.image.position.y
+
+        if centerX isnt imageX or centerY isnt imageY
+          room.items.pan new Point(centerX - imageX, centerY - imageY)
+
     addNewThumb: (canvasData) ->
       thumb = $("#canvasSelectDiv div:first").clone()
-      thumb.find("a").attr("data-cid", canvasData.canvasId).attr("data-fid", canvasData.fileId).attr("data-name", canvasData.name)
+      thumb.find("a").attr("data-cid", canvasData.canvasId).attr("data-fid", canvasData.fileId)
+        .attr("data-name", canvasData.name).attr("data-pos-x", canvasData.posX).attr("data-pos-y", canvasData.posY)
       $("#canvasSelectDiv").append(thumb)
 
     addNewMiniThumb: (canvasData) ->
@@ -400,9 +432,13 @@ $ ->
       if selectedCanvasId isnt canvasId
         @activateCopyCanvas()
         prevOpts = room.getOpts()
-        room.setOpts(@findCanvasOptsById(canvasId))
+        room.setOpts @findOptsById(canvasId)
         @clearCopyCanvas()
         @restore(false, false)
+      else
+        prevPandx = opts.pandx
+        prevPandy = opts.pandy
+        @centerOnImage true
 
       thumb = @findThumbByCanvasId(canvasId).find("canvas")
       thumbContext = thumb[0].getContext('2d')
@@ -426,6 +462,10 @@ $ ->
 
       transformMatrix = new Matrix(opts.currentScale / sy, 0, 0, opts.currentScale / sy, 0, 0)
       paper.project.activeLayer.transform(transformMatrix)
+
+      if selectedCanvasId is canvasId
+        room.items.pan new Point(prevPandx - opts.pandx, prevPandy - opts.pandy)
+
       room.redraw()
 
       if prevOpts
@@ -436,7 +476,7 @@ $ ->
 
     getSelectedCanvasId: -> @getSelected().data("cid")
 
-    isFirstInitialized: -> $(@getThumbs()[0]).data("initialized")
+    isFirstInitialized: -> "#{$(@getThumbs()[0]).data("initialized")}" == "true"
 
     getSelected: -> $(".canvasSelected")
 
@@ -461,11 +501,12 @@ $ ->
       $(anchor).addClass("canvasSelected")
 
       cid = $(anchor).data("cid")
-      canvasOpts = @findCanvasOptsById(cid)
+      canvasOpts = @findOptsById(cid)
 
       alert("No canvas opts by given canvasId=" + cid) unless canvasOpts
 
       @erase()
+      room.items.unselect()
       previousScale = opts.currentScale
       room.setOpts canvasOpts
       @restore(true, false)
@@ -476,12 +517,11 @@ $ ->
 
       $("#canvasName").html($(anchor).data("name"))
 
+      @centerOnImage()
+
       room.socket.emit("switchCanvas", cid) if emit
       room.redraw()
 
-    findCanvasOptsById: (canvasId) ->
-      for savedOpt in room.savedOpts
-        return savedOpt if savedOpt.canvasId is canvasId
-      return null
+    findOptsById: (canvasId) -> return savedOpt for savedOpt in room.savedOpts when savedOpt.canvasId is canvasId
 
   App.room.canvas = new RoomCanvas

@@ -24,7 +24,7 @@ $ ->
       return unless item
       room.history.add(
         actionType: "remove"
-        tool: item#TODO change tool to item
+        tool: item #TODO change tool to item
         eligible: true) if historize
       item.opacity = 0
       room.socket.emit("elementRemove", item.elementId)
@@ -43,19 +43,19 @@ $ ->
         rect.remove()
         @setSelected(null)
 
-    pan: (dx, dy) ->
+    pan: (delta) ->
       #TODO move history logic out of this method
       console.log 'pan'
-      opts.pandx += dx
-      opts.pandy += dy
+      opts.pandx += delta.x
+      opts.pandy += delta.y
       for el in opts.historytools.allHistory
         if el.commentMin
-          room.comments.translate(el.commentMin, dx, dy)
+          room.comments.translate el.commentMin, delta
         else if not el.actionType and el.translate
-          el.translate(new Point(dx, dy))
+          el.translate delta
 
     #TODO consider how to make this setter an action - select
-    setSelected: (item)-> @sel = item
+    setSelected: (item) -> @sel = item
 
     # ITEMS SELECT
 
@@ -89,30 +89,18 @@ $ ->
         @sel.selectionRect = @createSelRect()
         $("#removeSelected").removeClass("disabled")
         rect = @sel.selectionRect
-        bounds = @sel.bounds
-        @sel.scalersSelected = true
-        if rect.scalers.nw.bounds.contains(point)
-          @sel.scaleZone =
-            zx: -1
-            zy: -1
-            point: bounds.bottomRight
-        else if rect.scalers.se.bounds.contains(point)
-          @sel.scaleZone =
-            zx: 1
-            zy: 1
-            point: bounds.topLeft
-        else if rect.scalers.ne.bounds.contains(point)
-          @sel.scaleZone =
-            zx: 1
-            zy: -1
-            point: bounds.bottomLeft
-        else if rect.scalers.sw.bounds.contains(point)
-          @sel.scaleZone =
-            zx: -1
-            zy: 1
-            point: bounds.topRight
-        else
-          @sel.scalersSelected = false
+
+        @sel.selectedScaler = null
+        for sn, scaler of rect.scalers
+          if scaler.bounds.contains point
+            @sel.selectedScaler = scaler
+            p = @sel.bounds[scaler.name]
+            @sel.center = new Point(2*@sel.position.x - p.x, 2*@sel.position.y - p.y)
+            @sel.oldPoint = point
+            @sel.pzx = if point.x - @sel.center.x > 0 then 1 else -1
+            @sel.pzy = if point.y - @sel.center.y > 0 then 1 else -1
+            break
+
         if rect.removeButton?.bounds.contains(point)
           @remove()
 
@@ -126,13 +114,20 @@ $ ->
       width = 4
       outstend = 12
       selDash = [3, 3]
+
       nw = new Path.Circle(new Point(bounds.x - addBound, bounds.y - addBound), width)
       se = new Path.Circle(new Point(bounds.x + bounds.width + addBound, bounds.y + bounds.height + addBound), width)
       ne = new Path.Circle(new Point(bounds.x + bounds.width + addBound, bounds.y - addBound), width)
       sw = new Path.Circle(new Point(bounds.x - addBound, bounds.y + bounds.height + addBound), width)
+      nw.name = "topLeft"
+      se.name = "bottomRight"
+      ne.name = "topRight"
+      sw.name = "bottomLeft"
+
       unless @sel.commentMin
         removeButton = new Raster(@removeImg)
         removeButton.position = new Point(selRect.bounds.x + selRect.bounds.width + outstend, selRect.bounds.y - outstend)
+
       selGroup = new Group([selRect, nw, se, ne, sw])
       selGroup.theRect = selRect
       selGroup.scalers =
@@ -150,32 +145,58 @@ $ ->
       return selGroup
 
     # ITEMS SCALE
+    scale: (event) ->
+      return unless @sel
 
-    #TODO move center calculation out of the function.
-    #TODO reconsider arrow object
-    scale: (event, item = @sel) ->
-      return unless item
-      delta = event.delta
-      point = event.point
-      pos = item.position
-      corner = new Point(point.x - delta.x, point.y - delta.y)
-      center = new Point(2*pos.x - corner.x, 2*pos.y - corner.y)
-      w = point.x - center.x
-      h = point.y - center.y
-      return if -3 < w < 3 or -3 < h < 3
-      sx = 1 + delta.x/w
-      sy = 1 + delta.y/h
-      transformMatrix = new Matrix().scale(sx, sy, center)
-      #TODO this code is unclear
-      if @sel.arrow
-        @sel.arrow.scale(sx, sy, center)
-        @sel.drawTriangle()
-      else
-        @sel.transform(transformMatrix)
-      # redraw selection rect
-      #TODO it should be scaled not removed
+      zx = if event.point.x - @sel.center.x > 0 then 1 else -1
+      zy = if event.point.y - @sel.center.y > 0 then 1 else -1
+
+      # zone change
+      if @sel.pzx != zx or @sel.pzy != zy
+        dzx = @sel.pzx * zx
+        dzy = @sel.pzy * zy
+        ssx = if dzx == -1 then 0.00001 else 1
+        ssy = if dzy == -1 then 0.00001 else 1
+        @scaleInternal @sel, ssx, ssy
+        @scaleInternal @sel, dzx, dzy
+        @sel.pzx = zx
+        @sel.pzy = zy
+
+      w = @sel.bounds.width
+      h = @sel.bounds.height
+
+      sx = Math.abs(1 + @sel.pzx * event.delta.x / w)
+      sy = Math.abs(1 + @sel.pzy * event.delta.y / h)
+
+      @scaleInternal @sel, sx, sy
+
+      # redraw selection rect, we do not scale it because we need selectRect strokeWidth to stay unchanged
       @sel.selectionRect.remove()
       @sel.selectionRect = @createSelRect()
+
+    ###oldPoint = @sel.oldPoint
+    delta = new Point(event.point.x - oldPoint.x, event.point.y - oldPoint.y)
+
+    w = event.point.x - @sel.center.x
+    h = event.point.y - @sel.center.y
+
+    if -3 < w < 3 or -3 < h < 3
+      return
+    else
+      @sel.oldPoint = event.point
+
+    sx = 1 + delta.x / w
+    sy = 1 + delta.y / h###
+
+    # todo fix for arrow
+    scaleInternal: (item, sx, sy) ->
+      anchorPoint = if item.arrow then item.arrow.center else item.center
+      transformMatrix = new Matrix().scale(sx, sy, anchorPoint)
+      if item.arrow
+        item.arrow.transform transformMatrix
+        item.drawTriangle()
+      else
+        item.transform transformMatrix
 
     # ITEMS MISC
     createUserBadge: (uid, x, y) ->

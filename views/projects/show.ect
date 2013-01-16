@@ -140,10 +140,7 @@
         <div id="smallCanvasPreviews">
           <% for canvas, i in @canvases : %>
           <div class="smallCanvasPreview tooltipize <%- 'previewSelected' if i is 0 %>" title="<%= canvas.name %>"
-               data-cid="<%= canvas.id %>" data-name="<%= canvas.name %>"
-               data-initialized="<%= canvas.initialized %>"
-          <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
-        </div>
+               data-cid="<%= canvas.id %>"></div>
         <% end %>
       </div>
     </div>
@@ -160,11 +157,11 @@
     </div>
 
     <% if canvasInitialized : %>
-    <% foldFunc = "App.room.canvas.foldPreviews(); return false;" %>
-    <% foldImg = "/images/room/fold-down.png" %>
+      <% foldFunc = "App.room.canvas.foldPreviews(); return false;" %>
+      <% foldImg = "/images/room/fold-down.png" %>
     <% else : %>
-    <% foldFunc = "App.room.canvas.unfoldPreviews(); return false;" %>
-    <% foldImg = "/images/room/unfold-up.png" %>
+      <% foldFunc = "App.room.canvas.unfoldPreviews(); return false;" %>
+      <% foldImg = "/images/room/unfold-up.png" %>
     <% end %>
     <a id="canvasFolder" class="btn skwibl_image_btn canvasFolder" href="#" onclick="<%= foldFunc %>">
       <img src="<%= foldImg %>">
@@ -177,19 +174,19 @@
   <div class="canvasFooterBottom">
     <div id="canvasSelectDiv" class="canvasSelectDiv">
       <% for canvas, i in @canvases : %>
-      <% for element in canvas.elements : %>
-      <input class="canvasElement<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(element) %>"/>
-      <% end %>
-      <% for comment in canvas.comments : %>
-      <input class="canvasComment<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(comment) %>"/>
-      <% for text in comment.texts : %>
-      <input class="commentTexts<%= comment.elementId %>" type="hidden" value="<%= JSON.stringify(text) %>"/>
-      <% end %>
-      <% end %>
+        <% for element in canvas.elements : %>
+          <input class="canvasElement<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(element) %>"/>
+        <% end %>
+        <% for comment in canvas.comments : %>
+          <input class="canvasComment<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(comment) %>"/>
+          <% for text in comment.texts : %>
+            <input class="commentTexts<%= comment.elementId %>" type="hidden" value="<%= JSON.stringify(text) %>"/>
+          <% end %>
+        <% end %>
       <div class="canvasPreviewDiv">
         <a href="#" class="<%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.id %>" data-name="<%= canvas.name %>"
-           data-initialized="<%= canvas.initialized %>"
-        <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
+           data-initialized="<%= canvas.initialized %>" data-pos-x="<%= canvas.file.posX if canvas.file %>"
+           data-pos-y="<%= canvas.file.posY if canvas.file %>" <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
         <canvas width="80" height="60"></canvas>
         </a>
         <img class="canvasRemoveImg" src="/images/room/remove.png"

@@ -66,7 +66,7 @@ exports.setUp = (client, db) ->
       if not err and array and array.length
         users = []
         return tools.asyncParallel array, (uid, i) ->
-          unless i % 2
+          if i % 2
             db.contacts.getInfo uid, (err, user) ->
               users.push user
           return tools.asyncDone array, ->

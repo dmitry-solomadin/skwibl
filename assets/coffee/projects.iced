@@ -6,7 +6,9 @@ $ ->
 
       $("#showInviteParticipants").on "click", => @toogleParticipants()
 
-    toogleParticipants: () -> $("#inviteParticipants").toggle("slow")
+    toogleParticipants: () ->
+      $("#inviteParticipants").toggle("normal")
+      $("#showInviteParticipants .caret").toggleClass("caret-top")
 
     deleteProject: (pid) ->
       if confirm("Are you sure?")

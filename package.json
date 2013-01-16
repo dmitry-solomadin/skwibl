@@ -37,6 +37,7 @@
     "passport-linkedin": "*",
     "formidable": "*",
     "emailjs": "*",
+    "email-templates": "*",
     "password-generator": "*",
     "hiredis": "*",
     "redis": "0.7.2",

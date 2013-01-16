@@ -1,5 +1,8 @@
 body.room {
     padding-top: 55px;
+    padding-bottom: 0;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
 }
 
 #room-controls {
@@ -538,6 +541,7 @@ body.room {
 }
 
 .chatFilters .btn {
+    font-family: 'MyriadPro-SemiBold';
     margin-left: 0 !important;
     font-size: 14px;
     padding: 6px 0;
@@ -656,7 +660,6 @@ body.room {
 
 #conversation-inner b {
     font-size: 12px;
-    letter-spacing: -1px;
 }
 
 #conversation-inner i {
@@ -808,9 +811,9 @@ body.room {
 }
 
 .canvasFolderTrans img {
-    -webkit-transition: all 0.5s;
-    -moz-transition: all 0.5s;
-    transition: all 0.5s;
+    -webkit-transition: all 0.35s;
+    -moz-transition: all 0.35s;
+    transition: all 0.35s;
     -webkit-transform: rotate(180deg);
     -moz-transform: rotate(180deg);
     transform: rotate(180deg);
@@ -828,9 +831,9 @@ body.room {
 }
 
 .chatFolderTrans img {
-    -webkit-transition: all 0.5s;
-    -moz-transition: all 0.5s;
-    transition: all 0.5s;
+    -webkit-transition: all 0.35s;
+    -moz-transition: all 0.35s;
+    transition: all 0.35s;
     -webkit-transform: rotate(180deg);
     -moz-transform: rotate(180deg);
     transform: rotate(180deg);

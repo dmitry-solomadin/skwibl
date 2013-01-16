@@ -32,7 +32,11 @@ $ ->
 
         $(".colorSelected").css("background", sharedOpts.color)
 
-      $("#scaleDiv .dropdown-menu a").on "click", -> App.room.canvas.setScale($(@).data('scale'))
+      $("#scaleDiv .dropdown-menu a").on "click", ->
+        scaleAmout = $(@).data('scale')
+        if scaleAmout is "fitToImage"
+          scaleAmout = App.room.canvas.getFitToImage()
+        App.room.canvas.setScale scaleAmout
 
       @initDropbox()
 
@@ -57,6 +61,7 @@ $ ->
       @helper.initUploader()
       @helper.initHotkeys()
       @canvas.init()
+      @comments.assignBringToFront()
 
       # disable canvas text selection for cursor change
       canvas = $("#myCanvas")[0]
@@ -81,12 +86,20 @@ $ ->
                 linkInfo.cid = App.room.canvas.getSelectedCanvasId() if not App.room.canvas.isFirstInitialized()
                 linkInfos.push linkInfo
 
-              $.post '/file/uploadDropbox', {pid: $("#pid").val(), linkInfos: linkInfos}, (data, status, xhr) =>
+              posX = paper.view.center.x
+              posY = paper.view.center.y
+              $.post '/file/uploadDropbox', {pid: $("#pid").val(), linkInfos: linkInfos, posX: posX, posY: posY}, (data, status, xhr) =>
                 $("#canvasInitButtons").show()
                 $("#loadingProgressWrap").hide()
 
                 for file in data
-                  App.room.canvas.handleUpload {canvasId: file.canvasId, fileId: file.element.id, name: file.canvasName}, true
+                  App.room.canvas.handleUpload
+                    canvasId: file.canvasId
+                    fileId: file.element.id
+                    name: file.canvasName
+                    posX: file.element.posX
+                    posY: file.element.posY
+                  , true
             cancel: -> console.log "cancel hit"
         else
           alert "Can't reach Dropbox API. Check your internet connection."
@@ -206,10 +219,10 @@ $ ->
           @items.created = arrowGroup
           arrowGroup.triangle.removeOnDrag()
         when 'pan'
-          @items.pan(event.delta.x, event.delta.y)
+          @items.pan event.delta
         when 'select'
-          scalersSelected = @items.sel?.scalersSelected
-          if scalersSelected then @items.scale(event) else @items.translate(event.delta)
+          scalerSelected = @items.sel?.selectedScaler?
+          if scalerSelected then @items.scale(event) else @items.translate(event.delta)
 
           # redraw comment arrow if there is one.
           @comments.redrawArrow(@items.sel.commentMin) if @items.sel?.commentMin
@@ -325,4 +338,5 @@ $ ->
   App.room.init(App.room.canvas.getSelectedCanvasId())
 
   # resizing canvas
-  paper.view.setViewSize(Rectangle.create(0, 0, $("body").width(), $("body").height()).getSize())
+  newViewSize = Rectangle.create(0, 0, $("body").width(), $("body").height()).getSize()
+  prj.view.setViewSize newViewSize for prj in paper.projects
