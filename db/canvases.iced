@@ -4,7 +4,7 @@ exports.setUp = (client, db) ->
   mod = {}
 
   mod.add = (pid, file, time, fn) ->
-    return client.scard "projects:#{pid}:canvases", (err, count) ->
+    return client.llen "projects:#{pid}:canvases", (err, count) ->
       return client.incr 'canvases:next', (err, cid) ->
         unless err
           canvas =
@@ -19,20 +19,20 @@ exports.setUp = (client, db) ->
           else
             canvas.name = "Canvas #{count + 1}"
           client.hmset "canvases:#{cid}", canvas
-          client.sadd "projects:#{pid}:canvases", cid
+          client.lpush "projects:#{pid}:canvases", cid
           return tools.asyncOpt fn, null, canvas
         return tools.asyncOpt fn, err, null
 
   mod.initFirst = (pid, fn) ->
-    return client.smembers "projects:#{pid}:canvases", (err, canvasIds) ->
-      client.hset "canvases:#{canvasIds[0]}", "initialized", "true"
+    return client.lrange "projects:#{pid}:canvases", 0, 0, (err, val) ->
+      client.hset "canvases:#{val}", "initialized", "true"
       return tools.asyncOpt fn, err, null
 
   mod.get = (cid, fn) ->
     client.hgetall 'canvases:' + cid, fn
 
   mod.index = (pid, fn) ->
-    client.sort "projects:#{pid}:canvases", "by", "canvases:*->createdAt", (err, array) ->
+    client.lrange "projects:#{pid}:canvases", 0, -1, (err, array) ->
       if not err and array and array.length
         canvases = []
         return tools.asyncParallel array, (cid, index) ->
@@ -57,7 +57,7 @@ exports.setUp = (client, db) ->
   mod.delete = (cid, fn) ->
     db.canvases.get cid, (err, canvas)->
       if not err and canvas
-        client.smembers "projects:#{canvas.project}:canvases", (err, canvases) ->
+        client.lrange "projects:#{canvas.project}:canvases", 0, -1, (err, canvases) ->
           if not err and canvases and canvases.length
             if canvases.length <= 1
               db.canvases.clear cid
@@ -65,7 +65,7 @@ exports.setUp = (client, db) ->
               client.hset "canvases:#{cid}", "initialized", "false"
               tools.asyncOpt fn, null, null
             else
-              client.srem "projects:#{canvas.project}:canvases", cid
+              client.lrem "projects:#{canvas.project}:canvases", 0, cid
               db.canvases.clear cid
               client.del "canvases:#{cid}", cid
       tools.asyncOpt fn, null, null
@@ -80,5 +80,8 @@ exports.setUp = (client, db) ->
 
   mod.setProperties = (cid, properties) ->
     client.hmset "canvases:#{cid}", properties
+
+  mod.commentNumber = (cid, fn) ->
+    client.hget "canvases:#{cid}", 'nextComment', fn
 
   return mod

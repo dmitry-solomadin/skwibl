@@ -9,7 +9,7 @@ exports.setUp = (client, db) ->
 
   # get all the projects that are available for the user
   mod.index = (uid, fn) ->
-    client.sort "users:#{uid}:projects", "by", "projects:*->createdAt", "desc", (err, array) ->
+    client.zrevrange "users:#{uid}:projects", 0, -1, (err, array) ->
       projects = []
       if not err and array and array.length
         return tools.asyncParallel array, (pid) ->
@@ -85,13 +85,13 @@ exports.setUp = (client, db) ->
         project.status = 'new'
         client.hmset "projects:#{val}", project
         client.sadd "projects:#{val}:users", uid
-        client.sadd "users:#{uid}:projects", val
+        client.zadd "users:#{uid}:projects",  project.createdAt, val
         return db.canvases.add val, null, null, (err, canvas) ->
           return tools.asyncOpt(fn, err, project)
       return tools.asyncOpt fn, err, null
 
   mod.deleteCanvases = (pid, fn) ->
-    client.smembers "projects:#{pid}:canvases", (err, array) ->
+    client.lrange "projects:#{pid}:canvases", 0, -1, (err, array) ->
       client.del "projects:#{pid}:canvases" unless err
       if not err and array and array.length
         return tools.asyncParallel array, (cid) ->
@@ -199,10 +199,10 @@ exports.setUp = (client, db) ->
   mod.accept = (pid, aid, id, fn) ->
     db.contacts.add pid, id
     # Add the user to the project
-    client.zrem "projects:#{pid}:unconfirmed", aid
+    client.srem "projects:#{pid}:unconfirmed", aid
     client.sadd "projects:#{pid}:users", id
     # Add the project to the user
-    client.sadd "users:#{id}:projects", pid
+    client.zadd "users:#{id}:projects", Date.now(), pid
     return fn null, pid
 
   mod.decline = (pid, aid, fn) ->
@@ -211,7 +211,7 @@ exports.setUp = (client, db) ->
   # remove user from project.
   mod.remove = (pid, id, fn) ->
     # Remove project from user projects
-    client.srem "users:#{id}:projects", pid
+    client.zrem "users:#{id}:projects", pid
     # Get project members
     client.smembers "projects:#{pid}:users", (err, array) ->
       if not err and array and array.length
