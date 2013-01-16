@@ -14,4 +14,4 @@ exports.addEmpty = (req, res) ->
 #
 exports.initFirst = (req, res) ->
   return db.canvases.initFirst req.body.pid, (err) ->
-    return res.json err?
+    return res.json err

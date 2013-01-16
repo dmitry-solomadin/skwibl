@@ -39,14 +39,15 @@ exports.configure = (sio) ->
           canvasId: data.canvasId
           element: data.element
         db.actions.update socket.project, id, 'comment', data, (err, action) ->
-          if action.newAction
-            newNumber =
-              elementId: data.element.elementId
-              newNumber: action.number
-
-            # broadcast new number to everyone including sender
-            socket.emit 'commentNumberUpdate', newNumber
-            socket.broadcast.to(socket.project).emit 'commentNumberUpdate', newNumber
+          db.canvases.commentNumber data.canvasId, (err, id) ->
+            console.log err, id, action.number
+            if not err and id isnt "#{action.number}"
+              newNumber =
+                elementId: data.element.elementId
+                newNumber: action.number
+              # broadcast new number to everyone including sender
+              socket.emit 'commentNumberUpdate', newNumber
+              socket.broadcast.to(socket.project).emit 'commentNumberUpdate', newNumber
 
       socket.on 'commentRemove', (elementId, cb) ->
         socket.broadcast.to(socket.project).emit 'commentRemove',
@@ -80,7 +81,7 @@ exports.configure = (sio) ->
         db.comments.reopenTodo elementId
 
       socket.on 'updateCommentText', (data, cb) ->
-        return unless `(data.owner == id)`
+        return unless "#{data.owner}" is "#{id}"
 
         socket.broadcast.to(socket.project).emit 'updateCommentText',
           id: id

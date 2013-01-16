@@ -2,37 +2,45 @@ tools = require '../tools'
 cfg = require '../config'
 
 exports.setUp = (client, db) ->
+
   mod = {}
 
-  mod.update = (pid, ownerId, type, data, fn) ->
-    aid = data.element.elementId
+  mod.updateAction = (aid, action, create, fn) ->
+    pid = action.project
+    type = action.type
+    canvas = action.canvasId
+    client.hmset "actions:#{aid}", action
+    unless create # creating new action
+      action.new = create if create
+      client.rpush "projects:#{pid}:#{type}", aid
+      client.rpush "canvases:#{canvas}:#{type}", aid if canvas
+      return tools.asyncOpt fn, null, action
+    return tools.asyncOpt fn, null, action
+
+  mod.update = (pid, owner, type, data, fn) ->
+    element = data.element
+    canvasId = data.canvasId
+    aid = element.elementId
     action = {}
     action.project = pid
-    action.owner = ownerId
+    action.owner = owner
     action.type = type
-    action.canvasId = data.canvasId if data.canvasId
+    action.canvasId = canvasId if canvasId
     action.time = Date.now()
-    action.data = JSON.stringify(data.element)
+    action.data = JSON.stringify(element)
+    console.log data
     return client.exists "actions:#{aid}", (err, val) ->
-      client.hmset "actions:#{aid}", action
-      if not err and not val # creating new action
-        client.rpush "projects:#{pid}:#{type}", aid
-        client.rpush "canvases:#{data.canvasId}:#{type}", aid if data.canvasId
-        if type is 'comment'
-          client.incr "actions:#{data.canvasId}:next", (err, cid) ->
-            action.number = cid
-            action.newAction = true # this won't go into db, just a marker for top level code
-            client.hset "actions:#{aid}", "number", cid
-            if data.element.texts and data.element.texts.length
-              return tools.asyncParallel data.element.texts, (text) ->
-                return db.comments.add text, false, ->
-                  return tools.asyncDone data.element.texts, ->
-                    return tools.asyncOpt fn, null, action
-            else
-              return tools.asyncOpt fn, null, action
-        else
-          return tools.asyncOpt fn, null, action
-      return tools.asyncOpt fn, null, action
+      number = parseInt data.number if val and data.number
+      action.number = number unless isNaN number
+      if type is 'comment' and not val
+        return client.hincrby "canvases:#{canvasId}", 'nextComment', 1, (err, cid) ->
+          console.log cid
+          action.number = cid
+          if element.texts and element.texts.length
+            tools.asyncParallel element.texts, (text) ->
+              db.comments.add text
+          return db.actions.updateAction(aid, action, val, fn)
+      return db.actions.updateAction(aid, action, val, fn)
 
   mod.delete = (aid, fn) ->
     db.actions.findById aid, (err, action) ->

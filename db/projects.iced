@@ -9,7 +9,7 @@ exports.setUp = (client, db) ->
 
   # get all the projects that are available for the user
   mod.index = (uid, fn) ->
-    client.sort "users:#{uid}:projects", "by", "projects:*->createdAt", "desc", (err, array) ->
+    client.zrevrange "users:#{uid}:projects", 0, -1, (err, array) ->
       projects = []
       if not err and array and array.length
         return tools.asyncParallel array, (pid) ->
@@ -66,7 +66,7 @@ exports.setUp = (client, db) ->
       if not err and array and array.length
         users = []
         return tools.asyncParallel array, (uid, i) ->
-          unless i % 2
+          if i % 2
             db.contacts.getInfo uid, (err, user) ->
               users.push user
           return tools.asyncDone array, ->
@@ -85,13 +85,13 @@ exports.setUp = (client, db) ->
         project.status = 'new'
         client.hmset "projects:#{val}", project
         client.sadd "projects:#{val}:users", uid
-        client.sadd "users:#{uid}:projects", val
+        client.zadd "users:#{uid}:projects",  project.createdAt, val
         return db.canvases.add val, null, null, (err, canvas) ->
           return tools.asyncOpt(fn, err, project)
       return tools.asyncOpt fn, err, null
 
   mod.deleteCanvases = (pid, fn) ->
-    client.smembers "projects:#{pid}:canvases", (err, array) ->
+    client.lrange "projects:#{pid}:canvases", 0, -1, (err, array) ->
       client.del "projects:#{pid}:canvases" unless err
       if not err and array and array.length
         return tools.asyncParallel array, (cid) ->
@@ -153,7 +153,7 @@ exports.setUp = (client, db) ->
         # check if user is already invited
         return client.zrangebyscore "projects:#{pid}:unconfirmed", user.id, user.id, (err, array) ->
           if not err and array and not array.length
-            return db.activities.add pid, user.id, 'projectInvite', id, {}, (err, activity) ->
+            return db.activities.add pid, user.id, 'projectInvite', id, (err, activity) ->
               if not err and activity
                 client.zadd "projects:#{pid}:unconfirmed", user.id, activity.id
               return tools.asyncOpt fn, err, user
@@ -199,12 +199,12 @@ exports.setUp = (client, db) ->
   mod.accept = (pid, aid, uid, fn) ->
     db.contacts.add pid, uid
     # Add the user to the project
-    client.zrem "projects:#{pid}:unconfirmed", aid
+    client.srem "projects:#{pid}:unconfirmed", aid
     client.sadd "projects:#{pid}:users", uid
     # Add the project to the user
-    client.sadd "users:#{uid}:projects", pid
-    db.activities.addForAllInProject pid, 'projectJoin', uid, [uid], {}, (err) ->
-      tools.asyncOpt fn, err, pid
+    client.zadd "users:#{uid}:projects", Date.now(), pid
+    db.activities.addForAllInProject pid, 'projectJoin', uid, [uid], {}
+    return fn null, pid
 
   mod.decline = (pid, aid, fn) ->
     client.zrem "projects:#{pid}:unconfirmed", aid, fn
@@ -212,7 +212,7 @@ exports.setUp = (client, db) ->
   # remove user from project.
   mod.remove = (pid, uid, isLeave, fn) ->
     # Remove project from user projects
-    client.srem "users:#{uid}:projects", pid
+    client.zrem "users:#{uid}:projects", pid
     # Get project members
     client.smembers "projects:#{pid}:users", (err, array) ->
       if not err and array and array.length

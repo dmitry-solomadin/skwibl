@@ -194,6 +194,7 @@ $ ->
       # comment may already contain text if we are restoring deleted comment via 'undo'
       data =
         canvasId: room.canvas.getSelectedCanvasId()
+        number: $.trim($(commentMin).html())
         element:
           elementId: commentMin.elementId
           color: commentMin.data("color")

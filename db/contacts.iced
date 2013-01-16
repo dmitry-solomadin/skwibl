@@ -37,7 +37,7 @@ exports.setUp = (client, db) ->
 
   mod.isContact = (id, cid, pid, fn) ->
     #Get user projects
-    client.smembers "users:#{id}:projects", (err, array) ->
+    client.zrange "users:#{id}:projects", 0, -1, (err, array) ->
       if not err and array and array.length
         return tools.asyncParallel array, (project) ->
           if project isnt pid
