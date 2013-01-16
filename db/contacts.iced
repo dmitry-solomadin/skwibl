@@ -74,7 +74,7 @@ exports.setUp = (client, db) ->
     if index is array.length
       client.del "projects:#{pid}:users"
       return tools.asyncOpt fn, null, pid
-    return db.projects.remove pid, array[index], (err) ->
+    return db.projects.remove pid, array[index], false, (err) ->
       return process.nextTick ->
         db.contacts.deleteContacts pid, array, ++index, fn
 

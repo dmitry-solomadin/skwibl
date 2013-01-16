@@ -1,5 +1,5 @@
 $ ->
-  return unless currentPage "projects/show"
+  return unless currentPage "projects/room/show"
 
   class Chat
     constructor: ->

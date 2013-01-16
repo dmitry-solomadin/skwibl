@@ -4,11 +4,11 @@ cfg = require '../config'
 exports.setUp = (client, db) ->
   mod = {}
 
-  mod.update = (pid, owner, type, data, fn) ->
+  mod.update = (pid, ownerId, type, data, fn) ->
     aid = data.element.elementId
     action = {}
     action.project = pid
-    action.owner = owner
+    action.owner = ownerId
     action.type = type
     action.canvasId = data.canvasId if data.canvasId
     action.time = Date.now()
@@ -25,7 +25,7 @@ exports.setUp = (client, db) ->
             client.hset "actions:#{aid}", "number", cid
             if data.element.texts and data.element.texts.length
               return tools.asyncParallel data.element.texts, (text) ->
-                return db.comments.add text, ->
+                return db.comments.add text, false, ->
                   return tools.asyncDone data.element.texts, ->
                     return tools.asyncOpt fn, null, action
             else

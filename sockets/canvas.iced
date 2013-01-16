@@ -59,7 +59,7 @@ exports.configure = (sio) ->
         socket.broadcast.to(socket.project).emit 'commentText',
           id: id
           element: data
-        db.comments.add data
+        db.comments.add data, true
 
       socket.on 'markAsTodo', (elementId, cb) ->
         socket.broadcast.to(socket.project).emit 'markAsTodo',

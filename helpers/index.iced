@@ -1,2 +1,8 @@
+tools = require '../tools'
 
-module.exports = module.require './helpers'
+module
+
+tools.include __dirname, (mod, name) ->
+  module[name] = mod
+
+module.exports = module

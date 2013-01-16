@@ -72,8 +72,9 @@ exports.setUp = (logger) ->
 
   app.locals = {}
 
-  for method of helpers
-    app.locals[method] = helpers[method]
+  for file of helpers
+    for method of helpers[file]
+      app.locals[method] = helpers[file][method]
 
   app.locals.moment = moment
 

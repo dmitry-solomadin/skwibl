@@ -315,7 +315,7 @@ $ ->
   $.extend(App.room, room)
 
 $ ->
-  return unless currentPage("projects/show")
+  return unless currentPage("projects/room/show")
 
   # paper.install(window) causes errors upon defining getters for 'project', so we use this code
   for key of paper

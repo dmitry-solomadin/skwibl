@@ -21,13 +21,15 @@ exports.setUp = (client, db) ->
           initialized: true
           file: fid
         client.sadd "projects:#{pid}:files", fid
+        db.activities.addForAllInProject pid, 'fileUpload', owner, [owner], {canvasId: cid, fileId: fid}
         return tools.asyncOpt fn, null, canvasId: cid, element: file
       client.hmset "files:#{fid}", file
       client.sadd "projects:#{pid}:files", fid
       time = 0 if tools.getFileType(mime) is 'video'
       db.canvases.add pid, file, time, (err, canvas) ->
+        db.activities.addForAllInProject pid, 'fileUpload', owner, [owner], {canvasId: canvas.id, fileId: fid}
         return tools.asyncOpt fn, err, null if err
-        return tools.asyncOpt fn, null, canvasId: canvas.id, element: file, canvasName: canvas.name
+        return tools.asyncOpt fn, err, canvasId: canvas.id, element: file, canvasName: canvas.name
 
   mod.get = (uid, fn) ->
     #TODO

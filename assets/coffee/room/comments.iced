@@ -529,7 +529,7 @@ $ ->
       commentText.css("cursor", "pointer")
       commentText.find(".editCommentTextLink, .removeCommentTextLink").remove()
       commentText.on 'click', =>
-        @highlightComment commentText.data("element-id")
+        @highlightComment commentText.data("element-id"), false
 
       $("#todo-tab-inner").find("#" + commentText[0].id).remove()
       if commentText.hasClass("resolved")
@@ -553,7 +553,7 @@ $ ->
       $(".resolvedList").hide()
       $(".openList").show()
 
-    highlightComment: (commentTextId) ->
+    highlightComment: (commentTextId, twice) ->
       commentText = $("#commentText#{commentTextId}")
 
       result = room.helper.findByElementIdAllCanvases commentText.data("comment-id")
@@ -563,7 +563,8 @@ $ ->
       comment = result.element
       @unfoldComment comment.commentMin, false
 
-      commentText.effect("highlight", {}, 800);
+      commentText.effect("highlight", {}, 800)
+      commentText.effect("highlight", {}, 800) if twice
 
       commentX = commentText.offset().left - (room.canvas.getViewportAdjustX() / 2 )
       commentY = commentText.offset().top + (room.canvas.getViewportAdjustY()  / 2 )

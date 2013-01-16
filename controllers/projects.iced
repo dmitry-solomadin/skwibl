@@ -31,7 +31,7 @@ exports.show = (req, res, next) ->
           return next(err) if err
           db.actions.getProjectActions req.params.pid, 'chat', (err, chatMessages) ->
             return res.render 'index',
-              template: 'projects/show'
+              template: 'projects/room/show'
               pid: req.params.pid
               canvases: canvases,
               users: users,
@@ -191,7 +191,7 @@ exports.confirm = (req, res) ->
 exports.remove = (req, res) ->
   data = req.body
   if req.user.id isnt data.uid
-    return db.projects.remove data.pid, data.uid, (err) ->
+    return db.projects.remove data.pid, data.uid, false, (err) ->
       return res.send no if err
       return res.send uid: data.uid
   return res.send no
@@ -201,5 +201,5 @@ exports.remove = (req, res) ->
 # Remove current user from a project
 #
 exports.leave = (req, res) ->
-  db.projects.remove req.body.pid, req.user.id, (err) ->
+  db.projects.remove req.body.pid, req.user.id, true, (err) ->
     if err then res.send no else res.send yes

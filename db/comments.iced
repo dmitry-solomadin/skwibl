@@ -15,10 +15,12 @@ exports.setUp = (client, db) ->
               tools.asyncOpt fn, null, texts
       return tools.asyncOpt fn, err, []
 
-  mod.add = (element, fn) ->
+  # comment text may be restored after undo, in this case we consider this comment text as not new.
+  mod.add = (element, isNew, fn) ->
     element.time = Date.now()
     client.hmset "texts:#{element.elementId}", element
     client.rpush "comments:#{element.commentId}:texts", element.elementId
+    db.activities.addForAllInProject element.pid, 'newComment', element.owner, [element.owner], {commentTextId: element.elementId} if isNew
     return tools.asyncOpt fn, null, element
 
   mod.update = (elementId, text, fn) ->
@@ -50,6 +52,7 @@ exports.setUp = (client, db) ->
       if not err and text
         client.sadd "projects:#{text.pid}:todo", elementId
         client.hset "texts:#{elementId}", "todo", true
+        db.activities.addForAllInProject text.pid, 'newTodo', text.owner, [text.owner], {commentTextId: text.elementId}
         return tools.asyncOpt fn, err, null
       return tools.asyncOpt fn, err, null
 
@@ -58,6 +61,7 @@ exports.setUp = (client, db) ->
       if not err and text
         client.srem "projects:#{text.pid}:todo", elementId
         client.hset "texts:#{elementId}", "resolved", true
+        db.activities.addForAllInProject text.pid, 'todoResolved', text.owner, [text.owner], {commentTextId: text.elementId}
         return tools.asyncOpt fn, err, null
       return tools.asyncOpt fn, err, null
 
@@ -66,6 +70,7 @@ exports.setUp = (client, db) ->
       if not err and text
         client.sadd "projects:#{text.pid}:todo", elementId
         client.hdel "texts:#{elementId}", "resolved"
+        db.activities.addForAllInProject text.pid, 'todoReopened', text.owner, [text.owner], {commentTextId: text.elementId}
         return tools.asyncOpt fn, err, null
       return tools.asyncOpt fn, err, null
 

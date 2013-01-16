@@ -153,7 +153,7 @@ exports.setUp = (client, db) ->
         # check if user is already invited
         return client.zrangebyscore "projects:#{pid}:unconfirmed", user.id, user.id, (err, array) ->
           if not err and array and not array.length
-            return db.activities.add pid, user.id, 'projectInvite', id, (err, activity) ->
+            return db.activities.add pid, user.id, 'projectInvite', id, {}, (err, activity) ->
               if not err and activity
                 client.zadd "projects:#{pid}:unconfirmed", user.id, activity.id
               return tools.asyncOpt fn, err, user
@@ -196,32 +196,36 @@ exports.setUp = (client, db) ->
     #TODO
     console.log 'invite link'
 
-  mod.accept = (pid, aid, id, fn) ->
-    db.contacts.add pid, id
+  mod.accept = (pid, aid, uid, fn) ->
+    db.contacts.add pid, uid
     # Add the user to the project
     client.zrem "projects:#{pid}:unconfirmed", aid
-    client.sadd "projects:#{pid}:users", id
+    client.sadd "projects:#{pid}:users", uid
     # Add the project to the user
-    client.sadd "users:#{id}:projects", pid
-    return fn null, pid
+    client.sadd "users:#{uid}:projects", pid
+    db.activities.addForAllInProject pid, 'projectJoin', uid, [uid], {}, (err) ->
+      tools.asyncOpt fn, err, pid
 
   mod.decline = (pid, aid, fn) ->
     client.zrem "projects:#{pid}:unconfirmed", aid, fn
 
   # remove user from project.
-  mod.remove = (pid, id, fn) ->
+  mod.remove = (pid, uid, isLeave, fn) ->
     # Remove project from user projects
-    client.srem "users:#{id}:projects", pid
+    client.srem "users:#{uid}:projects", pid
     # Get project members
     client.smembers "projects:#{pid}:users", (err, array) ->
       if not err and array and array.length
-        db.contacts.recalculate id, array, pid
+        db.contacts.recalculate uid, array, pid
         return tools.asyncParallel array, (cid) ->
           # Recalculate member contacts
-          db.contacts.recalculate cid, [id], pid
+          db.contacts.recalculate cid, [uid], pid
           return tools.asyncDone array, ->
             # Remove user from project members
-            client.srem "projects:#{pid}:users", id
+            client.srem "projects:#{pid}:users", uid
+            if isLeave
+              return db.activities.addForAllInProject pid, 'projectLeave', uid, [uid], {}, (err) ->
+                return tools.asyncOpt fn, null
             return tools.asyncOpt fn, null
       return tools.asyncOpt fn, err
 

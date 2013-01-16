@@ -2,14 +2,24 @@
     margin: 5px 0;
 }
 
+.activity .label {
+    position: relative;
+    top: -2px;
+}
+
 .activityText {
     margin: 10px 0 10px 0;
+    font-size: 13px;
 }
 
 .activity .datetext {
-    color: #b2b2b2;
+    color: #909090;
     font-weight: normal;
-    font-size: 11px;
+    font-size: 12px;
+}
+
+.activity .activityHeader {
+    font-size: 17px;
 }
 
 #showInviteParticipants .caret {

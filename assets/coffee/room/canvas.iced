@@ -125,8 +125,16 @@ $ ->
     onLoadingFinished: ->
       # highlight to-do if id is provided
       if window.location.hash
-        commentTextId = window.location.hash.match(/tsl=(\d+)/)[1]
-        room.comments.highlightComment(commentTextId)
+        commentTextIdRaw = window.location.hash.match(/tsl=(\d+)/)
+        if commentTextIdRaw
+          commentTextId = commentTextIdRaw[1]
+          room.comments.highlightComment commentTextId, true
+
+        canvasIdRaw = window.location.hash.match(/cid=(\d+)/)
+        if canvasIdRaw
+          canvasId = canvasIdRaw[1]
+          room.canvas.findThumbByCanvasId(canvasId).click()
+
 
       @centerOnImage()
       room.redraw()

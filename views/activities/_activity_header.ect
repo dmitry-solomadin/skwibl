@@ -1,0 +1,7 @@
+<h4>
+  <span class="label <%- 'label-info' if @activity.status is 'new' %>"><%= @activity.status %></span>
+  <span class="activityHeader"><%= @header %></span>
+  <span class="datetext">
+    <%= @moment(parseFloat(@activity.time)).format("MMM DD, YYYY HH:mm") %>
+  </span>
+</h4>

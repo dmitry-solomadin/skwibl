@@ -7,8 +7,9 @@ exports.setUp = (client, db) ->
 
   mod = {}
 
-  # type is 'projectInvite' or ...
-  mod.add = (pid, ownerId, type, uid, fn) ->
+  # types are: 'projectInvite', 'projectJoin', 'projectLeft', 'newComment',
+  # 'newTodo', 'todoResolved', 'todoReopened', 'fileUpload'
+  mod.add = (pid, ownerId, type, uid, additionalInfo, fn) ->
     client.incr 'activities:next', (err, aid) ->
       if not err
         activity = {}
@@ -19,15 +20,28 @@ exports.setUp = (client, db) ->
         activity.time = Date.now()
         activity.status = 'new'
         activity.inviting = uid
+        activity.additionalInfo = JSON.stringify additionalInfo
         client.hmset "activities:#{aid}", activity
         client.rpush "users:#{ownerId}:activities", aid
         announce.in("activities#{ownerId}").emit 'new'
-        db.projects.findById pid, (err, project) ->
-          db.users.findById uid, (err, invitor) ->
-            db.users.findById ownerId, (err, owner) ->
-              smtp.prjInviteActivity owner, invitor, project
+        if type is 'projectInvite'
+          db.projects.findById pid, (err, project) ->
+            db.users.findById uid, (err, invitor) ->
+              db.users.findById ownerId, (err, owner) ->
+                smtp.prjInviteActivity owner, invitor, project
         return tools.asyncOpt fn, null, activity
       return tools.asyncOpt fn, err, null
+
+  mod.addForAllInProject = (pid, type, uid, except, additionalInfo, fn) ->
+    onDone = (err) -> tools.asyncOpt fn, err, null
+    db.projects.getUsers pid, (err, users) ->
+      tools.asyncOpt fn, err, null if err or not users or not users.length
+      return tools.asyncParallel users, (user) ->
+        if except and except.length
+          # continue to the next user if the user is in except
+          return onDone() for exceptId in except when exceptId is user.id
+        return db.activities.add pid, user.id, type, uid, additionalInfo, (err) ->
+          onDone err
 
   # todo consider refactoring in scope of #138
   mod.getAllNew = (uid, fn) ->
@@ -93,5 +107,8 @@ exports.setUp = (client, db) ->
           return tools.asyncDone activities, ->
             return tools.asyncOpt fn, null, null
         return tools.asyncOpt fn, err, []
+
+  mod.setStatus = (aid, newStatus) ->
+    client.hset "activities:#{aid}", 'status', newStatus
 
   return mod

@@ -1,25 +1,83 @@
-<% if @activity.type is 'projectInvite' : %>
 <div id="activity<%= @activity.id %>" class="activity">
-  <h4>
-    <span class="label <%- 'label-info' if @activity.status is 'new' %>"><%= @activity.status %></span>
-    Invite to project
-    <span class="datetext">
-      <%= @moment(parseFloat(@activity.time)).format("MMM DD, YYYY HH:mm") %>
-    </span>
-  </h4>
-
-  <div class="activityText">
-    <%= @activity.inviting.displayName %> invites you to the
-    <% if @activity.status is 'accepted' : %>
-    <a class="projectLink" href="/projects/<%= @activity.project.id %>"><b><%= @activity.project.name %></b></a>
-    <% else : %>
-    <b class="projectText"><%= @activity.project.name %></b>
+  <% switch @activity.type : %>
+    <% when 'projectInvite' : %>
+      <%- include './activities/_activity_header.ect', activity: @activity, moment: @moment, header: "Invite to project" %>
+      <div class="activityText">
+        <%= @activity.inviting.displayName %> invites you to the
+        <% if @activity.status is 'accepted' : %>
+        <a class="projectLink" href="/projects/<%= @activity.project.id %>"><b><%= @activity.project.name %></b></a>
+        <% else : %>
+        <b class="projectText"><%= @activity.project.name %></b>
+        <% end %>
+      </div>
     <% end %>
-  </div>
+    <% when 'projectJoin' : %>
+      <%- include './activities/_activity_header.ect', activity: @activity, moment: @moment, header: "New project member" %>
+      <div class="activityText">
+        <%= @activity.inviting.displayName %> joined the project
+        <a class="projectLink" href="/projects/<%= @activity.project.id %>"><b><%= @activity.project.name %></b></a>
+      </div>
+    <% end %>
+    <% when 'projectLeave' : %>
+      <%- include './activities/_activity_header.ect', activity: @activity, moment: @moment, header: "Project member left" %>
+      <div class="activityText">
+        <%= @activity.inviting.displayName %> left the project
+        <a class="projectLink" href="/projects/<%= @activity.project.id %>"><b><%= @activity.project.name %></b></a>
+      </div>
+    <% end %>
+    <% when 'newComment' : %>
+      <% additionalInfo = JSON.parse @activity.additionalInfo if @activity.additionalInfo %>
+      <% highlightString = '#tsl=' + additionalInfo.commentTextId if additionalInfo%>
+      <%- include './activities/_activity_header.ect', activity: @activity, moment: @moment, header: "New comment" %>
+      <div class="activityText">
+        A new comment has been added in <a class="projectLink" href="/projects/<%= @activity.project.id %>"><%= @activity.project.name %></a>
+        project by <%= @activity.inviting.displayName %>.<br>
+        See what he <a class="projectLink" href="/projects/<%= @activity.project.id %><%= highlightString %>">wrote</a>
+      </div>
+    <% end %>
+    <% when 'newTodo' : %>
+      <% additionalInfo = JSON.parse @activity.additionalInfo if @activity.additionalInfo %>
+      <% highlightString = '#tsl=' + additionalInfo.commentTextId if additionalInfo%>
+      <%- include './activities/_activity_header.ect', activity: @activity, moment: @moment, header: "New todo" %>
+      <div class="activityText">
+        A new todo has been created in <a class="projectLink" href="/projects/<%= @activity.project.id %>"><%= @activity.project.name %></a>
+        project by <%= @activity.inviting.displayName %>.
+        <a class="projectLink" href="/projects/<%= @activity.project.id %><%= highlightString %>">Show</a>
+      </div>
+    <% end %>
+    <% when 'todoResolved' : %>
+      <% additionalInfo = JSON.parse @activity.additionalInfo if @activity.additionalInfo %>
+      <% highlightString = '#tsl=' + additionalInfo.commentTextId if additionalInfo%>
+      <%- include './activities/_activity_header.ect', activity: @activity, moment: @moment, header: "Todo resolved" %>
+      <div class="activityText">
+        Todo has been resolved in <a class="projectLink" href="/projects/<%= @activity.project.id %>"><%= @activity.project.name %></a>
+        project by <%= @activity.inviting.displayName %>.
+        <a class="projectLink" href="/projects/<%= @activity.project.id %><%= highlightString %>">Show</a>
+      </div>
+    <% end %>
+    <% when 'todoReopened' : %>
+      <% additionalInfo = JSON.parse @activity.additionalInfo if @activity.additionalInfo %>
+      <% highlightString = '#tsl=' + additionalInfo.commentTextId if additionalInfo%>
+      <%- include './activities/_activity_header.ect', activity: @activity, moment: @moment, header: "Todo reopened" %>
+      <div class="activityText">
+        Todo has been reopened in <a class="projectLink" href="/projects/<%= @activity.project.id %>"><%= @activity.project.name %></a>
+        project by <%= @activity.inviting.displayName %>.
+        <a class="projectLink" href="/projects/<%= @activity.project.id %><%= highlightString %>">Show</a>
+      </div>
+    <% end %>
+    <% when 'fileUpload' : %>
+      <% additionalInfo = JSON.parse @activity.additionalInfo if @activity.additionalInfo %>
+      <% highlightString = '#cid=' + additionalInfo.canvasId if additionalInfo %>
+      <%- include './activities/_activity_header.ect', activity: @activity, moment: @moment, header: "New file" %>
+      <div class="activityText">
+        New file has been added in <a class="projectLink" href="/projects/<%= @activity.project.id %>"><%= @activity.project.name %></a>
+        project by <%= @activity.inviting.displayName %>.
+        <a class="projectLink" href="/projects/<%= @activity.project.id %><%= highlightString %>">Show</a>
+      </div>
+    <% end %>
+  <% end %>
 
-  <% if @activity.status is 'new' : %>
-  <button class="btn btn-success small-btn" name="accept" onclick="App.activities.accept('<%= @activity.id %>')">Accept</button>
-  <button class="btn btn-danger small-btn" name="decline" onclick="App.activities.decline('<%= @activity.id %>')">Decline</button>
+  <% unless @isReadOnly @activity : %>
+    <%- include './activities/_activity_controls.ect', activity: @activity %>
   <% end %>
 </div>
-<% end %>
