@@ -34,7 +34,6 @@ exports.setUp = (client, db) ->
       action.number = number unless isNaN number
       if type is 'comment' and not val
         return client.hincrby "canvases:#{canvasId}", 'nextComment', 1, (err, cid) ->
-          console.log cid
           action.number = cid
           if element.texts and element.texts.length
             tools.asyncParallel element.texts, (text) ->

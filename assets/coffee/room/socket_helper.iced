@@ -203,6 +203,9 @@ $ ->
             x: commentMinPosition.x - opts.pandx
             y: commentMinPosition.y - opts.pandy
 
+
+      data.requestNumber = true if $.trim($(commentMin[0]).html()) is "X"
+
       if commentMax
         data.element.max =
           x: commentMaxPosition.x - opts.pandx
