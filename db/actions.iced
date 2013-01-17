@@ -83,9 +83,7 @@ exports.setUp = (client, db) ->
         fetchedActions = []
         return tools.asyncParallel array, (aid) ->
           client.hgetall "actions:#{aid}", (err, action) ->
-            console.log "bp", action
             fetchedAction = JSON.parse(action.data)
-            console.log "ap", action
             fetchedAction.number = action.number
             return tools.asyncOpt fn, err, [] if err
             if type is 'comment'

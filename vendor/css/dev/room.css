@@ -610,6 +610,37 @@ body.room {
     padding-bottom: 195px;
 }
 
+#changelog-tab .datetext {
+    color: #909090;
+    font-weight: normal;
+    font-size: 10px;
+    margin-left: 5px;
+}
+
+.changelog-entry {
+    margin-bottom: 5px;
+}
+
+.changelog-header {
+    font-size: 14px;
+    font-family: 'MyriadPro-SemiBold';
+}
+
+#changelog-tab .image {
+    float: left;
+    margin-right: 3px;
+}
+
+#changelog-tab .changelog-inner {
+    line-height: 14px;
+}
+
+#changelog-tab .changelog-inner-change {
+    font-size: 11px;
+    color: #606060;
+    line-height: 11px;
+}
+
 .chat-message {
     margin-bottom: 7px;
     line-height: 14px;

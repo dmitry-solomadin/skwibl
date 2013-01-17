@@ -135,7 +135,6 @@ $ ->
           canvasId = canvasIdRaw[1]
           room.canvas.findThumbByCanvasId(canvasId).click()
 
-
       @centerOnImage()
       room.redraw()
 

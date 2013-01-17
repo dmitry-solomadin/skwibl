@@ -1,6 +1,7 @@
 tools = require '../tools'
 cfg = require '../config'
 smtp = require '../smtp'
+helpers = require '../helpers'
 announce = require('socket.io-announce') {namespace: '/activities'}
 
 exports.setUp = (client, db) ->
@@ -33,6 +34,7 @@ exports.setUp = (client, db) ->
       return tools.asyncOpt fn, err, null
 
   mod.addForAllInProject = (pid, type, uid, except, additionalInfo, fn) ->
+    db.changelog.add pid, uid, type, additionalInfo if helpers.activities.isChangeLoggable type
     onDone = (err) -> tools.asyncOpt fn, err, null
     db.projects.getUsers pid, (err, users) ->
       tools.asyncOpt fn, err, null if err or not users or not users.length

@@ -25,18 +25,21 @@ exports.show = (req, res, next) ->
   db.projects.set req.user.id, req.params.pid, ->
     db.projects.getData req.params.pid, (err, project) ->
       return next(err) if err
-      return db.canvases.index req.params.pid, (err, canvases) ->
+      return db.changelog.index req.params.pid, (err, changelog) ->
         return next(err) if err
-        db.projects.getUsers req.params.pid, (err, users) ->
+        return db.canvases.index req.params.pid, (err, canvases) ->
           return next(err) if err
-          db.actions.getProjectActions req.params.pid, 'chat', (err, chatMessages) ->
-            return res.render 'index',
-              template: 'projects/room/show'
-              pid: req.params.pid
-              canvases: canvases,
-              users: users,
-              chatMessages: chatMessages,
-              project: project
+          db.projects.getUsers req.params.pid, (err, users) ->
+            return next(err) if err
+            db.actions.getProjectActions req.params.pid, 'chat', (err, chatMessages) ->
+              return res.render 'index',
+                template: 'projects/room/show'
+                pid: req.params.pid
+                canvases: canvases,
+                users: users,
+                changelog: changelog
+                chatMessages: chatMessages,
+                project: project
 
 #
 # GET
@@ -137,7 +140,7 @@ exports.invite = (req, res) ->
     return db.users.persist user, ->
       db.projects.getData data.pid, (err, project) ->
         unless err
-          return res.render './projects/invite/participants.ect', project: project, (err, html) ->
+          return res.render './projects/invite/_participants.ect', project: project, (err, html) ->
             return res.send
               html: html
               msg: "Invitation has been sent."
@@ -150,7 +153,7 @@ exports.invite = (req, res) ->
 exports.participants = (req, res) ->
   db.projects.getData req.params.pid, (err, project) ->
     unless err
-      return res.render './projects/invite/participants.ect',
+      return res.render './projects/invite/_participants.ect',
         project: project
     res.send no
 

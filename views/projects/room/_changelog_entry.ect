@@ -1,0 +1,17 @@
+<span class="changelog-header"><%= @header %></span>
+<span class="datetext"><%= @time %></span>
+<div class="changelog-entry">
+  <div class="image">
+    <img class="userAvatar" src="<%= @picture %>" width="24" height="24"/>
+  </div>
+  <div class="changelog-inner">
+    <span class="messageAuthor"><%= @author %><%= ":" if @colon %></span>
+    <% if @text? : %>
+      <span class="changelog-inner-change"><%= @text %></span>
+    <% end %>
+    <% if @fileId? : %>
+      <div><img src="/files/<%= @pid %>/<%= @fileId %>" width="64" height="64"/></div>
+    <% end %>
+  </div>
+  <div style="clear:both;"></div>
+</div>

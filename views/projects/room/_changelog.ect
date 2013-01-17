@@ -1,0 +1,42 @@
+<% for changelogEntry in @changelog : %>
+  <%
+    picture = changelogEntry.initiator.picture or '/images/avatar.png'
+    parsedTime = parseFloat changelogEntry.time
+    time = @moment(parsedTime).format("MMM DD, YYYY HH:mm")
+    authorName = changelogEntry.initiator.displayName
+    changelog_params = {time: time, picture: picture, author: authorName, colon: true, pid: changelogEntry.pid}
+  %>
+  <% switch changelogEntry.type : %>
+    <% when 'newComment' : %>
+      <% changelog_params.header = "New comment" %>
+      <% changelog_params.text = changelogEntry.commentText.text %>
+    <% end %>
+    <% when 'projectJoin' : %>
+      <% changelog_params.header = "New project member" %>
+      <% changelog_params.colon = false %>
+    <% end %>
+    <% when 'projectLeave' : %>
+      <% changelog_params.header = "Project member left" %>
+      <% changelog_params.colon = false %>
+    <% end %>
+    <% when 'newTodo' : %>
+      <% changelog_params.header = "New todo" %>
+      <% changelog_params.text = changelogEntry.commentText.text %>
+    <% end %>
+    <% when 'todoResolved' : %>
+      <% changelog_params.header = "Todo resolved" %>
+      <%  changelog_params.text = changelogEntry.commentText.text %>
+    <% end %>
+    <% when 'todoReopened' : %>
+      <% changelog_params.header = "Todo reopened" %>
+      <% changelog_params.text = changelogEntry.commentText.text %>
+    <% end %>
+    <% when 'fileUpload' : %>
+      <% changelog_params.header = "New file added" %>
+      <% changelog_params.fileId = changelogEntry.additionalInfo.fileId %>
+      <% changelog_params.colon = false %>
+    <% end %>
+  <% end %>
+
+  <%- include './projects/room/_changelog_entry.ect', changelog_params %>
+<% end %>

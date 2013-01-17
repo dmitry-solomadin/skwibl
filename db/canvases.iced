@@ -19,7 +19,7 @@ exports.setUp = (client, db) ->
           else
             canvas.name = "Canvas #{count + 1}"
           client.hmset "canvases:#{cid}", canvas
-          client.lpush "projects:#{pid}:canvases", cid
+          client.rpush "projects:#{pid}:canvases", cid
           return tools.asyncOpt fn, null, canvas
         return tools.asyncOpt fn, err, null
 

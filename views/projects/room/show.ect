@@ -46,7 +46,7 @@
     </div>
     <div class="tab-content filter-box" id="changelog-tab" style="display: none;">
       <div id="changelog-tab-inner" class="filter-box-inner">
-        Changelog is yet to be implemented.
+        <%- include './projects/room/_changelog.ect'%>
       </div>
     </div>
   </div>
@@ -65,7 +65,7 @@
         <input id="fileupload" type="file" name="files[]" multiple>
       </span><br>
       <a href="#" id="dropboxChoose" class="btn font-normal">Dropbox</a><br>
-      <a class="btn font-normal disabled tooltipize" data-placement="bottom" title="This feature is comming soon">Google
+      <a class="btn font-normal disabled tooltipize" data-placement="bottom" title="This feature is coming soon">Google
         Drive</a><br>
 
       <div class="canvasInitHeader">or</div>
@@ -154,4 +154,4 @@
 </div>
 </div>
 
-<%- include './projects/invite/popup.ect' %>
+<%- include './projects/invite/_popup.ect' %>

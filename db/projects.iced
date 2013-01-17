@@ -149,11 +149,12 @@ exports.setUp = (client, db) ->
       return tools.asyncOptError fn, 'Cannot invite deleted user'
     # Check if user exists
     return client.exists "users:#{user.id}", (err, val) ->
+      console.log "here"
       if not err and val
         # check if user is already invited
         return client.zrangebyscore "projects:#{pid}:unconfirmed", user.id, user.id, (err, array) ->
           if not err and array and not array.length
-            return db.activities.add pid, user.id, 'projectInvite', id, (err, activity) ->
+            return db.activities.add pid, user.id, 'projectInvite', id, {}, (err, activity) ->
               if not err and activity
                 client.zadd "projects:#{pid}:unconfirmed", user.id, activity.id
               return tools.asyncOpt fn, err, user
