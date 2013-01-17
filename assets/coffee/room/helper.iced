@@ -40,7 +40,6 @@ $ ->
             setTimeout showButtons, 500
 
             for file in results
-              console.log "file", file
               room.canvas.handleUpload
                 canvasId: parseInt(file.canvasId)
                 fileId: file.element.id
@@ -118,7 +117,6 @@ $ ->
       for savedOpt in room.savedOpts
         for element in savedOpt.historytools.allHistory
           if element.commentMin
-            console.log element.commentMin.elementId
             if element.commentMin and "#{element.commentMin.elementId}" is "#{id}"
               return canvasId: savedOpt.canvasId, element: element
           if "#{element.elementId}" is "#{id}"

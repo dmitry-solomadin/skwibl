@@ -1,3 +1,6 @@
+<% if @changelog.length is 0 : %>
+    Items will appear in changelog when project participants will make actions.
+<% end %>
 <% for changelogEntry in @changelog : %>
   <%
     picture = changelogEntry.initiator.picture or '/images/avatar.png'
@@ -9,7 +12,7 @@
   <% switch changelogEntry.type : %>
     <% when 'newComment' : %>
       <% changelog_params.header = "New comment" %>
-      <% changelog_params.text = changelogEntry.commentText.text %>
+      <% changelog_params.text = if changelogEntry.commentText then changelogEntry.commentText.text else "Comment has been removed" %>
     <% end %>
     <% when 'projectJoin' : %>
       <% changelog_params.header = "New project member" %>
@@ -21,15 +24,15 @@
     <% end %>
     <% when 'newTodo' : %>
       <% changelog_params.header = "New todo" %>
-      <% changelog_params.text = changelogEntry.commentText.text %>
+      <% changelog_params.text = if changelogEntry.commentText then changelogEntry.commentText.text else "Comment has been removed" %>
     <% end %>
     <% when 'todoResolved' : %>
       <% changelog_params.header = "Todo resolved" %>
-      <%  changelog_params.text = changelogEntry.commentText.text %>
+      <%  changelog_params.text = if changelogEntry.commentText then changelogEntry.commentText.text else "Comment has been removed" %>
     <% end %>
     <% when 'todoReopened' : %>
       <% changelog_params.header = "Todo reopened" %>
-      <% changelog_params.text = changelogEntry.commentText.text %>
+      <% changelog_params.text = if changelogEntry.commentText then changelogEntry.commentText.text else "Comment has been removed" %>
     <% end %>
     <% when 'fileUpload' : %>
       <% changelog_params.header = "New file added" %>

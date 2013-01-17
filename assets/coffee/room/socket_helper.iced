@@ -169,9 +169,9 @@ $ ->
           strokeColor: elementToSend.strokeColor.toCssString()
           strokeWidth: elementToSend.strokeWidth
           opacity: elementToSend.opacity
-          isArrow: elementToSend.arrow?
+          isArrow: elementToSend.arrowGroup?
 
-      segments = if elementToSend.arrow then elementToSend.arrow.segments else elementToSend.segments
+      segments = elementToSend.segments
       for segment in segments
         data.element.segments.push
           x: segment.point.x - opts.pandx

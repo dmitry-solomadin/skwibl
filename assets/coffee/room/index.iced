@@ -156,8 +156,7 @@ $ ->
           @items.created.add(event.point) for [0..1]
         when 'arrow'
           arrow = new Path()
-          arrow.arrow = arrow
-          @items.init(arrow)
+          @items.init arrow
           @items.created.add(event.point) for [0..1]
           @items.created.lineStart = event.point
         when "select"
@@ -211,13 +210,9 @@ $ ->
         when 'straightline'
           @items.created.lastSegment.point = event.point
         when 'arrow'
-          arrowLine = @items.created.arrow
-          arrowLine.lastSegment.point = event.point
-
-          arrowGroup = @items.drawArrow(arrowLine)
-
-          @items.created = arrowGroup
-          arrowGroup.triangle.removeOnDrag()
+          @items.created.lastSegment.point = event.point
+          @items.drawArrow @items.created
+          @items.created.arrowGroup.triangle.removeOnDrag()
         when 'pan'
           @items.pan event.delta
         when 'select'

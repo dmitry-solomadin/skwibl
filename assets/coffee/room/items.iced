@@ -20,7 +20,6 @@ $ ->
       @created = item unless settings.noBuffer
 
     remove: (historize = true, item = @sel) ->
-      console.log 'remove'
       return unless item
       room.history.add(
         actionType: "remove"
@@ -32,7 +31,6 @@ $ ->
       room.redrawWithThumb()
 
     translate: (delta, item = @sel) ->
-      console.log 'translate selected'
       return unless item
       item.translate(delta)
       item.selectionRect?.translate(delta)
@@ -45,7 +43,6 @@ $ ->
 
     pan: (delta) ->
       #TODO move history logic out of this method
-      console.log 'pan'
       opts.pandx += delta.x
       opts.pandy += delta.y
       for el in opts.historytools.allHistory
@@ -60,7 +57,6 @@ $ ->
     # ITEMS SELECT
 
     testSelect: (point) ->
-      console.log 'test sel'
       selectTimeDelta = Date.now() - opts.selectTime if opts.selectTime
       opts.selectTime = Date.now()
       rect = @sel?.selectionRect
@@ -84,7 +80,6 @@ $ ->
       @setSelected(null) unless selected
 
     drawSelRect: (point) ->
-      console.log 'draw sel'
       if @sel
         @sel.selectionRect = @createSelRect()
         $("#removeSelected").removeClass("disabled")
@@ -105,7 +100,6 @@ $ ->
           @remove()
 
     createSelRect: ->
-#       console.log 'create sel'
       bounds = @sel.bounds
       addBound = parseInt(@sel.strokeWidth / 2)
       selRect = new Path.Rectangle(bounds.x - addBound, bounds.y - addBound,
@@ -168,6 +162,8 @@ $ ->
       sx = Math.abs(1 + @sel.pzx * event.delta.x / w)
       sy = Math.abs(1 + @sel.pzy * event.delta.y / h)
 
+      return if sx is 0 or sy is 0
+
       @scaleInternal @sel, sx, sy
 
       # redraw selection rect, we do not scale it because we need selectRect strokeWidth to stay unchanged
@@ -188,19 +184,12 @@ $ ->
     sx = 1 + delta.x / w
     sy = 1 + delta.y / h###
 
-    # todo fix for arrow
     scaleInternal: (item, sx, sy) ->
-      anchorPoint = if item.arrow then item.arrow.center else item.center
-      transformMatrix = new Matrix().scale(sx, sy, anchorPoint)
-      if item.arrow
-        item.arrow.transform transformMatrix
-        item.drawTriangle()
-      else
-        item.transform transformMatrix
+      item.transform new Matrix().scale(sx, sy, item.center)
+      item.arrowGroup.drawTriangle() if item.arrowGroup
 
     # ITEMS MISC
     createUserBadge: (uid, x, y) ->
-      console.log 'create user badge'
       getUserIndex = (uid) ->
         for user, index in App.chat.users
           return (index + 1) if "#{user.id}" is "#{uid}"
@@ -217,7 +206,6 @@ $ ->
       setTimeout fadeOutBadge, 2000
 
     isEmpty: (item) ->
-      console.log 'is item empty'
       #TODO this is strange code
       return true unless item
       return false unless item.segments
@@ -228,20 +216,18 @@ $ ->
       return false
 
     insertFirst: (item) ->
-      console.log 'insert first'
       paper.project.activeLayer.insertChild(0, item)
 
     drawArrow: (arrowLine) ->
-      console.log 'draw arrow'
       arrowGroup = new Group([arrowLine])
       arrowGroup.arrow = arrowLine
       arrowGroup.drawTriangle = => @drawArrowTriangle arrowGroup
-      triangle = arrowGroup.drawTriangle()
-      @init(triangle)
-      arrowGroup
+      arrowGroup.triangle = arrowGroup.drawTriangle()
+      @init arrowGroup.triangle
+      @created = arrowLine
+      arrowLine.arrowGroup = arrowGroup
 
     drawArrowTriangle: (group) ->
-      console.log 'draw arrow triangle'
       arrow = group.arrow
       arrowLastX = arrow.lastSegment.point.x
       arrowLastY = arrow.lastSegment.point.y
