@@ -1,51 +1,77 @@
 <input type="hidden" id="id" value="<%= @id %>"/>
 <input type="hidden" id="name" value="<%= @name %>"/>
 
-<h2>Projects</h2>
+<h1 class="page_header">Projects<%= ": #{@projects.length}" if @projects.length%></h1>
 
-<% if @projects.length : %>
-<div id="projects">
-  <% for project in @projects : %>
-  <div id="project<%= project.id %>" class="project">
-    <div class="fl projectLeft">
-      <div>
-        <% for file, index in project.files : %>
-          <% break if index > 3 %>
-          <div class="projectImage">
-            <img src="/files/<%= project.id %>/<%= file.id %>" width="64"/>
+<div class="content" id="projects">
+  <% if @projects.length : %>
+    <% for project in @projects : %>
+      <div class="project_body" id="project<%= project.id %>">
+        <div class="project clearfix">
+          <div class="project_pics">
+            <% if project.files.length : %>
+              <% for file, index in project.files : %>
+                <% break if index > 3 %>
+                <a href="#"><img src="/files/<%= project.id %>/<%= file.id %>" alt="test"></a>
+              <% end %>
+            <% else : %>
+              <div class="no_images">No images</div>
+            <% end %>
+            <div class="project_notice">0</div>
           </div>
-        <% end %>
-      </div>
-      <div>
-        <h4>Participants:</h4>
-        <% for user in project.users : %>
-          <img src="<%= if user.picture then user.picture else '/images/avatar.png' %>"
-               class="tooltipize" width="32" title="<%= user.displayName %>" data-placement="bottom"/>
-        <% end %>
-      </div>
-    </div>
-    <div class="fl projectRight">
-      <h3><a href="/projects/<%= project.id %>"><%= project.name %></a></h3>
+          <div class="project_r">
+            <h2 class="project_name"><a href="/projects/<%= project.id %>"><%= project.name %></a></h2>
 
-      <div class="todosDiv">
-        <% for todo in project.todos : %>
-          <a href="/projects/<%= project.id %>#tsl=<%= todo.elementId %>" onclick=""><%= todo.text %></a><br>
-        <% end %>
+            <div style="margin:3px 0;">To-Do: <strong style="color:#679e17;"><%= project.todosCount %></strong></div>
+            <ul class="project_list short">
+              <% for todo in project.todos : %>
+              <li><a href="/projects/<%= project.id %>#tsl=<%= todo.elementId %>" onclick=""><%= todo.text %></a></li>
+              <% end %>
+            </ul>
+            <a class="projects_more_btn" href="/projects/<%= project.id %>">View project &rarr;</a>
+          </div>
+          <div class="participants_number"><span style="color:#6b7078;">Projects participants: </span><%= project.users.length %></div>
+          <ul class="participants_list">
+            <% for user in project.users : %>
+              <li>
+                <a href="#">
+                  <img src="<%= if user.picture then user.picture else '/images/avatar.png' %>"
+                       class="tooltipize" width="50" title="<%= user.displayName %>" data-placement="bottom"/>
+                </a>
+              </li>
+            <% end %>
+          </ul>
+          <div class="projects_menu_container">
+            <ul class="projects_menu">
+              <li>
+                <a class="tooltipize"
+                   href="#" title="Move project"><img src="/images/projects/projects_menu1.png" alt="Move"></a>
+              </li>
+              <li>
+                <a onclick="App.projects.showInviteModal('<%= project.id %>'); return false;" class="tooltipize"
+                   href="#" title="Invite participant"><img src="/images/projects/projects_menu2.png" alt="Invite"></a>
+              </li>
+              <li>
+                <% if project.owner == @currentUser().id : %>
+                  <a onclick="App.projects.deleteProject('<%= project.id %>'); return false;" class="tooltipize"
+                     href="#" title="Delete project"><img src="/images/projects/projects_menu3.png" alt="Delete"></a>
+                <% else : %>
+                  <a onclick="App.projects.leaveProject('<%= project.id %>'); return false;" class="tooltipize"
+                     href="#" title="Leave project"><img src="/images/projects/projects_menu3.png" alt="Leave"></a>
+                <% end %>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
-
-      <a class="btn small-btn btn-success" href="#" onclick="App.projects.showInviteModal('<%= project.id %>'); return false;">Invite</a>
-      <% if project.owner == @currentUser().id : %>
-        <a class="btn small-btn btn-danger" href="#" onclick="App.projects.deleteProject('<%= project.id %>'); return false;">Delete</a>
-      <% else : %>
-        <a class="btn small-btn btn-warning" href="#" onclick="App.projects.leaveProject('<%= project.id %>'); return false;">Leave</a>
-      <% end %>
-    </div>
-    <div style="clear: both;"></div>
-  </div>
+    <% end %>
+    <a style="font-size:18px;" class="projects_more_btn" href="#">... See More Projects</a>
+  <% else : %>
+  No projects to display, do you want to <a href="/projects/new">create one</a>?
   <% end %>
 </div>
-<% else : %>
-    No projects to display, do you want to <a href="/projects/new">create one</a>?
-<% end %>
 
 <%- include './projects/invite/_popup.ect' %>
+
+
+

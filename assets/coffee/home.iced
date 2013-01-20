@@ -32,8 +32,8 @@ $ ->
       return false
 
     showForgotPassword: ->
-      $(".loginBlockWrapper > form:first").animate(left: -300)
-      $(".loginBlockWrapper > form:last").animate(left: -300)
+      $(".loginBlockWrapper > form:first").animate(left: -335)
+      $(".loginBlockWrapper > form:last").animate(left: -335)
 
     hideForgotPassword: ->
       $(".loginBlockWrapper > form:first").animate(left: 0)

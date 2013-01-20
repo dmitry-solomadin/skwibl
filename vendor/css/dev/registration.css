@@ -1,0 +1,152 @@
+.social {
+    float: right;
+    height: 56px;
+    line-height: 56px;
+    font-size: 0;
+    font-family: 'MyriadPro-Regular';
+}
+
+.social a {
+    position: relative;
+    display: inline-block;
+    width: 33px;
+    height: 32px;
+    vertical-align: middle;
+    margin-left: 10px;
+}
+
+.social img {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.social a img:first-child {
+    display: none;
+    z-index: 1;
+}
+
+.social a:hover img:first-child {
+    display: block;
+}
+
+.page_header {
+    font-family: 'MyriadPro-Regular';
+    font-size: 38px;
+    line-height: 40px;
+    padding: 30px 15px;
+    color: #fff;
+    text-shadow: -1px -1px rgba(0, 0, 0, 0.38);
+    margin: 0;
+    font-weight: normal;
+}
+
+.content {
+    padding: 30px 20px;
+    background: #f6f1ed;
+    border-radius: 4px;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.join_form {
+    width: 560px;
+    margin: 0 auto;
+    font-family: 'MyriadPro-Regular';
+}
+
+.social_join {
+    margin: 0;
+    list-style: none;
+}
+
+.social_join li {
+    margin: 0;
+    display: inline-block;
+    margin-left: 35px;
+}
+
+.social_join li:first-child {
+    margin-left: 0;
+}
+
+.social_join .add-on {
+    width: 33px;
+    padding: 0;
+    border: none;
+    height: 33px;
+    border-radius: 4px 0 0 4px;
+    margin-left: 0;
+    position: relative;
+}
+
+.social_join .btn {
+    height: 23px;
+    line-height: 23px;
+    font-size: 15px;
+    padding: 4px 20px;
+    font-family: 'MyriadPro';
+}
+
+hr {
+    border-top: 1px solid #c8bdb3;
+    margin: 25px 0;
+}
+
+input[type="text"],
+input[type="password"] {
+    font-family: Verdana, Geneva, sans-serif;
+    color: #474c55;
+    box-shadow: 0 0 0 3px #F6F1ED, inset 2px 2px 2px rgba(0, 0, 0, 0.06);
+    border: 1px solid #c8bdb3;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border: 1px solid #88c434;
+    box-shadow: 0 0 0 1px #88c434, 0 0 0 2px #fff;
+}
+
+.join_form input[type="text"],
+.join_form input[type="password"] {
+    width: 528px;
+    margin-bottom: 8px;
+}
+
+.verify_code {
+    float: left;
+    height: 80px;
+    width: 370px;
+    text-align: center;
+    font-size: 0;
+    line-height: 80px;
+    background: #fff;
+    margin-bottom: 8px;
+}
+
+a.verify_code_reset {
+    float: right;
+    width: 190px;
+    text-align: center;
+    color: #679e17;
+    text-decoration: underline;
+    font-size: 16px;
+    line-height: 80px;
+}
+
+.join_btn {
+    text-align: right;
+    margin-top: 15px;
+}
+
+.join_btn .btn {
+    font-size: 24px;
+    font-family: 'MyriadPro-Semibold';
+    padding: 14px 30px;
+}
+
+.join_div {
+    text-align: center;
+    font-size: 26px;
+    line-height: 36px;
+}

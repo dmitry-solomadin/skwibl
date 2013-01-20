@@ -1,57 +1,403 @@
-.activity {
-    margin: 5px 0;
+/* PROJECT INDEX START */
+
+.project_body {
+    border-bottom: 1px solid #fff;
+    margin-bottom: 35px;
 }
 
-.activity .label {
-    position: relative;
-    top: -2px;
-}
-
-.activityText {
-    margin: 10px 0 10px 0;
-    font-size: 13px;
-}
-
-.activity .datetext {
-    color: #909090;
-    font-weight: normal;
-    font-size: 12px;
-}
-
-.activity .activityHeader {
-    font-size: 17px;
-}
-
-#showInviteParticipants .caret {
-    vertical-align: middle;
-    margin-top: -1px;
-    margin-left: 5px;
-}
-
-#inviteParticipants {
-    margin-bottom: 10px;
-    display: none;
-}
-
-.showInviteParticipantsDiv {
-    margin-bottom: 5px;
-}
-
-.projectLeft {
-    margin-right: 20px;
-    padding-top: 5px;
-    width: 360px;
-}
-
-.projectRight {
-    vertical-align: top;
+.no_images {
+    font-size: 26px;
+    color: #a1a1a1;
+    text-align: center;
+    margin-top: 70px;
+    font-family: 'MyriadPro-Light';
 }
 
 .project {
-    margin-bottom: 35px;
-    padding-bottom: 10px;
-    border-bottom: 1px dashed #e3e3e3;
+    border-bottom: 1px solid #434a54;
+    padding-bottom: 15px;
+    position: relative;
 }
+
+.project_pics {
+    float: left;
+    width: 284px;
+    height: 176px;
+    padding: 0 2px 2px;
+    border: 1px solid #8ac535;
+    border-radius: 4px;
+    background: #fff;
+    position: relative;
+}
+
+.project_pics img {
+    border-top: 2px solid #fff;
+}
+
+.project_pics a img {
+    max-width: 105px;
+    max-height: 90px;
+}
+
+.project_pics a:first-child img {
+    float: left;
+    border-right: 2px solid #fff;
+    max-width: 175px;
+    max-height: 175px;
+}
+
+.project_notice {
+    position: absolute;
+    top: -19px;
+    right: -19px;
+    height: 36px;
+    width: 36px;
+    text-align: center;
+    line-height: 36px;
+    font-size: 18px;
+    font-family: 'MyriadPro-Bold';
+    color: #fff;
+    border-radius: 50%;
+    border: 1px solid #70ad18;
+    text-shadow: -1px -1px rgba(0, 0, 0, 0.38);
+    box-shadow: 1px 1px rgba(255, 255, 255, 0.84), inset 0 0 0 1px rgba(255, 255, 190, 0.75);
+    background: #cbed9c;
+    background: -moz-linear-gradient(top, #cbed9c 0%, #88c433 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #cbed9c), color-stop(100%, #88c433));
+    background: -webkit-linear-gradient(top, #cbed9c 0%, #88c433 100%);
+    background: -o-linear-gradient(top, #cbed9c 0%, #88c433 100%);
+    background: -ms-linear-gradient(top, #cbed9c 0%, #88c433 100%);
+    background: linear-gradient(to bottom, #cbed9c 0%, #88c433 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#cbed9c', endColorstr = '#88c433', GradientType = 0);
+}
+
+.project_r {
+    padding-left: 340px;
+    font-family: Tahoma, Geneva, sans-serif;
+    font-size: 16px;
+    line-height: 30px;
+}
+
+.project_name {
+    margin: 0;
+    font-family: 'MyriadPro-Regular';
+    font-size: 30px;
+    line-height: 30px;
+    font-weight: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.project_list {
+    list-style: none;
+    margin: 0;
+}
+
+.project_list li {
+    line-height: 30px;
+    padding-left: 25px;
+    background: url(/images/projects/list_style2.png) 0 11px no-repeat;
+}
+
+.project_list.short {
+    height: 90px;
+    overflow: hidden;
+}
+
+.project_list.short li {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+a.projects_more_btn {
+    font-size: 14px;
+    line-height: 14px;
+    color: #acabab;
+    text-decoration: underline;
+    display: block;
+    margin-top: 10px;
+}
+
+.participants_number {
+    font-family: 'MyriadPro-Regular';
+    font-size: 16px;
+    line-height: 20px;
+    margin-top: 10px;
+}
+
+.participants_list {
+    margin: 0;
+    list-style: none;
+    font-size: 0;
+    max-width: 720px;
+}
+
+.participants_list li {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    margin: 10px 10px 0 0;
+}
+
+.projects_menu_container {
+    position: absolute;
+    right: 0;
+    bottom: 15px;
+    overflow: hidden;
+    height: 0;
+    -webkit-transition: all 0.2s linear;
+    -moz-transition: all 0.2s linear;
+    -o-transition: all 0.2s linear;
+    -ms-transition: all 0.2s linear;
+    transition: all 0.2s linear;
+}
+
+.projects_menu {
+    border: 1px solid #7db232;
+    border-radius: 4px;
+    background: #88c433;
+    margin: 0;
+    list-style: none;
+    white-space: nowrap;
+    font-size: 0;
+    padding: 0 10px;
+}
+
+.project:hover .projects_menu_container {
+    height: 54px;
+}
+
+.projects_menu li {
+    display: inline-block;
+}
+
+.projects_menu li a {
+    display: block;
+    padding: 10px;
+}
+
+/* PROJECT INDEX END */
+
+/* PROJECT CREATE START */
+
+.project_create_btn {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.project_create_btn .btn {
+    font-size: 28px;
+    height: 36px;
+    line-height: 36px;
+    padding: 4px 38px;
+    font-family: 'MyriadPro-Semibold';
+}
+
+.project_create_form {
+    margin: 0;
+}
+
+.invite_head {
+    padding-left: 80px;
+    margin: 15px 0;
+    background: url(/images/projects/invite_head_icon.png) 0 0 no-repeat;
+    font-family: 'MyriadPro-Regular';
+    font-size: 30px;
+    line-height: 55px;
+}
+
+.invite_head .btn {
+    padding: 2px 6px 6px 6px;
+    vertical-align: top;
+    margin-top: 8px;
+}
+
+.invite_head .caret-image {
+    background: url("/images/projects/caret-bottom.png");
+    display: inline-block;
+    height: 7px;
+    width: 12px;
+}
+
+.invite_head .caret-image-top {
+    background: url("/images/projects/caret-top.png");
+}
+
+.invite_by_email {
+    margin-bottom: 10px;
+    font-family: Tahoma, Geneva, sans-serif;
+    color: #474C55;
+    box-shadow: 0 0 0 3px #F6F1ED, inset 2px 2px 2px rgba(0, 0, 0, 0.06);
+    font-size: 13px;
+    padding: 1px 8px 9px 0;
+    min-height: 22px;
+    border: 1px solid #C8BDB3;
+    background-color: #fff;
+    -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+    -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
+    -o-transition: border linear 0.2s, box-shadow linear 0.2s;
+    transition: border linear 0.2s, box-shadow linear 0.2s;
+    border-radius: 4px;
+}
+
+.invite_by_email_item {
+    display: inline-block;
+    background: #f6f1ed;
+    border: 1px solid #e2d8cf;
+    margin: 8px 0 0 8px;
+    border-radius: 2px;
+    padding-left: 8px;
+}
+
+.invite_by_email_item_close {
+    display: inline-block;
+    vertical-align: top;
+    height: 20px;
+    width: 24px;
+    background: url(/images/projects/invite_by_email_item_close.png) 50% no-repeat;
+}
+
+.from_contacts {
+    margin: 0;
+    list-style: none;
+}
+
+.from_contacts li {
+    display: inline-block;
+    margin-bottom: 20px;
+    height: 54px;
+    vertical-align: top;
+}
+
+.from_contacts li:first-child {
+    line-height: 54px;
+    font-size: 20px;
+    font-family: 'MyriadPro-Regular';
+    margin-right: 15px;
+}
+
+a.user {
+    display: inline-block;
+    height: 56px;
+    width: 150px;
+    text-decoration: none;
+}
+
+.user_pic {
+    padding: 3px;
+    background: #fff;
+    float: left;
+    width: 50px;
+    height: 50px;
+    position: relative;
+}
+
+.user_pic img {
+    border: 1px solid #f6f1ed;
+}
+
+.user:hover .user_pic {
+    padding: 2px;
+    border: 1px solid #8f8f8f;
+}
+
+.user_name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 14px;
+    color: #679e17;
+}
+
+.user_add, .user_remove {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+}
+
+.user_add {
+    background: url(/images/projects/add.png) 50% no-repeat;
+}
+
+.user_remove {
+    background: url(/images/projects/remove.png) 50% no-repeat;
+}
+
+.user:hover .user_add, .user:hover .user_remove {
+    display: block;
+}
+
+.contacts_nav {
+    margin: 0 0 15px;
+    list-style: none;
+    font-size: 0;
+}
+
+.contacts_nav li {
+    display: inline-block;
+    margin-right: 2px;
+}
+
+.contacts_nav li .btn {
+    height: 30px;
+    line-height: 30px;
+    padding: 4px 25px;
+    font-size: 18px;
+    text-shadow: 1px 1px rgba(255, 255, 255, 0.75);
+}
+
+.contacts_nav li.active .btn {
+    background-color: #88c433;
+    font-family: 'MyriadPro-Bold';
+    color: #fff;
+    text-shadow: -1px -1px rgba(0, 0, 0, 0.38);
+    background-image: none;
+    outline: 0;
+    -webkit-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+input.search_contacts {
+    width: 863px;
+    background: #fff url(/images/projects/search.png) 10px 50% no-repeat;
+    padding-left: 40px;
+    margin-bottom: 15px;
+}
+
+.contacts_container {
+    margin: 0 0 20px;
+    list-style: none;
+    height: 218px;
+    overflow: auto;
+    font-size: 0;
+    display: none;
+}
+
+.contacts_container.active {
+    display: block;
+}
+
+.contacts_container li {
+    display: inline-block;
+    margin-bottom: 25px;
+    width: 225px;
+}
+
+.contacts_container li .user {
+    width: 225px;
+}
+
+/* PROJECT CREATE END */
+
+/* INVITE PARTICIPANT MODAL START */
 
 .inviteNewDiv > * {
     vertical-align: top;
@@ -70,18 +416,8 @@
     font-size: 18px;
 }
 
-.projectImage {
-    background: #f5f5f5;
-    padding: 10px;
-    vertical-align: top;
-    display: inline-block;
-}
-
-.projectImage img {
-    vertical-align: middle;
-}
-
 .unconfirmed {
     color: gray;
 }
 
+/* INVITE PARTICIPANT MODAL END */

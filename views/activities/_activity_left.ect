@@ -1,0 +1,10 @@
+<% user = @activity.inviting %>
+<% picture = user.picture or '/images/avatar.png' %>
+<div class="activity_user">
+  <div class="timeline_point <%= 'active' if @activity.status is 'new' %>"></div>
+  <div class="activity_date"><%= @moment(parseFloat(@activity.time)).format("MMM DD, YYYY HH:mm") %></div>
+  <a href="#" class="clearfix" style="text-decoration:none;display:block;">
+    <div class="activity_user_pic"><img src="<%= picture %>" alt="<%= user.displayName %>"></div>
+    <div class="activity_user_name"><%= user.displayName %></div>
+  </a>
+</div>

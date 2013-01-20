@@ -30,7 +30,9 @@ exports.setUp = (client, db) ->
               project.files = files
               return db.comments.getProjectTodos pid, 3, (err, todos) ->
                 project.todos = todos
-                return tools.asyncOpt fn, err, project
+                return db.comments.getProjectTodosCount pid, (err, todos) ->
+                  project.todosCount = todos
+                  return tools.asyncOpt fn, err, project
       return tools.asyncOpt fn, err, null
 
   mod.findById = (pid, fn) ->

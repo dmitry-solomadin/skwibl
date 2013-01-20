@@ -4,11 +4,15 @@ $ ->
     constructor: ->
       @uid = $("#uid").val()
 
-      $("#showInviteParticipants").on "click", => @toogleParticipants()
+      $("#inviteParticipantsToggle").on "click", => @toogleParticipants()
 
-    toogleParticipants: () ->
-      $("#inviteParticipants").toggle("normal")
-      $("#showInviteParticipants .caret").toggleClass("caret-top")
+    toogleParticipants: ->
+      if $("#inviteParticipants:visible")[0]
+        $("#inviteParticipants").slideUp()
+      else
+        $("#inviteParticipants").slideDown()
+
+      $("#inviteParticipantsToggle .caret-image").toggleClass("caret-image-top")
 
     deleteProject: (pid) ->
       if confirm("Are you sure?")

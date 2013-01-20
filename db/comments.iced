@@ -37,7 +37,7 @@ exports.setUp = (client, db) ->
       client.del "texts:#{elementId}", fn
 
   mod.getProjectTodos = (pid, count, fn) ->
-    client.lrange "projects:#{pid}:todo", 0, -1, (err, array) ->
+    client.lrange "projects:#{pid}:todo", 0, count, (err, array) ->
       if not err and array and array.length
         todos = []
         return tools.asyncParallel array, (textId) ->
@@ -46,6 +46,10 @@ exports.setUp = (client, db) ->
             tools.asyncDone array, ->
               tools.asyncOpt fn, null, todos
       return tools.asyncOpt fn, err, []
+
+  mod.getProjectTodosCount = (pid, fn) ->
+    client.llen "projects:#{pid}:todo", (err, len) ->
+      return tools.asyncOpt fn, err, len
 
   mod.markAsTodo = (elementId, fn) ->
     db.comments.findById elementId, (err, text) ->

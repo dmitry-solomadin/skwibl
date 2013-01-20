@@ -13,65 +13,77 @@
     _gaq.push(['_setAccount', 'UA-37020806-1']);
     _gaq.push(['_trackPageview']);
 
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    (function () {
+      var ga = document.createElement('script');
+      ga.type = 'text/javascript';
+      ga.async = true;
       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(ga, s);
     })();
 
   </script>
 
 </head>
-<body <%= "class='room'" if @room %>>
-<input type="hidden" id="currentTemplate" value="<%= @template %>"/>
-<% include './header/header.ect' %>
+<body class="app">
+<div class="footer_stick">
+  <input type="hidden" id="currentTemplate" value="<%= @template %>"/>
+  <% include './header/header.ect' %>
 
-<% if @room : %>
-<div id="room-content" class="room-content">
-  <% include "./#{@template}.ect" %>
-</div>
-<% else : %>
-<div id="main-content" class="container">
-  <% include './shared/flash.ect' %>
+  <div id="main-content" class="container">
+    <% include './shared/flash.ect' %>
 
-  <% include "./#{@template}.ect" %>
+    <% include "./#{@template}.ect" %>
+    <div class="footer_push"></div>
+  </div>
+
+  <% include "./shared/_footer.ect" %>
 </div>
-<% end %>
 
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
   (function (d, w, c) {
-    (w[c] = w[c] || []).push(function() {
+    (w[c] = w[c] || []).push(function () {
       try {
-        w.yaCounter18806251 = new Ya.Metrika({id:18806251,
-          webvisor:true,
-          clickmap:true,
-          trackLinks:true,
-          accurateTrackBounce:true});
-      } catch(e) { }
+        w.yaCounter18806251 = new Ya.Metrika({id: 18806251,
+          webvisor: true,
+          clickmap: true,
+          trackLinks: true,
+          accurateTrackBounce: true});
+      } catch (e) {
+      }
     });
 
     var n = d.getElementsByTagName("script")[0],
         s = d.createElement("script"),
-        f = function () { n.parentNode.insertBefore(s, n); };
+        f = function () {
+          n.parentNode.insertBefore(s, n);
+        };
     s.type = "text/javascript";
     s.async = true;
     s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js";
 
     if (w.opera == "[object Opera]") {
       d.addEventListener("DOMContentLoaded", f, false);
-    } else { f(); }
+    } else {
+      f();
+    }
   })(document, window, "yandex_metrika_callbacks");
 </script>
-<noscript><div><img src="//mc.yandex.ru/watch/18806251" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<noscript>
+  <div><img src="//mc.yandex.ru/watch/18806251" style="position:absolute; left:-9999px;" alt=""/></div>
+</noscript>
 <!-- /Yandex.Metrika counter -->
 
 <script type="text/javascript">
   var uvOptions = {};
-  (function() {
-    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+  (function () {
+    var uv = document.createElement('script');
+    uv.type = 'text/javascript';
+    uv.async = true;
     uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/W6VHMgC86rkfE5OBvWTe0w.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(uv, s);
   })();
 </script>
 

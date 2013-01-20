@@ -1,56 +1,49 @@
-<h2>Join Skwibl</h2>
+<div class="page_container">
+  <h1 style="text-align:center;" class="page_header">Join skwibl</h1>
 
-<%- include './shared/errors.ect' %>
-
-<form action="/register" method="post" id="form_register" class="form-horizontal">
-  <fieldset>
-    <div class="control-group">
-      <div class="controls">
-        Use your social account to sign up:
-        <div style="clear: both;"></div>
-        <a class="fl" href="/auth/facebook">
-          <img src="/images/facebook_32.png">
-        </a>
-        <a class="fl" href="/auth/twitter">
-          <img src="/images/twitter_32.png">
-        </a>
-        <a class="fl" href="/auth/google">
-          <img src="/images/google_32.png">
-        </a>
-        <a class="fl" href="/auth/facebook">
-          <img src="/images/linkedin_32.png">
-        </a>
-        <div style="clear: both;"></div>
+  <div class="content">
+    <%- include './shared/errors.ect' %>
+    <div class="join_form">
+      <div class="join_div">
+        <div>Join through your Social Networks:</div>
+        <ul class="social_join">
+          <li class="input-append">
+            <img class="add-on" src="/images/registration/join_soc1.png" alt="Google+"><a
+              class="btn" href="/auth/google" title="Connect with Google+">Connect</a>
+          </li>
+          <li class="input-append">
+            <img class="add-on" src="/images/registration/join_soc2.png" alt="Facebook"><a
+              class="btn" href="/auth/facebook" title="Connect with Facebook">Connect</a>
+          </li>
+          <li class="input-append">
+            <img class="add-on" src="/images/registration/join_soc3.png" alt="Linkedin"><a
+              class="btn" href="/auth/linkedin" title="Connect with Linkedin">Connect</a>
+          </li>
+        </ul>
+        <hr>
+        <div style="color:#acabab">or</div>
+        <div>Create an Account</div>
       </div>
+      <form action="/register" method="post">
+        <input class="input-big" type="text" placeholder="Type your Name" name="name">
+        <input class="input-big" type="text" placeholder="Type your Email" name="email">
+        <input class="input-big" type="password" placeholder="Type your Password" name="password">
 
-      <div class="controls">
-        Or
-      </div>
+        <!--
+        CAPTCHA
+        <div class="verify_code">
+          <img src="pic/code.jpg" alt="verify code">
+        </div>
+        <a href="#" class="verify_code_reset">Generate new</a>
+
+        <div class="clearfix"></div>
+        <input style="width:338px;" type="text" placeholder="Enter the Characters Shown Above">
+        -->
+
+        <div class="join_btn">
+          <button type="submit" class="btn btn-success">Join Skwibl</button>
+        </div>
+      </form>
     </div>
-    <div class="control-group">
-      <label class="control-label" for="name">Name</label>
-
-      <div class="controls">
-        <input type="text" class="input-xlarge" name="name" id="name">
-      </div>
-      <div class="clear_medium"></div>
-      <label class="control-label" for="email">Email</label>
-
-      <div class="controls">
-        <input type="text" class="input-xlarge" name="email" id="email">
-      </div>
-      <div class="clear_medium"></div>
-      <label class="control-label" for="registerpassword">Password</label>
-
-      <div class="controls">
-        <input type="password" class="input-xlarge" name="password" id="registerpassword">
-      </div>
-      <div class="clear_medium"></div>
-    </div>
-    <div class="control-group">
-      <div class="controls">
-        <button class="btn btn-primary btn-large" type="submit">Join Skwibl</button>
-      </div>
-    </div>
-  </fieldset>
-</form>
+  </div>
+</div>

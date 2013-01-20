@@ -32,7 +32,7 @@ exports.show = (req, res, next) ->
           db.projects.getUsers req.params.pid, (err, users) ->
             return next(err) if err
             db.actions.getProjectActions req.params.pid, 'chat', (err, chatMessages) ->
-              return res.render 'index',
+              return res.render 'room_index',
                 template: 'projects/room/show'
                 pid: req.params.pid
                 canvases: canvases,

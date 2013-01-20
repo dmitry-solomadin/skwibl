@@ -29,10 +29,22 @@
           <%- include './header/user_dropdown.ect' %>
         <% else : %>
         <div class="nav-collapse">
-          <ul id="topLinks" class="nav">
-            <li class="activityLi"><a href="/activities">Activities</a></li>
-            <li class="activity-badge-wrapper"><span id="activityBadge" class="badge activity-badge">0</span></li>
-            <li><a href="/projects">Projects</a></li>
+          <ul id="topLinks" class="top_nav">
+            <% isProjects = @req.originalUrl.indexOf("projects") isnt -1 %>
+            <% isActivities = @req.originalUrl.indexOf("activities") isnt -1 %>
+            <li class="<%= 'selected' if isActivities %>">
+              <a href="/activities">
+                <div class="top_nav_icon"><img src="/images/top_nav1.png" alt="Activities" width="33"></div>
+                <div class="top_nav_name">Activities</div>
+                <div id="activityBadge" class="top_nav_notice">0</div>
+              </a>
+            </li>
+            <li class="<%= 'selected' if isProjects %>">
+              <a href="/projects">
+                <div class="top_nav_icon"><img src="/images/top_nav2.png" alt="Projects" width="36"></div>
+                <div class="top_nav_name">Projects</div>
+              </a>
+            </li>
           </ul>
 
           <%- include './header/user_dropdown.ect' %>
@@ -49,8 +61,8 @@
 
 <div id="loginBlock" class="loginBlock" style="display: none;">
   <div class="loginBlockWrapper">
-    <%- include './users/login_block.ect' %>
-    <%- include './users/forgot_password.ect' %>
+    <%- include './users/_login_block.ect' %>
+    <%- include './users/_forgot_password.ect' %>
   </div>
 </div>
 

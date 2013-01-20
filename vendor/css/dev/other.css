@@ -1,0 +1,74 @@
+.user_menu {
+    float: right;
+    white-space: nowrap;
+    position: relative;
+    margin-left: 35px;
+}
+
+.user_menu a:first-child {
+    color: #474c55;
+    text-decoration: none;
+}
+
+.user_menu_body {
+    padding-right: 24px;
+}
+
+.user_menu_name {
+    font-family: 'MyriadPro-Bold';
+    font-size: 17px;
+    line-height: 56px;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.user_menu_pic {
+    display: inline-block;
+    font-size: 0;
+    line-height: 56px;
+    vertical-align: top;
+}
+
+.user_menu img {
+    margin: 0 0 0 16px;
+}
+
+.user_menu_body:after {
+    content: "";
+    position: absolute;
+    right: 6px;
+    top: 25px;
+    border-top: 6px solid #41454b;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+}
+
+.user_menu .dropdown-menu:before {
+    position: absolute;
+    top: -7px;
+    left: 9px;
+    display: inline-block;
+    border-right: 7px solid transparent;
+    border-bottom: 7px solid #ccc;
+    border-left: 7px solid transparent;
+    border-bottom-color: rgba(0, 0, 0, 0.2);
+    content: '';
+}
+
+.user_menu .dropdown-menu:after {
+    position: absolute;
+    top: -6px;
+    left: 10px;
+    display: inline-block;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid #ffffff;
+    border-left: 6px solid transparent;
+    content: '';
+}
+
+
+
+
+
+
+

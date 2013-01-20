@@ -1,17 +1,158 @@
-<h2>Create new project</h2>
+<h1 class="page_header">Create a Project</h1>
+<div class="content">
+  <%- include './shared/errors.ect' %>
 
-<%- include './shared/errors.ect' %>
+  <form action="/projects/add" method="POST" class="project_create_form">
+    <input class="input-big" style="width:870px;" type="text" placeholder="Type Project Name" name="name">
 
-<form action="/projects/add" method="POST">
-  <label for="projectName">Name:</label>
-  <input id="projectName" type="text" name="name" value="">
+    <div class="invite_head">
+      Invite Participants
+      <a class="btn noselect" id="inviteParticipantsToggle"><span class="caret-image"></span></a>
+    </div>
 
-  <div class="showInviteParticipantsDiv">
-    <a id="showInviteParticipants" href="#">Invite participants<span class="caret"></span></a>
-  </div>
-  <div id="inviteParticipants">
-    <label for="inviteeEmails">E-mails(comma separated):</label>
-    <input type="text" name="inviteeEmails" id="inviteeEmails" value="">
-  </div>
-  <input type="submit" class="btn" value="Submit"/>
-</form>
+    <div id="inviteParticipants" style="display: none;">
+      <label style="font-family: 'MyriadPro-Regular';font-size:20px;line-height:26px;">By email:</label>
+
+      <input class="input-big" style="width:870px;" type="text" placeholder="Type email (comma separated)"
+             name="inviteeEmails">
+
+      <!-- NICE EMAIL INPUT
+      <div class="invite_by_email">
+        <div class="invite_by_email_item">valeriya@gmail.com<a class="invite_by_email_item_close" href="#"></a></div>
+        <div class="invite_by_email_item">mariya.korsak@gmail.com<a class="invite_by_email_item_close" href="#"></a></div>
+      </div>
+      -->
+
+      <!-- INVITE FROM CONTACS
+      <ul class="from_contacts">
+        <li>From contacts:</li>
+        <li>
+          <a href="#" class="user">
+            <div class="user_pic">
+              <img src="/images/avatar.png" alt="test">
+
+              <div class="user_add"></div>
+            </div>
+            <div style="padding:14px 0 14px 60px;">
+              <div class="user_name">Robby</div>
+              <div class="user_name">Williams</div>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="user">
+            <div class="user_pic">
+              <img src="/images/avatar.png" alt="test">
+
+              <div class="user_remove"></div>
+            </div>
+            <div style="padding:14px 0 14px 60px;">
+              <div class="user_name">Robby</div>
+              <div class="user_name">Williams</div>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="user">
+            <div class="user_pic">
+              <img src="/images/avatar.png" alt="test">
+
+              <div class="user_remove"></div>
+            </div>
+            <div style="padding:14px 0 14px 60px;">
+              <div class="user_name">Robby</div>
+              <div class="user_name">Williams</div>
+            </div>
+          </a>
+        </li>
+      </ul>
+      <ul id="contacts_tab" class="contacts_nav">
+        <li class="active"><a href="#all_contacts_tab" data-toggle="tab" class="btn">All contacts</a></li>
+        <li class=""><a href="#skwibl_contacts_tab" data-toggle="tab" class="btn">Skwibl</a></li>
+        <li class=""><a href="#facebook_contacts_tab" data-toggle="tab" class="btn">Facebook</a></li>
+        <li class=""><a href="#google_contacts_tab" data-toggle="tab" class="btn">Google</a></li>
+        <li class=""><a href="#linkedin_contacts_tab" data-toggle="tab" class="btn">Linkedin</a></li>
+      </ul>
+      <input class="input-big search_contacts" type="text" placeholder="Type to Search Contacts">
+      <ul id="all_contacts_tab" class="contacts_container active">
+        <li>
+          <a href="#" class="user">
+            <div class="user_pic">
+              <img src="/images/avatar.png" alt="test">
+
+              <div class="user_add"></div>
+            </div>
+            <div style="padding:14px 0 14px 60px;">
+              <div class="user_name">Robby</div>
+              <div class="user_name">Williams</div>
+            </div>
+          </a>
+        </li>
+      </ul>
+      <ul id="skwibl_contacts_tab" class="contacts_container">
+        <li>
+          <a href="#" class="user">
+            <div class="user_pic">
+              <img src="pic/user2.png" alt="test">
+
+              <div class="user_add"></div>
+            </div>
+            <div style="padding:14px 0 14px 60px;">
+              <div class="user_name">Robby</div>
+              <div class="user_name">Williams</div>
+            </div>
+          </a>
+        </li>
+      </ul>
+      <ul id="facebook_contacts_tab" class="contacts_container">
+        <li>
+          <a href="#" class="user">
+            <div class="user_pic">
+              <img src="pic/user3.png" alt="test">
+
+              <div class="user_add"></div>
+            </div>
+            <div style="padding:14px 0 14px 60px;">
+              <div class="user_name">Robby</div>
+              <div class="user_name">Williams</div>
+            </div>
+          </a>
+        </li>
+      </ul>
+      <ul id="google_contacts_tab" class="contacts_container">
+        <li>
+          <a href="#" class="user">
+            <div class="user_pic">
+              <img src="/images/avatar.png" alt="test">
+
+              <div class="user_add"></div>
+            </div>
+            <div style="padding:14px 0 14px 60px;">
+              <div class="user_name">Robby</div>
+              <div class="user_name">Williams</div>
+            </div>
+          </a>
+        </li>
+      </ul>
+      <ul id="linkedin_contacts_tab" class="contacts_container">
+        <li>
+          <a href="#" class="user">
+            <div class="user_pic">
+              <img src="pic/user2.png" alt="test">
+
+              <div class="user_add"></div>
+            </div>
+            <div style="padding:14px 0 14px 60px;">
+              <div class="user_name">Robby</div>
+              <div class="user_name">Williams</div>
+            </div>
+          </a>
+        </li>
+      </ul>
+      -->
+    </div>
+    <div class="project_create_btn">
+      <input type="submit" class="btn btn-success" value="Create"/>
+    </div>
+  </form>
+</div>
