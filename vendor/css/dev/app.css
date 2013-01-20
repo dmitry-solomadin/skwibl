@@ -42,6 +42,28 @@ body.app {
 
 /* GENERAL END */
 
+
+/* COMMON STYLES START */
+
+.page_header {
+    font-family: 'MyriadPro-Regular';
+    font-size: 38px;
+    line-height: 40px;
+    padding: 30px 15px;
+    color: #fff;
+    text-shadow: -1px -1px rgba(0, 0, 0, 0.38);
+    margin: 0;
+    font-weight: normal;
+}
+
+.content {
+    padding: 30px 20px;
+    background: #f6f1ed;
+    border-radius: 4px;
+    margin-bottom: 40px;
+    position: relative;
+}
+
 input.input-big {
     height: 32px;
     line-height: 32px;
@@ -173,6 +195,10 @@ input.input-big {
     background: #87ceeb;
 }
 
+/* COMMON STYLES END */
+
+/* LOGIN START */
+
 .loginBlock {
     z-index: 69;
     padding: 15px 10px 10px 10px;
@@ -286,7 +312,10 @@ input.input-big {
     padding: 5px 30px;
 }
 
+/* LOGIN END */
+
 /* TOP NAV START */
+
 .top_nav {
     float: left;
     margin: 0 0 0 80px;
@@ -440,6 +469,38 @@ input.input-big {
 
 .footer_push {
     height: 54px;
+}
+
+.social {
+    float: right;
+    height: 56px;
+    line-height: 62px;
+    font-size: 0;
+    font-family: 'MyriadPro-Regular';
+}
+
+.social a {
+    position: relative;
+    display: inline-block;
+    width: 33px;
+    height: 32px;
+    vertical-align: middle;
+    margin-left: 10px;
+}
+
+.social img {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.social a img:first-child {
+    display: none;
+    z-index: 1;
+}
+
+.social a:hover img:first-child {
+    display: block;
 }
 
 /* FOOTER END */

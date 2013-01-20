@@ -243,34 +243,3 @@ address {
     line-height: 56px;
     margin: 0 0 0 10px;
 }
-
-.social {
-    float: right;
-    height: 56px;
-    line-height: 56px;
-    font-size: 0;
-}
-
-.social a {
-    position: relative;
-    display: inline-block;
-    width: 33px;
-    height: 32px;
-    vertical-align: middle;
-    margin-left: 10px;
-}
-
-.social img {
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-.social a img:first-child {
-    display: none;
-    z-index: 1;
-}
-
-.social a:hover img:first-child {
-    display: block;
-}
