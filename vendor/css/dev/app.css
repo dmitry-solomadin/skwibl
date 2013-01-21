@@ -468,6 +468,15 @@ input.input-big {
     height: 56px;
 }
 
+.footer {
+    height: 56px;
+    box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.22), 0 -1px 0 #444b54;
+    border-top: 1px solid #86898d;
+    background: url(/images/mainpage/footer_bg.png);
+    line-height: 56px;
+    overflow: hidden;
+}
+
 .footer ul li {
     display: inline-block;
     font-size: 14px;
@@ -486,9 +495,11 @@ input.input-big {
 .social {
     float: right;
     height: 56px;
-    line-height: 62px;
+    line-height: 0;
     font-size: 0;
-    font-family: 'MyriadPro-Regular';
+    padding-top: 13px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
 }
 
 .social a {
