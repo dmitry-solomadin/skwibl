@@ -11,7 +11,7 @@ exports.setUp = (client, db) ->
     canvas = action.canvasId
     client.hmset "actions:#{aid}", action
     unless create # creating new action
-      action.new = create if create
+      action.new = create
       client.rpush "projects:#{pid}:#{type}", aid
       client.rpush "canvases:#{canvas}:#{type}", aid if canvas
       return tools.asyncOpt fn, null, action
@@ -45,7 +45,7 @@ exports.setUp = (client, db) ->
     db.actions.findById aid, (err, action) ->
       if err or not action
         return tools.asyncOpt fn, err, null
-      client.del "actions:#{aid}", fn unless err
+      client.del "actions:#{aid}", fn
       client.lrem "projects:#{action.project}:#{action.type}", 0, aid
       client.lrem "canvases:#{action.canvasId}:#{action.type}", 0, aid if action.canvasId
       if action.type is 'comment'
@@ -59,21 +59,6 @@ exports.setUp = (client, db) ->
 
   mod.findById = (aid, fn) ->
     client.hgetall "actions:#{aid}", fn
-
-  mod.getProjectActions = (pid, type, fn) ->
-    client.lrange "projects:#{pid}:#{type}", 0, -1, (err, array) ->
-      if not err and array and array.length
-        actions = []
-        return tools.asyncParallel array, (aid) ->
-          client.hgetall "actions:#{aid}", (err, action) ->
-            return tools.asyncOpt fn, err, [] if err
-            db.users.findById action.owner, (err, user) ->
-              return tools.asyncOpt fn, err, [] if err
-              action.owner = user
-              actions.push action
-              return tools.asyncDone array, ->
-                return tools.asyncOpt fn, null, actions
-      return tools.asyncOpt fn, err, []
 
   mod.getElements = (cid, type, fn) ->
     client.lrange "canvases:#{cid}:#{type}", 0, -1, (err, array) ->

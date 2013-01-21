@@ -6,7 +6,7 @@
     </div>
     <div class="message">
       <b class="messageAuthor"><%= "#{@message.owner.displayName}:" if @message %></b>
-      <span class="messageText"><%= JSON.parse(@message.data).msg if @message %></span>
+      <span class="messageText"><%= @message.message if @message %></span>
     </div>
   </div>
   <div class="timestamp">

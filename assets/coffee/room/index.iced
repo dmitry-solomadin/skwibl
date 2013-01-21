@@ -229,10 +229,10 @@ $ ->
       switch tooltype
         when 'line'
           @items.created.add(event.point)
-          @items.created.simplify(10)
+          @items.created.simplify(64)
         when 'highligher'
           @items.created.add(event.point)
-          @items.created.simplify(10)
+          @items.created.simplify(64)
         when "comment"
           commentRect = if @items.created and @items.created.isCommentRect then @items.created
           commentMin = @comments.create(event.point.x, event.point.y, commentRect)

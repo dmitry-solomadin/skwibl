@@ -119,6 +119,16 @@ exports.setUp = (client, db) ->
             return tools.asyncOpt fn, null, pid
       return tools.asyncOpt fn, err, pid
 
+  mod.deleteMessages = (pid, fn) ->
+    client.lrange "projects:#{pid}:messages", 0, -1, (err, array) ->
+      client.del "projects:#{pid}:messages" unless err
+      if not err and array and array.length
+        return tools.asyncParallel array, (mid) ->
+        client.del db.messages.delete mid
+        return tools.asyncDone array, ->
+          return tools.asyncOpt fn, null, pid
+      return tools.asyncOpt fn, err, pid
+
   mod.deleteInvitations = (pid, fn) ->
     client.zrange "projects:#{pid}:unconfirmed", 0, -1, (err, array) ->
       client.del "projects:#{pid}:unconfirmed" unless err
@@ -132,11 +142,10 @@ exports.setUp = (client, db) ->
   mod.delete = (pid, fn) ->
     db.projects.deleteCanvases pid
     db.projects.deleteUsers pid
-    db.projects.deleteActions pid, 'chat'
+    db.projects.deleteMessages pid
     db.projects.deleteActions pid, 'element'
     db.projects.deleteActions pid, 'comment'
     db.projects.deleteInvitations pid
-    dir = "./uploads/#{pid}"
     client.del "projects:#{pid}", fn
 
   mod.setProperties = (pid, properties, fn) ->

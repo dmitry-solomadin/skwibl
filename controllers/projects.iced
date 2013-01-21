@@ -31,7 +31,7 @@ exports.show = (req, res, next) ->
           return next(err) if err
           db.projects.getUsers req.params.pid, (err, users) ->
             return next(err) if err
-            db.actions.getProjectActions req.params.pid, 'chat', (err, chatMessages) ->
+            db.messages.getProjectMessages req.params.pid, (err, chatMessages) ->
               return res.render 'room_index',
                 template: 'projects/room/show'
                 pid: req.params.pid

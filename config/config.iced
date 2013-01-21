@@ -15,7 +15,7 @@ exports.FACEBOOK_APP_SECRET = 'ad4fc590e9e78619bcf076c4cda6bfb3'
 exports.LINKEDIN_CONSUMER_KEY = 'two4f1vl4319'
 exports.LINKEDIN_CONSUMER_SECRET = 'CN5FSKF3HYDw74Do'
 
-exports.DROPBOX_APP_KEY = 'btskqrr7wnr3k20'
+exports.DROPBOX_APP_KEY = 'i2bzqlvifx8i0c8'# Core API Key - 'btskqrr7wnr3k20'
 exports.DROPBOX_APP_SECRET = 'cd23he9pnhymnly'
 
 exports.YAHOO_CONSUMER_KEY = 'dj0yJmk9SlR3RUNVNGU4cnlMJmQ9WVdrOWJHOWtORlZ3TnpnbWNHbzlNVEkwTkRBeU16RTJNZy0tJnM9Y29uc3VtZXJzZWNyZXQmeD1kOQ--'
