@@ -27,51 +27,62 @@ exports.regPage = (req, res) ->
 # Local registration
 #
 exports.register = (req, res, next) ->
-  if req.body isnt null
-    email = req.body.email
-    unless cfg.ENVIRONMENT is 'development' or tools.isEmail email
-      tools.addError req, "Incorrect email address: #{email}"
-      return res.redirect '/registration'
-    db.users.findByEmail email, (err, user) ->
-      return next err if err
-      unless user
-        hash = tools.hash email
-        return db.users.add
-          hash: hash
-          displayName: req.body.name
-          password: req.body.password
-          status: 'unconfirmed'
-          provider: 'local'
-        , null, [
-          value: email
-          type: 'main'
-        ], (err, user) ->
-          return next err if err
-          unless user
-            tools.addError req, 'Enter valid email.'
+  error = false
+  unless req.body.email.length
+    tools.addError req, "Please enter email"
+    error = true
+
+  unless req.body.name.length
+    tools.addError req, "Please enter name"
+    error = true
+
+  unless req.body.password.length
+    tools.addError req, "Please enter password"
+    error = true
+
+  return res.redirect '/registration' if error
+
+  email = req.body.email
+  unless cfg.ENVIRONMENT is 'XXX' or tools.isEmail email
+    tools.addError req, "Incorrect email address: #{email}"
+    return res.redirect '/registration'
+  db.users.findByEmail email, (err, user) ->
+    return next err if err
+    unless user
+      hash = tools.hash email
+      return db.users.add
+        hash: hash
+        displayName: req.body.name
+        password: req.body.password
+        status: 'unconfirmed'
+        provider: 'local'
+      , null, [
+        value: email
+        type: 'main'
+      ], (err, user) ->
+        return next err if err
+        unless user
+          tools.addError req, 'Enter valid email.'
+          return res.redirect '/registration'
+        return smtp.regConfirm user, hash, (err, msg) ->
+          if err
+            req.flash 'error', "Can not send confirmation to  #{user.email}"
             return res.redirect '/registration'
-          return smtp.regConfirm user, hash, (err, msg) ->
+          else
+            req.flash 'message', "User with email: #{user.email} successfuly registred."
+            return res.redirect '/checkmail'
+    if user.status is 'deleted'
+      return db.users.restore user, (err) ->
+        unless err
+          return smtp.passwordSend user, (err, message) ->
             if err
-              req.flash 'error', "Can not send confirmation to  #{user.email}"
-              return res.redirect '/'
+              req.flash 'error', "Unable send confirmation to #{email}"
+              return res.redirect '/registration'
             else
-              req.flash 'message', "User with email: #{user.email} successfuly registred."
+              req.flash 'message', "Password successfuly sent to email: #{email}"
               return res.redirect '/checkmail'
-      if user.status is 'deleted'
-        return db.users.restore user, (err) ->
-          unless err
-            return smtp.passwordSend user, (err, message) ->
-              if err
-                req.flash 'error', "Unable send confirmation to #{email}"
-                return res.redirect '/'
-              else
-                req.flash 'message', "Password successfuly sent to email: #{email}"
-                return res.redirect '/checkmail'
-          return next err
-      tools.addError req, "This mail is already in use: #{email}"
-      return res.redirect '/registration'
-  else
-    tools.addError req, "Invalid user mail or password: #{email}"
+        return next err
+    tools.addError req, "This mail is already in use: #{email}"
     return res.redirect '/registration'
 
 #

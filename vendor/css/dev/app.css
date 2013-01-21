@@ -184,6 +184,18 @@ input.input-big {
     color: black;
 }
 
+.error_ajax {
+    height: 14px;
+    font-size: 14px;
+    color: red;
+    margin-bottom: 6px;
+    margin-top: 2px;
+}
+
+.just_hidden {
+    visibility: hidden;
+}
+
 .jp-play-bar {
     overflow: visible !important;
 }
