@@ -25,8 +25,11 @@
         <div>Create an Account</div>
       </div>
       <form action="/register" method="post" onsubmit="return App.Home.submitJoinForm();">
-        <input id="joinName" class="input-big" type="text" placeholder="Type your Name" name="name">
-        <div id="joinNameError" class="error_ajax just_hidden"></div>
+        <input id="joinGivenName" class="input-big input_half fl" type="text" placeholder="Type your First Name" name="givenName">
+        <input id="joinFamilyName" class="input-big input_half fl ml25" type="text" placeholder="Type your Last Name" name="familyName">
+        <div id="joinGivenNameError" class="error_ajax error_half fl just_hidden"></div>
+        <div id="joinFamilyNameError" class="error_ajax error_half fl ml25 just_hidden"></div>
+        <div class="clearfix"></div>
         <input id="joinEmail" class="input-big" type="text" placeholder="Type your Email" name="email">
         <div id="joinEmailError" class="error_ajax just_hidden"></div>
         <input id="joinPassword" class="input-big" type="password" placeholder="Type your Password" name="password">

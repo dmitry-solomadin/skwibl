@@ -62,6 +62,14 @@ input[type="password"]:focus {
     margin-bottom: 0;
 }
 
+.join_form .input_half {
+    width: 235px !important;
+}
+
+.join_form .error_half {
+    width: 267px !important;
+}
+
 .verify_code {
     float: left;
     height: 80px;

@@ -32,8 +32,12 @@ exports.register = (req, res, next) ->
     tools.addError req, "Please enter email"
     error = true
 
-  unless req.body.name.length
-    tools.addError req, "Please enter name"
+  unless req.body.givenName.length
+    tools.addError req, "Please enter first name"
+    error = true
+
+  unless req.body.familyName.length
+    tools.addError req, "Please enter last name"
     error = true
 
   unless req.body.password.length

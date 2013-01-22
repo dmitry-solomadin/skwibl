@@ -54,11 +54,13 @@ $ ->
     submitJoinForm: ->
       $(".error_ajax").css("visibility", "hidden")
 
-      name = $("#joinName").val()
+      firstName = $("#joinGivenName").val()
+      lastName = $("#joinFamilyName").val()
       email = $("#joinEmail").val()
       password = $("#joinPassword").val()
 
-      $("#joinNameError").html("Please enter name").css("visibility", "visible") unless name.length
+      $("#joinGivenNameError").html("Please enter first name").css("visibility", "visible") unless firstName.length
+      $("#joinFamilyNameError").html("Please enter last name").css("visibility", "visible") unless lastName.length
       if not email.length
         $("#joinEmailError").html("Please enter email").css("visibility", "visible")
       else if not App.Util.isEmailValid(email)
