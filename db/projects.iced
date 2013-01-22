@@ -20,6 +20,7 @@ exports.setUp = (client, db) ->
       return tools.asyncOpt fn, err, projects
 
   mod.getData = (pid, fn) ->
+    #TODO use async to simplify this function
     client.hgetall "projects:#{pid}", (err, project) ->
       if not err and project
         return db.projects.getUsers pid, (err, users) ->
@@ -28,9 +29,9 @@ exports.setUp = (client, db) ->
             project.unconfirmedUsers = unconfirmedUsers
             return db.projects.getFiles pid, (err, files) ->
               project.files = files
-              return db.comments.getProjectTodos pid, 3, (err, todos) ->
+              return db.texts.getProjectTodos pid, 3, (err, todos) ->
                 project.todos = todos
-                return db.comments.getProjectTodosCount pid, (err, todos) ->
+                return db.texts.getProjectTodosCount pid, (err, todos) ->
                   project.todosCount = todos
                   return tools.asyncOpt fn, err, project
       return tools.asyncOpt fn, err, null
@@ -97,7 +98,7 @@ exports.setUp = (client, db) ->
       client.del "projects:#{pid}:canvases" unless err
       if not err and array and array.length
         return tools.asyncParallel array, (cid) ->
-          client.del "canvases:#{cid}"
+          db.canvases.delete cid
           return tools.asyncDone array, ->
             return tools.asyncOpt fn, null, pid
       return tools.asyncOpt fn, err, pid
@@ -107,16 +108,6 @@ exports.setUp = (client, db) ->
       if not err and array and array.length
         db.contacts.deleteContacts pid, array, 0, fn
       client.del "projects:#{pid}:users"
-      return tools.asyncOpt fn, err, pid
-
-  mod.deleteActions = (pid, type, fn) ->
-    client.lrange "projects:#{pid}:#{type}", 0, -1, (err, array) ->
-      client.del "projects:#{pid}:#{type}" unless err
-      if not err and array and array.length
-        return tools.asyncParallel array, (aid) ->
-          client.del db.actions.delete aid
-          return tools.asyncDone array, ->
-            return tools.asyncOpt fn, null, pid
       return tools.asyncOpt fn, err, pid
 
   mod.deleteMessages = (pid, fn) ->
@@ -143,8 +134,6 @@ exports.setUp = (client, db) ->
     db.projects.deleteCanvases pid
     db.projects.deleteUsers pid
     db.projects.deleteMessages pid
-    db.projects.deleteActions pid, 'element'
-    db.projects.deleteActions pid, 'comment'
     db.projects.deleteInvitations pid
     client.del "projects:#{pid}", fn
 

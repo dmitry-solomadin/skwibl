@@ -25,21 +25,20 @@ exports.show = (req, res, next) ->
   db.projects.set req.user.id, req.params.pid, ->
     db.projects.getData req.params.pid, (err, project) ->
       return next(err) if err
+      #TODO move all this to getData
       return db.changelog.index req.params.pid, (err, changelog) ->
         return next(err) if err
         return db.canvases.index req.params.pid, (err, canvases) ->
           return next(err) if err
-          db.projects.getUsers req.params.pid, (err, users) ->
-            return next(err) if err
-            db.messages.getProjectMessages req.params.pid, (err, chatMessages) ->
-              return res.render 'room_index',
-                template: 'projects/room/show'
-                pid: req.params.pid
-                canvases: canvases,
-                users: users,
-                changelog: changelog
-                chatMessages: chatMessages,
-                project: project
+          db.messages.getProjectMessages req.params.pid, (err, chatMessages) ->
+            return res.render 'room_index',
+              template: 'projects/room/show'
+              pid: req.params.pid
+              canvases: canvases,
+              users: project.users,
+              changelog: changelog
+              chatMessages: chatMessages,
+              project: project
 
 #
 # GET
