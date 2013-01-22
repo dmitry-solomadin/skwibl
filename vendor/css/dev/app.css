@@ -16,7 +16,7 @@ h2 {
 }
 
 h3 {
-    font-family: 'MyriadPro';
+    font-family: 'MyriadPro-Regular';
     font-weight: normal;
     font-size: 24px;
     line-height: 30px;
@@ -29,7 +29,7 @@ h4 {
 }
 
 h4, h5, h6 {
-    font-family: 'MyriadPro';
+    font-family: 'MyriadPro-Regular';
     font-weight: normal;
 }
 
@@ -53,6 +53,11 @@ body.app {
     background: url(/images/site_bg.jpg) 50% 0 no-repeat fixed;
 }
 
+b {
+    font-family: 'MyriadPro-SemiBold';
+    font-weight: 600;
+}
+
 /* GENERAL END */
 
 /* COMMON STYLES START */
@@ -73,7 +78,7 @@ body.app {
 }
 
 .page_header {
-    font-family: 'MyriadPro-Regular';
+    font-family: MyriadPro-Regular;
     font-size: 38px;
     line-height: 40px;
     padding: 30px 15px;
@@ -123,7 +128,7 @@ input.input-big {
 }
 
 .font-normal {
-    font-family: 'MyriadPro' !important;
+    font-family: 'MyriadPro-Regular' !important;
 }
 
 .navbar .btn {
@@ -335,7 +340,7 @@ input.input-big {
     line-height: 16px;
     font-size: 14px;
     padding: 4px 10px;
-    font-family: 'MyriadPro';
+    font-family: 'MyriadPro-Regular';
 }
 
 .login_or_wrap {
