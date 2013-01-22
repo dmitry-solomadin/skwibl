@@ -30,8 +30,9 @@ exports.setUp = (client, db) ->
         for email in emails
           value = email.value
           umails.push value
-          emailtypes.push "emails:#{value}:type"
-          emailtypes.push email.type
+          if email.type
+            emailtypes.push "emails:#{value}:type"
+            emailtypes.push email.type
           emailuid.push "emails:#{value}:uid"
           emailuid.push val
         if user.hash
