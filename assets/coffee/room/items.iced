@@ -7,7 +7,6 @@ $ ->
 
     # ITEMS MANIPULATION
 
-
     init: (item, settings) ->
       settings = settings or {}
       item.strokeJoin = "round"
@@ -42,7 +41,6 @@ $ ->
         @setSelected(null)
 
     pan: (delta) ->
-      #TODO move history logic out of this method
       opts.pandx += delta.x
       opts.pandy += delta.y
       for el in opts.historytools.allHistory
@@ -206,7 +204,6 @@ $ ->
       setTimeout fadeOutBadge, 2000
 
     isEmpty: (item) ->
-      #TODO this is strange code
       return true unless item
       return false unless item.segments
       return true if item.segments.length is 1

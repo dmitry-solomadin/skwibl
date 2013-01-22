@@ -11,7 +11,7 @@
           <div class="project_pics">
             <% if project.files.length : %>
               <% for file, index in project.files : %>
-                <% break if index > 3 %>
+                <% break if index > 2 %>
                 <a href="#"><img src="/files/<%= project.id %>/<%= file.id %>" alt="test"></a>
               <% end %>
             <% else : %>
