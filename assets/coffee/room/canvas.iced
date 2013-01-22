@@ -240,12 +240,15 @@ $ ->
 
         room.comments.showComment(element.commentMin) if element.commentMin and withComments
 
-    getFitToImage: ->
+    getFitToImage: (dontEnlarge = true)->
       w = paper.project.view.viewSize.width / opts.image.width
       h = paper.project.view.viewSize.height / opts.image.height
-      if h < w then h else w
+      r = if h < w then h else w
+      return null if r > 1 and dontEnlarge
+      return r
 
     setScale: (scale, prevScale) ->
+      return unless scale
       $("#scaleAmount").html "#{parseInt(scale * 100)}%"
 
       previousScale = prevScale or opts.currentScale
@@ -372,8 +375,9 @@ $ ->
 
       @addImage canvasData.fileId, canvasData.posX, canvasData.posY, (raster, executeLoadImage) =>
         executeLoadImage()
-        @setScale @getFitToImage(), prevScale
-        @centerOnImage()
+        if @getSelectedCanvasId() is canvasData.canvasId
+          @setScale @getFitToImage(), prevScale
+          @centerOnImage()
         @updateThumb parseInt(canvasData.canvasId)
 
       room.socket.emit("fileAdded", canvasData) if emit
@@ -468,7 +472,7 @@ $ ->
 
       if opts.image
         fitted = true
-        @setScale @getFitToImage()
+        @setScale @getFitToImage(false)
         @centerOnImage true
 
       transformMatrix = new Matrix(sy / scale, 0, 0, sy / scale, 0, 0)
@@ -527,7 +531,7 @@ $ ->
       room.setOpts canvasOpts
       @restore(true, false)
 
-      newScale = if opts.image and not opts.scaleChanged then @getFitToImage() else opts.currentScale
+      newScale = if opts.image and not opts.scaleChanged and @getFitToImage() then @getFitToImage() else opts.currentScale
       @setScale newScale, previousScale
       @centerOnImage()
 

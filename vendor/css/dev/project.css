@@ -23,20 +23,16 @@
     float: left;
     width: 284px;
     height: 176px;
-    padding: 0 2px 2px;
+    padding: 2px;
     border: 1px solid #8ac535;
     border-radius: 4px;
     background: #fff;
     position: relative;
 }
 
-.project_pics img {
-    border-top: 2px solid #fff;
-}
-
 .project_pics a img {
     max-width: 105px;
-    max-height: 90px;
+    max-height: 87px;
 }
 
 .project_pics a:first-child img {
@@ -44,6 +40,10 @@
     border-right: 2px solid #fff;
     max-width: 175px;
     max-height: 175px;
+}
+
+.project_pics a:nth-child(2) img {
+    border-bottom: 2px solid #fff;
 }
 
 .project_notice {
