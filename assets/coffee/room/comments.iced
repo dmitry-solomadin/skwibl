@@ -572,8 +572,8 @@ $ ->
       commentWidth = commentText.width()
       commentHeight = commentText.height()
 
-      canvasX = paper.view.center.x
-      canvasY = paper.view.center.y
+      canvasX = opts.scaledCenter.x
+      canvasY = opts.scaledCenter.y
 
       diffX = canvasX - commentX - (commentWidth / 2)
       diffY = canvasY - commentY - (commentHeight / 2)

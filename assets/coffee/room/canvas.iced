@@ -63,18 +63,17 @@ $ ->
 
       @forEachThumbInContext (cid, fid, posX, posY, index) =>
         if fid
-          @addImage fid, posX, posY, (raster, executeLoadImage) =>
+          return @addImage fid, posX, posY, (raster, executeLoadImage) =>
             executeLoadImage()
 
             if cid isnt selectedCid and opts.image and opts.image.id isnt raster.id
               room.helper.findById(raster.id).remove()
 
             @updateThumb(cid)
-            if (room.canvas.getThumbs().length - 1) is index
-              @onLoadingFinished()
+            @onFitstCavasLoaded() if index is 0
+            @onLoadingFinished() if (room.canvas.getThumbs().length - 1) is index
         else
           @onLoadingFinished() unless isAnyFilePresent
-
           @updateThumb(cid)
 
     initBackground: ->
@@ -122,6 +121,11 @@ $ ->
       selectedOpts = @findOptsById(selectedCid)
       room.setOpts(selectedOpts)
 
+    onFitstCavasLoaded: ->
+      @setScale @getFitToImage()
+      @centerOnImage()
+      room.redraw()
+
     onLoadingFinished: ->
       # highlight to-do if id is provided
       if window.location.hash
@@ -135,7 +139,6 @@ $ ->
           canvasId = canvasIdRaw[1]
           room.canvas.findThumbByCanvasId(canvasId).click()
 
-      @centerOnImage()
       room.redraw()
 
     initNameChanger: ->
@@ -175,14 +178,11 @@ $ ->
         @destroy cid, true
 
     destroy: (cid, emit) ->
-      optsToRemove = @findOptsById(cid)
-
       if @getThumbs().length > 1
         @findThumbByCanvasId(cid).parent().remove()
         @findMiniThumbByCanvasId(cid).remove()
+        room.savedOpts.splice room.savedOpts.indexOf(@findOptsById(cid)), 1
         @selectThumb $("#canvasSelectDiv div:first a")
-        room.savedOpts.splice room.savedOpts.indexOf(optsToRemove), 1
-        room.setOpts @findOptsById(@getSelectedCanvasId())
       else
         @erase()
         room.savedOpts = []
@@ -267,10 +267,9 @@ $ ->
 
             room.comments.redrawArrow(element.commentMin)
 
-      scaledCenter = opts.scaledCenter or paper.view.center
-      newScaledCenter = room.applyCurrentScale paper.view.center
-      opts.scaledCenter = newScaledCenter
-      room.items.pan new Point(newScaledCenter.x - scaledCenter.x, newScaledCenter.y - scaledCenter.y)
+      prevScaledCenter = opts.scaledCenter
+      opts.scaledCenter = room.applyCurrentScale paper.view.center
+      room.items.pan new Point(opts.scaledCenter.x - prevScaledCenter.x, opts.scaledCenter.y - prevScaledCenter.y)
 
       room.redraw()
 
@@ -282,9 +281,13 @@ $ ->
       $.post '/projects/prepareDownload', {pid: $("#pid").val(), canvasData: dataURL}, (data, status, xhr) =>
         window.location = "/projects/download?pid=#{$("#pid").val()}&img=#{data}"
 
-    addScale: -> @setScale(opts.currentScale + 0.1);
+    addScale: ->
+      opts.scaleChanged = true
+      @setScale(opts.currentScale + 0.1)
 
-    subtractScale: -> @setScale(opts.currentScale - 0.1);
+    subtractScale: ->
+      opts.scaleChanged = true
+      @setScale(opts.currentScale - 0.1)
 
     getViewportAdjustX: -> if App.chat.isVisible() then 300 else 0
 
@@ -350,8 +353,8 @@ $ ->
     deinitializeFirst: () ->
       firstThumb = $(@getThumbs()[0])
       room.showSplashScreen()
-      room.initOpts firstThumb.data("cid")
       #initialiaze new empty opts
+      room.initOpts firstThumb.data("cid")
       firstThumb.attr("data-initialized", "false").data("initialized", "false")
 
     addEmpty: (canvasData) ->
@@ -360,6 +363,7 @@ $ ->
       room.socket.emit "canvasAdded", canvasData
 
     handleUpload: (canvasData, emit) ->
+      prevScale = opts.currentScale
       if @isFirstInitialized()
         room.hideSplashScreen true
         @addNewThumbAndSelect canvasData
@@ -368,7 +372,8 @@ $ ->
 
       @addImage canvasData.fileId, canvasData.posX, canvasData.posY, (raster, executeLoadImage) =>
         executeLoadImage()
-
+        @setScale @getFitToImage(), prevScale
+        @centerOnImage()
         @updateThumb parseInt(canvasData.canvasId)
 
       room.socket.emit("fileAdded", canvasData) if emit
@@ -398,11 +403,12 @@ $ ->
 
       img
 
-    centerOnImage: ->
+    centerOnImage: (force = false) ->
       # do not center user if the moved the canvas by himself
-      if opts.image and not opts.pandx and not opts.pandy
-        centerX = paper.view.center.x
-        centerY = paper.view.center.y
+      userMovedCanvas = true if opts.pandx or opts.pandy
+      if opts.image and (not userMovedCanvas or force)
+        centerX = opts.scaledCenter.x
+        centerY = opts.scaledCenter.y
         imageX = opts.image.position.x
         imageY = opts.image.position.y
 
@@ -411,29 +417,26 @@ $ ->
 
     cancelPan: -> room.items.pan new Point(-opts.pandx, -opts.pandy)
 
-    addNewThumb: (canvasData) ->
-      thumb = $("#canvasSelectDiv div:first").clone()
-      thumb.find("a").attr("data-cid", canvasData.canvasId).attr("data-fid", canvasData.fileId)
-        .attr("data-name", canvasData.name).attr("data-pos-x", canvasData.posX).attr("data-pos-y", canvasData.posY)
-      $("#canvasSelectDiv").append(thumb)
-
-    addNewMiniThumb: (canvasData) ->
-      mini = $("<div class='smallCanvasPreview tooltipize' title='#{canvasData.name}'></div>")
-      mini.attr("data-cid", canvasData.canvasId).attr("data-fid", canvasData.fileId).attr("data-name", canvasData.name)
-      $("#smallCanvasPreviews").append(mini)
-
     addNewThumbAndSelect: (canvasData) ->
       @erase()
       room.initOpts(canvasData.canvasId)
 
-      @addNewThumb canvasData
-      @addNewMiniThumb canvasData
-
+      @addNewThumbHtml canvasData
       $("#canvasSelectDiv a").removeClass("canvasSelected")
       $("#canvasSelectDiv div:last a").addClass("canvasSelected")
       $(".smallCanvasPreview").removeClass("previewSelected")
       $(".smallCanvasPreview:last").addClass("previewSelected")
       $("#canvasName").html(canvasData.name)
+
+    addNewThumbHtml: (canvasData) ->
+      thumb = $("#canvasSelectDiv div:first").clone()
+      thumb.find("a").attr("data-cid", canvasData.canvasId).attr("data-fid", canvasData.fileId)
+        .attr("data-name", canvasData.name).attr("data-pos-x", canvasData.posX).attr("data-pos-y", canvasData.posY)
+      $("#canvasSelectDiv").append(thumb)
+
+      mini = $("<div class='smallCanvasPreview tooltipize' title='#{canvasData.name}'></div>")
+      mini.attr("data-cid", canvasData.canvasId).attr("data-fid", canvasData.fileId).attr("data-name", canvasData.name)
+      $("#smallCanvasPreviews").append(mini)
 
     updateThumb: (canvasId) ->
       selectedCanvasId = @getSelectedCanvasId()
@@ -460,7 +463,15 @@ $ ->
       th = $(thumb).height()
       sy = th / cvh
 
-      transformMatrix = new Matrix(sy / opts.currentScale, 0, 0, sy / opts.currentScale, 0, 0)
+      prevScale = opts.currentScale
+      scale = if opts.image then 1 else opts.currentScale
+
+      if opts.image
+        fitted = true
+        @setScale @getFitToImage()
+        @centerOnImage true
+
+      transformMatrix = new Matrix(sy / scale, 0, 0, sy / scale, 0, 0)
       paper.project.activeLayer.transform(transformMatrix)
       room.redraw()
 
@@ -469,8 +480,11 @@ $ ->
       thumbContext.clearRect(0, 0, tw, th)
       thumbContext.drawImage(canvas, shift, 0) for i in [0..2]
 
-      transformMatrix = new Matrix(opts.currentScale / sy, 0, 0, opts.currentScale / sy, 0, 0)
+      transformMatrix = new Matrix(scale / sy, 0, 0, scale / sy, 0, 0)
       paper.project.activeLayer.transform(transformMatrix)
+
+      if fitted
+        @setScale prevScale
 
       if selectedCanvasId is canvasId
         room.items.pan new Point(prevPandx - opts.pandx, prevPandy - opts.pandy)
@@ -489,8 +503,6 @@ $ ->
 
     getSelected: -> $(".canvasSelected")
 
-    getMiniSelected: -> $("#smallCanvasPreviews .previewSelected")
-
     getThumbs: -> $("#canvasSelectDiv > div > a")
 
     findThumbByCanvasId: (canvasId) -> $("#canvasSelectDiv a[data-cid='#{canvasId}']")
@@ -499,15 +511,10 @@ $ ->
 
     selectMiniThumb: (mini, emit) ->
       cid = $(mini).data("cid")
-      $(".smallCanvasPreview").removeClass("previewSelected")
-      $(mini).addClass("previewSelected")
       @selectThumb @findThumbByCanvasId(cid), emit
 
     selectThumb: (anchor, emit) ->
       return if $(anchor).hasClass("canvasSelected")
-
-      $("#canvasSelectDiv a").removeClass("canvasSelected")
-      $(anchor).addClass("canvasSelected")
 
       cid = $(anchor).data("cid")
       canvasOpts = @findOptsById(cid)
@@ -519,14 +526,17 @@ $ ->
       previousScale = opts.currentScale
       room.setOpts canvasOpts
       @restore(true, false)
-      @setScale opts.currentScale, previousScale
 
+      newScale = if opts.image and not opts.scaleChanged then @getFitToImage() else opts.currentScale
+      @setScale newScale, previousScale
+      @centerOnImage()
+
+      $("#canvasSelectDiv a").removeClass("canvasSelected")
+      $(anchor).addClass("canvasSelected")
       $(".smallCanvasPreview").removeClass("previewSelected")
       $(@findMiniThumbByCanvasId(cid)).addClass("previewSelected")
 
       $("#canvasName").html($(anchor).data("name"))
-
-      @centerOnImage()
 
       room.socket.emit("switchCanvas", cid) if emit
       room.redraw()

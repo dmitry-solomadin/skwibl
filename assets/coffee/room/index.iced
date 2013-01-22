@@ -33,6 +33,7 @@ $ ->
         $(".colorSelected").css("background", sharedOpts.color)
 
       $("#scaleDiv .dropdown-menu a").on "click", ->
+        opts.scaleChanged = true
         scaleAmout = $(@).data('scale')
         if scaleAmout is "fitToImage"
           scaleAmout = App.room.canvas.getFitToImage()
@@ -115,6 +116,7 @@ $ ->
         eligibleHistory: []
         allHistory: []
       @opts.canvasId = canvasId
+      @opts.scaledCenter = paper.view.center
       @savedOpts.push(@opts)
 
     setOpts: (opts) ->
@@ -311,6 +313,11 @@ $ ->
 
 $ ->
   return unless currentPage("projects/room/show")
+
+  # initialize dropbox script
+  # todo test
+  $("body").append("<script type='text/javascript' src='https://www.dropbox.com/static/api/1/dropbox.js'
+  id='dropboxjs' data-app-key='btskqrr7wnr3k20'></script>")
 
   # paper.install(window) causes errors upon defining getters for 'project', so we use this code
   for key of paper
