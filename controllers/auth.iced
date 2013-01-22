@@ -43,20 +43,25 @@ exports.register = (req, res, next) ->
   return res.redirect '/registration' if error
 
   email = req.body.email
-  unless cfg.ENVIRONMENT is 'XXX' or tools.isEmail email
+  unless cfg.ENVIRONMENT is 'development' or tools.isEmail email
     tools.addError req, "Incorrect email address: #{email}"
     return res.redirect '/registration'
   db.users.findByEmail email, (err, user) ->
     return next err if err
     unless user
       hash = tools.hash email
+      givenName = req.body.givenName
+      familyName = req.body.familyName
       return db.users.add
         hash: hash
-        displayName: req.body.name
+        displayName: "#{givenName} #{familyName}"
         password: req.body.password
         status: 'unconfirmed'
         provider: 'local'
-      , null, [
+      ,
+        givenName: givenName
+        familyName: familyName
+      , [
         value: email
         type: 'main'
       ], (err, user) ->

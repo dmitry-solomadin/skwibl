@@ -45,7 +45,7 @@ exports.getName = (user) ->
   if user.name
     name = user.name
     if name.givenName and name.familyName
-      return name.givenName + ' ' + name.familyName
+      return "#{name.givenName} #{name.familyName}"
     if name.givenName
       return name.givenName
     if name.familyName
@@ -85,10 +85,6 @@ exports.include = (dir, fn) ->
     if isModule
       mod = require dir + '/' + name
       fn mod, shortName
-
-exports.async = (fn) ->
-  return process.nextTick ->
-    fn err, val
 
 exports.asyncOpt = (fn, err, val)->
   process.nextTick(-> fn err, val) if fn
