@@ -32,7 +32,7 @@ exports.setUp = (client, db) ->
               changelogEntry.additionalInfo = JSON.parse changelogEntry.additionalInfo
               changelog.push changelogEntry
               if changelogEntry.additionalInfo.commentTextId
-                return db.comments.findById changelogEntry.additionalInfo.commentTextId, (err, text) ->
+                return db.texts.findById changelogEntry.additionalInfo.commentTextId, (err, text) ->
                   changelogEntry.commentText = text
                   return tools.asyncDone changelogIds, -> tools.asyncOpt fn, null, changelog
               return tools.asyncDone changelogIds, -> return tools.asyncOpt fn, null, changelog
