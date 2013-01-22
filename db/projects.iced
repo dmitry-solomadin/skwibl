@@ -200,7 +200,7 @@ exports.setUp = (client, db) ->
   mod.accept = (pid, aid, uid, fn) ->
     db.contacts.add pid, uid
     # Add the user to the project
-    client.srem "projects:#{pid}:unconfirmed", aid
+    client.zrem "projects:#{pid}:unconfirmed", aid
     client.sadd "projects:#{pid}:users", uid
     # Add the project to the user
     client.zadd "users:#{uid}:projects", Date.now(), pid

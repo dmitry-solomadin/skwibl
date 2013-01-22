@@ -1,10 +1,9 @@
 <% errorMessages = @errorMessages() %>
-<% if errorMessages && errorMessages[0] : %>
+<% if errorMessages and errorMessages.length : %>
   <div id="errorMessages" class="alert alert-error">
     Please, fix following errors:
-    <% errors = errorMessages[0] %>
     <ul>
-    <% for error in errors : %>
+    <% for error in errorMessages : %>
       <li data-error-id="<%= error.id %>"><%= error.text %></li>
     <% end %>
     </ul>

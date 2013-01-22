@@ -59,7 +59,7 @@ input[type="password"]:focus {
 .join_form input[type="text"],
 .join_form input[type="password"] {
     width: 528px;
-    margin-bottom: 8px;
+    margin-bottom: 0;
 }
 
 .verify_code {

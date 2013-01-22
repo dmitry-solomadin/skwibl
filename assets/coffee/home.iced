@@ -51,6 +51,22 @@ $ ->
           $("#forgotPasswordError")[0].className = "textError"
           $("#forgotPasswordError").html("We don't have this email.")
 
+    submitJoinForm: ->
+      $(".error_ajax").css("visibility", "hidden")
+
+      name = $("#joinName").val()
+      email = $("#joinEmail").val()
+      password = $("#joinPassword").val()
+
+      $("#joinNameError").html("Please enter name").css("visibility", "visible") unless name.length
+      if not email.length
+        $("#joinEmailError").html("Please enter email").css("visibility", "visible")
+      else if not App.Util.isEmailValid(email)
+        $("#joinEmailError").html("Please enter valid email").css("visibility", "visible")
+      $("#joinPasswordError").html("Please enter password").css("visibility", "visible") unless password.length
+
+      return not hasAjaxError()
+
     processLogin: (data) ->
       $("#loginError").html("")
       if data is "OK"

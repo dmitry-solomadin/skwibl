@@ -138,13 +138,7 @@ exports.startCluster = (stop, start) ->
     start cluster
 
 exports.addError = (req, text, id) ->
-  errors = req.flash "objectErrors"
-
-  errors.push
-    text: text
-    id: id
-
-  req.flash "objectErrors", errors
+  req.flash "objectErrors", {text: text, id: id} # it will add error object to flash array
 
 exports.sendError = (res, err) ->
   if err

@@ -24,10 +24,13 @@
         <div style="color:#acabab">or</div>
         <div>Create an Account</div>
       </div>
-      <form action="/register" method="post">
-        <input class="input-big" type="text" placeholder="Type your Name" name="name">
-        <input class="input-big" type="text" placeholder="Type your Email" name="email">
-        <input class="input-big" type="password" placeholder="Type your Password" name="password">
+      <form action="/register" method="post" onsubmit="return App.Home.submitJoinForm();">
+        <input id="joinName" class="input-big" type="text" placeholder="Type your Name" name="name">
+        <div id="joinNameError" class="error_ajax just_hidden"></div>
+        <input id="joinEmail" class="input-big" type="text" placeholder="Type your Email" name="email">
+        <div id="joinEmailError" class="error_ajax just_hidden"></div>
+        <input id="joinPassword" class="input-big" type="password" placeholder="Type your Password" name="password">
+        <div id="joinPasswordError" class="error_ajax just_hidden"></div>
 
         <!--
         CAPTCHA

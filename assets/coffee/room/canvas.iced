@@ -409,6 +409,8 @@ $ ->
         if centerX isnt imageX or centerY isnt imageY
           room.items.pan new Point(centerX - imageX, centerY - imageY)
 
+    cancelPan: -> room.items.pan new Point(-opts.pandx, -opts.pandy)
+
     addNewThumb: (canvasData) ->
       thumb = $("#canvasSelectDiv div:first").clone()
       thumb.find("a").attr("data-cid", canvasData.canvasId).attr("data-fid", canvasData.fileId)
@@ -445,7 +447,7 @@ $ ->
       else
         prevPandx = opts.pandx
         prevPandy = opts.pandy
-        @centerOnImage true
+        @cancelPan()
 
       thumb = @findThumbByCanvasId(canvasId).find("canvas")
       thumbContext = thumb[0].getContext('2d')

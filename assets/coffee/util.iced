@@ -1,4 +1,12 @@
 $ ->
+  class Util
+
+    constructor: ->
+      @emailRegexp = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
+
+    isEmailValid: (email)->
+      return @emailRegexp.test email
+
   $.fn.combinedHover = (settings) ->
     trigger = this
     additionalTriggers = settings.additionalTriggers
@@ -75,7 +83,18 @@ $ ->
       $(@).removeAttr("disabled")
       $(@).html($(@).data("prevText"))
 
+  App.Util = new Util
 
 window.isMac = -> return /Mac/.test(navigator.userAgent)
 
 window.currentPage = (template) -> return $("#currentTemplate").val() is template
+
+window.hasAjaxError = ->
+  for ajaxError in $(".error_ajax")
+    return true if $(ajaxError).css("visibility") is "visible"
+  return false
+
+
+
+
+
