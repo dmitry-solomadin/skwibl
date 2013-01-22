@@ -17,7 +17,10 @@
             <% else : %>
               <div class="no_images">No images</div>
             <% end %>
-            <div class="project_notice">0</div>
+            <!--
+              PROJECT UNREAD ACTIVITIES
+              <div class="project_notice">0</div>
+            -->
           </div>
           <div class="project_r">
             <h2 class="project_name"><a href="/projects/<%= project.id %>"><%= project.name %></a></h2>
@@ -65,9 +68,12 @@
         </div>
       </div>
     <% end %>
+    <!--
+    SEE MORE PROJECTS LINK
     <a style="font-size:18px;" class="projects_more_btn" href="#">... See More Projects</a>
+    -->
   <% else : %>
-  No projects to display, do you want to <a href="/projects/new">create one</a>?
+  <h3>No projects to display, do you want to <a href="/projects/new">create one</a>?</h3>
   <% end %>
 </div>
 
