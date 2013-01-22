@@ -35,7 +35,7 @@ exports.setUp = (client, db) ->
                 return db.comments.findById changelogEntry.additionalInfo.commentTextId, (err, text) ->
                   changelogEntry.commentText = text
                   return tools.asyncDone changelogIds, -> tools.asyncOpt fn, null, changelog
-              return tools.asyncDone changelogIds, -> tools.asyncOpt fn, null, changelog
+              return tools.asyncDone changelogIds, -> return tools.asyncOpt fn, null, changelog
       return tools.asyncOpt fn, err, []
 
   return mod

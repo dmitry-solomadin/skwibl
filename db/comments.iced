@@ -2,80 +2,72 @@ tools = require '../tools'
 cfg = require '../config'
 
 exports.setUp = (client, db) ->
+
   mod = {}
 
-  mod.index = (eid, fn) ->
-    client.lrange "comments:#{eid}:texts", 0, -1, (err, array) ->
-      if not err and array and array.length
-        texts = []
-        return tools.asyncParallel array, (textId) ->
-          client.hgetall "texts:#{textId}", (err, text) ->
-            texts.push text
-            tools.asyncDone array, ->
-              tools.asyncOpt fn, null, texts
-      return tools.asyncOpt fn, err, []
-
-  # comment text may be restored after undo, in this case we consider this comment text as not new.
-  mod.add = (element, isNew, fn) ->
-    element.time = Date.now()
-    client.hmset "texts:#{element.elementId}", element
-    client.rpush "comments:#{element.commentId}:texts", element.elementId
-    db.activities.addForAllInProject element.pid, 'newComment', element.owner, [element.owner], {commentTextId: element.elementId} if isNew
+  mod.updateComment = (eid, element, create, fn) ->
+    pid = element.project
+    canvas = element.canvasId
+    client.hmset "comments:#{eid}", element
+    unless create # creating new element
+      element.new = create
+      client.rpush "canvases:#{canvas}:comments", eid
+      return tools.asyncOpt fn, null, element
     return tools.asyncOpt fn, null, element
 
-  mod.update = (elementId, text, fn) ->
-    client.hset "texts:#{elementId}", "text", text
+  mod.update = (pid, owner, data, fn) ->
+    canvasId = data.canvasId
+    dataElement = data.element
+    eid = dataElement.elementId
+    element = {}
+    element.project = pid
+    element.owner = owner
+    element.canvasId = canvasId
+    element.time = Date.now()
+    element.data = JSON.stringify(dataElement)
+    return client.exists "comments:#{eid}", (err, val) ->
+      number = parseInt data.number if val and data.number
+      element.number = number unless isNaN number
+      unless val
+        return client.hincrby "canvases:#{canvasId}", 'nextComment', 1, (err, cid) ->
+          element.number = cid
+          if element.texts and element.texts.length
+            tools.asyncParallel element.texts, (text) ->
+              db.texts.add text
+          return db.comments.updateComment(eid, element, val, fn)
+      return db.comments.updateComment(eid, element, val, fn)
 
-  mod.findById = (elementId, fn) ->
-    client.hgetall "texts:#{elementId}", fn
+  mod.delete = (eid, fn) ->
+    db.comments.findById eid, (err, element) ->
+      if err or not element
+        return tools.asyncOpt fn, err, null
+      client.del "comments:#{eid}", fn
+      client.lrem "canvases:#{element.canvasId}:comments", 0, eid
+      client.lrange "comments:#{eid}:texts", 0, -1, (err, array) ->
+        return tools.asyncOpt fn, err, null if err
+        return tools.asyncParallel array, (tid) ->
+          db.texts.remove tid
+          return tools.asyncDone array, ->
+            return tools.asyncOpt fn, null, eid
 
-  mod.remove = (elementId, fn) ->
-    db.comments.findById elementId, (err, text) ->
-      return tools.asyncOpt fn, err, null if err or not text
-      client.lrem "comments:#{text.commentId}:texts", 0, elementId
-      client.lrem "projects:#{text.pid}:todo", 0, elementId
-      client.del "texts:#{elementId}", fn
+  mod.findById = (eid, fn) ->
+    client.hgetall "comments:#{eid}", fn
 
-  mod.getProjectTodos = (pid, count, fn) ->
-    client.lrange "projects:#{pid}:todo", 0, count, (err, array) ->
-      if not err and array and array.length
-        todos = []
-        return tools.asyncParallel array, (textId) ->
-          client.hgetall "texts:#{textId}", (err, todo) ->
-            todos.push todo
-            tools.asyncDone array, ->
-              tools.asyncOpt fn, null, todos
+  mod.index = (cid, fn) ->
+    client.lrange "canvases:#{cid}:comments", 0, -1, (err, array) ->
+      return tools.asyncOpt fn, null, [] if not array or not array.length
+      if not err
+        elements = []
+        return tools.asyncParallel array, (eid) ->
+          client.hgetall "comments:#{eid}", (err, element) ->
+            elementData = JSON.parse(element.data)
+            elementData.number = element.number
+            return tools.asyncOpt fn, err, [] if err
+            return db.texts.index elementData.elementId, (err, texts) ->
+              elementData.texts = texts
+              elements.push elementData
+              return tools.asyncDone array, ->
+                return tools.asyncOpt fn, null, elements
       return tools.asyncOpt fn, err, []
-
-  mod.getProjectTodosCount = (pid, fn) ->
-    client.llen "projects:#{pid}:todo", (err, len) ->
-      return tools.asyncOpt fn, err, len
-
-  mod.markAsTodo = (elementId, fn) ->
-    db.comments.findById elementId, (err, text) ->
-      if not err and text
-        client.lpush "projects:#{text.pid}:todo", elementId
-        client.hset "texts:#{elementId}", "todo", true
-        db.activities.addForAllInProject text.pid, 'newTodo', text.owner, [text.owner], {commentTextId: text.elementId}
-        return tools.asyncOpt fn, err, null
-      return tools.asyncOpt fn, err, null
-
-  mod.resolveTodo = (elementId, fn) ->
-    db.comments.findById elementId, (err, text) ->
-      if not err and text
-        client.lrem "projects:#{text.pid}:todo", 0, elementId
-        client.hset "texts:#{elementId}", "resolved", true
-        db.activities.addForAllInProject text.pid, 'todoResolved', text.owner, [text.owner], {commentTextId: text.elementId}
-        return tools.asyncOpt fn, err, null
-      return tools.asyncOpt fn, err, null
-
-  mod.reopenTodo = (elementId, fn) ->
-    db.comments.findById elementId, (err, text) ->
-      if not err and text
-        client.lpush "projects:#{text.pid}:todo", elementId
-        client.hdel "texts:#{elementId}", "resolved"
-        db.activities.addForAllInProject text.pid, 'todoReopened', text.owner, [text.owner], {commentTextId: text.elementId}
-        return tools.asyncOpt fn, err, null
-      return tools.asyncOpt fn, err, null
 
   return mod

@@ -41,11 +41,14 @@ exports.configure = (sio) ->
         socket.leave socket.project
         socket.broadcast.to(socket.project).emit 'exit', id
 
-      socket.on 'userRemoved', (uid, cb) ->
+      socket.on 'userRemoved', (uid) ->
         socket.broadcast.to(socket.project).emit 'userRemoved', uid
 
-      socket.on 'message', (msg, cb) ->
+      socket.on 'message', (data) ->
         socket.broadcast.to(socket.project).emit 'message',
           id: id
-          message: msg
-        db.actions.update socket.project, id, 'chat', msg
+          message: data
+        # protect user-generated id
+        # TODO make it work for update
+        data.elementId = "#{id}##{data.elementId}"
+        db.messages.update socket.project, id, data

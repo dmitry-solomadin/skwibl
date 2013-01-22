@@ -111,21 +111,16 @@ $ ->
 
     sendMessage: ->
       chatMessage =
-        element:
-          msg: $('#chattext').val()
-          elementId: App.room.generateId()
-
+        msg: $('#chattext').val()
+        elementId: App.room.generateId()
       $('#chattext').val("")
-
-      return if $.trim(chatMessage.element.msg).length is 0
-
-      App.chat.addMessage($("#uid")[0].value, chatMessage.element.msg)
+      return if $.trim(chatMessage.msg).length is 0
+      App.chat.addMessage($("#uid")[0].value, chatMessage.msg)
       App.chat.chatIO.emit("message", chatMessage)
 
     removeUser: (uid) ->
       for user, index in @users
         @users.splice(index, 1) if "#{user.id}" is "#{uid}"
-
       $("#chatUser#{uid}").remove()
 
     showMessageRange: (showRangeLink) ->
@@ -143,7 +138,7 @@ $ ->
     initSockets: ->
       @chatIO = io.connect('/chat', window.copt)
 
-      @chatIO.on 'message', (data) => @addMessage(data.id, data.message.element.msg)
+      @chatIO.on 'message', (data) => @addMessage(data.id, data.message.msg)
 
       @chatIO.on 'userRemoved', (uid) =>
         if "#{uid}" is "#{$("#uid").val()}"

@@ -8,7 +8,7 @@ exports.setUp = (client, db) ->
 
   mod.getInfo = (id, fn) ->
     client.hmget "users:#{id}", 'id', 'provider', 'providerId', 'displayName', 'picture', (err, array) ->
-      if not err and array
+      if not err and array and array.length
         user = {}
         user.id = array[0]
         user.provider = array[1]

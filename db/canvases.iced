@@ -40,9 +40,9 @@ exports.setUp = (client, db) ->
             if not err and canvas
               db.files.findById canvas.file, (err, file) ->
                 canvas.file = file
-                db.actions.getElements cid, "element", (err, elements) ->
+                db.elements.index cid, (err, elements) ->
                   canvas.elements = elements
-                  db.actions.getElements cid, "comment", (err, comments) ->
+                  db.comments.index cid, (err, comments) ->
                     canvas.comments = comments
                     unless err
                       canvases[index] = canvas
@@ -51,8 +51,8 @@ exports.setUp = (client, db) ->
       return tools.asyncOpt fn, err, []
 
   mod.clear = (cid) ->
-    db.canvases.deleteActions cid, "element"
-    db.canvases.deleteActions cid, "comment"
+    db.canvases.deleteElements cid
+    db.canvases.deleteComments cid
 
   mod.delete = (cid, fn) ->
     db.canvases.get cid, (err, canvas)->
@@ -63,18 +63,26 @@ exports.setUp = (client, db) ->
               db.canvases.clear cid
               client.hdel "canvases:#{cid}", "file"
               client.hset "canvases:#{cid}", "initialized", "false"
-              tools.asyncOpt fn, null, null
+              return tools.asyncOpt fn, null, null
             else
               client.lrem "projects:#{canvas.project}:canvases", 0, cid
               db.canvases.clear cid
-              client.del "canvases:#{cid}", cid
-      tools.asyncOpt fn, null, null
+              return client.del "canvases:#{cid}", cid
+      return tools.asyncOpt fn, null, null
 
-  mod.deleteActions = (cid, type, fn) ->
-    client.lrange "canvases:#{cid}:#{type}", 0, -1, (err, array) ->
+  mod.deleteElements = (cid, fn) ->
+    client.lrange "canvases:#{cid}:elements", 0, -1, (err, array) ->
       return tools.asyncOpt fn, null, null if not array or not array.length
       return tools.asyncParallel array, (aid) ->
-        db.actions.delete aid, fn
+        db.elements.delete aid, fn
+        return tools.asyncDone array, ->
+          return tools.asyncOpt fn, null, null
+
+  mod.deleteComments = (cid, fn) ->
+    client.lrange "canvases:#{cid}:comments", 0, -1, (err, array) ->
+      return tools.asyncOpt fn, null, null if not array or not array.length
+      return tools.asyncParallel array, (aid) ->
+        db.comments.delete aid, fn
         return tools.asyncDone array, ->
           return tools.asyncOpt fn, null, null
 
