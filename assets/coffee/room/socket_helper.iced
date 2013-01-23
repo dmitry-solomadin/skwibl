@@ -153,10 +153,9 @@ $ ->
       path.closed = data.closed
       path.elementId = data.elementId
 
-      if data.isArrow
-        room.items.drawArrow(path)
-      else
-        path
+      room.items.drawArrow(path) if data.isArrow
+
+      path
 
     prepareElementToSend: (elementToSend, action) ->
       data =

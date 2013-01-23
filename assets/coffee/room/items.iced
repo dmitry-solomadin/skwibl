@@ -32,6 +32,7 @@ $ ->
     translate: (delta, item = @sel) ->
       return unless item
       item.translate(delta)
+      item.arrowGroup?.triangle.translate delta
       item.selectionRect?.translate(delta)
 
     unselect: (id = @sel?.elementId) ->
