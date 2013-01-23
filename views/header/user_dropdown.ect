@@ -1,16 +1,11 @@
-<ul class="nav pull-right">
+<ul class="nav pull-right" data-dropdown-toggler="userDropdownMenu" data-duration="200">
   <li class="dropdown ">
-    <a class="dropdown-toggle userDropdown" data-toggle="dropdown" href="#">
-      <img width="32" src="<%= if @currentUser().picture then @currentUser().picture else '/images/avatar.png' %>">
+    <a class="dropdown-toggle userDropdown" href="#">
       <div>
-        <%= @currentUser().displayName %>
+        <span class="username"><%= @currentUser().displayName %></span>
+        <img src="<%= if @currentUser().picture then @currentUser().picture else '/images/avatar.png' %>">
         <span class="caret"></span>
       </div>
     </a>
-    <ul class="dropdown-menu">
-      <li><a href="/users/<%= @currentUser().id %>/edit">Edit Profile</a></li>
-      <li class="divider"></li>
-      <li><a href="/logout">Sign Out</a></li>
-    </ul>
   </li>
 </ul>

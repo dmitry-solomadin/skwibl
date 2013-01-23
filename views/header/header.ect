@@ -1,5 +1,4 @@
 <div class="navbar navbar-fixed-top" id="header">
-
   <% if @currentUser() : %>
   <input type="hidden" id="uid" value="<%= @currentUser().id %>"/>
   <% end %>
@@ -18,7 +17,7 @@
       <% unless @currentUser() : %>
       <span class="pull-right header_btns">
         <a class="btn btn-success" href="/registration">Join Skwibl</a>
-        <a id="signInButton" class="btn" href="#" onclick="App.Home.showLogin();">
+        <a id="signInButton" class="btn" href="#" data-dropdown-toggler="loginBlock">
           Sign In
         </a>
       </span>
@@ -58,11 +57,26 @@
     </div>
   </div>
 </div>
+<div class="navbar navbar-fixed-top navbar-fixed-top-under">
+  <div class="header_shadow"></div>
+</div>
 
-<div id="loginBlock" class="loginBlock" style="display: none;">
+<div id="loginBlock" class="loginBlock skwibl-dropdown" style="display: none;">
+  <hr>
   <div class="loginBlockWrapper">
     <%- include './users/_login_block.ect' %>
     <%- include './users/_forgot_password.ect' %>
   </div>
 </div>
+
+<% if @currentUser() : %>
+<div id="userDropdownMenu" class="skwibl-dropdown" style="display: none;">
+  <hr>
+  <ul class="dropdownMenu">
+    <li><a href="/users/<%= @currentUser().id %>/edit">Edit Profile</a></li>
+    <li class="divider"></li>
+    <li><a href="/logout">Sign Out</a></li>
+  </ul>
+</div>
+<% end %>
 

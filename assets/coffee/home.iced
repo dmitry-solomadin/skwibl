@@ -14,23 +14,6 @@ $ ->
         $(@).addClass("selected")
         false
 
-    showLogin: ->
-      $("#loginBlock").show().css(
-        position: 'absolute'
-        top: $("#header").height() - 500
-        left: $("#signInButton").offset().left - $("#loginBlock").width() + 95
-      ).animate(
-        top: $("#header").height() - 5
-      , 400)
-
-      $(document).on "click.login", (event) ->
-        target = event.target
-        return if target.id is "loginBlock" or target.id is "signInButton" or $(target).closest("#loginBlock")[0]
-        $("#loginBlock").animate
-          top: $("#header").height() - 500, 400
-
-      return false
-
     showForgotPassword: ->
       $(".loginBlockWrapper > form:first").animate(left: -335)
       $(".loginBlockWrapper > form:last").animate(left: -335)

@@ -112,6 +112,10 @@ input.input-big {
     z-index: 99;
 }
 
+.navbar-fixed-top-under {
+    z-index: 39;
+}
+
 .btn {
     -webkit-font-smoothing: antialiased;
     margin-left: 3px;
@@ -243,9 +247,8 @@ input.input-big {
 
 /* LOGIN START */
 
-.loginBlock {
+.skwibl-dropdown {
     z-index: 69;
-    padding: 15px 10px 10px 10px;
     box-shadow: #202020 0 10px 20px;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
@@ -253,6 +256,17 @@ input.input-big {
     border-left: 1px solid black;
     border-right: 1px solid black;
     border-bottom: 1px solid black;
+    overflow: hidden;
+    position: fixed;
+}
+
+.room .skwibl-dropdown {
+    border-color: #a1a1a1;
+    box-shadow: #808080 0 5px 10px;
+}
+
+.loginBlockWrapper {
+    padding: 15px 10px 10px 10px;
 }
 
 .loginBlock .login_header {
@@ -264,7 +278,14 @@ input.input-big {
 }
 
 .forgotPasswordFields {
-    margin-bottom: 110px;
+    margin-bottom: 80px;
+}
+
+.forgotPasswordFields .desc {
+    color: #505050;
+    font-size: 12px;
+    line-height: 15px;
+    display: block;
 }
 
 .forgotPasswordError {
@@ -300,9 +321,8 @@ input.input-big {
 }
 
 #loginBlock {
-    width: 312px;
-    height: 225px;
-    overflow: hidden;
+    width: 332px;
+    height: 250px;
 }
 
 #loginError {
@@ -436,29 +456,74 @@ input.input-big {
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#cbed9c', endColorstr = '#88c433', GradientType = 0);
 }
 
+.dropdownMenu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.dropdownMenu li {
+    padding: 0;
+}
+
+.dropdownMenu li a {
+    display: block;
+    padding: 12px 0 12px 15px;
+    min-width: 150px;
+    font-family: "MyriadPro-Regular";
+    font-size: 16px;
+}
+
+.dropdownMenu li a:hover {
+    background: rgba(255, 255, 255, 0.7);
+}
+
 /* TOP NAV END */
+
+#userDropdownMenu hr {
+    margin: 0;
+}
+
+.navbar .nav > li > a.userDropdown {
+    color: #606060;
+    font-size: 16px;
+    font-family: 'MyriadPro-Regular';
+}
+
+.navbar .nav > li > a.userDropdown:hover {
+    color: black;
+}
 
 .userDropdown {
     padding: 0 !important;
 }
 
 .userDropdown img {
-    float: left;
-    width: 32px;
-    height: 32px;
-    padding-top: 12px;
+    width: 46px;
+    height: 46px;
+    border-radius: 2px;
+}
+
+.userDropdown .username {
+    margin-right: 3px;
 }
 
 .userDropdown .caret {
     border-top-color: black !important;
     border-bottom-color: black !important;
+    border-top-width: 6px;
+    border-right-width: 5px;
+    border-left-width: 5px;
+    margin-top: 20px;
+    margin-left: 3px;
+    opacity: 0.5;
 }
 
 .userDropdown div {
     float: left;
     vertical-align: top;
     margin-left: 5px;
-    padding-top: 18px;
+    padding-top: 4px;
     line-height: 16px;
     height: 17px;
     padding-bottom: 11px;
