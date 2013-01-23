@@ -38,8 +38,9 @@ exports.configure = (sio) ->
           id: id
           canvasId: data.canvasId
           element: data.element
+        number = "#{data.number}".trim()
         db.comments.update socket.project, id, data, (err, action) ->
-          if not err and data.requestNumber
+          if not err and number is "X"
             newNumber =
               elementId: data.element.elementId
               newNumber: action.number

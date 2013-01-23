@@ -192,10 +192,13 @@ $ ->
 
     #hides elements and emits canvas cleared event
     clear: (emit) ->
-      room.history.add actionType: "clear", tools: room.history.getSelectableTools(), eligible: true if emit
+      items = []
       for element in opts.historytools.allHistory
-        element.opacity = 0 if not element.actionType and not element.isImage
+        continue if element.isImage
+        element.opacity = 0 if not element.actionType
         room.comments.hideComment(element.commentMin) if element.commentMin
+        items.push element
+      room.history.add actionType: "clear", tools: items, eligible: true if emit
 
       room.items.unselect()
       room.redrawWithThumb()

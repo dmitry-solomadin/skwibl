@@ -158,9 +158,10 @@ $ ->
       else
         path
 
-    prepareElementToSend: (elementToSend) ->
+    prepareElementToSend: (elementToSend, action) ->
       data =
         canvasId: room.canvas.getSelectedCanvasId()
+        action: action
         element:
           elementId: if elementToSend.commentMin then elementToSend.commentMin.elementId else elementToSend.elementId
           canvasId: room.canvas.getSelectedCanvasId()
@@ -183,7 +184,7 @@ $ ->
 
       data
 
-    prepareCommentToSend: (commentMin) ->
+    prepareCommentToSend: (commentMin, action) ->
       # apply current scale before sending coordinates
       commentMax = commentMin[0].$maximized[0]
       commentMinPosition = new Point(commentMin.position().left, commentMin.position().top)
@@ -193,6 +194,7 @@ $ ->
 
       # comment may already contain text if we are restoring deleted comment via 'undo'
       data =
+        action: action
         canvasId: room.canvas.getSelectedCanvasId()
         number: $.trim($(commentMin).html())
         element:
@@ -202,9 +204,6 @@ $ ->
           min:
             x: commentMinPosition.x - opts.pandx
             y: commentMinPosition.y - opts.pandy
-
-
-      data.requestNumber = true if $.trim($(commentMin[0]).html()) is "X"
 
       if commentMax
         data.element.max =

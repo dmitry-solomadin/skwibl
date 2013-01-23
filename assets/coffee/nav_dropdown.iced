@@ -18,7 +18,7 @@ $ ->
 
     show: (dropdownId, duration)->
       dropdown = $("##{dropdownId}")
-      dropdown.show().animate top: $("#header").height() - 5, duration
+      dropdown.show().animate top: $("#header").height(), duration
 
       $(document).on "click.login", (event) =>
         target = event.target

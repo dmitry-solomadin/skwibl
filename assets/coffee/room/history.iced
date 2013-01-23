@@ -5,21 +5,23 @@ $ ->
       return if room.opts.historyCounter is 0
 
       executePrevHistory = (item, reverse) =>
+        return if item.isImage
+
         if item.actionType is "remove"
           executePrevHistory(item.tool, true)
         else if item.actionType is "clear"
-          $(item.tools).each -> executePrevHistory(@, true)
+          executePrevHistory(tool, true) for tool in item.tools
         else if item.commentMin
           if reverse
             room.comments.showComment item.commentMin
-            room.socket.emit "commentUpdate", room.socketHelper.prepareCommentToSend item.commentMin
+            room.socket.emit "commentUpdate", room.socketHelper.prepareCommentToSend(item.commentMin, "create")
           else
             room.comments.hideComment item.commentMin
             room.socket.emit "commentRemove", item.commentMin.elementId
         else
           if reverse
             item.opacity = 1
-            room.socket.emit "elementUpdate", room.socketHelper.prepareElementToSend item
+            room.socket.emit "elementUpdate", room.socketHelper.prepareElementToSend(item, "create")
           else
             room.items.remove false, item
 
@@ -38,23 +40,25 @@ $ ->
       return if opts.historyCounter is opts.historytools.eligibleHistory.length
 
       executeNextHistory = (item, reverse) =>
+        return if item.isImage
+
         if item.actionType is "remove"
           executeNextHistory(item.tool, true)
         else if item.actionType is "clear"
-          $(item.tools).each -> executeNextHistory(@, true)
+          executeNextHistory(tool, true) for tool in item.tools
         else if item.commentMin
           if reverse
             room.comments.hideComment item.commentMin
             room.socket.emit "commentRemove", item.commentMin.elementId
           else
             room.comments.showComment item.commentMin
-            room.socket.emit "commentUpdate", room.socketHelper.prepareCommentToSend item.commentMin
+            room.socket.emit "commentUpdate", room.socketHelper.prepareCommentToSend(item.commentMin, "create")
         else
           if reverse
             room.items.remove false, item
           else
             item.opacity = 1
-            room.socket.emit "elementUpdate", room.socketHelper.prepareElementToSend item
+            room.socket.emit "elementUpdate", room.socketHelper.prepareElementToSend(item, "create")
 
       $("#undoLink").removeClass("disabled")
 

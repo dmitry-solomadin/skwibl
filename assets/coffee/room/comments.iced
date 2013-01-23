@@ -58,7 +58,7 @@ $ ->
           commentMax.css(left: (commentMax.position().left + dx) + "px", top: (commentMax.position().top + dy) + "px")
           @redrawArrow(commentMin)
         onAfterDrag: =>
-          room.socket.emit("commentUpdate", room.socketHelper.prepareCommentToSend(commentMin))
+          room.socket.emit("commentUpdate", room.socketHelper.prepareCommentToSend(commentMin, "move"))
           room.redrawWithThumb()
 
       commentMin.drags
@@ -66,7 +66,7 @@ $ ->
           commentMin.css({left: (commentMin.position().left + dx) + "px", top: (commentMin.position().top + dy) + "px"})
           @redrawArrow(commentMin)
         onAfterDrag: =>
-          room.socket.emit("commentUpdate", room.socketHelper.prepareCommentToSend(commentMin))
+          room.socket.emit("commentUpdate", room.socketHelper.prepareCommentToSend(commentMin, "move"))
           room.redrawWithThumb()
 
       $(document).off("click.toggleCommentButtons").on "click.toggleCommentButtons", (evt) =>
@@ -303,22 +303,22 @@ $ ->
         room.redraw()
 
     hideComment: ($commentmin) ->
-      $commentmin[0].$maximized.hide()
+      $commentmin[0].$maximized.css("visibility", "hidden")
       $commentmin[0].arrow.opacity = 0
       $commentmin[0].arrow.isHidden = true
-      $commentmin.hide()
+      $commentmin.css("visibility", "hidden")
       $commentmin[0].rect.opacity = 0 if $commentmin[0].rect
 
     showComment: ($commentmin) ->
       folded = $commentmin[0].arrow.isFolded
 
-      $commentmin[0].$maximized.show()
+      $commentmin[0].$maximized.css("visibility", "visible")
 
       unless folded
         $commentmin[0].arrow.opacity = 1
         $commentmin[0].arrow.isHidden = false
 
-      $commentmin.show()
+      $commentmin.css("visibility", "visible")
       $commentmin[0].rect.opacity = 1 if $commentmin[0].rect
 
     toggleComments: ->

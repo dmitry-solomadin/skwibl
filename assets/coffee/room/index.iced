@@ -219,7 +219,11 @@ $ ->
           @items.pan event.delta
         when 'select'
           scalerSelected = @items.sel?.selectedScaler?
-          if scalerSelected then @items.scale(event) else @items.translate(event.delta)
+          if scalerSelected
+            @items.sel.scaled = true
+            @items.scale(event)
+          else
+            @items.translate(event.delta)
 
           # redraw comment arrow if there is one.
           @comments.redrawArrow(@items.sel.commentMin) if @items.sel?.commentMin
@@ -248,7 +252,7 @@ $ ->
             @history.add()
 
             @items.created.elementId = @generateId()
-            @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@items.created))
+            @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@items.created, "create"))
         when "comment"
           if commentRect
             @items.created.eligible = true
@@ -257,14 +261,16 @@ $ ->
             @history.add actionType: "comment", commentMin: commentMin, eligible: true
 
           commentMin.elementId = @generateId()
-          @socket.emit("commentUpdate", @socketHelper.prepareCommentToSend(commentMin))
+          @socket.emit("commentUpdate", @socketHelper.prepareCommentToSend(commentMin, "create"))
         when 'select'
           selectedItem = @items.sel
           if selectedItem
+            action = if selectedItem.scaled then "scale" else "move"
+            selectedItem.scaled = null
             if selectedItem.commentMin # if the dragged element is comment rectangle
-              @socket.emit "commentUpdate", @socketHelper.prepareCommentToSend(selectedItem.commentMin)
+              @socket.emit "commentUpdate", @socketHelper.prepareCommentToSend(selectedItem.commentMin, action)
             else
-              @socket.emit "elementUpdate", @socketHelper.prepareElementToSend(selectedItem)
+              @socket.emit "elementUpdate", @socketHelper.prepareElementToSend(selectedItem, action)
 
       @sharedOpts.tooltype = "select" if tooltype is 'comment'
 
