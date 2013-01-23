@@ -105,8 +105,14 @@ $ ->
         else
           alert "Can't reach Dropbox API. Check your internet connection."
 
-      script = $("<script type='text/javascript' src='https://www.dropbox.com/static/api/1/dropbox.js' id='dropbox' data-app-key='btskqrr7wnr3k20'></script>")
-      $("body").append(script)
+      # do not translate it into jQuery it will work only in native js.
+      dropboxAPIKey = $('#dropboxAPIKey').val()
+      script = document.createElement('script');
+      script.id = "dropboxjs"
+      script.type = 'text/javascript';
+      script.src = 'https://www.dropbox.com/static/api/1/dropbox.js';
+      script.setAttribute('data-app-key', dropboxAPIKey)
+      $("body")[0].appendChild(script)
 
     initOpts: (canvasId) ->
       @opts = {}
@@ -319,11 +325,6 @@ $ ->
 
 $ ->
   return unless currentPage("projects/room/show")
-
-  # initialize dropbox script
-  # todo test
-  $("body").append("<script type='text/javascript' src='https://www.dropbox.com/static/api/1/dropbox.js'
-  id='dropboxjs' data-app-key='btskqrr7wnr3k20'></script>")
 
   # paper.install(window) causes errors upon defining getters for 'project', so we use this code
   for key of paper

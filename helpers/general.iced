@@ -19,6 +19,8 @@ exports.errorMessages = ->
 exports.isProduction = ->
   return cfg.ENVIRONMENT is 'production'
 
+exports.getConfig = -> cfg
+
 # todo move this to helpers/comments.iced
 exports.splitComments = (messages) ->
   yesterday = @moment().subtract("days", 1).endOf("day")
