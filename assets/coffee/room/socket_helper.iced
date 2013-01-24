@@ -153,16 +153,20 @@ $ ->
       path.closed = data.closed
       path.elementId = data.elementId
 
-      room.items.drawArrow(path) if data.isArrow
-
-      path
+      if data.isArrow
+        arrowGroup = room.items.drawArrow(path)
+        arrowGroup.elementId = data.elementId
+        return arrowGroup
+      return path
 
     prepareElementToSend: (elementToSend, action) ->
+      elementToSend = elementToSend.arrow if elementToSend.arrow
+
       data =
         canvasId: room.canvas.getSelectedCanvasId()
         action: action
         element:
-          elementId: if elementToSend.commentMin then elementToSend.commentMin.elementId else elementToSend.elementId
+          elementId: elementToSend.elementId
           canvasId: room.canvas.getSelectedCanvasId()
           segments: []
           closed: elementToSend.closed
