@@ -125,7 +125,10 @@ $ ->
       return null
 
     findById: (id) ->
+      # we don't have more than two levels of children (and won't have probably) so no need for recursion
       for element in paper.project.activeLayer.children
         return element if element.id is id
+        if element.children and element.children.length
+          return child for child in element.children when child.id is id
 
   App.room.helper = new RoomHelper

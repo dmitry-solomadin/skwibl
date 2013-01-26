@@ -7,6 +7,7 @@ $ ->
       @initElements()
       @initComments()
       @initThumbnails()
+      @initThumbSort()
 
     #@initBackground()
 
@@ -75,6 +76,14 @@ $ ->
         else
           @onLoadingFinished() unless isAnyFilePresent
           @updateThumb(cid)
+
+    initThumbSort: ->
+      $("#canvasSelectDiv").sortable
+        items: "> .canvasPreviewDiv"
+        handle: ".canvasReorderImg"
+        distance: 10
+        revert: true
+        scroll: false
 
     initBackground: ->
       wFreq = 25

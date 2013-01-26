@@ -230,8 +230,12 @@ body.room {
 
 .canvasPreviewDiv {
     float: left;
-    margin-right: 10px;
+    padding-right: 10px;
     position: relative;
+}
+
+.canvasPreviewDiv.ui-sortable-placeholder {
+    padding-right: 0;
 }
 
 .canvasSelected {
@@ -248,7 +252,7 @@ body.room {
 .canvasRemoveImg {
     position: absolute;
     top: -7px;
-    right: -7px;
+    right: 2px;
     cursor: pointer;
     display: none;
 }
@@ -256,7 +260,7 @@ body.room {
 .canvasDownloadImg {
     position: absolute;
     bottom: 7px;
-    left: 5px;
+    left: 2px;
     display: none;
     cursor: pointer;
 }
@@ -264,7 +268,7 @@ body.room {
 .canvasReorderImg {
     position: absolute;
     bottom: 5px;
-    right: 5px;
+    right: 12px;
     display: none;
     cursor: pointer;
 }

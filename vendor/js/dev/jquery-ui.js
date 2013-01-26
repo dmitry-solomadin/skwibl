@@ -1,7 +1,8 @@
 /*! jQuery UI - v1.10.0 - 2013-01-23
 * http://jqueryui.com
 * Includes: jquery.ui.core.js, jquery.ui.widget.js, jquery.ui.mouse.js, jquery.ui.sortable.js, jquery.ui.effect.js, jquery.ui.effect-highlight.js
-* Copyright (c) 2013 jQuery Foundation and other contributors Licensed MIT */
+* Copyright (c) 2013 jQuery Foundation and other contributors Licensed MIT
+* SKWIBL NOTE: jquery.ui.sortable has been modified to support placeholder animations. */
 
 (function( $, undefined ) {
 
@@ -1739,8 +1740,8 @@ $.widget("ui.sortable", $.ui.mouse, {
 					}
 
 					//If the element doesn't have a actual height by itself (without styles coming from a stylesheet), it receives the inline height from the dragged item
-					if(!p.height()) { p.height(that.currentItem.innerHeight() - parseInt(that.currentItem.css("paddingTop")||0, 10) - parseInt(that.currentItem.css("paddingBottom")||0, 10)); }
-					if(!p.width()) { p.width(that.currentItem.innerWidth() - parseInt(that.currentItem.css("paddingLeft")||0, 10) - parseInt(that.currentItem.css("paddingRight")||0, 10)); }
+					if(!p.height()) { p.height(that.currentItem.innerHeight()); }
+					if(!p.width()) { p.width(that.currentItem.innerWidth()); }
 				}
 			};
 		}
@@ -2074,8 +2075,39 @@ $.widget("ui.sortable", $.ui.mouse, {
 	},
 
 	_rearrange: function(event, i, a, hardRefresh) {
+    if (this.isAnimInProgress) {
+      return;
+    }
 
-		a ? a[0].appendChild(this.placeholder[0]) : i.item[0].parentNode.insertBefore(this.placeholder[0], (this.direction === "down" ? i.item[0] : i.item[0].nextSibling));
+    var self = this;
+
+    if (!this.placeholder[0].cln) {
+      var cln = this.placeholder.clone();
+      this.placeholder.replaceWith(cln);
+      this.refreshPositions(true);
+      cln.animate({height: 0, width: 0}, {queue: false, duration: 200, complete: function () {
+        cln.remove();
+        self.placeholder[0].cln = null;
+        self.refreshPositions(true);
+      }});
+      this.placeholder[0].cln = cln
+    }
+
+    var w = this.placeholder.width();
+    var h = this.placeholder.height();
+    console.log(w)
+    this.placeholder.width(0);
+    this.placeholder.height(0);
+    this.placeholder.css("padding", "0");
+    if (a){
+      a[0].appendChild(this.placeholder[0]);
+    } else {
+      i.item[0].parentNode.insertBefore(this.placeholder[0], (this.direction === "down" ? i.item[0] : i.item[0].nextSibling));
+    }
+    this.isAnimInProgress = true;
+    this.placeholder.animate({width: w, height: h}, {queue: false, duration:200, complete: function(){
+      self.isAnimInProgress = false;
+    }});
 
 		//Various things done here to improve the performance:
 		// 1. we create a setTimeout, that calls refreshPositions

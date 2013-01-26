@@ -32,9 +32,11 @@ $ ->
 
     translate: (delta, item = @sel) ->
       return unless item
-      item.translate(delta)
-      item.arrowGroup?.triangle.translate delta
       item.selectionRect?.translate(delta)
+      if item.children
+        child.translate(delta) for child in item.children
+      else
+        item.translate(delta)
 
     unselect: (id = @sel?.elementId) ->
       rect = @sel?.selectionRect
@@ -49,7 +51,7 @@ $ ->
         if el.commentMin
           room.comments.translate el.commentMin, delta
         else if not el.actionType and el.translate
-          el.translate delta
+          @translate delta, el
 
     #TODO consider how to make this setter an action - select
     setSelected: (item) -> @sel = item
@@ -89,9 +91,9 @@ $ ->
         for sn, scaler of rect.scalers
           if scaler.bounds.contains point
             @sel.selectedScaler = scaler
-            p = @sel.bounds[scaler.name]
-            @sel.center = new Point(2*@sel.position.x - p.x, 2*@sel.position.y - p.y)
-            @sel.oldPoint = point
+            item = if @sel.arrow then @sel.arrow else @sel
+            p = item.bounds[scaler.name]
+            @sel.center = new Point(2 * item.position.x - p.x, 2 * item.position.y - p.y)
             @sel.pzx = if point.x - @sel.center.x > 0 then 1 else -1
             @sel.pzy = if point.y - @sel.center.y > 0 then 1 else -1
             break
@@ -156,8 +158,8 @@ $ ->
         @sel.pzx = zx
         @sel.pzy = zy
 
-      w = @sel.bounds.width
-      h = @sel.bounds.height
+      w = if @sel.arrow then @sel.arrow.bounds.width else @sel.bounds.width
+      h = if @sel.arrow then @sel.arrow.bounds.height else @sel.bounds.height
 
       sx = Math.abs(1 + @sel.pzx * event.delta.x / w)
       sy = Math.abs(1 + @sel.pzy * event.delta.y / h)
@@ -185,8 +187,12 @@ $ ->
     sy = 1 + delta.y / h###
 
     scaleInternal: (item, sx, sy) ->
-      item.transform new Matrix().scale(sx, sy, item.center)
-      item.arrowGroup.drawTriangle() if item.arrowGroup
+      if item.arrow
+        item.arrow.transform new Matrix().scale(sx, sy, item.center)
+      else
+        item.transform new Matrix().scale(sx, sy, item.center)
+
+      item.drawTriangle() if item.arrow
 
     # ITEMS MISC
     createUserBadge: (uid, x, y) ->
@@ -220,10 +226,12 @@ $ ->
     drawArrow: (arrowLine) ->
       arrowGroup = new Group([arrowLine])
       arrowGroup.arrow = arrowLine
-      arrowGroup.drawTriangle = => @drawArrowTriangle arrowGroup
-      arrowGroup.triangle = arrowGroup.drawTriangle()
-      @init arrowGroup.triangle
-      @created = arrowLine
+      arrowGroup.drawTriangle = =>
+        triangle = @drawArrowTriangle arrowGroup
+        arrowGroup.triangle = triangle
+        @init arrowGroup.triangle
+        @created = arrowLine
+      arrowGroup.drawTriangle()
       arrowLine.arrowGroup = arrowGroup
 
     drawArrowTriangle: (group) ->

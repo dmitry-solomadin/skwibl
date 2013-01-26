@@ -242,6 +242,14 @@ $ ->
 
     redrawArrow: ($commentMin) ->
       arrow = $commentMin[0].arrow
+
+      # reposition comment-minimized when user translates comment rectangle or moves comment
+      if $commentMin[0].rect
+        bp = @getArrowBindPoint $commentMin
+        $commentMin.css
+          left: (bp.x * opts.currentScale) - ($commentMin.width() / 2)
+          top: (bp.y * opts.currentScale) - ($commentMin.height() / 2)
+
       return if arrow.isHidden
 
       coords = @getArrowCoords $commentMin
@@ -273,13 +281,13 @@ $ ->
     translate: (commentMin, delta) ->
       unscaledD = room.applyReverseCurrentScale delta
       commentMin.css
-        top: commentMin.position().top + unscaledD.y
-        left: commentMin.position().left + unscaledD.x
+        top: commentMin.position().top + Math.ceil(unscaledD.y)
+        left: commentMin.position().left + Math.ceil(unscaledD.x)
       commentMin[0].arrow.translate delta
       maximized = commentMin[0].$maximized
       maximized.css
-        top: maximized.position().top + unscaledD.y
-        left: maximized.position().left + unscaledD.x
+        top: maximized.position().top + Math.ceil(unscaledD.y)
+        left: maximized.position().left + Math.ceil(unscaledD.x)
       commentMin[0].rect.translate delta if commentMin[0].rect
 
     removeComment: ($commentmin) ->
@@ -288,6 +296,8 @@ $ ->
         $commentmin[0].arrow.opacity = 0
         $commentmin[0].rect.opacity = 0 if $commentmin[0].rect
         $commentmin.hide()
+
+        room.items.unselect()
 
         if $commentmin[0].rect
           room.history.add(actionType: "remove", tool: $commentmin[0].rect, eligible: true)

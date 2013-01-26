@@ -167,6 +167,7 @@ $ ->
           @items.init arrow
           @items.created.add(event.point) for [0..1]
           @items.created.lineStart = event.point
+          @items.drawArrow @items.created
         when "select"
           @items.testSelect(event.point)
           @items.drawSelRect(event.point)
@@ -219,8 +220,7 @@ $ ->
           @items.created.lastSegment.point = event.point
         when 'arrow'
           @items.created.lastSegment.point = event.point
-          @items.drawArrow @items.created
-          @items.created.arrowGroup.triangle.removeOnDrag()
+          @items.created.arrowGroup.drawTriangle()
         when 'pan'
           @items.pan event.delta
         when 'select'
@@ -254,10 +254,13 @@ $ ->
         when 'straightline', 'arrow', 'circle', 'rectangle', 'line', 'highligher'
           # Check if the item is empty then there is no need to save it on the server.
           unless @items.isEmpty @items.created
+            @items.created.elementId = @generateId()
+            if @items.created.arrowGroup
+              @items.created.arrowGroup.elementId = @items.created.elementId
+              @items.created = @items.created.arrowGroup
             @items.created.eligible = true
             @history.add()
 
-            @items.created.elementId = @generateId()
             @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@items.created, "create"))
         when "comment"
           if commentRect
