@@ -299,7 +299,7 @@ $ ->
           $("#todo-tab-inner").find("#" + commentText.id).remove()
         @recalcTasksCount()
 
-        room.socket.emit("commentRemove", $commentmin.elementId)
+        room.socket.emit("commentRemove", canvasId: room.canvas.getSelectedCanvasId(), elementId: $commentmin.elementId)
         room.redraw()
 
     hideComment: ($commentmin) ->

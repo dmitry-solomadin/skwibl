@@ -6,7 +6,6 @@ exports.setUp = (client, db) ->
   mod = {}
 
   mod.update = (pid, owner, data, fn) ->
-    console.log data
     data = data.element
     canvas = data.canvasId
     eid = data.elementId
@@ -17,7 +16,6 @@ exports.setUp = (client, db) ->
     element.time = Date.now()
     element.data = JSON.stringify(data)
     return client.exists "elements:#{eid}", (err, exists) ->
-      console.log exists
       client.hmset "elements:#{eid}", element
       unless exists # creating new element
         client.rpush "canvases:#{canvas}:elements", eid if canvas
@@ -49,5 +47,8 @@ exports.setUp = (client, db) ->
             return tools.asyncDone array, ->
               return tools.asyncOpt fn, null, elements
       return tools.asyncOpt fn, err, []
+
+  mod.getCanvas = (eid, fn) ->
+    client.hget "elements:#{eid}", 'canvasId', fn
 
   return mod

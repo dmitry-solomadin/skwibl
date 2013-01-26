@@ -45,10 +45,8 @@ exports.configure = (sio) ->
         socket.broadcast.to(socket.project).emit 'userRemoved', uid
 
       socket.on 'message', (data) ->
+        console.log data
         socket.broadcast.to(socket.project).emit 'message',
           id: id
           message: data
-        # protect user-generated id
-        # TODO make it work for update
-        data.elementId = "#{id}##{data.elementId}"
         db.messages.update socket.project, id, data

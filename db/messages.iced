@@ -45,4 +45,7 @@ exports.setUp = (client, db) ->
                 return tools.asyncOpt fn, null, messages
       return tools.asyncOpt fn, err, []
 
+  mod.getOwner = (mid, fn) ->
+    client.hget "messages:#{mid}", 'owner'
+
   return mod
