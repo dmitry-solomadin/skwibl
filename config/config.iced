@@ -60,6 +60,16 @@ exports.SESSION_DURATION = 7200 # two hours
 exports.UPLOADS = './uploads'
 exports.UPLOADS_TMP = './uploads/tmp'
 
+exports.THUMBNAILS = 'thumbnails'
+
+exports.TUMB_SIZE =
+  small:
+    width: 100
+    height: 100
+  large:
+    width: 200
+    height: 200
+
 exports.DIRECTORY_PERMISION = 0o751 # rwxr-x--x
 exports.FILE_PERMISSION = 0o640 # rw-r-----
 

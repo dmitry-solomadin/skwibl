@@ -45,7 +45,7 @@ exports.configure = (sio) ->
         socket.broadcast.to(socket.project).emit 'userRemoved', uid
 
       socket.on 'message', (data) ->
-        console.log data
+#         console.log data
         socket.broadcast.to(socket.project).emit 'message',
           id: id
           message: data

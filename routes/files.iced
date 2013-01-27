@@ -14,9 +14,9 @@ exports.configure = (app, passport) ->
 
   #TODO change to work with mid.isMember (be ready to listen req.data event understand how to use req.pause() properly)
   #Todo add isAuth to express.iced
-  #app.post '/file/upload', ctrls.mid.isAuth, ctrls.files.upload
+#   app.post '/file/upload', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.files.upload
 
-  app.post '/file/uploadDropbox', ctrls.mid.isAuth, ctrls.files.uploadDropbox
+  app.post '/file/uploadDropbox', ctrls.mid.isAuth, ctrls.mid.isMember, ctrls.files.uploadDropbox
 
   app.get '/files/:pid', ctrls.mid.isAuth, ctrls.files.project
 

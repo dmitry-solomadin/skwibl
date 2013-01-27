@@ -2,6 +2,7 @@ request = require 'request'
 fs = require 'fs'
 path = require 'path'
 formidable = require 'formidable'
+im = require 'imagemagick'
 
 db = require '../db'
 tools = require '../tools'
@@ -66,45 +67,49 @@ exports.upload = (req, res, next) ->
     fileCount--
     if fileCount is 0
       savedFiles = []
+      data = req.body
       tools.asyncParallel files, (file) ->
-        db.files.add req.user.id, req.cid, req.pid, file.name, file.mime, req.posX, req.posY, (err, savedFile) ->
+        db.files.add req.user.id, data.cid, data.pid, file.name, file.mime, data.posX, data.posY, (err, savedFile) ->
           savedFiles.push savedFile
           return tools.asyncDone files, ->
             return res.json savedFiles
   form = new formidable.IncomingForm()
   form.uploadDir = cfg.UPLOADS_TMP
   form.on 'field', (name, value)->
-    req[name] = value
-  form.on 'fileBegin', ->
-    console.log "fileBegin"
+    req.body[name] = value
+#   form.on 'fileBegin', ->
+#     console.log "fileBegin"
   form.on 'file', (name, file) ->
-    fileCount++
-    files.push file
-    pid = req.pid
-    cid = req.cid
-    size = file.length
-    # todo cfg.minFileSize and cfg.maxFileSize are not yet defined.
-    if cfg.minFileSize and cfg.minFileSize > size
-      fs.unlink file.path
-      return
-    if cfg.maxFileSize and size > cfg.maxFileSize
-      fs.unlink file.path
-      return
-    mime = file.mime
-    type = tools.getFileType mime
-    unless tools.isMimeSupported mime
-      fs.unlink file.path
-      return
-    uploadDir = "#{cfg.UPLOADS}/#{pid}/#{type}"
-    fs.rename file.path, "#{uploadDir}/#{file.name}", (err) ->
-      console.log "unexpected error. implement manual copy process" if err
-      return end()
-  form.on 'aborted', ->
-    console.log "abort"
-  form.on 'error', (err) ->
-    console.log "error: ", err
-  form.on 'end', ->
-    console.log "end"
+    pid = req.body.pid
+    cid = req.body.cid
+    db.mid.isMember req.user.id, pid, (err, val) ->
+      return res.json new Error 'Access denied' unless val
+      fileCount++
+      files.push file
+      #TODO check if user is project Member
+      size = file.length
+      #TODO cfg.MIN_FILE_SIZE and cfg.MAX_FILE_SIZE are not yet defined.
+      if cfg.MIN_FILE_SIZE and cfg.MIN_FILE_SIZE > size
+        fs.unlink file.path
+        return
+      if cfg.MAX_FILE_SIZE and size > cfg.MAX_FILE_SIZE
+        fs.unlink file.path
+        return
+      mime = file.mime
+      type = tools.getFileType mime
+      unless tools.isMimeSupported mime
+        fs.unlink file.path
+        return
+      uploadDir = "#{cfg.UPLOADS}/#{pid}/#{type}"
+      fs.rename file.path, "#{uploadDir}/#{file.name}", (err) ->
+        console.log "unexpected error. implement manual copy process" if err
+        return end()
+#   form.on 'aborted', ->
+#     console.log "abort"
+#   form.on 'error', (err) ->
+#     console.log "error: ", err
+#   form.on 'end', ->
+#     console.log "end"
   form.parse req
 
 exports.uploadDropbox = (req, res) ->
@@ -113,7 +118,7 @@ exports.uploadDropbox = (req, res) ->
   posX = req.body.posX
   posY = req.body.posY
 
-  finish = ->
+  end = ->
     fileCount--
     if fileCount is 0
       savedFiles = []
@@ -131,7 +136,7 @@ exports.uploadDropbox = (req, res) ->
     uploadDir = "./uploads/#{pid}/#{linkInfo.type}"
     filePath = "#{uploadDir}/#{linkInfo.name}"
     r = request(linkInfo.link + "?dl=1")
-    r.on "end", -> finish()
+    r.on "end", -> end()
     r.pipe fs.createWriteStream(filePath)
 
 #

@@ -174,7 +174,7 @@ exports.configure = (sio) ->
 
       socket.on 'initializeFirstCanvas', (canvasId) ->
 #         console.log canvasId
-        db.canvases.getProject canvasId (err, project) ->
+        db.canvases.getProject canvasId, (err, project) ->
           if project is socket.project
 #             socket.canvas = canvasId
             socket.broadcast.to(project).emit "initializeFirstCanvas",
@@ -183,7 +183,7 @@ exports.configure = (sio) ->
       socket.on 'switchCanvas', (canvasId) ->
 #         console.log 'switchCanvas'
 #         console.log canvasId
-        db.canvases.getProject canvasId (err, project) ->
+        db.canvases.getProject canvasId, (err, project) ->
           if project is socket.project
 #             socket.canvas = canvasId
             socket.broadcast.to(socket.project).emit 'switchCanvas',
