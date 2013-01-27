@@ -2,6 +2,7 @@
 cluster = require 'cluster'
 os = require 'os'
 fs = require 'fs'
+gm = require 'gm'
 crypto = require 'crypto'
 validator = require 'validator'
 generatePassword = require 'password-generator'
@@ -77,6 +78,17 @@ exports.getFileType = (mime) ->
   return null if not mime
   return mime.split('/')[0]
 
+exports.makeThumbs = (pid, element, fn) ->
+  type = @getFileType element.mime
+  if type is 'image'
+    path = "#{cfg.UPLOADS}/#{pid}/image"
+    for size, rect of cfg.THUMB_SIZE
+      gm("#{path}/#{element.name}")
+      .resize(rect.width, rect.height)
+      .noProfile()
+      .write "#{path}/#{size}/#{element.name}", (err) =>
+        return @asyncOpt fn, err, element
+
 exports.include = (dir, fn) ->
   for name in fs.readdirSync(dir)
     shortName = name.split('.')[0]
@@ -111,9 +123,6 @@ exports.asyncParallel = (array, fn) ->
       process.nextTick ->
         fn val, index
     )(el, index)
-
-exports.asyncContinue = (array, fn) ->
-  exports.asyncDone array fn
 
 exports.asyncDone = (array, fn) ->
   --array.left

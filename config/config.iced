@@ -62,7 +62,7 @@ exports.UPLOADS_TMP = './uploads/tmp'
 
 exports.THUMBNAILS = 'thumbnails'
 
-exports.TUMB_SIZE =
+exports.THUMB_SIZE =
   small:
     width: 100
     height: 100

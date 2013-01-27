@@ -2,7 +2,6 @@ request = require 'request'
 fs = require 'fs'
 path = require 'path'
 formidable = require 'formidable'
-im = require 'imagemagick'
 
 db = require '../db'
 tools = require '../tools'
@@ -29,11 +28,13 @@ exports.project = (req, res) ->
 #
 exports.file = (req, res) ->
   fid = req.params.fid
+  size = req.query.size
+  size = if size then "#{size}/" else ''
   db.files.findById fid, (err, file) ->
     return res.send err if err
     type = tools.getFileType file.mime
     res.writeHead 200, 'Content-Type': file.mime
-    rs = fs.createReadStream "./uploads/#{req.params.pid}/#{type}/#{file.name}"
+    rs = fs.createReadStream "./uploads/#{req.params.pid}/#{type}/#{size}#{file.name}"
     rs.pipe res
 
 #
@@ -70,6 +71,8 @@ exports.upload = (req, res, next) ->
       data = req.body
       tools.asyncParallel files, (file) ->
         db.files.add req.user.id, data.cid, data.pid, file.name, file.mime, data.posX, data.posY, (err, savedFile) ->
+          element = savedFile.element
+          tools.makeThumbs data.pid, element
           savedFiles.push savedFile
           return tools.asyncDone files, ->
             return res.json savedFiles
@@ -86,7 +89,6 @@ exports.upload = (req, res, next) ->
       return res.json new Error 'Access denied' unless val
       fileCount++
       files.push file
-      #TODO check if user is project Member
       size = file.length
       #TODO cfg.MIN_FILE_SIZE and cfg.MAX_FILE_SIZE are not yet defined.
       if cfg.MIN_FILE_SIZE and cfg.MIN_FILE_SIZE > size
@@ -124,6 +126,8 @@ exports.uploadDropbox = (req, res) ->
       savedFiles = []
       tools.asyncParallel req.body.linkInfos, (linkInfo) ->
         db.files.add req.user.id, linkInfo.cid, pid, linkInfo.name, linkInfo.mime, posX, posY, (err, savedFile) ->
+          element = savedFile.element
+          tools.makeThumbs pid, element
           savedFiles.push savedFile
           return tools.asyncDone req.body.linkInfos, ->
             return res.json savedFiles

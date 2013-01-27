@@ -44,7 +44,7 @@
     "lodash": "*",
     "moment": "*",
     "winston": "*",
-    "imagemagick": "*",
+    "gm": "*",
     "validator": "*"
   },
   "devDependencies": {
