@@ -17,7 +17,7 @@ $ ->
             room.socket.emit "commentUpdate", room.socketHelper.prepareCommentToSend(item.commentMin, "create")
           else
             room.comments.hideComment item.commentMin
-            room.socket.emit "commentRemove", item.commentMin.elementId
+            room.socket.emit "commentRemove", canvasId: room.canvas.getSelectedCanvasId(), elementId: item.commentMin.elementId
         else
           if reverse
             item.opacity = 1
@@ -49,7 +49,7 @@ $ ->
         else if item.commentMin
           if reverse
             room.comments.hideComment item.commentMin
-            room.socket.emit "commentRemove", item.commentMin.elementId
+            room.socket.emit "commentRemove", canvasId: room.canvas.getSelectedCanvasId(), elementId: item.commentMin.elementId
           else
             room.comments.showComment item.commentMin
             room.socket.emit "commentUpdate", room.socketHelper.prepareCommentToSend(item.commentMin, "create")

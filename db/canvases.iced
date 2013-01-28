@@ -25,9 +25,9 @@ exports.setUp = (client, db) ->
         return tools.asyncOpt fn, err, null
 
   mod.initFirst = (pid, fn) ->
-    return client.lrange "projects:#{pid}:canvases", 0, 0, (err, val) ->
+    return client.lindex "projects:#{pid}:canvases", 0, (err, val) ->
       client.hset "canvases:#{val}", "initialized", "true"
-      return tools.asyncOpt fn, err, null
+      return tools.asyncOpt fn, err, val
 
   mod.get = (cid, fn) ->
     client.hgetall 'canvases:' + cid, fn
@@ -114,5 +114,8 @@ exports.setUp = (client, db) ->
 
   mod.commentNumber = (cid, fn) ->
     client.hget "canvases:#{cid}", 'nextComment', fn
+
+  mod.getProject = (cid, fn) ->
+    client.hget "canvases:#{cid}", 'project', fn
 
   return mod

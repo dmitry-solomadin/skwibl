@@ -28,11 +28,13 @@ exports.project = (req, res) ->
 #
 exports.file = (req, res) ->
   fid = req.params.fid
+  size = req.query.size
+  size = if size then "#{size}/" else ''
   db.files.findById fid, (err, file) ->
     return res.send err if err
     type = tools.getFileType file.mime
     res.writeHead 200, 'Content-Type': file.mime
-    rs = fs.createReadStream "./uploads/#{req.params.pid}/#{type}/#{file.name}"
+    rs = fs.createReadStream "./uploads/#{req.params.pid}/#{type}/#{size}#{file.name}"
     rs.pipe res
 
 #
@@ -66,45 +68,50 @@ exports.upload = (req, res, next) ->
     fileCount--
     if fileCount is 0
       savedFiles = []
+      data = req.body
       tools.asyncParallel files, (file) ->
-        db.files.add req.user.id, req.cid, req.pid, file.name, file.mime, req.posX, req.posY, (err, savedFile) ->
+        db.files.add req.user.id, data.cid, data.pid, file.name, file.mime, data.posX, data.posY, (err, savedFile) ->
+          element = savedFile.element
+          tools.makeThumbs data.pid, element
           savedFiles.push savedFile
           return tools.asyncDone files, ->
             return res.json savedFiles
   form = new formidable.IncomingForm()
   form.uploadDir = cfg.UPLOADS_TMP
   form.on 'field', (name, value)->
-    req[name] = value
-  form.on 'fileBegin', ->
-    console.log "fileBegin"
+    req.body[name] = value
+#   form.on 'fileBegin', ->
+#     console.log "fileBegin"
   form.on 'file', (name, file) ->
-    fileCount++
-    files.push file
-    pid = req.pid
-    cid = req.cid
-    size = file.length
-    # todo cfg.minFileSize and cfg.maxFileSize are not yet defined.
-    if cfg.minFileSize and cfg.minFileSize > size
-      fs.unlink file.path
-      return
-    if cfg.maxFileSize and size > cfg.maxFileSize
-      fs.unlink file.path
-      return
-    mime = file.mime
-    type = tools.getFileType mime
-    unless tools.isMimeSupported mime
-      fs.unlink file.path
-      return
-    uploadDir = "#{cfg.UPLOADS}/#{pid}/#{type}"
-    fs.rename file.path, "#{uploadDir}/#{file.name}", (err) ->
-      console.log "unexpected error. implement manual copy process" if err
-      return end()
-  form.on 'aborted', ->
-    console.log "abort"
-  form.on 'error', (err) ->
-    console.log "error: ", err
-  form.on 'end', ->
-    console.log "end"
+    pid = req.body.pid
+    cid = req.body.cid
+    db.mid.isMember req.user.id, pid, (err, val) ->
+      return res.json new Error 'Access denied' unless val
+      fileCount++
+      files.push file
+      size = file.length
+      #TODO cfg.MIN_FILE_SIZE and cfg.MAX_FILE_SIZE are not yet defined.
+      if cfg.MIN_FILE_SIZE and cfg.MIN_FILE_SIZE > size
+        fs.unlink file.path
+        return
+      if cfg.MAX_FILE_SIZE and size > cfg.MAX_FILE_SIZE
+        fs.unlink file.path
+        return
+      mime = file.mime
+      type = tools.getFileType mime
+      unless tools.isMimeSupported mime
+        fs.unlink file.path
+        return
+      uploadDir = "#{cfg.UPLOADS}/#{pid}/#{type}"
+      fs.rename file.path, "#{uploadDir}/#{file.name}", (err) ->
+        console.log "unexpected error. implement manual copy process" if err
+        return end()
+#   form.on 'aborted', ->
+#     console.log "abort"
+#   form.on 'error', (err) ->
+#     console.log "error: ", err
+#   form.on 'end', ->
+#     console.log "end"
   form.parse req
 
 exports.uploadDropbox = (req, res) ->
@@ -113,12 +120,14 @@ exports.uploadDropbox = (req, res) ->
   posX = req.body.posX
   posY = req.body.posY
 
-  finish = ->
+  end = ->
     fileCount--
     if fileCount is 0
       savedFiles = []
       tools.asyncParallel req.body.linkInfos, (linkInfo) ->
         db.files.add req.user.id, linkInfo.cid, pid, linkInfo.name, linkInfo.mime, posX, posY, (err, savedFile) ->
+          element = savedFile.element
+          tools.makeThumbs pid, element
           savedFiles.push savedFile
           return tools.asyncDone req.body.linkInfos, ->
             return res.json savedFiles
@@ -131,7 +140,7 @@ exports.uploadDropbox = (req, res) ->
     uploadDir = "./uploads/#{pid}/#{linkInfo.type}"
     filePath = "#{uploadDir}/#{linkInfo.name}"
     r = request(linkInfo.link + "?dl=1")
-    r.on "end", -> finish()
+    r.on "end", -> end()
     r.pipe fs.createWriteStream(filePath)
 
 #

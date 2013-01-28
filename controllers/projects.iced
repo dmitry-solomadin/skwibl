@@ -80,7 +80,9 @@ exports.add = (req, res) ->
       dir = "#{cfg.UPLOADS}/#{project.id}"
       fs.mkdir dir, cfg.DIRECTORY_PERMISSION, (err) ->
         fs.mkdir "#{dir}/video", cfg.DIRECTORY_PERMISSION
-        fs.mkdir "#{dir}/image", cfg.DIRECTORY_PERMISSION
+        fs.mkdir "#{dir}/image", cfg.DIRECTORY_PERMISSION, (err) ->
+          fs.mkdir  "#{dir}/image/small", cfg.DIRECTORY_PERMISSION
+          fs.mkdir "#{dir}/image/large", cfg.DIRECTORY_PERMISSION
       inviteeEmails = req.body.inviteeEmails.trim()
       if inviteeEmails and inviteeEmails isnt ''
         inviteeEmails = inviteeEmails.split(",")

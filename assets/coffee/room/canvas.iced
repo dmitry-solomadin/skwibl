@@ -367,7 +367,7 @@ $ ->
       firstThumb = $(@getThumbs()[0])
       room.hideSplashScreen()
       firstThumb.attr("data-initialized", "true").data("initialized", "true")
-      room.socket.emit "initializeFirstCanvas" if emit
+      room.socket.emit "initializeFirstCanvas", firstThumb.data('cid') if emit
 
     deinitializeFirst: () ->
       firstThumb = $(@getThumbs()[0])

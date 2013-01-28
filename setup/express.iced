@@ -59,7 +59,8 @@ exports.setUp = (logger) ->
     }
     app.use passport.initialize()
     app.use passport.session()
-    app.use '/file/upload', (req, res, next) -> ctrls.files.upload(req, res, next)
+    app.use '/file/upload', ctrls.mid.isAuth
+    app.use '/file/upload', ctrls.files.upload
     app.use (req, res, next) ->
       res.locals.req = req
       next()

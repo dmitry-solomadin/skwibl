@@ -10,7 +10,6 @@ exports.setUp = (client, db) ->
     canvas = element.canvasId
     client.hmset "comments:#{eid}", element
     unless create # creating new element
-      element.new = create
       client.rpush "canvases:#{canvas}:comments", eid
       return tools.asyncOpt fn, null, element
     return tools.asyncOpt fn, null, element
@@ -69,5 +68,8 @@ exports.setUp = (client, db) ->
               return tools.asyncDone array, ->
                 return tools.asyncOpt fn, null, elements
       return tools.asyncOpt fn, err, []
+
+  mod.getCanvas = (eid, fn) ->
+    client.hget "comments:#{eid}", 'canvasId', fn
 
   return mod
