@@ -26,7 +26,7 @@
           <h2 class="project_name"><a href="/projects/<%= project.id %>"><%= project.name %></a></h2>
 
           <div style="margin:3px 0;">To-Do: <strong style="color:#679e17;"><%= project.todosCount %></strong></div>
-          <ul class="project_list short">
+          <ul class="skwibl_list project_list short">
             <% for todo in project.todos : %>
             <li><a href="/projects/<%= project.id %>#tsl=<%= todo.elementId %>" onclick=""><%= todo.text %></a></li>
             <% end %>

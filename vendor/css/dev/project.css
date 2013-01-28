@@ -89,14 +89,20 @@
     text-overflow: ellipsis;
 }
 
-.project_list {
+ul.skwibl_list {
     list-style: none;
     margin: 0;
 }
 
+ul.skwibl_list li {
+    padding-left: 20px;
+    line-height: 25px;
+    background: url(/images/projects/list_style2.png) 0 9px no-repeat;
+}
+
 .project_list li {
-    line-height: 30px;
     padding-left: 25px;
+    line-height: 30px;
     background: url(/images/projects/list_style2.png) 0 11px no-repeat;
 }
 

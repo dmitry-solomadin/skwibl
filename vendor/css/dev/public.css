@@ -1,0 +1,22 @@
+.team_pics {
+    width: 580px;
+    margin: 0 auto;
+}
+
+.team_pics div {
+    float:left;
+}
+
+.team_pics div img {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+}
+
+.team_pics div {
+    margin-left: 20px;
+}
+
+.team_pics div:first-child {
+    margin-left: 0;
+}
