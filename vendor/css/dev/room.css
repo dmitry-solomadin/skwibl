@@ -544,6 +544,10 @@ body.room {
     padding: 7px 4px 0 5px;
 }
 
+.gecko .chatFilters .btn{
+    padding: 5px 0 7px 0;
+}
+
 .chatFilters .btn {
     font-family: 'MyriadPro-SemiBold';
     margin-left: 0 !important;

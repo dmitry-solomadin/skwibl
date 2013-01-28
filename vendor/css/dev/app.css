@@ -131,6 +131,11 @@ input.input-big {
     -moz-box-sizing: content-box;
 }
 
+.gecko .btn {
+    padding-top: 6px;
+    padding-bottom: 8px;
+}
+
 .font-normal {
     font-family: 'MyriadPro-Regular' !important;
 }
@@ -140,12 +145,21 @@ input.input-big {
     padding-bottom: 7px;
 }
 
+.gecko .navbar .btn {
+    padding-top: 6px;
+    padding-bottom: 8px;
+}
+
 .small-btn {
     padding: 4px !important;
     font: 14px 'MyriadPro-SemiBold';
     -webkit-font-smoothing: antialiased;
     line-height: 19px !important;
     height: 18px;
+}
+
+.gecko .small-btn {
+    padding: 3px 4px 5px 4px !important;
 }
 
 .btn:active {
@@ -190,6 +204,10 @@ input.input-big {
 
 .btn .icon-plus-sign {
     margin-top: 2px;
+}
+
+.gecko .btn .icon-plus-sign {
+    margin-top: 3px;
 }
 
 .btn.btn-success:hover,
@@ -361,6 +379,10 @@ input.input-big {
     font-size: 14px;
     padding: 4px 10px;
     font-family: 'MyriadPro-Regular';
+}
+
+.gecko .login_social_join .btn {
+    padding: 3px 10px 5px 10px;
 }
 
 .login_or_wrap {

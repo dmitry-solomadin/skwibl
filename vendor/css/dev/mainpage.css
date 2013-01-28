@@ -71,6 +71,10 @@ body.mainpage {
     padding: 10px 0 !important;
 }
 
+.gecko .header_btns .btn {
+    padding: 9px 0 11px 0 !important;
+}
+
 .banner_bg {
     height: 532px;
     background: url(/images/mainpage/banner_bg.jpg);
