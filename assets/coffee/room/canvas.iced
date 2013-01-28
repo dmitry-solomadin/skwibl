@@ -84,6 +84,10 @@ $ ->
         distance: 10
         revert: true
         scroll: false
+        update: (event, ui) ->
+          cid = $(ui.item[0]).find("a").data("cid")
+          pos = $(".canvasPreviewDiv").index(ui.item)
+          room.socket.emit "canvasReorder", canvasId: cid, position: pos
 
     initBackground: ->
       wFreq = 25
@@ -448,6 +452,7 @@ $ ->
       thumb = $("#canvasSelectDiv div:first").clone()
       thumb.find("a").attr("data-cid", canvasData.canvasId).attr("data-fid", canvasData.fileId)
         .attr("data-name", canvasData.name).attr("data-pos-x", canvasData.posX).attr("data-pos-y", canvasData.posY)
+        .attr("data-position", canvasData.position)
       $("#canvasSelectDiv").append(thumb)
 
       mini = $("<div class='smallCanvasPreview tooltipize' title='#{canvasData.name}'></div>")
@@ -522,6 +527,14 @@ $ ->
     getThumbs: -> $("#canvasSelectDiv > div > a")
 
     findThumbByCanvasId: (canvasId) -> $("#canvasSelectDiv a[data-cid='#{canvasId}']")
+
+    setCanvasPosition: (cid, pos) ->
+      canvasPreviewDiv = @findThumbByCanvasId(cid).parent()
+      oldPos = $(".canvasPreviewDiv").index(canvasPreviewDiv)
+      if pos < oldPos
+        $("#canvasSelectDiv .canvasPreviewDiv:eq(#{pos})").before(canvasPreviewDiv)
+      else
+        $("#canvasSelectDiv .canvasPreviewDiv:eq(#{pos})").after(canvasPreviewDiv)
 
     findMiniThumbByCanvasId: (canvasId) -> $(".smallCanvasPreview[data-cid='#{canvasId}']")
 

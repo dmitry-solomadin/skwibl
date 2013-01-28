@@ -2095,7 +2095,6 @@ $.widget("ui.sortable", $.ui.mouse, {
 
     var w = this.placeholder.width();
     var h = this.placeholder.height();
-    console.log(w)
     this.placeholder.width(0);
     this.placeholder.height(0);
     this.placeholder.css("padding", "0");

@@ -14,6 +14,7 @@ exports.setUp = (client, db) ->
           canvas.time = time if time
           canvas.file = file.id if file
           canvas.initialized = true if count > 0
+          canvas.position = count
           if file and file.name.trim().length > 0
             canvas.name = file.name
           else
@@ -32,7 +33,7 @@ exports.setUp = (client, db) ->
     client.hgetall 'canvases:' + cid, fn
 
   mod.index = (pid, fn) ->
-    client.lrange "projects:#{pid}:canvases", 0, -1, (err, array) ->
+    client.sort "projects:#{pid}:canvases", "by", "canvases:*->position", (err, array) ->
       if not err and array and array.length
         canvases = []
         return tools.asyncParallel array, (cid, index) ->
@@ -49,6 +50,28 @@ exports.setUp = (client, db) ->
                     return tools.asyncDone array, ->
                       return tools.asyncOpt fn, null, canvases
       return tools.asyncOpt fn, err, []
+
+  mod.reorder = (pid, cid, toPos, fn) ->
+    db.canvases.get cid, (err, moveCanvas) ->
+      fromPos = moveCanvas.position
+      return tools.asyncOpt fn, err, null if fromPos is toPos
+      client.lrange "projects:#{pid}:canvases", 0, -1, (err, array) ->
+        if not err and array and array.length
+          return tools.asyncParallel array, (canvasId) ->
+            return db.canvases.get canvasId, (err, canvas) ->
+              if "#{canvasId}" is "#{cid}"
+                db.canvases.setProperties canvas.id, position: toPos
+                return tools.asyncDone array, -> return tools.asyncOpt fn, null, null
+
+              if fromPos < toPos
+                if fromPos < canvas.position <= toPos
+                  db.canvases.setProperties canvas.id, position: parseInt(canvas.position) - 1
+              else
+                if toPos <= canvas.position < fromPos
+                  db.canvases.setProperties canvas.id, position: parseInt(canvas.position) + 1
+
+              return tools.asyncDone array, -> return tools.asyncOpt fn, null, null
+        return tools.asyncOpt fn, err, null
 
   mod.clear = (cid) ->
     db.canvases.deleteElements cid

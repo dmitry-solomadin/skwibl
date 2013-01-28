@@ -24,6 +24,7 @@ $ ->
       socket.on 'changeCanvasName', (data) => room.canvas.changeName(data.name)
       socket.on 'switchCanvas', (data) =>
         room.canvas.selectThumb(room.canvas.findThumbByCanvasId(data.canvasId), false)
+      socket.on 'canvasReorder', (data) => room.canvas.setCanvasPosition data.canvasId, data.position
       socket.on 'eraseCanvas', => room.canvas.clear false
       socket.on 'removeCanvas', (data) => room.canvas.destroy data.canvasId, false
       socket.on 'userMouseDown', (data) => room.items.createUserBadge data.id, data.x, data.y

@@ -115,6 +115,13 @@ exports.configure = (sio) ->
           id: id
           canvasData: data
 
+      socket.on 'canvasReorder', (data, cb) ->
+        socket.broadcast.to(socket.project).emit "canvasReorder",
+          id: id
+          canvasId: data.canvasId
+          position: data.position
+        db.canvases.reorder socket.project, data.canvasId, data.position
+
       socket.on 'initializeFirstCanvas', (data, cb) ->
         socket.broadcast.to(socket.project).emit "initializeFirstCanvas",
           id: id

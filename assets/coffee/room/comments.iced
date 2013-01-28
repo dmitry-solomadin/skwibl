@@ -281,13 +281,13 @@ $ ->
     translate: (commentMin, delta) ->
       unscaledD = room.applyReverseCurrentScale delta
       commentMin.css
-        top: commentMin.position().top + Math.ceil(unscaledD.y)
-        left: commentMin.position().left + Math.ceil(unscaledD.x)
+        top: commentMin.position().top + unscaledD.y
+        left: commentMin.position().left + unscaledD.x
       commentMin[0].arrow.translate delta
       maximized = commentMin[0].$maximized
       maximized.css
-        top: maximized.position().top + Math.ceil(unscaledD.y)
-        left: maximized.position().left + Math.ceil(unscaledD.x)
+        top: maximized.position().top + unscaledD.y
+        left: maximized.position().left + unscaledD.x
       commentMin[0].rect.translate delta if commentMin[0].rect
 
     removeComment: ($commentmin) ->
