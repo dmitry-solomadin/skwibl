@@ -95,7 +95,7 @@ exports.setUp = (client, db) ->
   mod.getProjectForActivities = (activities, fn) ->
     return tools.asyncParallel activities, (activity) ->
       return db.projects.getData activity.project, (err, project) ->
-        if not err and project
+        unless err
           activity.project = project
           return tools.asyncDone activities, ->
             return tools.asyncOpt fn, null, null

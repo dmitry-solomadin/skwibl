@@ -1,108 +1,18 @@
 <h1 class="page_header">Activities</h1>
 <div class="content activities">
   <% if @activities.length : %>
-  <% for @activity in @activities.reverse() : %>
-    <%- include './activities/_activity.ect' %>
-  <% end %>
-  <!--<div class="activity_container clearfix">
-    <div class="activity_user">
-      <div class="timeline_point active"></div>
-      <div class="activity_date">Sept 14, 12:55am</div>
-      <a href="#" class="clearfix" style="text-decoration:none;display:block;">
-        <div class="activity_user_pic"><img src="pic/participant2.png" alt="test"></div>
-        <div class="activity_user_name">Pat Harris</div>
-      </a>
+    <% for @activity in @activities.reverse() : %>
+      <%- include './activities/_activity.ect' %>
+    <% end %>
+    <!-- SEE PREVIOUS ACTIVITIES
+    <div class="timeline_bottom">
+      <div class="timeline_body"></div>
     </div>
-    <div class="activity">
-      <div>Make notes for the 2 Mockups</div>
-      <img style="margin:10px 10px 0 0;" src="pic/mockup.png" alt="test">
-      <img style="margin:10px 10px 0 0;" src="pic/mockup.png" alt="test">
+    <div class="activities_btn"><a href="#" class="btn"><span
+        style="text-decoration:underline;">See Previous Activities</span> <span class="caret"></span></a>
     </div>
-  </div>
-  <div class="activity_container clearfix">
-    <div class="activity_user">
-      <div class="timeline_point"></div>
-      <div class="activity_date">Sept 14, 11:18am</div>
-      <a href="#" class="clearfix" style="text-decoration:none;display:block;">
-        <div class="activity_user_pic"><img src="pic/participant2.png" alt="test"></div>
-        <div class="activity_user_name">Semen Tolstyi</div>
-      </a>
-    </div>
-    <div class="activity">
-      <div>Uploaded Mockups for the <a href="#" style="color:#474c55;text-decoration:underline;"><strong>First Mockups
-        Review</strong></a> Meeteng
-      </div>
-      <img style="margin:10px 10px 0 0;" src="pic/mockup.png" alt="test">
-      <img style="margin:10px 10px 0 0;" src="pic/mockup.png" alt="test">
-      <img style="margin:10px 10px 0 0;" src="pic/mockup.png" alt="test">
-      <img style="margin:10px 10px 0 0;" src="pic/mockup.png" alt="test">
-    </div>
-  </div>
-  <div class="activity_container clearfix">
-    <div class="activity_user">
-      <div class="timeline_point"></div>
-      <div class="activity_date">Sept 14, 11:16am</div>
-      <a href="#" class="clearfix" style="text-decoration:none;display:block;">
-        <div class="activity_user_pic"><img src="pic/participant2.png" alt="test"></div>
-        <div class="activity_user_name">Ivanna Osmak</div>
-      </a>
-    </div>
-    <div class="activity">
-      <div>Create a meeeting <a href="#" style="color:#474c55;text-decoration:underline;"><strong>First Mockups
-        Review</strong></a> on Sept 15, 11:00pm
-      </div>
-    </div>
-  </div>
-  <div class="activity_container clearfix">
-    <div class="activity_user">
-      <div class="timeline_point"></div>
-      <div class="activity_date">Sept 14, 10:37am</div>
-      <a href="#" class="clearfix" style="text-decoration:none;display:block;">
-        <div class="activity_user_pic"><img src="pic/participant2.png" alt="test"></div>
-        <div class="activity_user_name"></div>
-      </a>
-    </div>
-    <div class="activity">
-      <div>Two of your contacts: <a href="#"><strong style="color:#679e17;">Sveta Gluhova</strong></a> and <a
-          href="#"><strong style="color:#679e17;">Arkadiy Raykin</strong></a> joined the meeting <a href="#"
-                                                                                                    style="color:#474c55;text-decoration:underline;"><strong>Kick
-        of the New Corporate Web Site</strong></a> on Sept 14, 10:37am
-      </div>
-    </div>
-  </div>
-  <div class="activity_container clearfix">
-    <div class="activity_user">
-      <div class="timeline_point"></div>
-      <div class="activity_date">Sept 14, 10:23am</div>
-      <a href="#" class="clearfix" style="text-decoration:none;display:block;">
-        <div class="activity_user_pic"><img src="pic/participant2.png" alt="test"></div>
-        <div class="activity_user_name">Andrey Chuzhov</div>
-      </a>
-    </div>
-    <div class="activity">
-      <div>Just created a Project New Corporate Web Site and invited 2 partisipants:</div>
-      <a href="#" class="invited_user">
-        <img style="float:left;" src="pic/invited_user.png" alt="test">
-
-        <div style="padding-left:55px;">
-          <div class="invited_user_name">Stepan Kosyh</div>
-        </div>
-      </a>
-      <a href="#" class="invited_user">
-        <img style="float:left;" src="pic/invited_user.png" alt="test">
-
-        <div style="padding-left:55px;">
-          <div class="invited_user_name">Ann Klymchuk</div>
-        </div>
-      </a>
-    </div>
-  </div>-->
-  <div class="timeline_bottom">
-    <div class="timeline_body"></div>
-  </div>
-  <div class="activities_btn"><a href="#" class="btn"><span
-      style="text-decoration:underline;">See Previous Activities</span> <span class="caret"></span></a></div>
+    -->
   <% else : %>
-  <h3>There is no activities to display</h3>
+    <h3>There is no activities to display</h3>
   <% end %>
 </div>

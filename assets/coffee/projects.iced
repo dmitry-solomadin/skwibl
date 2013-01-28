@@ -16,13 +16,22 @@ $ ->
 
     deleteProject: (pid) ->
       if confirm("Are you sure?")
-        $.post '/projects/delete', {pid: pid}, (data, status, xhr) ->
-          $("#project#{pid}").fadeOut()
+        $.post '/projects/delete', {pid: pid}, (data, status, xhr) =>
+          @deleteProjectHtml pid
+
+    deleteProjectHtml: (pid) ->
+      $("#project#{pid}").toggle("normal")
+      newProjectsCount = parseInt($.trim($("#projectCount").html())) - 1
+      if newProjectsCount is 0
+        $("#noProjectsText").show()
+        $("#projectCountSemicolon").hide()
+      else
+        $("#projectCount").html(newProjectsCount)
 
     leaveProject: (pid) ->
       if confirm("Are you sure?")
-        $.post '/projects/leave', {pid: pid}, (data, status, xhr) ->
-          $("#project#{pid}").fadeOut() if data
+        $.post '/projects/leave', {pid: pid}, (data, status, xhr) =>
+          @deleteProjectHtml pid if data
 
     showInviteModal: (pid) ->
       $.get "/projects/#{pid}/participants", (data) ->
