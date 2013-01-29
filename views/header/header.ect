@@ -10,14 +10,14 @@
       <% else : %>
       <div class="logo">
         <a href="/" title="Skwibl"><img src="/images/mainpage/logo.png" alt="Skwibl"></a>
-        <span class="beta">α</span>
+        <img class="beta" src="/images/beta.png">
       </div>
       <% end %>
 
       <% unless @currentUser() : %>
       <span class="pull-right header_btns">
         <a class="btn btn-success" href="/registration">Join Skwibl</a>
-        <a id="signInButton" class="btn" href="#" data-dropdown-toggler="loginBlock">
+        <a id="signInButton" class="btn" href="#" data-dropdown-toggler="loginBlock" data-duration="300">
           Sign In
         </a>
       </span>

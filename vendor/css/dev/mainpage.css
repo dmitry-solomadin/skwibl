@@ -47,18 +47,15 @@ body.mainpage {
     vertical-align: top;
 }
 
-.beta {
-    font-size: 16px;
-    font-family: serif;
-    position: relative;
-    top: -19px;
-    left: 3px;
-    color: #606060;
-}
-
 .logo img {
     vertical-align: top;
     width: 149px;
+}
+
+.beta {
+    position: relative;
+    height: 15px;
+    width: 15px !important;
 }
 
 .header_btns {

@@ -78,11 +78,11 @@ exports.getFileType = (mime) ->
   return null if not mime
   return mime.split('/')[0]
 
-exports.makeThumbs = (pid, element, fn) ->
+exports.makeProjectThumbs = (pid, element, fn) ->
   type = @getFileType element.mime
   if type is 'image'
     path = "#{cfg.UPLOADS}/#{pid}/image"
-    for size, rect of cfg.THUMB_SIZE
+    for size, rect of cfg.PROJECT_THUMB_SIZE
       gm("#{path}/#{element.name}")
       .resize(rect.width, rect.height)
       .noProfile()

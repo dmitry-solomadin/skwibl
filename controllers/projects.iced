@@ -81,8 +81,8 @@ exports.add = (req, res) ->
       fs.mkdir dir, cfg.DIRECTORY_PERMISSION, (err) ->
         fs.mkdir "#{dir}/video", cfg.DIRECTORY_PERMISSION
         fs.mkdir "#{dir}/image", cfg.DIRECTORY_PERMISSION, (err) ->
-          fs.mkdir  "#{dir}/image/small", cfg.DIRECTORY_PERMISSION
-          fs.mkdir "#{dir}/image/large", cfg.DIRECTORY_PERMISSION
+          for size of cfg.PROJECT_THUMB_SIZE
+            fs.mkdir "#{dir}/image/#{size}", cfg.DIRECTORY_PERMISSION
       inviteeEmails = req.body.inviteeEmails.trim()
       if inviteeEmails and inviteeEmails isnt ''
         inviteeEmails = inviteeEmails.split(",")

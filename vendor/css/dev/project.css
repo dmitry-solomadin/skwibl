@@ -30,6 +30,18 @@
     position: relative;
 }
 
+.project_pics a {
+    height: 90px;
+    width: 105px;
+    display: inline-block;
+    float: left;
+}
+
+.project_pics a:first-child {
+    width: 175px;
+    height: 175px;
+}
+
 .project_pics a img {
     max-width: 105px;
     max-height: 87px;

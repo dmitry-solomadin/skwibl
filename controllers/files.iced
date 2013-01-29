@@ -33,9 +33,12 @@ exports.file = (req, res) ->
   db.files.findById fid, (err, file) ->
     return res.send err if err
     type = tools.getFileType file.mime
-    res.writeHead 200, 'Content-Type': file.mime
-    rs = fs.createReadStream "./uploads/#{req.params.pid}/#{type}/#{size}#{file.name}"
-    rs.pipe res
+    name = "./uploads/#{req.params.pid}/#{type}/#{size}#{file.name}"
+    fs.exists name, (exists) ->
+      return res.send '' unless exists
+      res.writeHead 200, 'Content-Type': file.mime
+      rs = fs.createReadStream name
+      rs.pipe res
 
 #
 # POST
@@ -72,7 +75,7 @@ exports.upload = (req, res, next) ->
       tools.asyncParallel files, (file) ->
         db.files.add req.user.id, data.cid, data.pid, file.name, file.mime, data.posX, data.posY, (err, savedFile) ->
           element = savedFile.element
-          tools.makeThumbs data.pid, element
+          tools.makeProjectThumbs data.pid, element
           savedFiles.push savedFile
           return tools.asyncDone files, ->
             return res.json savedFiles
@@ -127,7 +130,7 @@ exports.uploadDropbox = (req, res) ->
       tools.asyncParallel req.body.linkInfos, (linkInfo) ->
         db.files.add req.user.id, linkInfo.cid, pid, linkInfo.name, linkInfo.mime, posX, posY, (err, savedFile) ->
           element = savedFile.element
-          tools.makeThumbs pid, element
+          tools.makeProjectThumbs pid, element
           savedFiles.push savedFile
           return tools.asyncDone req.body.linkInfos, ->
             return res.json savedFiles

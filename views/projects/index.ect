@@ -12,7 +12,8 @@
           <% if project.files.length : %>
             <% for file, index in project.files : %>
               <% break if index > 2 %>
-              <a href="#"><img src="/files/<%= project.id %>/<%= file.id %>" alt="test"></a>
+              <% size = if index is 0 then "lsmall" else "rsmall"%>
+              <a href="#"><img src="/files/<%= project.id %>/<%= file.id %>?size=<%= size %>" alt="test"></a>
             <% end %>
           <% else : %>
             <div class="no_images">No images</div>

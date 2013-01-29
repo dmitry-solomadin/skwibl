@@ -62,13 +62,16 @@ exports.UPLOADS_TMP = './uploads/tmp'
 
 exports.THUMBNAILS = 'thumbnails'
 
-exports.THUMB_SIZE =
-  small:
-    width: 100
-    height: 100
-  large:
-    width: 200
-    height: 200
+exports.PROJECT_THUMB_SIZE =
+  tiny:
+    width: 50
+    height: 50
+  lsmall:
+    width: 175
+    height: 175
+  rsmall:
+    width: 105
+    height: 90
 
 exports.DIRECTORY_PERMISION = 0o751 # rwxr-x--x
 exports.FILE_PERMISSION = 0o640 # rw-r-----

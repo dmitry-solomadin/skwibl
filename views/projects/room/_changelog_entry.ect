@@ -10,7 +10,7 @@
       <span class="changelog-inner-change"><%= @text %></span>
     <% end %>
     <% if @fileId? : %>
-      <div><img src="/files/<%= @pid %>/<%= @fileId %>" width="64" height="64"/></div>
+      <div><img src="/files/<%= @pid %>/<%= @fileId %>?size=tiny"/></div>
     <% end %>
   </div>
   <div style="clear:both;"></div>

@@ -1,6 +1,23 @@
+.about_us {
+    font-size: 14px;
+}
+
+.about_us h3 {
+    margin-bottom: 5px;
+}
+
 .team_pics {
-    width: 580px;
+    width: 840px;
     margin: 0 auto;
+}
+
+.team_pics {
+    text-align: center;
+}
+
+.team_pics h4 {
+    margin-top: 5px;
+    font-size: 18px;
 }
 
 .team_pics div {
@@ -9,8 +26,8 @@
 
 .team_pics div img {
     border-radius: 50%;
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
 }
 
 .team_pics div {
