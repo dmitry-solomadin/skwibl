@@ -4,7 +4,7 @@
   <% end %>
 
   <div class="navbar-inner header">
-    <div class="<%= if @room then 'container-fluid' else 'container' %>">
+    <div class="<%= if @room then 'container-fluid room-container-fluid' else 'container' %>">
       <% if @room : %>
       <%- include './header/room_header.ect' %>
       <% else : %>

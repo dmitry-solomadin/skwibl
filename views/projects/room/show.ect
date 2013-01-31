@@ -5,19 +5,33 @@
 
 <div id="chat" class="chat <%= 'chatFolded' unless canvasInitialized %>">
   <div class="projectHeader">
+    <span><img src="/images/room/new/room_chat_head_icon.png" alt="Web site mockups review" width="16" height="17"></span>
     <%= @project.name %>
   </div>
-  <div id="participants" class="participants">
-    <% for user in @users : %>
-    <% picture = if user.picture then user.picture else '/images/avatar.png' %>
-    <div class="chatUser" id="chatUser<%= user.id %>" data-uid="<%= user.id %>"
-         data-display-name="<%= user.displayName %>"
-         data-picture="<%= picture %>">
-      <img class="userAvatar tooltipize" src="<%= picture %>" width="48" title="<%= user.displayName %>"/>
-      <span class="chatUserStatus"></span>
+  <div class="project_participants_head">Project participants: <%= @users.length %></div>
+  <div class="project_participants_slider">
+    <div id="participants" class="project_participants_slider_container">
+      <% for user in @users : %>
+      <% picture = if user.picture then user.picture else '/images/avatar.png' %>
+      <div class="chatUser" id="chatUser<%= user.id %>" data-uid="<%= user.id %>"
+           data-display-name="<%= user.displayName %>"
+           data-picture="<%= picture %>">
+        <img class="userAvatar tooltipize" src="<%= picture %>" width="48" title="<%= user.displayName %>"/>
+
+      </div>
+      <% end %>
     </div>
+    <a href="#" class="project_participants_slider_l" style="display: block;"></a>
+    <a href="#" class="project_participants_slider_r" style="display: block;"></a>
+  </div>
+  <div id="statuses" class="userStatuses">
+    <% for user in @users : %>
+      <span class="chatUserStatus" id="chatUserStatus<%= user.id %>"></span>
     <% end %>
   </div>
+
+  <div class="clearfix"></div>
+
   <div id="chatFilters" class="btn-group chatFilters">
     <button data-tab="chat-tab" class="btn btn-large active">Chat</button>
     <button data-tab="todo-tab" class="btn btn-large">Todo</button>
@@ -91,11 +105,11 @@
           <% for canvas, i in @canvases : %>
           <div class="smallCanvasPreview tooltipize <%- 'previewSelected' if i is 0 %>" title="<%= canvas.name %>"
                data-cid="<%= canvas.id %>"></div>
-        <% end %>
+          <% end %>
+        </div>
       </div>
-    </div>
-    <div id="nameChanger">
-      <% hasName = @canvases[0].name and @canvases[0].name.trim().length > 0 %>
+      <div id="nameChanger">
+        <% hasName = @canvases[0].name and @canvases[0].name.trim().length > 0 %>
         <span id="canvasName" class="canvasName tooltipize <%= 'noname' unless hasName %>" data-delay="500"
               title="Click to change name">
           <%= if hasName then @canvases[0].name else "blank name" %>
@@ -104,51 +118,55 @@
           <input id="canvasNameInput" class="canvasNameInput" type="text"/>
           <a id="canvasNameSave" class="btn small-btn canvasNameSave">Save</a>
         </span>
-    </div>
+      </div>
 
-    <% if canvasInitialized : %>
-      <% foldFunc = "App.room.canvas.foldPreviews(); return false;" %>
-      <% foldImg = "/images/room/fold-down.png" %>
-    <% else : %>
-      <% foldFunc = "App.room.canvas.unfoldPreviews(); return false;" %>
-      <% foldImg = "/images/room/unfold-up.png" %>
-    <% end %>
-    <a id="canvasFolder" class="btn skwibl_image_btn canvasFolder" href="#" onclick="<%= foldFunc %>">
-      <img src="<%= foldImg %>">
-    </a>
-    <a class="btn small-btn btn-success pull-right" onclick="App.room.showSplashScreen()">
-      <i class="icon-plus-sign"></i>
-      New
-    </a>
-  </div>
-  <div class="canvasFooterBottom">
-    <div id="canvasSelectDiv" class="canvasSelectDiv">
-      <% for canvas, i in @canvases : %>
+      <% if canvasInitialized : %>
+        <% foldFunc = "App.room.canvas.foldPreviews(); return false;" %>
+        <% foldImg = "/images/room/new/hide_icon.png" %>
+      <% else : %>
+        <% foldFunc = "App.room.canvas.unfoldPreviews(); return false;" %>
+        <% foldImg = "/images/room/new/hide_icon_up.png" %>
+      <% end %>
+
+      <div class="gallery_bar_right">
+        <a class="createNewCanvasLink" href="#" onclick="App.room.showSplashScreen()">
+          <img src="/images/room/new/create_icon.png" alt="Create" width="19" height="20">
+          <span>Create</span></a>
+        <img src="<%= foldImg %>" alt="Hide" width="10" height="11"
+             id="canvasFolder" onclick="<%= foldFunc %>" class="canvasFolder">
+      </div>
+    </div>
+    <div class="canvasFooterBottom">
+      <div id="canvasSelectDiv" class="canvasSelectDiv">
+        <% for canvas, i in @canvases : %>
         <% for element in canvas.elements : %>
-          <input class="canvasElement<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(element) %>"/>
+        <input class="canvasElement<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(element) %>"/>
         <% end %>
         <% for comment in canvas.comments : %>
-          <input class="canvasComment<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(comment) %>"/>
-          <% for text in comment.texts : %>
-            <input class="commentTexts<%= comment.elementId %>" type="hidden" value="<%= JSON.stringify(text) %>"/>
-          <% end %>
+        <input class="canvasComment<%= canvas.id %>" type="hidden" value="<%= JSON.stringify(comment) %>"/>
+        <% for text in comment.texts : %>
+        <input class="commentTexts<%= comment.elementId %>" type="hidden" value="<%= JSON.stringify(text) %>"/>
         <% end %>
-      <div class="canvasPreviewDiv">
-        <a href="#" class="<%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.id %>" data-name="<%= canvas.name %>"
-           data-initialized="<%= canvas.initialized %>" data-pos-x="<%= canvas.file.posX if canvas.file %>"
-           data-pos-y="<%= canvas.file.posY if canvas.file %>" <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
-        <canvas width="80" height="60"></canvas>
-        </a>
-        <img class="canvasRemoveImg" src="/images/room/remove.png"
-             onclick="App.room.canvas.onDeleteClick(this, true); return false;">
-        <img class="canvasDownloadImg" src="/images/room/download.png"
-             onclick="App.room.canvas.download(this); return false;">
-        <img class="canvasReorderImg" src="/images/room/reorder.png">
+        <% end %>
+        <div class="canvasPreviewDiv">
+          <div href="#" class="clink <%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.id %>"
+             data-name="<%= canvas.name %>"
+             data-initialized="<%= canvas.initialized %>" data-pos-x="<%= canvas.file.posX if canvas.file %>"
+             data-pos-y="<%= canvas.file.posY if canvas.file %>" <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
+          <canvas width="80" height="60"></canvas>
+          </div>
+          <a href="#" class="gallery_slide_close" onclick="App.room.canvas.onDeleteClick(this, true); return false;"></a>
+          <div class="gallery_slide_controls_container">
+            <div class="gallery_slide_controls">
+              <a href="#" class="gallery_slide_save" title="Save image" onclick="App.room.canvas.download(this); return false;"></a>
+              <a href="#" class="gallery_slide_drag" title="Drag image"></a>
+            </div>
+          </div>
+        </div>
+        <% end %>
       </div>
-      <% end %>
     </div>
   </div>
-</div>
 </div>
 
 <%- include './projects/invite/_popup.ect' %>

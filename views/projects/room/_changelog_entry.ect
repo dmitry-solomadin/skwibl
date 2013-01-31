@@ -1,5 +1,30 @@
-<span class="changelog-header"><%= @header %></span>
-<span class="datetext"><%= @time %></span>
+<div class="changelog-header-wrap">
+  <span class="changelog-header"><%= @header %></span>
+  <span class="changelog-image">
+    <% switch @type : %>
+      <% when 'newComment' : %>
+        <img src="/images/room/new/changelog_new_comment.png">
+      <% end %>
+      <% when 'projectJoin' : %>
+        <img src="/images/room/new/changelog_new_person.png">
+      <% end %>
+      <% when 'projectLeave' : %>
+      <% end %>
+      <% when 'newTodo' : %>
+        <img src="/images/room/new/changelog_new_todo.png">
+      <% end %>
+      <% when 'todoResolved' : %>
+      <% end %>
+      <% when 'todoReopened' : %>
+        <img src="/images/room/new/changelog_todo_reopen.png">
+      <% end %>
+      <% when 'fileUpload' : %>
+        <img src="/images/room/new/changelog_new_file.png">
+      <% end %>
+    <% end %>
+  </span>
+  <span class="datetext"><%= @time %></span>
+</div>
 <div class="changelog-entry">
   <div class="image">
     <img class="userAvatar" src="<%= @picture %>" width="24" height="24"/>

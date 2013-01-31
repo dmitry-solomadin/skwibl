@@ -332,12 +332,14 @@ $ ->
       $commentmin[0].rect.opacity = 1 if $commentmin[0].rect
 
     toggleComments: ->
-      if $("#toggleComments").hasClass("active")
+      if $("#toggleComments").parent().hasClass("selected")
         @foldAll()
-        $("#toggleComments").removeClass("active").html("Show comments").attr("data-original-title", "Show all comments")
+        $("#toggleComments").attr("data-original-title", "Show all comments")
+        $("#toggleComments").parent().removeClass("selected")
       else
         @unfoldAll()
-        $("#toggleComments").addClass("active").html("Hide comments").attr("data-original-title", "Hide all comments")
+        $("#toggleComments").addClass("active").attr("data-original-title", "Hide all comments")
+        $("#toggleComments").parent().addClass("selected")
 
     foldAll: ->
       for savedOpt in room.savedOpts

@@ -7,7 +7,7 @@
     parsedTime = parseFloat changelogEntry.time
     time = @moment(parsedTime).format("MMM DD, YYYY HH:mm")
     authorName = changelogEntry.initiator.displayName
-    changelog_params = {time: time, picture: picture, author: authorName, colon: true, pid: changelogEntry.pid}
+    changelog_params = {time: time, picture: picture, author: authorName, colon: true, pid: changelogEntry.pid, type: changelogEntry.type}
   %>
   <% switch changelogEntry.type : %>
     <% when 'newComment' : %>

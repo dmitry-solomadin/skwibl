@@ -80,12 +80,12 @@ $ ->
     initThumbSort: ->
       $("#canvasSelectDiv").sortable
         items: "> .canvasPreviewDiv"
-        handle: ".canvasReorderImg"
+        handle: ".gallery_slide_drag"
         distance: 10
         revert: true
         scroll: false
         update: (event, ui) ->
-          cid = $(ui.item[0]).find("a").data("cid")
+          cid = $(ui.item[0]).find(".clink").data("cid")
           pos = $(".canvasPreviewDiv").index(ui.item)
           room.socket.emit "canvasReorder", canvasId: cid, position: pos
 
@@ -187,7 +187,7 @@ $ ->
 
     onDeleteClick: (deleteLink) ->
       if confirm "Are you sure? This will delete all canvas content."
-        cid = $(deleteLink).parent().find("a").data("cid")
+        cid = $(deleteLink).parent().find(".clink").data("cid")
         @destroy cid, true
 
     destroy: (cid, emit) ->
@@ -195,7 +195,7 @@ $ ->
         @findThumbByCanvasId(cid).parent().remove()
         @findMiniThumbByCanvasId(cid).remove()
         room.savedOpts.splice room.savedOpts.indexOf(@findOptsById(cid)), 1
-        @selectThumb $("#canvasSelectDiv div:first a")
+        @selectThumb $("#canvasSelectDiv div:first .clink")
       else
         @erase()
         room.savedOpts = []
@@ -293,7 +293,7 @@ $ ->
       room.redraw()
 
     download: (downloadLink) ->
-      cid = $(downloadLink).parent().find("a").data("cid")
+      cid = $(downloadLink).parents(".canvasPreviewDiv").find(".clink").data("cid")
       @flushCanvasIntoCopy cid
 
       dataURL = $("#copyCanvas")[0].toDataURL("image/png")
@@ -318,16 +318,11 @@ $ ->
 
     # CANVAS THUMBNAILS & IMAGE UPLOAD
 
-    onMouseOverThumb: (thumb) ->
-      $(thumb).find(".canvasRemoveImg, .canvasDownloadImg, .canvasReorderImg").show()
-
-    onMouseOutThumb: (thumb) ->
-      $(thumb).find(".canvasRemoveImg, .canvasDownloadImg, .canvasReorderImg").hide()
 
     foldPreviews: ->
       $("#canvasFolder").addClass("canvasFolderTrans")
-      $("#canvasFooter").animate {height: 37}, queue: false, complete: ->
-        $("#canvasFolder").removeClass("canvasFolderTrans").find("img").attr("src", "/images/room/unfold-up.png")
+      $("#canvasFooter").animate {height: 35}, queue: false, complete: ->
+        $("#canvasFolder").removeClass("canvasFolderTrans").attr("src", "/images/room/new/hide_icon_up.png")
 
       if $("#smallCanvasPreviewsWrap").css('position') is "relative"
         $("#nameChanger").animate(left: 0, 500)
@@ -346,7 +341,7 @@ $ ->
         $("#nameChanger").animate(left: 0, 500)
 
       $("#canvasFooter").animate {height: 108}, duration: 500, easing: 'easeOutBack', queue: false, complete: ->
-        $("#canvasFolder").removeClass("canvasFolderTrans").find("img").attr("src", "/images/room/fold-down.png")
+        $("#canvasFolder").removeClass("canvasFolderTrans").attr("src", "/images/room/new/hide_icon.png")
 
       $("#smallCanvasPreviews").animate(left: -500, 500)
       $("#canvasFolder").attr("onclick", "App.room.canvas.foldPreviews(this); return false;")
@@ -442,15 +437,15 @@ $ ->
       room.initOpts(canvasData.canvasId)
 
       @addNewThumbHtml canvasData
-      $("#canvasSelectDiv a").removeClass("canvasSelected")
-      $("#canvasSelectDiv div:last a").addClass("canvasSelected")
+      $("#canvasSelectDiv .clink").removeClass("canvasSelected")
+      $("#canvasSelectDiv .canvasPreviewDiv:last .clink").addClass("canvasSelected")
       $(".smallCanvasPreview").removeClass("previewSelected")
       $(".smallCanvasPreview:last").addClass("previewSelected")
       $("#canvasName").html(canvasData.name)
 
     addNewThumbHtml: (canvasData) ->
-      thumb = $("#canvasSelectDiv div:first").clone()
-      thumb.find("a").attr("data-cid", canvasData.canvasId).attr("data-fid", canvasData.fileId)
+      thumb = $("#canvasSelectDiv .canvasPreviewDiv:first").clone()
+      thumb.find(".clink").attr("data-cid", canvasData.canvasId).attr("data-fid", canvasData.fileId)
         .attr("data-name", canvasData.name).attr("data-pos-x", canvasData.posX).attr("data-pos-y", canvasData.posY)
         .attr("data-position", canvasData.position)
       $("#canvasSelectDiv").append(thumb)
@@ -524,9 +519,9 @@ $ ->
 
     getSelected: -> $(".canvasSelected")
 
-    getThumbs: -> $("#canvasSelectDiv > div > a")
+    getThumbs: -> $("#canvasSelectDiv > .canvasPreviewDiv > .clink")
 
-    findThumbByCanvasId: (canvasId) -> $("#canvasSelectDiv a[data-cid='#{canvasId}']")
+    findThumbByCanvasId: (canvasId) -> $("#canvasSelectDiv .clink[data-cid='#{canvasId}']")
 
     setCanvasPosition: (cid, pos) ->
       canvasPreviewDiv = @findThumbByCanvasId(cid).parent()
@@ -560,7 +555,7 @@ $ ->
       @setScale newScale, previousScale
       @centerOnImage()
 
-      $("#canvasSelectDiv a").removeClass("canvasSelected")
+      $("#canvasSelectDiv .clink").removeClass("canvasSelected")
       $(anchor).addClass("canvasSelected")
       $(".smallCanvasPreview").removeClass("previewSelected")
       $(@findMiniThumbByCanvasId(cid)).addClass("previewSelected")

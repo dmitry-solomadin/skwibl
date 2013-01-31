@@ -20,19 +20,26 @@ $ ->
       $(".toolTypeChanger").on "click", ->
         sharedOpts.tooltype = $(@).data("tooltype")
 
+        $(".instruments > li").removeClass("selected")
+        if $(@).parents("#additionalInsSelect")[0]
+          $("#additionalInsDropdown").parent().addClass("selected")
+        else
+          $(@).parent().addClass("selected")
+
       $("#additionalInsSelect a").click ->
         $("#additionalInsDropdown").find("img").attr("src", $(@).find("img").attr("src"))
         $("#additionalInsDropdown").attr("data-tooltype", $(@).data("tooltype")).data("tooltype", $(@).data("tooltype"))
         $("#additionalInsDropdown").attr("data-original-title", $(@).data("title")).data("original-title", $(@).data("title"))
 
-      $('#colorSelect .color').click ->
-        $('#colorSelect .color').removeClass('activen')
-        sharedOpts.color = $(@).attr('data-color')
+      $('#colorSelect .instrument_color_link').click ->
+        insColor = $(@).find(".instrument_color")
+        $('#colorSelect .instrument_color_link').removeClass('activen')
+        sharedOpts.color = insColor.attr('data-color')
         $(@).addClass('activen')
 
         $(".colorSelected").css("background", sharedOpts.color)
 
-      $("#scaleDiv .dropdown-menu a").on "click", ->
+      $("#scaleDiv .instrument_zoom_drop a").on "click", ->
         opts.scaleChanged = true
         scaleAmout = $(@).data('scale')
         if scaleAmout is "fitToImage"
@@ -43,16 +50,8 @@ $ ->
 
       @canvas.initNameChanger()
 
-      $(document).on "click", "#canvasSelectDiv a", ->
+      $(document).on "click", "#canvasSelectDiv .clink", ->
         App.room.canvas.selectThumb(@, true)
-        false
-
-      $(document).on "mouseover", "#canvasSelectDiv div", ->
-        App.room.canvas.onMouseOverThumb(@)
-        false
-
-      $(document).on "mouseout", "#canvasSelectDiv div", ->
-        App.room.canvas.onMouseOutThumb(@)
         false
 
       $(document).on "click", ".smallCanvasPreview", ->
@@ -157,7 +156,7 @@ $ ->
       switch @sharedOpts.tooltype
         when 'line'
           @items.init new Path()
-        when 'highligher'
+        when 'highlighter'
           @items.init new Path(), {color: @sharedOpts.color, width: 15, opacity: 0.7}
         when 'straightline'
           @items.init new Path()
@@ -173,7 +172,7 @@ $ ->
           @items.drawSelRect(event.point)
 
       switch @sharedOpts.tooltype
-        when 'line', 'highligher', 'arrow', 'circle', 'rectangle', 'comment', 'straightline'
+        when 'line', 'highlighter', 'arrow', 'circle', 'rectangle', 'comment', 'straightline'
           @socket.emit "userMouseDown", x: event.point.x - opts.pandx, y: event.point.y - opts.pandy
 
     onMouseDrag: (canvas, event) ->
@@ -187,7 +186,7 @@ $ ->
         when 'line'
           @items.created.add(event.point)
           @items.created.smooth()
-        when 'highligher'
+        when 'highlighter'
           @items.created.add(event.point)
           @items.created.smooth()
         when 'circle'
@@ -242,7 +241,7 @@ $ ->
         when 'line'
           @items.created.add(event.point)
           @items.created.simplify(64)
-        when 'highligher'
+        when 'highlighter'
           @items.created.add(event.point)
           @items.created.simplify(64)
         when "comment"
@@ -251,7 +250,7 @@ $ ->
           commentRect.commentMin = commentMin if commentRect
 
       switch tooltype
-        when 'straightline', 'arrow', 'circle', 'rectangle', 'line', 'highligher'
+        when 'straightline', 'arrow', 'circle', 'rectangle', 'line', 'highlighter'
           # Check if the item is empty then there is no need to save it on the server.
           unless @items.isEmpty @items.created
             @items.created.elementId = @generateId()

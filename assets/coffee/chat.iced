@@ -10,6 +10,7 @@ $ ->
           displayName: $(chatUser).data("display-name")
           picture: $(chatUser).data("picture")
 
+      @initCarousel()
       @initSockets()
 
       # when the client clicks SEND
@@ -33,6 +34,21 @@ $ ->
       $("#chat").data("visible", "true")
       @scrollToTheBottom()
 
+    initCarousel: ->
+      $('.project_participants_slider_container').carouFredSel
+        circular: false
+        items:
+          visible: 5
+          minimum: 1
+        scroll:
+          items: 2
+        auto:
+          play: false
+        prev:
+          button: ".project_participants_slider_l"
+        next:
+          button: ".project_participants_slider_r"
+
     addNewUser: (user) ->
       @users.push user
 
@@ -41,26 +57,22 @@ $ ->
       $("#participants").append("<div class='chatUser' id='chatUser#{user.id}' data-uid='#{user.id}'
                               data-display-name='#{user.displayName}' data-picture='#{picture}'>
                               <img class='userAvatar tooltipize' src='#{picture}' width='48' title='#{user.displayName}'/>
-                              <span class='chatUserStatus'></span>
                               </div>")
+      $("#statuses").append("<div class='chatUserStatus' id='chatUserStatus#{user.id}'></div>")
 
     isVisible: -> $("#chat").data("visible") is "true"
 
     fold: ->
-      $("#chatFolder").addClass("chatFolderTrans")
       $("#chat").data("visible", "false")
-      $("#chat").animate {left: -305}, queue: false, complete: ->
-        $("#chatFolder").removeClass("chatFolderTrans").find("img").attr("src", "/images/room/unfold.png")
+      $("#chat").animate {left: -305}, queue: false
       $("#canvasFooter").animate(paddingLeft: 0)
       $(".canvasFooterInner").animate({width: $(window).width()}, -> $(".canvasFooterInner").css(width: "100%"))
 
       $("#chatFolder").attr("onclick", "App.chat.unfold(this); return false;")
 
     unfold: ->
-      $("#chatFolder").addClass("chatFolderTrans")
       $("#chat").data("visible", "true")
-      $("#chat").animate {left: 0}, queue: false, complete: ->
-        $("#chatFolder").removeClass("chatFolderTrans").find("img").attr("src", "/images/room/fold.png")
+      $("#chat").animate {left: 0}, queue: false
       $("#canvasFooter").animate(paddingLeft: 300)
       $(".canvasFooterInner").animate({width: $(window).width() - 300}, -> $(".canvasFooterInner").css(width: "100%"))
 
@@ -103,7 +115,11 @@ $ ->
       $('#conversation-inner .today').append("<div>#{message}</div>")
 
     changeUserStatus: (uid, online) ->
-      chatStatus = $("#chatUser#{uid}").find(".chatUserStatus")
+      chatStatus = $("#chatUserStatus#{uid}")
+      chatStatus.show()
+      chatStatus.css
+        top: $("#chatUser#{uid}").position().top
+        left: $("#chatUser#{uid}").position().left
       if online
         chatStatus.addClass("chatUserOnline").removeClass("chatUserOffline")
       else
