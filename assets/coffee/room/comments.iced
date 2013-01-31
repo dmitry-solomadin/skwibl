@@ -322,9 +322,8 @@ $ ->
     showComment: ($commentmin) ->
       folded = $commentmin[0].arrow.isFolded
 
-      $commentmin[0].$maximized.css("visibility", "visible")
-
       unless folded
+        $commentmin[0].$maximized.css("visibility", "visible")
         $commentmin[0].arrow.opacity = 1
         $commentmin[0].arrow.isHidden = false
 
@@ -332,14 +331,16 @@ $ ->
       $commentmin[0].rect.opacity = 1 if $commentmin[0].rect
 
     toggleComments: ->
-      if $("#toggleComments").parent().hasClass("selected")
+      if not $("#toggleComments").parent().hasClass("selected")
         @foldAll()
         $("#toggleComments").attr("data-original-title", "Show all comments")
-        $("#toggleComments").parent().removeClass("selected")
+        $("#toggleComments").parent().addClass("selected")
+        $("#toggleComments").find("strong").html("Show")
       else
         @unfoldAll()
         $("#toggleComments").addClass("active").attr("data-original-title", "Hide all comments")
-        $("#toggleComments").parent().addClass("selected")
+        $("#toggleComments").parent().removeClass("selected")
+        $("#toggleComments").find("strong").html("Hide")
 
     foldAll: ->
       for savedOpt in room.savedOpts
@@ -348,28 +349,27 @@ $ ->
     unfoldAll: ->
       for savedOpt in room.savedOpts
         for element in savedOpt.historytools.allHistory when element.commentMin
-          skipUnfoldArrow = opts.canvasId isnt savedOpt.canvasId
-          @unfoldComment(element.commentMin, skipUnfoldArrow)
+          if opts.canvasId is savedOpt.canvasId
+            @unfoldComment(element.commentMin)
 
     foldComment: ($commentmin) ->
       $commentmin[0].$maximized.css("visibility", "hidden")
       $commentmin[0].arrow.opacity = 0
       $commentmin[0].arrow.isHidden = true
       $commentmin[0].arrow.isFolded = true
-      $commentmin.css("visibility", "visible")
+      $commentmin.css("visibility", "visible") if $commentmin[0].rect
 
       room.redrawWithThumb()
 
-    unfoldComment: ($commentmin, skipUnfoldArrow) ->
+    unfoldComment: ($commentmin) ->
       $commentmin[0].$maximized.css("visibility", "visible")
 
-      unless skipUnfoldArrow
-        $commentmin[0].arrow.opacity = 1
-        $commentmin[0].arrow.isHidden = false
-        $commentmin[0].arrow.isFolded = false
+      $commentmin[0].arrow.opacity = 1
+      $commentmin[0].arrow.isHidden = false
+      $commentmin[0].arrow.isFolded = false
 
-        # the comment position might have been changed.
-        @redrawArrow($commentmin)
+      # the comment position might have been changed.
+      @redrawArrow($commentmin)
 
       $commentmin.css("visibility", "hidden") if $commentmin[0].rect
 

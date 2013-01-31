@@ -111,7 +111,7 @@ emailTemplates templatesDir, (err, template) ->
         text: text
         from: "#{cfg.DOMAIN} <#{cfg.SMTP_NOREPLY}>"
         to: "<#{email}>"
-        subject: "Skwibl — #{name} invites you to his project."
+        subject: "Skwibl — #{name} invites you to discuss a project online."
         attachment: [
           data: html
           alternative: on
