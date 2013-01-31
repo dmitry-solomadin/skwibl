@@ -581,14 +581,16 @@ $ ->
       commentX = commentText.offset().left - (room.canvas.getViewportAdjustX() / 2 )
       commentY = commentText.offset().top + (room.canvas.getViewportAdjustY()  / 2 )
 
+      commentPoint = room.applyCurrentScale new Point(commentX, commentY)
+
       commentWidth = commentText.width()
       commentHeight = commentText.height()
 
       canvasX = opts.scaledCenter.x
       canvasY = opts.scaledCenter.y
 
-      diffX = canvasX - commentX - (commentWidth / 2)
-      diffY = canvasY - commentY - (commentHeight / 2)
+      diffX = canvasX - commentPoint.x - (commentWidth)
+      diffY = canvasY - commentPoint.y - (commentHeight / 2)
 
       room.items.pan new Point(diffX, diffY)
       room.redrawWithThumb()
