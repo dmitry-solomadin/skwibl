@@ -444,7 +444,7 @@ input.input-big {
     font-size: 0;
     height: 55px;
     line-height: 55px;
-    margin-right: 16px;
+    margin-right: 12px;
 }
 
 .top_nav_name {
@@ -456,7 +456,7 @@ input.input-big {
 .top_nav_notice {
     position: absolute;
     top: 5px;
-    left: 52px;
+    left: 49px;
     height: 18px;
     width: 18px;
     text-align: center;

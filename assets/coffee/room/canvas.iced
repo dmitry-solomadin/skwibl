@@ -318,7 +318,6 @@ $ ->
 
     # CANVAS THUMBNAILS & IMAGE UPLOAD
 
-
     foldPreviews: ->
       $("#canvasFolder").addClass("canvasFolderTrans")
       $("#canvasFooter").animate {height: 35}, queue: false, complete: ->
@@ -368,11 +367,12 @@ $ ->
       firstThumb = $(@getThumbs()[0])
       room.showSplashScreen()
       #initialiaze new empty opts
+      @setScale 1
       room.initOpts firstThumb.data("cid")
       firstThumb.attr("data-initialized", "false").data("initialized", "false")
 
     addEmpty: (canvasData) ->
-      @addNewThumbAndSelect canvasData
+      @addNewThumbAndSelect canvasData, true
       room.hideSplashScreen()
       room.socket.emit "canvasAdded", canvasData
 
@@ -432,8 +432,9 @@ $ ->
 
     cancelPan: -> room.items.pan new Point(-opts.pandx, -opts.pandy)
 
-    addNewThumbAndSelect: (canvasData) ->
+    addNewThumbAndSelect: (canvasData, setDefaultScale = false) ->
       @erase()
+      @setScale 1 if setDefaultScale
       room.initOpts(canvasData.canvasId)
 
       @addNewThumbHtml canvasData
