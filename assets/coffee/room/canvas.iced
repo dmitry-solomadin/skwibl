@@ -67,7 +67,7 @@ $ ->
           return @addImage fid, posX, posY, (raster, executeLoadImage) =>
             executeLoadImage()
 
-            if cid isnt selectedCid and opts.image and opts.image.id isnt raster.id
+            if cid isnt selectedCid and ((opts.image and opts.image.id isnt raster.id) or !opts.image)
               room.helper.findById(raster.id).remove()
 
             @updateThumb(cid)
