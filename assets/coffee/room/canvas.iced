@@ -263,19 +263,21 @@ $ ->
       return null if r > 1 and dontEnlarge
       return r
 
-    setScale: (scale, prevScale) ->
+    setScale: (scale) ->
+      # savePrevScale in the canvasContext
       return unless scale
       $("#scaleAmount").html "#{parseInt(scale * 100)}%"
 
-      previousScale = prevScale or opts.currentScale
-
-      finalScale = scale / previousScale
+      previousScale = opts.currentScale
+      finalScale = scale / room.sharedOpts.scale
       opts.currentScale = scale
+      room.sharedOpts.scale = scale
 
       transformMatrix = new Matrix(finalScale, 0, 0, finalScale, 0, 0)
       paper.project.activeLayer.transform(transformMatrix)
 
-      unless prevScale
+      if previousScale != scale
+        finalScale = scale if finalScale == 1
         for element in opts.historytools.allHistory
           if element.commentMin
             element.commentMin.css({top: element.commentMin.position().top * finalScale,
@@ -377,7 +379,6 @@ $ ->
       room.socket.emit "canvasAdded", canvasData
 
     handleUpload: (canvasData, emit) ->
-      prevScale = opts.currentScale
       if @isFirstInitialized()
         room.hideSplashScreen true
         @addNewThumbAndSelect canvasData
@@ -387,7 +388,7 @@ $ ->
       @addImage canvasData.fileId, canvasData.posX, canvasData.posY, (raster, executeLoadImage) =>
         executeLoadImage()
         if @getSelectedCanvasId() is canvasData.canvasId
-          @setScale @getFitToImage(), prevScale
+          @setScale @getFitToImage()
           @centerOnImage()
         @updateThumb parseInt(canvasData.canvasId)
 
@@ -548,12 +549,11 @@ $ ->
 
       @erase()
       room.items.unselect()
-      previousScale = opts.currentScale
       room.setOpts canvasOpts
       @restore(true, false)
 
       newScale = if opts.image and not opts.scaleChanged and @getFitToImage() then @getFitToImage() else opts.currentScale
-      @setScale newScale, previousScale
+      @setScale newScale
       @centerOnImage()
 
       $("#canvasSelectDiv .clink").removeClass("canvasSelected")

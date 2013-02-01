@@ -16,6 +16,7 @@ $ ->
 
     init: (canvasId) ->
       @initOpts(canvasId)
+      @sharedOpts.scale = 1
 
       $(".toolTypeChanger").on "click", ->
         sharedOpts.tooltype = $(@).data("tooltype")
