@@ -25,7 +25,6 @@ $ ->
         tool: item #TODO change tool to item
         eligible: true) if historize
       item.opacity = 0
-      console.log item
       room.socket.emit("elementRemove", canvasId: room.canvas.getSelectedCanvasId(), elementId: item.elementId)
       @unselect item.elementId
       room.redrawWithThumb()

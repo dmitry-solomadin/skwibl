@@ -63,7 +63,8 @@
   </div>
 </div>
 
-<canvas id="myCanvas" resize="true" style="<%= 'display:none' unless canvasInitialized %>"></canvas>
+<canvas id="myCanvas" resize="true"
+        style="<%= 'display:none' unless canvasInitialized %>;background: url('/images/room/new/site_bg.jpg');"></canvas>
 <div id="commentsDiv" style="<%= 'display:none' unless canvasInitialized %>"></div>
 <canvas id="copyCanvas" resize="true" style="display: none;"></canvas>
 <div id="canvasInitDivWrapper" class="canvasInitDivWrapper" style="<%= 'display:none' if canvasInitialized %>">

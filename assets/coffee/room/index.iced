@@ -5,11 +5,11 @@ $ ->
       @savedOpts = []
       @sharedOpts =
         tooltype: 'line'
-        color: '#404040'
+        color: 'red'
 
       @defaultOpts =
         defaultWidth: 2
-        currentScale: 1
+        currentScale: null
         opacity: 1
         pandx: 0
         pandy: 0
@@ -130,6 +130,24 @@ $ ->
       window.opts = opts
 
     getOpts: -> @opts
+
+    saveTempOpts: (opts) ->
+      history: opts.historytools.allHistory
+      prevScaledCenter: new Point(opts.scaledCenter.x, opts.scaledCenter.y)
+      prevGlobalScale: @sharedOpts.scale
+      prevScale: opts.currentScale
+      prevPandx: opts.pandx
+      prevPandy: opts.pandy
+
+    restoreFromTemp: (tempOpts) ->
+      opts.currentScale = tempOpts.prevScale
+      opts.scaledCenter = tempOpts.prevScaledCenter
+      opts.historytools.allHistory = tempOpts.history
+      opts.pandx = tempOpts.prevPandx
+      opts.pandy = tempOpts.prevPandy
+      @sharedOpts.scale = tempOpts.prevGlobalScale
+
+    restoreFromSaved: (opts) ->
 
     # Mouse events handling
 

@@ -121,6 +121,7 @@ $ ->
       $("#commentsDiv").prepend(commentMax)
 
       coords = @getArrowCoords commentMin
+
       path = new Path()
       path.strokeColor = color
       path.strokeWidth = "1"
@@ -158,7 +159,7 @@ $ ->
       h2 = c.h / 2
 
       switch zone
-        when 1
+        when 1, 5
           x1 = c.xtl
           y1 = c.ytl + @CORNER_OFFSET
           x2 = c.xtl + @CORNER_OFFSET
@@ -205,7 +206,6 @@ $ ->
       commentMax = $commentMin[0].$maximized
 
       zone = @getZone $commentMin
-      return null if zone is 5
 
       bp = @getArrowBindPoint $commentMin
       c = commentMax[0].coords()
@@ -253,12 +253,6 @@ $ ->
       return if arrow.isHidden
 
       coords = @getArrowCoords $commentMin
-
-      if coords
-        arrow.opacity = 1
-      else
-        arrow.opacity = 0
-        return
 
       arrow.segments[0].point.x = coords.x0
       arrow.segments[0].point.y = coords.y0

@@ -62,19 +62,26 @@ $ ->
           isAnyFilePresent = true
           break
 
+      totalCanvases = room.canvas.getThumbs().length
+      loadedCanvases = 0
+
       @forEachThumbInContext (cid, fid, posX, posY, index) =>
         if fid
           return @addImage fid, posX, posY, (raster, executeLoadImage) =>
+            loadedCanvases++
             executeLoadImage()
 
             if cid isnt selectedCid and ((opts.image and opts.image.id isnt raster.id) or !opts.image)
               room.helper.findById(raster.id).remove()
 
+            @onEachCanvasLoaded()
+            @onFirstCavasLoaded() if index is 0
+            @onLoadingFinished() if totalCanvases is loadedCanvases
             @updateThumb(cid)
-            @onFitstCavasLoaded() if index is 0
-            @onLoadingFinished() if (room.canvas.getThumbs().length - 1) is index
         else
-          @onLoadingFinished() unless isAnyFilePresent
+          loadedCanvases++
+          @onEachCanvasLoaded()
+          @onLoadingFinished() if totalCanvases is loadedCanvases
           @updateThumb(cid)
 
     initThumbSort: ->
@@ -134,7 +141,7 @@ $ ->
       selectedOpts = @findOptsById(selectedCid)
       room.setOpts(selectedOpts)
 
-    onFitstCavasLoaded: ->
+    onFirstCavasLoaded: ->
       @setScale @getFitToImage()
       @centerOnImage()
       room.redraw()
@@ -153,6 +160,15 @@ $ ->
           room.canvas.findThumbByCanvasId(canvasId).click()
 
       room.redraw()
+
+    onEachCanvasLoaded: ->
+      @changeCanvasBg()
+
+    changeCanvasBg: ->
+      bg = if opts.image then "url(/images/room/new/site_bg.jpg)" else "none"
+      if bg isnt $("#myCanvas").data('background-image')
+        $("#myCanvas").css background: bg
+        $("#myCanvas").data('background-image', bg)
 
     initNameChanger: ->
       $("#canvasName").on "click", ->
@@ -263,10 +279,12 @@ $ ->
       return null if r > 1 and dontEnlarge
       return r
 
-    setScale: (scale) ->
-      # savePrevScale in the canvasContext
+    setScale: (scale, skipUpdateAmount = false) ->
+      # if first time scale
+      scale = 1 if not scale and not opts.currentScale
       return unless scale
-      $("#scaleAmount").html "#{parseInt(scale * 100)}%"
+      firstTimeScale = opts.currentScale is null
+      $("#scaleAmount").html "#{parseInt(scale * 100)}%" unless  skipUpdateAmount
 
       previousScale = opts.currentScale
       finalScale = scale / room.sharedOpts.scale
@@ -277,7 +295,7 @@ $ ->
       paper.project.activeLayer.transform(transformMatrix)
 
       if previousScale != scale
-        finalScale = scale if finalScale == 1
+        finalScale = scale if firstTimeScale
         for element in opts.historytools.allHistory
           if element.commentMin
             element.commentMin.css({top: element.commentMin.position().top * finalScale,
@@ -304,11 +322,11 @@ $ ->
 
     addScale: ->
       opts.scaleChanged = true
-      @setScale(opts.currentScale + 0.1)
+      @setScale(room.sharedOpts.scale + 0.1)
 
     subtractScale: ->
       opts.scaleChanged = true
-      @setScale(opts.currentScale - 0.1)
+      @setScale(room.sharedOpts.scale - 0.1)
 
     getViewportAdjustX: -> if App.chat.isVisible() then 300 else 0
 
@@ -391,6 +409,7 @@ $ ->
           @setScale @getFitToImage()
           @centerOnImage()
         @updateThumb parseInt(canvasData.canvasId)
+        @onEachCanvasLoaded()
 
       room.socket.emit("fileAdded", canvasData) if emit
 
@@ -438,6 +457,8 @@ $ ->
       @setScale 1 if setDefaultScale
       room.initOpts(canvasData.canvasId)
 
+      @changeCanvasBg()
+
       @addNewThumbHtml canvasData
       $("#canvasSelectDiv .clink").removeClass("canvasSelected")
       $("#canvasSelectDiv .canvasPreviewDiv:last .clink").addClass("canvasSelected")
@@ -457,22 +478,24 @@ $ ->
       $("#smallCanvasPreviews").append(mini)
 
     updateThumb: (canvasId) ->
-      selectedCanvasId = @getSelectedCanvasId()
+      prevOpts = room.getOpts()
 
-      if selectedCanvasId isnt canvasId
-        @activateCopyCanvas()
-        prevOpts = room.getOpts()
-        room.setOpts @findOptsById(canvasId)
-        @clearCopyCanvas()
-        @restore(false, false)
-      else
-        prevPandx = opts.pandx
-        prevPandy = opts.pandy
-        @cancelPan()
+      @activateCopyCanvas()
+      room.setOpts @findOptsById(canvasId)
+      tempSavedOpts  = room.saveTempOpts(opts)
+      opts.historytools.allHistory = []
+      opts.historytools.allHistory.push(tool.clone()) for tool in tempSavedOpts.history when not tool.commentMin
+      @restore(false, false)
+      @cancelPan()
+
+      if opts.image
+        room.sharedOpts.scale = 1
+        opts.scaledCenter = paper.view.center
+        opts.currentScale = 1
+        @setScale @getFitToImage(false), true
 
       thumb = @findThumbByCanvasId(canvasId).find("canvas")
       thumbContext = thumb[0].getContext('2d')
-
       canvas = paper.project.view.element
 
       cvw = $(canvas).width()
@@ -481,15 +504,7 @@ $ ->
       th = $(thumb).height()
       sy = th / cvh
 
-      prevScale = opts.currentScale
-      scale = if opts.image then 1 else opts.currentScale
-
-      if opts.image
-        fitted = true
-        @setScale @getFitToImage(false)
-        @centerOnImage true
-
-      transformMatrix = new Matrix(sy / scale, 0, 0, sy / scale, 0, 0)
+      transformMatrix = new Matrix(sy, 0, 0, sy, 0, 0)
       paper.project.activeLayer.transform(transformMatrix)
       room.redraw()
 
@@ -498,20 +513,13 @@ $ ->
       thumbContext.clearRect(0, 0, tw, th)
       thumbContext.drawImage(canvas, shift, 0) for i in [0..2]
 
-      transformMatrix = new Matrix(scale / sy, 0, 0, scale / sy, 0, 0)
-      paper.project.activeLayer.transform(transformMatrix)
+      new Layer()
+      paper.project.layers[paper.project.layers.length - 1].activate()
+      paper.project.layers[0].remove()
 
-      if fitted
-        @setScale prevScale
-
-      if selectedCanvasId is canvasId
-        room.items.pan new Point(prevPandx - opts.pandx, prevPandy - opts.pandy)
-
-      room.redraw()
-
-      if prevOpts
-        @activateNormalCanvas()
-        room.setOpts(prevOpts)
+      @activateNormalCanvas()
+      room.restoreFromTemp(tempSavedOpts)
+      room.setOpts(prevOpts)
 
     updateSelectedThumb: -> @updateThumb @getSelectedCanvasId()
 
@@ -551,6 +559,8 @@ $ ->
       room.items.unselect()
       room.setOpts canvasOpts
       @restore(true, false)
+
+      @changeCanvasBg()
 
       newScale = if opts.image and not opts.scaleChanged and @getFitToImage() then @getFitToImage() else opts.currentScale
       @setScale newScale
