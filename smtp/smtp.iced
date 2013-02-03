@@ -24,7 +24,7 @@ emailTemplates templatesDir, (err, template) ->
     template 'welcome', locals, (err, html, text) ->
       return smtp.send
         text: text
-        from: "#{cfg.DOMAIN} <#{cfg.SMTP_NOREPLY}>"
+        from: "Skwibl <#{cfg.SMTP_NOREPLY}>"
         to: "<#{email}>"
         subject: 'Skwibl — registration complete'
         attachment: [
@@ -45,7 +45,7 @@ emailTemplates templatesDir, (err, template) ->
     template 'regConfirm', locals, (err, html, text) ->
       return smtp.send
         text: text
-        from: "#{cfg.DOMAIN} <#{cfg.SMTP_NOREPLY}>"
+        from: "Skwibl <#{cfg.SMTP_NOREPLY}>"
         to: "<#{email}>"
         subject: 'Skwibl — confirm registration'
         attachment: [
@@ -68,7 +68,7 @@ emailTemplates templatesDir, (err, template) ->
     template 'regPropose', locals, (err, html, text) ->
       return smtp.send
         text: text
-        from: "#{cfg.DOMAIN} <#{cfg.SMTP_NOREPLY}>"
+        from: "Skwibl <#{cfg.SMTP_NOREPLY}>"
         to: "<#{email}>"
         subject: 'Skwibl — confirm invitation'
         attachment: [
@@ -89,7 +89,7 @@ emailTemplates templatesDir, (err, template) ->
     template 'passwordSend', locals, (err, html, text) ->
       return smtp.send
         text: text
-        from: "#{cfg.DOMAIN} <#{cfg.SMTP_NOREPLY}>"
+        from: "Skwibl <#{cfg.SMTP_NOREPLY}>"
         to: "<#{email}>"
         subject: 'Skwibl — password sent'
         attachment: [
@@ -109,7 +109,7 @@ emailTemplates templatesDir, (err, template) ->
     template 'prjInviteActivity', locals, (err, html, text) ->
       return smtp.send
         text: text
-        from: "#{cfg.DOMAIN} <#{cfg.SMTP_NOREPLY}>"
+        from: "Skwibl <#{cfg.SMTP_NOREPLY}>"
         to: "<#{email}>"
         subject: "Skwibl — #{name} invites you to discuss a project online."
         attachment: [
