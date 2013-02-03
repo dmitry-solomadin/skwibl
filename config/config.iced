@@ -1,5 +1,5 @@
 
-exports.HOST = process.env.HOST or 'localhost'
+exports.HOST = 'localhost'
 exports.PORT = 3000
 exports.SOCKET_PORT = 9000
 exports.ENVIRONMENT = process.env.NODE_ENV or 'development'
