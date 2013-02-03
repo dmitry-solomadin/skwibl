@@ -7,6 +7,12 @@
 <form action="/users/<%= user.id %>/update" method="post" id="newUserForm">
   <fieldset>
     <div class="control-group">
+      <div class="controls" style="margin-bottom: 10px">
+        <% if user.picture: %>
+        <img src="<%= user.picture %>"/>
+        <% end %>
+      </div>
+
       <label class="control-label" for="name">Name</label>
 
       <div class="controls">
@@ -26,20 +32,10 @@
         <input type="password" class="input-xlarge" name="user[password]" id="registerpassword"
                placeholder="Change password" autocomplete="off">
       </div>
-
-      <label class="control-label" >Profile picture</label>
-
-      <div class="controls">
-        <% if user.picture: %>
-          <img src="<%= user.picture %>"/>
-        <% end %>
-        <a class="btn">Upload</a>
-        <a class="btn">Update from facebook</a>
-      </div>
     </div>
     <div class="control-group">
       <div class="controls">
-        <button class="btn btn-primary btn-large" type="submit">Update</button>
+        <button class="btn btn-success btn-large" type="submit">Update</button>
       </div>
     </div>
   </fieldset>

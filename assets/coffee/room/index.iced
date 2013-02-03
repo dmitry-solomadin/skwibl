@@ -46,6 +46,8 @@ $ ->
         if scaleAmout is "fitToImage"
           scaleAmout = App.room.canvas.getFitToImage()
         App.room.canvas.setScale scaleAmout
+        App.room.canvas.centerOnImage true
+        App.room.redraw()
 
       @initDropbox()
 
@@ -326,11 +328,14 @@ $ ->
       App.chat.unfold()
       App.room.canvas.unfoldPreviews()
 
+    getScale: ->
+      return if @opts.currentScale is null then 1 else @opts.currentScale
+
     applyCurrentScale: (point) ->
-      point.transform(new Matrix(1 / @opts.currentScale, 0, 0, 1 / @opts.currentScale, 0, 0))
+      point.transform(new Matrix(1 / @getScale(), 0, 0, 1 / @getScale(), 0, 0))
 
     applyReverseCurrentScale: (point) ->
-      point.transform(new Matrix(@opts.currentScale, 0, 0, @opts.currentScale, 0, 0))
+      point.transform(new Matrix(@getScale(), 0, 0, @getScale(), 0, 0))
 
     generateId: -> $("#uid").val() + Date.now()
 

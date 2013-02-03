@@ -247,8 +247,8 @@ $ ->
       if $commentMin[0].rect
         bp = @getArrowBindPoint $commentMin
         $commentMin.css
-          left: (bp.x * opts.currentScale) - ($commentMin.width() / 2)
-          top: (bp.y * opts.currentScale) - ($commentMin.height() / 2)
+          left: (bp.x * room.getScale()) - ($commentMin.width() / 2)
+          top: (bp.y * room.getScale()) - ($commentMin.height() / 2)
 
       return if arrow.isHidden
 
