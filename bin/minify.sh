@@ -1,19 +1,6 @@
 #!/bin/bash
 
-## uglifyjs executable
-UGLIFYJS='node_modules/uglify-js/bin/uglifyjs'
-
-## cleancss executable
-CLEANCSS='node_modules/clean-css/bin/cleancss'
-
-## application script name
-JS_NAME='./vendor/js/skwibl'
-
-## application style name
-CSS_NAME='./vendor/css/skwibl'
-
-## socket.io script
-SOCKETIO='./node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js'
+. bin/config.sh
 
 ## list of js files
 JS_LIST=`cat views/shared/application_scripts.ect | grep -o '\/js.*\.js' | sed 's/\/js/\.\/assets\/js/' | sed 's/\.\/assets\/js\/dev/\.\/vendor\/js\/dev/'`
