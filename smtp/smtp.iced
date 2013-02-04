@@ -63,7 +63,7 @@ emailTemplates templatesDir, (err, template) ->
       provider: user.provider
       email: email
       name: name
-      password: user.password
+      password: contact.password
       link: link
     template 'regPropose', locals, (err, html, text) ->
       return smtp.send
