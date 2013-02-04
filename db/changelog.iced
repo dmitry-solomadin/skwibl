@@ -5,6 +5,7 @@ exports.setUp = (client, db) ->
   mod = {}
 
   mod.add = (pid, uid, type, additionalInfo, fn) ->
+    #TODO do not store all changelog in redis
     client.incr 'changelog:next', (err, clid) ->
       if not err
         changelog = {}
@@ -20,6 +21,7 @@ exports.setUp = (client, db) ->
       return tools.asyncOpt fn, err, null
 
   mod.index = (pid, fn) ->
+    #TODO remove sort
     client.sort "projects:#{pid}:changelog", "by", "changelog:*->time", "desc", (err, changelogIds) ->
       if not err and changelogIds and changelogIds.length
         changelog = []

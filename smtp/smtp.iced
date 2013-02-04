@@ -1,7 +1,7 @@
 path = require 'path'
 email = require 'emailjs'
 emailTemplates = require 'email-templates'
-templatesDir = path.resolve(__dirname, "templates")
+templatesDir = path.resolve __dirname, "templates"
 
 cfg = require '../config'
 tools = require '../tools'
@@ -21,7 +21,7 @@ emailTemplates templatesDir, (err, template) ->
       provider: user.provider
       email: email
       password: user.password
-    template 'welcome', locals, (err, html, text) ->
+    template 'sendRegMail', locals, (err, html, text) ->
       return smtp.send
         text: text
         from: "Skwibl <#{cfg.SMTP_NOREPLY}>"
@@ -38,7 +38,6 @@ emailTemplates templatesDir, (err, template) ->
     email = user.email
     locals =
       domain: cfg.DOMAIN
-      provider: user.provider
       email: email
       link: link
       password: user.password
@@ -60,7 +59,6 @@ emailTemplates templatesDir, (err, template) ->
     name = tools.getName user
     locals =
       domain: cfg.DOMAIN
-      provider: user.provider
       email: email
       name: name
       password: contact.password

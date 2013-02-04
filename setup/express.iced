@@ -21,7 +21,6 @@ exports.setUp = (logger) ->
 
   viewsDir = path.join __dirname, '../views'
   assetsDir = path.join __dirname, '../assets'
-  vendorDir = path.join __dirname, '../vendor'
 
   logStream =
     write: (message, encoding) ->
@@ -46,7 +45,7 @@ exports.setUp = (logger) ->
     app.set 'view engine', 'ect'
     app.use express.logger stream: logStream, format: 'dev'
     app.enable 'trust proxy'
-    app.use express.favicon "#{vendorDir}/images/butterfly-tiny.png"
+    app.use express.favicon "#{assetsDir}/images/butterfly-tiny.png"
     app.set 'view options', {layout: false}
     app.use express.json()
     app.use express.urlencoded()
@@ -67,7 +66,6 @@ exports.setUp = (logger) ->
     app.use flash()
     app.use app.router
     app.use express.static assetsDir
-    app.use express.static vendorDir
     app.use ctrls.aux.notFound
 #     app.use(ctrls.aux.error);
 

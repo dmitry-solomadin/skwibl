@@ -3,10 +3,10 @@
 . bin/config.sh
 
 ## list of js files
-JS_LIST=`cat views/shared/application_scripts.ect | grep -o '\/js.*\.js' | sed 's/\/js/\.\/assets\/js/' | sed 's/\.\/assets\/js\/dev/\.\/vendor\/js\/dev/'`
+JS_LIST=`cat views/shared/application_scripts.ect | grep -o '\/js.*\.js' | sed 's/\/js/\.\/assets\/js/'`
 
 ## list of css files
-CSS_LIST=`cat views/shared/application_scripts.ect | grep -o '\/css.*\.css' | sed 's/^/\.\/vendor/'`
+CSS_LIST=`cat views/shared/application_scripts.ect | grep -o '\/css.*\.css' | sed 's/^/\.\/assets/'`
 
 cat $SOCKETIO >> $JS_NAME.js
 for SCRIPT in $JS_LIST; do
@@ -20,7 +20,7 @@ gzip -9 $JS_NAME.min.js -c > $JS_NAME.min.js.gz
 
 rm -f $JS_NAME.js $JS_NAME.min.js
 
-cp ./vendor/js/dev/Jplayer.swf ./vendor/js/Jplayer.swf
+cp ./assets/js/vendor/Jplayer.swf ./assets/js/Jplayer.swf
 
 for CSS in $CSS_LIST; do
   if [[ $CSS != *'/skwibl-min.css' ]]; then

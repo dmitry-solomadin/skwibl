@@ -15,19 +15,19 @@ UGLIFYJS='node_modules/uglify-js/bin/uglifyjs'
 CLEANCSS='node_modules/clean-css/bin/cleancss'
 
 ## application script name
-JS_NAME='./vendor/js/skwibl'
+JS_NAME='./assets/js/skwibl'
 
 ## application style name
-CSS_NAME='./vendor/css/skwibl'
+CSS_NAME='./assets/css/skwibl'
 
 ## socket.io script
 SOCKETIO='./node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js'
 
 ## coffee dir
-COFFEE_DIR='assets/coffee/'
+COFFEE_DIR='client'
 
 ## coffee output
-JS_OUTPUT_DIR='assets/js'
+JS_OUTPUT_DIR='assets/js/client'
 
 ## uploads dir
 UPLOADS='uploads'

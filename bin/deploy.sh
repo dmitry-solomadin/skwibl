@@ -12,4 +12,4 @@ find ./assets/coffee -name "*.js" -delete
 rm -f $TOOLS_FILE
 mv $TOOLS_FILE.save $TOOLS_FILE
 ./minify.sh
-sshpass -p $PASSWORD rsync ./pass.rsync -rvuzl ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee" --exclude "*.iced" --exclude "assets" --exclude "uploads/*" --exclude "vendor/js/dev" --exclude "vendor/socket.io" --exclude "vendor/css/dev"
+sshpass -p $PASSWORD rsync ./pass.rsync -rvuzl ./ root@$IP:/var/www/skwibl/ --exclude '.git' --exclude "*.coffee" --exclude "*.iced" --exclude "assets" --exclude "uploads/*" --exclude "assets/js/vendor" --exclude "assets/js/client" --exclude "assets/socket.io" --exclude "assets/css/dev"
