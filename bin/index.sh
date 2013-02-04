@@ -7,17 +7,12 @@ if [ ! -e $COFFEE ]; then
   bin/update.sh
 fi
 
-## connect procedure
-function connect {
-  sshpass -p $PASSWORD ssh root@$IP
-}
-
 case "$1" in
   -a|--dynamic)
     bin/start.sh -a
     exit 0;;
   -b|--build)
-    build
+    bin/build.sh -b
     exit 0;;
   -c|--clean)
     bin/clean.sh
@@ -25,7 +20,7 @@ case "$1" in
   -d|--deploy)
     bin/clean.sh
     bin/init.sh
-    build_deploy
+    bin/build.sh -d
     bin/deploy.sh
     bin/clean.sh
     exit 0;;
@@ -33,7 +28,7 @@ case "$1" in
     bin/init.sh
     exit 0;;
   -o|--connect)
-    connect;;
+    bin/connect.sh;;
   -p|--product)
     bin/start.sh -p;;
   -r|--reset)
@@ -54,9 +49,9 @@ case "$1" in
   -u|--update)
     bin/update.sh
     exit 0;;
-  -w|--dynamicWatch)
+  -w|--buildWatch)
     bin/init.sh
-    buildWatch
+    bin/build.sh -w
 #     startDyn
     exit 0;;
   -h|--help)
