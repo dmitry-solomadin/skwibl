@@ -484,7 +484,8 @@ $ ->
       room.setOpts @findOptsById(canvasId)
       tempSavedOpts  = room.saveTempOpts(opts)
       opts.historytools.allHistory = []
-      opts.historytools.allHistory.push(tool.clone()) for tool in tempSavedOpts.history when not tool.commentMin
+      for tool in tempSavedOpts.history
+        opts.historytools.allHistory.push(tool.clone()) if not tool.commentMin and not tool.actionType
       @restore(false, false)
       @cancelPan()
 
