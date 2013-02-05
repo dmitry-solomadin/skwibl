@@ -24,6 +24,10 @@ body.mainpage {
     margin: 0 auto;
 }
 
+#header {
+    height: 55px;
+}
+
 .header {
     height: 55px;
     position: relative;
@@ -49,13 +53,12 @@ body.mainpage {
 
 .logo img {
     vertical-align: top;
-    width: 149px;
 }
 
 .beta {
     position: relative;
-    height: 15px;
-    width: 15px !important;
+    height: auto;
+    width: auto;
 }
 
 .header_btns {
