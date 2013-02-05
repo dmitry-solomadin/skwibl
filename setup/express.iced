@@ -62,7 +62,9 @@ exports.setUp = (logger) ->
     app.use '/file/upload', ctrls.mid.isAuth
     app.use '/file/upload', ctrls.files.upload
     app.use (req, res, next) ->
-      res.locals.req = req
+      #req.user, req.flash
+      res.locals.general = helpers.general
+      res.locals.general.req = req
       next()
     app.use flash()
     app.use app.router
