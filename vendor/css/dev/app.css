@@ -28,6 +28,12 @@ h4 {
     line-height: 22px;
 }
 
+h5 {
+    font-size: 15px;
+    font-weight: normal;
+    line-height: 20px;
+}
+
 h4, h5, h6 {
     font-family: 'MyriadPro-Regular';
     font-weight: normal;
