@@ -45,6 +45,7 @@
     "moment": "*",
     "winston": "*",
     "gm": "*",
+    "phantomjs": "*",
     "validator": "*"
   },
   "devDependencies": {

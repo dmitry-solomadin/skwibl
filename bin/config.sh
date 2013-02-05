@@ -6,13 +6,13 @@ DYN='app'
 SOC='server'
 
 ## coffee executable
-COFFEE='node_modules/iced-coffee-script/bin/coffee'
+COFFEE='bin/coffee'
 
 ## uglifyjs executable
-UGLIFYJS='node_modules/uglify-js/bin/uglifyjs'
+UGLIFYJS='bin/uglifyjs'
 
 ## cleancss executable
-CLEANCSS='node_modules/clean-css/bin/cleancss'
+CLEANCSS='bin/cleancss'
 
 ## application script name
 JS_NAME='./assets/js/skwibl'

@@ -4,7 +4,7 @@ echo "cleaning"
 
 find ./ -name \*~ -delete
 rm -f *.js
-find ./assets -name "*.js" -delete
+find ./client -name "*.js" -delete
 find ./config -name "*.js" -delete
 find ./controllers -name "*.js" -delete
 find ./db -name "*.js" -delete
