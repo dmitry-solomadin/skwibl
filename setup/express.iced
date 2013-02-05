@@ -4,6 +4,8 @@ flash = require 'connect-flash'
 ect = require 'ect'
 path = require 'path'
 
+moment = require 'moment'
+
 routes = require '../routes'
 ctrls = require '../controllers'
 helpers = require '../helpers'
@@ -11,7 +13,6 @@ db = require '../db'
 cfg = require '../config'
 
 passportUp = require './passport'
-moment = require 'moment'
 
 exports.setUp = (logger) ->
 
@@ -69,11 +70,10 @@ exports.setUp = (logger) ->
     app.use ctrls.aux.notFound
 #     app.use(ctrls.aux.error);
 
-  app.locals = {}
-
-  for file of helpers
-    for method of helpers[file]
-      app.locals[method] = helpers[file][method]
+  app.locals helpers
+#   for file of helpers
+#     for method of helpers[file]
+#       app.locals[method] = helpers[file][method]
 
   app.locals.moment = moment
 

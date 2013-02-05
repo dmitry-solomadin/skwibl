@@ -79,7 +79,7 @@
       <% end %>
     <% end %>
 
-    <% unless @isReadOnly @activity : %>
+    <% unless @activities.isReadOnly @activity : %>
       <%- include './activities/_activity_controls.ect', activity: @activity %>
     <% end %>
   </div>

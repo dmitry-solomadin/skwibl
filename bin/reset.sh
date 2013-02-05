@@ -7,6 +7,7 @@ echo "resetting"
 rm -rf $MODULES_DIR
 rm -rf $UPLOADS
 rm -f $JS_OUTPUT_DIR/*.*
+mkdir $JS_OUTPUT_DIR/room
 
 eval $FLUSH_REDIS_CMD
 

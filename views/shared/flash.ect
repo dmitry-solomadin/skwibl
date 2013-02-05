@@ -1,14 +1,14 @@
-<% message = @flashMessage() %>
+<% message = @general.flashMessage() %>
 <% if message && message.length != 0 : %>
 <div class="alert alert-info"><%= message %></div>
 <% end %>
 
-<% warning = @flashWarning() %>
+<% warning = @general.flashWarning() %>
 <% if warning && warning.length != 0 : %>
 <div class="alert alert-warning"><%= warning %></div>
 <% end %>
 
-<% error = @flashError() %>
+<% error = @general.flashError() %>
 <% if error && error.length != 0 : %>
 <div class="alert alert-error"><%= error %></div>
 <% end %>

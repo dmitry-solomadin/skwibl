@@ -20,7 +20,7 @@ case "$1" in
   -d|--deploy)
     bin/clean.sh
     bin/init.sh
-    bin/build.sh -d
+    bin/build.sh -b
     bin/deploy.sh
     bin/clean.sh
     exit 0;;

@@ -1,6 +1,6 @@
 <div class="navbar navbar-fixed-top" id="header">
-  <% if @currentUser() : %>
-  <input type="hidden" id="uid" value="<%= @currentUser().id %>"/>
+  <% if @general.currentUser() : %>
+  <input type="hidden" id="uid" value="<%= @general.currentUser().id %>"/>
   <% end %>
 
   <div class="navbar-inner header">
@@ -14,7 +14,7 @@
       </div>
       <% end %>
 
-      <% unless @currentUser() : %>
+      <% unless @general.currentUser() : %>
       <span class="pull-right header_btns">
         <a class="btn btn-success" href="/registration">Join Skwibl</a>
         <a id="signInButton" class="btn" href="#" data-dropdown-toggler="loginBlock" data-duration="300">
@@ -23,7 +23,7 @@
       </span>
       <% end %>
 
-      <% if @currentUser() : %>
+      <% if @general.currentUser() : %>
         <% if @room : %>
           <%- include './header/user_dropdown.ect' %>
         <% else : %>
@@ -69,11 +69,11 @@
   </div>
 </div>
 
-<% if @currentUser() : %>
+<% if @general.currentUser() : %>
 <div id="userDropdownMenu" class="skwibl-dropdown" style="display: none;">
   <hr>
   <ul class="dropdownMenu">
-    <li><a href="/users/<%= @currentUser().id %>/edit">Edit Profile</a></li>
+    <li><a href="/users/<%= @general.currentUser().id %>/edit">Edit Profile</a></li>
     <li class="divider"></li>
     <li><a href="/logout">Sign Out</a></li>
   </ul>

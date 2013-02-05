@@ -13,17 +13,9 @@ function build {
   $COFFEE -I none -c -o $JS_OUTPUT_DIR $COFFEE_DIR &
 }
 
-function buildDeploy {
-  echo "building"
-  $COFFEE -I none -c -o $JS_OUTPUT_DIR $COFFEE_DIR &
-}
-
 case "$1" in
   -b|--build)
     build
-    exit 0;;
-  -d|--buildDeploy)
-    buildDeploy
     exit 0;;
   -w|--buildWatch)
     bin/init.sh

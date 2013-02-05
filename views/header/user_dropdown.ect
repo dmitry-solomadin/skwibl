@@ -2,8 +2,8 @@
   <li class="dropdown ">
     <a class="dropdown-toggle userDropdown" href="#">
       <div>
-        <span class="username"><%= @currentUser().displayName %></span>
-        <img src="<%= if @currentUser().picture then @currentUser().picture else '/images/avatar.png' %>">
+        <span class="username"><%= @general.currentUser().displayName %></span>
+        <img src="<%= if @general.currentUser().picture then @general.currentUser().picture else '/images/avatar.png' %>">
         <span class="caret"></span>
       </div>
     </a>

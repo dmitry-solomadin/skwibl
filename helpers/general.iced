@@ -1,25 +1,26 @@
 cfg = require '../config'
 
 exports.currentUser = (id) ->
-  return id is this.req.user.id if id
-  return this.req.user
+  console.log @
+  return id is @req.user.id if id
+  return @req.user
 
 exports.flashError = ->
-  return this.req.flash 'error'
+  return @req.flash 'error'
 
 exports.flashMessage = ->
-  return this.req.flash 'message'
+  return @req.flash 'message'
 
 exports.flashWarning = ->
-  return this.req.flash 'warning'
+  return @req.flash 'warning'
 
 exports.errorMessages = ->
-  return this.req.flash 'objectErrors'
+  return @req.flash 'objectErrors'
 
 exports.isProduction = ->
   return cfg.ENVIRONMENT is 'production'
 
-exports.getConfig = -> cfg
+exports.getDropboxKey = -> cfg.DROPBOX_APP_KEY
 
 # todo move this to helpers/comments.iced
 exports.splitComments = (messages) ->

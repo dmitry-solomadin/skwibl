@@ -22,7 +22,7 @@ exports.configure = (app, passport) ->
 
   app.get '/auth/facebook', ctrls.auth.facebook passport, ctrls.aux.empty
 
-  app.get '/auth/facebook/callback', ctrls.auth.facebookCb(passport), ctrls.auth.facebookCbSuccess
+  app.get '/auth/facebook/callback', ctrls.auth.facebookCb(passport), ctrls.auth.logIn
 
   app.get '/connect/facebook', ctrls.auth.connectFacebook
 

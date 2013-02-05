@@ -1,5 +1,5 @@
 <input id="pid" type="hidden" value="<%= @pid %>">
-<input id="dropboxAPIKey" type="hidden" value="<%= @getConfig().DROPBOX_APP_KEY %>">
+<input id="dropboxAPIKey" type="hidden" value="<%= @general.getDropboxKey() %>">
 
 <% canvasInitialized = "#{@canvases[0].initialized}" == "true" %>
 
