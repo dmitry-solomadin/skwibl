@@ -1,6 +1,6 @@
 ctrls = require '../controllers'
 
-exports.configure = (app, passport) ->
+exports.configure = (app) ->
 
   app.get '/about_us', ctrls.public.aboutUs
 

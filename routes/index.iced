@@ -1,5 +1,5 @@
 tools = require '../tools'
 
-exports.configure = (app, passport) ->
+exports.configure = (app) ->
   tools.include __dirname, (mod, name) ->
-    mod.configure app, passport
+    mod.configure app

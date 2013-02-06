@@ -64,7 +64,6 @@ exports.setUp = (logger) ->
     app.use (req, res, next) ->
       #TODO change to req.user, req.flash
       #TODO temporary fix, find a nicer way
-#       res.locals.general = helpers.general
       res.locals helpers
       res.locals.general.req = req
       res.locals.originalUrl = req.originalUrl
@@ -79,8 +78,9 @@ exports.setUp = (logger) ->
 #     app.use(ctrls.aux.error);
 
   app.locals.moment = moment
+  app.locals.passport = passport
 
-  routes.configure app, passport
+  routes.configure app
 
   return app
 

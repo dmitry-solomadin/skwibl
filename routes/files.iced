@@ -1,6 +1,6 @@
 ctrls = require '../controllers'
 
-exports.configure = (app, passport) ->
+exports.configure = (app) ->
 
   app.get '/files', ctrls.mid.isAuth, ctrls.files.get
 

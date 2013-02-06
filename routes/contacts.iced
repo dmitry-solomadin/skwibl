@@ -1,5 +1,5 @@
 ctrls = require '../controllers'
 
-exports.configure = (app, passport) ->
+exports.configure = (app) ->
 
   app.get '/contacts', ctrls.mid.isAuth, ctrls.contacts.get

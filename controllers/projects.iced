@@ -68,8 +68,9 @@ exports.add = (req, res) ->
   onDone = (err, pid) ->
     if err
       req.flash 'warning', 'Project was created but there was some problems with sending invites.'
-    else
-      req.flash 'message', 'Project was created invites were sent.'
+      return res.redirect '/projects'
+#     else
+#       req.flash 'message', 'Project was created invites were sent.'
     return res.redirect "/projects/#{pid}"
 
   if not req.body.name or req.body.name is ''
@@ -92,7 +93,7 @@ exports.add = (req, res) ->
             return tools.asyncDone inviteeEmails, onDone err, project.id
           return db.projects.inviteEmail project.id, req.user.id, inviteeEmail, (err, user) ->
             return tools.asyncDone inviteeEmails, -> onDone err, project.id
-      req.flash 'message', 'Project was created'
+#       req.flash 'message', 'Project was created'
       return res.redirect "/projects/#{project.id}"
     return res.redirect '/projects/new'
 

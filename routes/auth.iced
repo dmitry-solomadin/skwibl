@@ -1,6 +1,8 @@
 ctrls = require '../controllers'
 
-exports.configure = (app, passport) ->
+exports.configure = (app) ->
+
+  passport = app.locals.passport
 
   app.get '/', ctrls.auth.mainPage
 
@@ -8,7 +10,7 @@ exports.configure = (app, passport) ->
 
   app.post '/register', ctrls.auth.register
 
-  app.post '/login', ctrls.auth.local passport
+  app.post '/login', ctrls.auth.local(passport)
 
   app.get '/confirm/:hash', ctrls.auth.hash(passport), ctrls.auth.confirm, ctrls.auth.logIn
 

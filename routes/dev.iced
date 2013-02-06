@@ -1,6 +1,6 @@
 ctrls = require '../controllers'
 
-exports.configure = (app, passport) ->
+exports.configure = (app) ->
 
   app.get '/dev/player', ctrls.mid.isAuth, ctrls.dev.player
 

@@ -1,6 +1,6 @@
 ctrls = require '../controllers'
 
-exports.configure = (app, passport) ->
+exports.configure = (app) ->
 
   app.get '/users/:id', ctrls.users.profile
 
