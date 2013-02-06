@@ -1,7 +1,8 @@
 cfg = require '../config'
 
+#TODO separate on submodules
+
 exports.currentUser = (id) ->
-  console.log @
   return id is @req.user.id if id
   return @req.user
 

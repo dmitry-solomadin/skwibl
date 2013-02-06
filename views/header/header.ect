@@ -29,8 +29,8 @@
         <% else : %>
         <div class="nav-collapse">
           <ul id="topLinks" class="top_nav">
-            <% isProjects = @req.originalUrl.indexOf("projects") isnt -1 %>
-            <% isActivities = @req.originalUrl.indexOf("activities") isnt -1 %>
+            <% isProjects = @originalUrl.indexOf("projects") isnt -1 %>
+            <% isActivities = @originalUrl.indexOf("activities") isnt -1 %>
             <li class="<%= 'selected' if isActivities %>">
               <a href="/activities">
                 <div class="top_nav_icon top_nav_activities"><img src="/images/top_nav1.png" alt="Activities" width="33"></div>

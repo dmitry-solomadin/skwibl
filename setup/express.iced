@@ -62,20 +62,21 @@ exports.setUp = (logger) ->
     app.use '/file/upload', ctrls.mid.isAuth
     app.use '/file/upload', ctrls.files.upload
     app.use (req, res, next) ->
-      #req.user, req.flash
-      res.locals.general = helpers.general
+      #TODO change to req.user, req.flash
+      #TODO temporary fix, find a nicer way
+#       res.locals.general = helpers.general
+      res.locals helpers
       res.locals.general.req = req
+      res.locals.originalUrl = req.originalUrl
+#       res.locals.general.user = req.user
+#       res.locals.general.flash = req.flash
+      res.locals.general.moment = moment
       next()
     app.use flash()
     app.use app.router
     app.use express.static assetsDir
     app.use ctrls.aux.notFound
 #     app.use(ctrls.aux.error);
-
-  app.locals helpers
-#   for file of helpers
-#     for method of helpers[file]
-#       app.locals[method] = helpers[file][method]
 
   app.locals.moment = moment
 
