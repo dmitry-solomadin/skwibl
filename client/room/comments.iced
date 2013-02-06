@@ -338,29 +338,37 @@ $ ->
 
     foldAll: ->
       for savedOpt in room.savedOpts
-        @foldComment(element.commentMin) for element in savedOpt.historytools.allHistory when element.commentMin
+        for element in savedOpt.historytools.allHistory when element.commentMin
+          showMinIfRect = opts.canvasId is savedOpt.canvasId
+          @foldComment(element.commentMin, showMinIfRect)
+
 
     unfoldAll: ->
       for savedOpt in room.savedOpts
         for element in savedOpt.historytools.allHistory when element.commentMin
           if opts.canvasId is savedOpt.canvasId
             @unfoldComment(element.commentMin)
+          else
+            @markAsUnfolded(element.commentMin)
 
-    foldComment: ($commentmin) ->
+    foldComment: ($commentmin, showMinIfRect = true) ->
       $commentmin[0].$maximized.css("visibility", "hidden")
       $commentmin[0].arrow.opacity = 0
       $commentmin[0].arrow.isHidden = true
       $commentmin[0].arrow.isFolded = true
-      $commentmin.css("visibility", "visible") if $commentmin[0].rect
+      $commentmin.css("visibility", "visible") if $commentmin[0].rect and showMinIfRect
 
       room.redrawWithThumb()
+
+    markAsUnfolded: ($commentmin) ->
+      $commentmin[0].arrow.isHidden = false
+      $commentmin[0].arrow.isFolded = false
 
     unfoldComment: ($commentmin) ->
       $commentmin[0].$maximized.css("visibility", "visible")
 
       $commentmin[0].arrow.opacity = 1
-      $commentmin[0].arrow.isHidden = false
-      $commentmin[0].arrow.isFolded = false
+      @markAsUnfolded($commentmin)
 
       # the comment position might have been changed.
       @redrawArrow($commentmin)
