@@ -1,5 +1,3 @@
-ctrls = require '../controllers'
-
 exports.configure = (app) ->
 
-  app.get '/activities', ctrls.mid.isAuth, ctrls.activities.index
+  app.get '/activities', @ctrls.mid.isAuth, @ctrls.activities.index

@@ -64,12 +64,11 @@ exports.setUp = (logger) ->
     app.use (req, res, next) ->
       #TODO change to req.user, req.flash
       #TODO temporary fix, find a nicer way
-      res.locals helpers
-      res.locals.general.req = req
+      res.locals helpers: helpers
+      res.locals.helpers.general.req = req
       res.locals.originalUrl = req.originalUrl
 #       res.locals.general.user = req.user
 #       res.locals.general.flash = req.flash
-      res.locals.general.moment = moment
       next()
     app.use flash()
     app.use app.router

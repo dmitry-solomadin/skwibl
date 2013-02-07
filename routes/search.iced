@@ -1,5 +1,3 @@
-ctrls = require '../controllers'
-
 exports.configure = (app) ->
 
-  app.get '/search', ctrls.mid.isAuth, ctrls.search.search
+  app.get '/search', @ctrls.mid.isAuth, @ctrls.search.search

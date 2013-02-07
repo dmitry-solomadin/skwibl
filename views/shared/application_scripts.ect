@@ -8,7 +8,7 @@
   App.room = {};
 </script>
 
-<% if @general.isProduction() : %>
+<% if @helpers.general.isProduction() : %>
   <link href="/css/skwibl-min.css" rel="stylesheet" type="text/css">
   <script type="text/javascript" src="/js/skwibl.min.js"></script>
 <% else : %>

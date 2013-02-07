@@ -3,5 +3,5 @@
 # GET
 # Search
 #
-exports.search = (req, res) ->
+exports.search = (req, res) =>
   res.render 'index', template: 'search'

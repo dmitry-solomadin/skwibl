@@ -1,5 +1,5 @@
-<% currentUserIsOwner = @project.owner == @general.currentUser().id %>
-<% isCurrentUser = @general.currentUser(@participant.id) %>
+<% currentUserIsOwner = @project.owner == @helpers.general.currentUser().id %>
+<% isCurrentUser = @helpers.general.currentUser(@participant.id) %>
 <% unconfirmed = @participant.unconfirmed %>
 <div id="participant<%= @participant.id%>" class="participant <%= 'unconfirmed' if unconfirmed %>">
   <span><%= @participant.displayName %><%= " (you)" if isCurrentUser %><%= " (unconfirmed)" if unconfirmed %></span>
