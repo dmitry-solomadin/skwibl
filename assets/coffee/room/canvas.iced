@@ -468,6 +468,7 @@ $ ->
 
     addNewThumbHtml: (canvasData) ->
       thumb = $("#canvasSelectDiv .canvasPreviewDiv:first").clone()
+      thumb.find(".canvasData").remove() # we don't need data associated with another canvas
       thumb.find(".clink").attr("data-cid", canvasData.canvasId).attr("data-fid", canvasData.fileId)
         .attr("data-name", canvasData.name).attr("data-pos-x", canvasData.posX).attr("data-pos-y", canvasData.posY)
         .attr("data-position", canvasData.position)

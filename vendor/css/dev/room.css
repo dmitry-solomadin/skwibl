@@ -61,7 +61,7 @@ body.room {
     height: 40px;
 }
 
-.instruments li a img{
+.instruments li a img {
     position: absolute;
     margin: auto;
     top: 0;
@@ -449,8 +449,8 @@ body.room {
 
 .gallery_slide_close {
     position: absolute;
-    top: -8px;
-    right: -8px;
+    top: -6px;
+    right: -6px;
     background-image: url(/images/room/new/gallery_slide_close.png);
     background-repeat: no-repeat;
     background-position: 20px -20px;
@@ -470,9 +470,9 @@ body.room {
 
 .gallery_slide_controls_container {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 3px;
+    left: 2px;
+    right: 2px;
     height: 20px;
     overflow: hidden;
 }
@@ -548,9 +548,52 @@ body.room {
 }
 
 .canvasFooterBottom {
-    padding: 5px 10px;
-    height: 63px;
-    background: rgba(0,0,0,0.25);
+    padding: 0 10px;
+    position: relative;
+    height: 75px;
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.canvasSelectDiv {
+    height: 75px !important;
+    padding: 5px 1px;
+}
+
+.gallery_l {
+    position: relative;
+    float: left;
+    width: 16px;
+    height: 62px;
+    margin-top: 5px;
+    margin-right: 5px;
+    background: url(/images/room/new/gallery_l.png) 50% no-repeat;
+    border: 1px solid transparent;
+    -webkit-transition: all 0.2s linear;
+    -moz-transition: all 0.2s linear;
+    -o-transition: all 0.2s linear;
+    -ms-transition: all 0.2s linear;
+    transition: all 0.2s linear;
+}
+
+.gallery_r {
+    position: absolute;
+    right: 5px;
+    top: 0;
+    float: right;
+    width: 16px;
+    height: 62px;
+    margin-top: 5px;
+    background: url(/images/room/new/gallery_r.png) 50% no-repeat;
+    border: 1px solid transparent;
+    -webkit-transition: all 0.2s linear;
+    -moz-transition: all 0.2s linear;
+    -o-transition: all 0.2s linear;
+    -ms-transition: all 0.2s linear;
+    transition: all 0.2s linear;
+}
+
+.gallery_l:hover, .gallery_r:hover {
+    border: 1px solid #fff;
 }
 
 body.room {
@@ -1038,10 +1081,24 @@ body.room {
 
 .project_participants_slider {
     padding: 0 15px;
-    margin-bottom: 7px;
+    margin-bottom: 2px;
     position: relative;
     margin-left: 3px;
     margin-right: 3px;
+    height: 45px;
+    overflow: hidden;
+}
+
+.project_participants_slider.no-carousel {
+    padding: 0;
+}
+
+.project_participants_slider.no-carousel .project_participants_slider_l {
+    display: none !important;
+}
+
+.project_participants_slider.no-carousel .project_participants_slider_r {
+    display: none !important;
 }
 
 .chatUser {
@@ -1053,6 +1110,7 @@ body.room {
 
 .project_participants_slider_l {
     position: absolute;
+    height: 40px;
     top: 0;
     bottom: 0;
     left: 0;
@@ -1062,6 +1120,7 @@ body.room {
 
 .project_participants_slider_r {
     position: absolute;
+    height: 40px;
     top: 0;
     bottom: 0;
     right: 0;
@@ -1083,20 +1142,16 @@ body.room {
     top: 42px;
 }
 
-.userStatuses {
-    position: relative;
-    left: 59px;
-    top: -12px;
-}
-
 .chatUserStatus {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    position: absolute;
     background-color: gray;
     border: 1px solid #404040;
-    display: none;
+    position: relative;
+    top: -5px;
+    left: 36px;
+    float: left;
 }
 
 .chatUserOffline {

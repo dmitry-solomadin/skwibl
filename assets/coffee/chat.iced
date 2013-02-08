@@ -35,10 +35,15 @@ $ ->
       @scrollToTheBottom()
 
     initCarousel: ->
+      visibleUserCount = 5
+      userCount = $(".project_participants_slider .chatUser").length
+      $(".project_participants_slider").removeClass("no-carousel") if userCount > visibleUserCount
+
       $('.project_participants_slider_container').carouFredSel
         circular: false
+        height: 45
         items:
-          visible: 5
+          visible: visibleUserCount
           minimum: 1
         scroll:
           items: 2
@@ -55,26 +60,31 @@ $ ->
       picture = user.picture or '/images/avatar.png'
 
       $("#participants").append("<div class='chatUser' id='chatUser#{user.id}' data-uid='#{user.id}'
-                              data-display-name='#{user.displayName}' data-picture='#{picture}'>
-                              <img class='userAvatar tooltipize' src='#{picture}' width='48' title='#{user.displayName}'/>
-                              </div>")
-      $("#statuses").append("<div class='chatUserStatus' id='chatUserStatus#{user.id}'></div>")
+                                                              data-display-name='#{user.displayName}' data-picture='#{picture}'>
+                                                              <img class='userAvatar tooltipize' src='#{picture}' width='48' title='#{user.displayName}'/>
+                                                              </div>")
 
-    isVisible: -> $("#chat").data("visible") is "true"
+    isVisible: ->
+      $("#chat").data("visible") is "true"
 
     fold: ->
       $("#chat").data("visible", "false")
       $("#chat").animate {left: -305}, queue: false
       $("#canvasFooter").animate(paddingLeft: 0)
-      $(".canvasFooterInner").animate({width: $(window).width()}, -> $(".canvasFooterInner").css(width: "100%"))
+      $(".canvasFooterInner").animate {width: $(window).width()}, ->
+        $(".canvasFooterInner").css(width: "100%")
+        $('.canvasSelectDiv').trigger("updateSizes")
 
       $("#chatFolder").attr("onclick", "App.chat.unfold(this); return false;")
+
 
     unfold: ->
       $("#chat").data("visible", "true")
       $("#chat").animate {left: 0}, queue: false
       $("#canvasFooter").animate(paddingLeft: 300)
-      $(".canvasFooterInner").animate({width: $(window).width() - 300}, -> $(".canvasFooterInner").css(width: "100%"))
+      $(".canvasFooterInner").animate {width: $(window).width() - 300}, ->
+        $(".canvasFooterInner").css(width: "100%")
+        $('.canvasSelectDiv').trigger("updateSizes")
 
       $("#chatFolder").attr("onclick", "App.chat.fold(this); return false;")
       @clearBadgeCount()
@@ -84,9 +94,11 @@ $ ->
       for user in @users
         return user if "#{user.id}" is "#{uid}"
 
-    addBadgeCount: -> $("#chatBadge").show().html(parseInt($("#chatBadge").html()) + 1)
+    addBadgeCount: ->
+      $("#chatBadge").show().html(parseInt($("#chatBadge").html()) + 1)
 
-    clearBadgeCount: -> $("#chatBadge").hide().html("0")
+    clearBadgeCount: ->
+      $("#chatBadge").hide().html("0")
 
     addMessage: (uid, message) ->
       @addBadgeCount() unless @isVisible()
@@ -116,10 +128,6 @@ $ ->
 
     changeUserStatus: (uid, online) ->
       chatStatus = $("#chatUserStatus#{uid}")
-      chatStatus.show()
-      chatStatus.css
-        top: $("#chatUser#{uid}").position().top
-        left: $("#chatUser#{uid}").position().left
       if online
         chatStatus.addClass("chatUserOnline").removeClass("chatUserOffline")
       else
@@ -154,7 +162,8 @@ $ ->
     initSockets: ->
       @chatIO = io.connect('/chat', window.copt)
 
-      @chatIO.on 'message', (data) => @addMessage(data.id, data.message.msg)
+      @chatIO.on 'message', (data) =>
+        @addMessage(data.id, data.message.msg)
 
       @chatIO.on 'userRemoved', (uid) =>
         if "#{uid}" is "#{$("#uid").val()}"
@@ -173,6 +182,7 @@ $ ->
         user = @getUserById uid
         @addTechMessage("<i>#{user.displayName} left the project</i>")
 
-      @chatIO.on 'onlineUsers', (uids) => @changeUserStatus(uid, true) for uid in uids
+      @chatIO.on 'onlineUsers', (uids) =>
+        @changeUserStatus(uid, true) for uid in uids
 
   App.chat = new Chat
