@@ -61,17 +61,17 @@ exports.setUp = (logger) ->
     app.use passport.session()
     app.use '/file/upload', ctrls.mid.isAuth
     app.use '/file/upload', ctrls.files.upload
+    app.use flash()
     app.use (req, res, next) ->
       #TODO change to req.user, req.flash
       #TODO temporary fix, find a nicer way
       res.locals helpers: helpers
-      res.locals.helpers.general.req = req
-#       res.locals.helpers.general.req.user = req.user
-#       res.locals.helpers.general.req.session = req.session
-#       res.locals.helpers.general.req.flash = req.flash
+      res.locals.helpers.users.user = req.user
+      res.locals.helpers.flash.req = {}
+      res.locals.helpers.flash.req.session = req.session
+      res.locals.helpers.flash.req.flash = req.flash
       res.locals.originalUrl = req.originalUrl
       next()
-    app.use flash()
     app.use app.router
     app.use express.static assetsDir
     app.use ctrls.aux.notFound
