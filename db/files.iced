@@ -1,13 +1,10 @@
-
-tools = require '../tools'
-
-exports.setUp = (client, db) ->
+exports.setUp = (client, db) =>
 
   mod = {}
 
-  mod.add = (owner, cid, pid, name, mime, posX, posY, fn) ->
-    return client.incr 'files:next', (err, fid) ->
-      return tools.asyncOpt(fn, err, null) if err
+  mod.add = (owner, cid, pid, name, mime, posX, posY, fn) =>
+    return client.incr 'files:next', (err, fid) =>
+      return @tools.asyncOpt(fn, err, null) if err
       file =
         id: fid
         name: name
@@ -22,31 +19,31 @@ exports.setUp = (client, db) ->
           file: fid
         client.sadd "projects:#{pid}:files", fid
         db.activities.addForAllInProject pid, 'fileUpload', owner, [owner], {canvasId: cid, fileId: fid}
-        return tools.asyncOpt fn, null, canvasId: cid, element: file
+        return @tools.asyncOpt fn, null, canvasId: cid, element: file
       client.hmset "files:#{fid}", file
       client.sadd "projects:#{pid}:files", fid
-      time = 0 if tools.getFileType(mime) is 'video'
-      db.canvases.add pid, file, time, (err, canvas) ->
+      time = 0 if @tools.getFileType(mime) is 'video'
+      db.canvases.add pid, file, time, (err, canvas) =>
         db.activities.addForAllInProject pid, 'fileUpload', owner, [owner], {canvasId: canvas.id, fileId: fid}
-        return tools.asyncOpt fn, err, null if err
-        return tools.asyncOpt fn, err, canvasId: canvas.id, element: file, canvasName: canvas.name
+        return @tools.asyncOpt fn, err, null if err
+        return @tools.asyncOpt fn, err, canvasId: canvas.id, element: file, canvasName: canvas.name
 
-  mod.get = (uid, fn) ->
+  mod.get = (uid, fn) =>
     #TODO
 
-  mod.project = (pid, fn) ->
+  mod.project = (pid, fn) =>
     #TODO
 
-  mod.findById = (fid, fn) ->
-    client.hgetall "files:#{fid}", (err, file) ->
+  mod.findById = (fid, fn) =>
+    client.hgetall "files:#{fid}", (err, file) =>
       if not err
-        return tools.asyncOpt fn, null, file
-      return tools.asyncOpt fn, err
+        return @tools.asyncOpt fn, null, file
+      return @tools.asyncOpt fn, err
 
-  mod.delete = (id, fn) ->
+  mod.delete = (id, fn) =>
     #TODO
 
-  mod.setProperties = (id, properties, fn) ->
+  mod.setProperties = (id, properties, fn) =>
     #TODO
 
   return mod

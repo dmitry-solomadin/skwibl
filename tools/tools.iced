@@ -89,13 +89,14 @@ exports.makeProjectThumbs = (pid, element, fn) ->
       .write "#{path}/#{size}/#{element.name}", (err) =>
         return @asyncOpt fn, err, element
 
-exports.include = (dir, fn) ->
+exports.include = (dir, fn, defaults) ->
   for name in fs.readdirSync(dir)
     shortName = name.split('.')[0]
     ext = name.split('.')[1]
     isModule = shortName isnt 'index' and ( ext is 'js' or ext is 'coffee' or ext is 'iced' )
     if isModule
       mod = require dir + '/' + name
+      _.extend mod, defaults
       fn mod, shortName
 
 exports.asyncOpt = (fn, err, val)->

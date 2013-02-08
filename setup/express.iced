@@ -66,9 +66,10 @@ exports.setUp = (logger) ->
       #TODO temporary fix, find a nicer way
       res.locals helpers: helpers
       res.locals.helpers.general.req = req
+#       res.locals.helpers.general.req.user = req.user
+#       res.locals.helpers.general.req.session = req.session
+#       res.locals.helpers.general.req.flash = req.flash
       res.locals.originalUrl = req.originalUrl
-#       res.locals.general.user = req.user
-#       res.locals.general.flash = req.flash
       next()
     app.use flash()
     app.use app.router

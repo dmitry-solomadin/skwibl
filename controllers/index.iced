@@ -10,7 +10,7 @@ defaults =
   cfg: require '../config'
 
 tools.include __dirname, (mod, name) ->
-  _.extend mod, defaults
   module[name] = mod
+, defaults
 
 module.exports = module

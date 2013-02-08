@@ -1,16 +1,12 @@
-
 _ = require 'lodash'
 
-smtp = require '../smtp'
-tools = require '../tools'
-
-exports.setUp = (client, db) ->
+exports.setUp = (client, db) =>
 
   mod = {}
 
-  mod.findOrCreate = (profile, token, secret, fn) ->
+  mod.findOrCreate = (profile, token, secret, fn) =>
     emails = profile.emails
-    return db.users.findByEmails emails, (err, user) ->
+    return db.users.findByEmails emails, (err, user) =>
       unless user
         email = emails[0].value
         password = tools.genPass()
@@ -21,13 +17,13 @@ exports.setUp = (client, db) ->
           picture: profile._json.picture
           status: 'registred'
           provider: profile.provider
-        , profile.name, emails, (err, user) ->
+        , profile.name, emails, (err, user) =>
           if user
             db.auth.connect user.id, user.provider,
               token: token
               secret: secret
             , tools.logError
-            return smtp.sendRegMail user, fn
+            return @smtp.sendRegMail user, fn
           return tools.asyncOpt fn, err, user
       unless user.picture
         user.picture = profile._json.picture;
@@ -50,20 +46,20 @@ exports.setUp = (client, db) ->
         return db.users.restore user, fn
       return tools.asyncOpt fn, err, user
 
-  mod.connections = (id, fn) ->
+  mod.connections = (id, fn) =>
     client.smembers "users:#{id}:connections", fn
 
-  mod.getConnection = (id, provider, fn) ->
+  mod.getConnection = (id, provider, fn) =>
     client.hgetall "users:#{id}:#{provider}", fn
 
-  mod.connect = (id, provider, connection, fn) ->
+  mod.connect = (id, provider, connection, fn) =>
     client.sadd "users:#{id}:connections", provider
     client.hmset "users:#{id}:#{provider}", connection, fn
 
-  mod.setConnection = (id, provider, connection, fn) ->
+  mod.setConnection = (id, provider, connection, fn) =>
     client.hmset "users:#{id}:#{provider}", connection, fn
 
-  mod.disconnect = (id, provider, fn) ->
+  mod.disconnect = (id, provider, fn) =>
     client.srem "users:#{id}:connections", provider
     client.del "users:#{id}:#{provider}", fn
 
