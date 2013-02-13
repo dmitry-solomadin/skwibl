@@ -14,7 +14,7 @@ exports.add = (pid, file, time, fn) =>
           canvas.name = file.name
         else
           canvas.name = "Canvas #{count + 1}"
-        @client.hmset "canvases:#{cid}", canvas
+        @client.hmset "canvases:#{cid}", canvas, @tools.logError
         @client.rpush "projects:#{pid}:canvases", cid
         return @tools.asyncOpt fn, null, canvas
       return @tools.asyncOpt fn, err, null
@@ -105,7 +105,7 @@ exports.deleteComments = (cid, fn) =>
         return @tools.asyncOpt fn, null, null
 
 exports.setProperties = (cid, properties) =>
-  @client.hmset "canvases:#{cid}", properties
+  @client.hmset "canvases:#{cid}", properties, @tools.logError
 
 exports.commentNumber = (cid, fn) =>
   @client.hget "canvases:#{cid}", 'nextComment', fn

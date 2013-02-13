@@ -1,7 +1,7 @@
 exports.updateComment = (eid, element, create, fn) =>
   pid = element.project
   canvas = element.canvasId
-  @client.hmset "comments:#{eid}", element
+  @client.hmset "comments:#{eid}", element, @tools.logError
   unless create # creating new element
     @client.rpush "canvases:#{canvas}:comments", eid
     return @tools.asyncOpt fn, null, element

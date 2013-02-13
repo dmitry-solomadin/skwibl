@@ -77,7 +77,7 @@ exports.add = (uid, name, fn) =>
       project.createdAt = Date.now()
       project.start = Date()
       project.status = 'new'
-      @client.hmset "projects:#{val}", project
+      @client.hmset "projects:#{val}", project, @tools.logError
       @client.sadd "projects:#{val}:users", uid
       @client.zadd "users:#{uid}:projects",  project.createdAt, val
       return @db.canvases.add val, null, null, (err, canvas) =>

@@ -30,12 +30,12 @@ exports.add = (user, name, emails, fn) =>
         emailuid.push val
       if user.hash
         @client.set "hashes:#{user.hash}:uid", val
-      @client.hmset "users:#{val}", user
+      @client.hmset "users:#{val}", user, @tools.logError
       purifiedName = @tools.purify name
       if purifiedName
-        @client.hmset "users:#{val}:name", purifiedName
+        @client.hmset "users:#{val}:name", purifiedName, @tools.logError
       @client.sadd "users:#{val}:emails", umails
-      @client.mset emailtypes
+      @client.mset emailtypes, @tools.logError
       return @client.mset emailuid, (err, results) =>
         if not err
           user.name = purifiedName
@@ -102,5 +102,5 @@ exports.addEmails = (id, emails, fn) =>
   values = _.pluck emails, 'value'
   @client.sadd "users:#{id}:emails" , values
   for value, index in values
-    @client.mset "emails:#{value}:uid", id, "emails:#{value}:type", emails[index].type
+    @client.mset "emails:#{value}:uid", id, "emails:#{value}:type", emails[index].type, @tools.logError
   return @tools.asyncOpt fn, null, values

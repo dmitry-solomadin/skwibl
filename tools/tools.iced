@@ -1,4 +1,3 @@
-
 cluster = require 'cluster'
 os = require 'os'
 fs = require 'fs'
@@ -82,6 +81,7 @@ exports.makeProjectThumbs = (pid, element, fn) ->
   type = @getFileType element.mime
   if type is 'image'
     path = "#{cfg.UPLOADS}/#{pid}/image"
+    #TODO make this async
     for size, rect of cfg.PROJECT_THUMB_SIZE
       gm("#{path}/#{element.name}")
       .resize(rect.width, rect.height)

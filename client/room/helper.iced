@@ -86,7 +86,7 @@ $ ->
 
     reverseOpacity: (elem) -> elem.opacity = 1 - elem.opacity
 
-    notifyComment: -> App.notificator.notify("Drag to comment an area.")
+    notifyComment: -> App.notificator.notify("Select an area to comment.")
 
     containsPoint: (array, point) ->
       for element in array

@@ -9,14 +9,14 @@ exports.add = (owner, cid, pid, name, mime, posX, posY, fn) =>
       posX: posX
       posY: posY
     if cid
-      @client.hmset "files:#{fid}", file
+      @client.hmset "files:#{fid}", file, @tools.logError
       @db.canvases.setProperties cid,
         initialized: true
         file: fid
       @client.sadd "projects:#{pid}:files", fid
       @db.activities.addForAllInProject pid, 'fileUpload', owner, [owner], {canvasId: cid, fileId: fid}
       return @tools.asyncOpt fn, null, canvasId: cid, element: file
-    @client.hmset "files:#{fid}", file
+    @client.hmset "files:#{fid}", file, @tools.logError
     @client.sadd "projects:#{pid}:files", fid
     time = 0 if @tools.getFileType(mime) is 'video'
     @db.canvases.add pid, file, time, (err, canvas) =>

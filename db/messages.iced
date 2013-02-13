@@ -7,7 +7,7 @@ exports.update = (pid, owner, data, fn) =>
   msg.message = data.msg
   console.log data
   return @client.exists "messages:#{mid}", (err, exists) =>
-    @client.hmset "messages:#{mid}", msg
+    @client.hmset "messages:#{mid}", msg, @tools.logError
     unless exists # creating new message
       @client.rpush "projects:#{pid}:messages", mid
       return @tools.asyncOpt fn, err, msg

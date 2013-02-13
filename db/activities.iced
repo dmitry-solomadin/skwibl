@@ -15,7 +15,7 @@ exports.add = (pid, ownerId, type, uid, additionalInfo, fn) =>
       activity.status = 'new'
       activity.inviting = uid
       activity.additionalInfo = JSON.stringify additionalInfo
-      @client.hmset "activities:#{aid}", activity
+      @client.hmset "activities:#{aid}", activity, @tools.logError
       @client.rpush "users:#{ownerId}:activities", aid
       announce.in("activities#{ownerId}").emit 'new'
       if type is 'projectInvite'
@@ -40,7 +40,7 @@ exports.addForAllInProject = (pid, type, uid, except, additionalInfo, fn) =>
 
 # todo consider refactoring in scope of #138
 exports.getAllNew = (uid, fn) =>
-  exports.index uid, fn, (activity) =>
+  @db.activities.index uid, fn, (activity) =>
     return activity.status is 'new'
 
 exports.findById = (aid, fn) =>
@@ -75,15 +75,13 @@ exports.getDataActivity = (aid, fn) =>
     return @tools.asyncOpt fn, err, [] if err
     activities = []
     activities.push activity
-    return exports.getDataActivities activities, (err) =>
+    return @db.activities.getDataActivities activities, (err) =>
       return @tools.asyncOpt fn, err, activity
 
 exports.getDataActivities = (activities, fn) =>
-  return exports.getProjectForActivities activities, (err) =>
-    unless err
-      return exports.getUserForActivities activities, (err) =>
-        fn err
-    return fn err
+  return @db.activities.getProjectForActivities activities, (err) =>
+    return fn err if err
+    return @db.activities.getUserForActivities activities, fn
 
 exports.getProjectForActivities = (activities, fn) =>
   return @tools.asyncParallel activities, (activity) =>

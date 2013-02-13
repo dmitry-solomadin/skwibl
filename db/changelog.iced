@@ -9,7 +9,7 @@ exports.add = (pid, uid, type, additionalInfo, fn) =>
       changelog.time = Date.now()
       changelog.initiator = uid
       changelog.additionalInfo = JSON.stringify additionalInfo
-      @client.hmset "changelog:#{clid}", changelog
+      @client.hmset "changelog:#{clid}", changelog, @tools.logError
       @client.rpush "projects:#{pid}:changelog", clid
       return @tools.asyncOpt fn, null, changelog
     return @tools.asyncOpt fn, err, null

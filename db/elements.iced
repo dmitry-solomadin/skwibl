@@ -9,7 +9,7 @@ exports.update = (pid, owner, data, fn) =>
   element.time = Date.now()
   element.data = JSON.stringify(data)
   return @client.exists "elements:#{eid}", (err, exists) =>
-    @client.hmset "elements:#{eid}", element
+    @client.hmset "elements:#{eid}", element, @tools.logError
     unless exists # creating new element
       @client.rpush "canvases:#{canvas}:elements", eid if canvas
       return @tools.asyncOpt fn, err, element

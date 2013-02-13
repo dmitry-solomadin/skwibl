@@ -12,7 +12,7 @@ exports.index = (elementId, fn) =>
 # comment text may be restored after undo, in this case we consider this comment text as not new.
 exports.add = (element, isNew, fn) =>
   element.time = Date.now()
-  @client.hmset "texts:#{element.elementId}", element
+  @client.hmset "texts:#{element.elementId}", element, @tools.logError
   @client.rpush "comments:#{element.commentId}:texts", element.elementId
   @db.activities.addForAllInProject element.pid, 'newComment', element.owner, [element.owner], {commentTextId: element.elementId} if isNew
   return @tools.asyncOpt fn, null, element
