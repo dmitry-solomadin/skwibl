@@ -184,7 +184,7 @@ a.projects_more_btn {
 }
 
 .project:hover .projects_menu_container {
-    height: 54px;
+    height: 50px;
 }
 
 .projects_menu li {
@@ -193,7 +193,7 @@ a.projects_more_btn {
 
 .projects_menu li a {
     display: block;
-    padding: 10px;
+    padding: 8px 10px;
 }
 
 /* PROJECT INDEX END */

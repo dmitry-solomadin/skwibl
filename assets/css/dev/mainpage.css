@@ -58,7 +58,7 @@ body.mainpage {
 .beta {
     position: relative;
     height: auto;
-    width: auto;
+    width: 9px;
 }
 
 .header_btns {

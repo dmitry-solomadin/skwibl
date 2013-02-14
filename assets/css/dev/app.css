@@ -49,7 +49,7 @@ body {
     min-width: 1000px;
     font-family: Verdana, Geneva, sans-serif;
     height: 100%;
-    padding-top: 80px;
+    padding-top: 55px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     padding-bottom: 57px;
@@ -230,7 +230,8 @@ input.input-big {
 }
 
 #createNewProject button {
-    margin-top: 10px;
+    margin-top: 8px;
+    padding: 9px 22px;
 }
 
 .navbar .nav > li > a {
@@ -444,13 +445,17 @@ input.input-big {
     color: #484e58;
 }
 
+.top_nav li.projectsLi a {
+    padding: 0 22px 0 15px;
+}
+
 .top_nav_icon {
     display: inline-block;
     vertical-align: top;
     font-size: 0;
     height: 55px;
     line-height: 55px;
-    margin-right: 12px;
+    margin-right: 8px;
 }
 
 .top_nav_name {
@@ -461,8 +466,8 @@ input.input-big {
 
 .top_nav_notice {
     position: absolute;
-    top: 5px;
-    left: 49px;
+    top: 4px;
+    left: 47px;
     height: 18px;
     width: 18px;
     text-align: center;

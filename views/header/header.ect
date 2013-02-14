@@ -12,7 +12,7 @@
         <a href="/" title="Skwibl">
           <img src="/images/mainpage/logo.png" alt="Skwibl" width="149">
         </a>
-        <img class="beta" src="/images/beta.png">
+        <img class="beta" src="/images/beta.png" width="9">
       </div>
       <% end %>
 
@@ -40,7 +40,7 @@
                 <div id="activityBadge" class="top_nav_notice hide">0</div>
               </a>
             </li>
-            <li class="<%= 'selected' if isProjects %>">
+            <li class="projectsLi <%= 'selected' if isProjects %>">
               <a href="/projects">
                 <div class="top_nav_icon"><img src="/images/top_nav2.png" alt="Projects" width="36"></div>
                 <div class="top_nav_name">Projects</div>
@@ -51,7 +51,7 @@
           <%- include './header/user_dropdown.ect' %>
 
           <a class="fr mr25" id="createNewProject" href="/projects/new">
-            <button class="btn btn-success">Create a Project</button>
+            <button class="btn btn-success">New project</button>
           </a>
         </div>
         <% end %>
