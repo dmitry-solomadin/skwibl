@@ -1,5 +1,5 @@
 <input id="pid" type="hidden" value="<%= @pid %>">
-<input id="dropboxAPIKey" type="hidden" value="<%= @getConfig().DROPBOX_APP_KEY %>">
+<input id="dropboxAPIKey" type="hidden" value="<%= @helpers.general.getDropboxKey() %>">
 
 <% canvasInitialized = "#{@canvases[0].initialized}" == "true" %>
 
@@ -75,6 +75,7 @@
       <a href="#" id="dropboxChoose" class="btn font-normal">Dropbox</a><br>
       <a class="btn font-normal disabled tooltipize" data-placement="bottom" title="This feature is coming soon">Google
         Drive</a><br>
+      <a href="#" id="linkChoose" class="btn font-normal" onclick="App.room.canvas.requestLinkScreenshot(); return false;">Link</a><br>
 
       <div class="canvasInitHeader">or</div>
       <a href="#" class="btn font-normal" onclick="App.room.canvas.requestAddEmpty(); return false;">Create empty

@@ -57,7 +57,7 @@
                  href="#" title="Invite participant"><img src="/images/projects/projects_menu2.png" alt="Invite"></a>
             </li>
             <li>
-              <% if project.owner == @currentUser().id : %>
+              <% if project.owner == @helpers.users.currentUser().id : %>
                 <a onclick="App.projects.deleteProject('<%= project.id %>'); return false;" class="tooltipize"
                    href="#" title="Delete project"><img src="/images/projects/projects_menu3.png" alt="Delete"></a>
               <% else : %>

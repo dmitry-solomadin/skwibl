@@ -1,17 +1,12 @@
-
-db = require '../db'
-tools = require '../tools'
-cfg = require '../config'
-
-exports.player = (req, res) ->
+exports.player = (req, res) =>
   return res.render 'dev/index',
     template: 'player'
     user: req.user
 
-exports.conns = (req, res, next) ->
+exports.conns = (req, res, next) =>
   user = req.user
-  name = tools.getName user
-  db.auth.connections user.id, (err, connections) ->
+  name = @tools.getName user
+  @db.auth.connections user.id, (err, connections) =>
     unless err
       conns =
         facebook: off
@@ -30,6 +25,6 @@ exports.conns = (req, res, next) ->
         connections: conns
     return next err
 
-exports.integration = (req, res) ->
+exports.integration = (req, res) =>
   service = req.body.service
   return res.send true

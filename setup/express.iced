@@ -4,6 +4,8 @@ flash = require 'connect-flash'
 ect = require 'ect'
 path = require 'path'
 
+moment = require 'moment'
+
 routes = require '../routes'
 ctrls = require '../controllers'
 helpers = require '../helpers'
@@ -11,7 +13,6 @@ db = require '../db'
 cfg = require '../config'
 
 passportUp = require './passport'
-moment = require 'moment'
 
 exports.setUp = (logger) ->
 
@@ -21,7 +22,6 @@ exports.setUp = (logger) ->
 
   viewsDir = path.join __dirname, '../views'
   assetsDir = path.join __dirname, '../assets'
-  vendorDir = path.join __dirname, '../vendor'
 
   logStream =
     write: (message, encoding) ->
@@ -46,7 +46,7 @@ exports.setUp = (logger) ->
     app.set 'view engine', 'ect'
     app.use express.logger stream: logStream, format: 'dev'
     app.enable 'trust proxy'
-    app.use express.favicon "#{vendorDir}/images/butterfly-tiny.png"
+    app.use express.favicon "#{assetsDir}/images/butterfly-tiny.png"
     app.set 'view options', {layout: false}
     app.use express.json()
     app.use express.urlencoded()
@@ -61,25 +61,26 @@ exports.setUp = (logger) ->
     app.use passport.session()
     app.use '/file/upload', ctrls.mid.isAuth
     app.use '/file/upload', ctrls.files.upload
-    app.use (req, res, next) ->
-      res.locals.req = req
-      next()
     app.use flash()
+    app.use (req, res, next) ->
+      #TODO change to req.user, req.flash
+      #TODO temporary fix, find a nicer way
+      res.locals helpers: helpers
+      res.locals.helpers.users.user = req.user
+      res.locals.helpers.flash.req = {}
+      res.locals.helpers.flash.req.session = req.session
+      res.locals.helpers.flash.req.flash = req.flash
+      res.locals.originalUrl = req.originalUrl
+      next()
     app.use app.router
     app.use express.static assetsDir
-    app.use express.static vendorDir
     app.use ctrls.aux.notFound
 #     app.use(ctrls.aux.error);
 
-  app.locals = {}
-
-  for file of helpers
-    for method of helpers[file]
-      app.locals[method] = helpers[file][method]
-
   app.locals.moment = moment
+  app.locals.passport = passport
 
-  routes.configure app, passport
+  routes.configure app
 
   return app
 

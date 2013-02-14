@@ -1,4 +1,3 @@
-
 cluster = require 'cluster'
 os = require 'os'
 fs = require 'fs'
@@ -82,6 +81,7 @@ exports.makeProjectThumbs = (pid, element, fn) ->
   type = @getFileType element.mime
   if type is 'image'
     path = "#{cfg.UPLOADS}/#{pid}/image"
+    #TODO make this async
     for size, rect of cfg.PROJECT_THUMB_SIZE
       gm("#{path}/#{element.name}")
       .resize(rect.width, rect.height)
@@ -89,13 +89,14 @@ exports.makeProjectThumbs = (pid, element, fn) ->
       .write "#{path}/#{size}/#{element.name}", (err) =>
         return @asyncOpt fn, err, element
 
-exports.include = (dir, fn) ->
+exports.include = (dir, fn, defaults) ->
   for name in fs.readdirSync(dir)
     shortName = name.split('.')[0]
     ext = name.split('.')[1]
     isModule = shortName isnt 'index' and ( ext is 'js' or ext is 'coffee' or ext is 'iced' )
     if isModule
       mod = require dir + '/' + name
+      _.extend mod, defaults
       fn mod, shortName
 
 exports.asyncOpt = (fn, err, val)->

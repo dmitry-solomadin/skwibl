@@ -1,9 +1,7 @@
-ctrls = require '../controllers'
+exports.configure = (app) ->
 
-exports.configure = (app, passport) ->
+  app.get '/about_us', @ctrls.public.aboutUs
 
-  app.get '/about_us', ctrls.publicPages.aboutUs
+  app.get '/contact_us', @ctrls.public.contacts
 
-  app.get '/contact_us', ctrls.publicPages.contacts
-
-  app.get '/team', ctrls.publicPages.team
+  app.get '/team', @ctrls.public.team

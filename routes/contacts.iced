@@ -1,5 +1,3 @@
-ctrls = require '../controllers'
+exports.configure = (app) ->
 
-exports.configure = (app, passport) ->
-
-  app.get '/contacts', ctrls.mid.isAuth, ctrls.contacts.get
+  app.get '/contacts', @ctrls.mid.isAuth, @ctrls.contacts.get

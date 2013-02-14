@@ -3,7 +3,7 @@
 <div class="content">
 <%- include './shared/errors.ect' %>
 
-<% user = @currentUser() %>
+<% user = @helpers.users.currentUser() %>
 <form action="/users/<%= user.id %>/update" method="post" id="newUserForm">
   <fieldset>
     <div class="control-group">

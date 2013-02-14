@@ -1,4 +1,4 @@
-<% errorMessages = @errorMessages() %>
+<% errorMessages = @helpers.flash.errorMessages() %>
 <% if errorMessages and errorMessages.length : %>
   <div id="errorMessages" class="alert alert-error">
     Please, fix following errors:

@@ -2,11 +2,7 @@ readOnlyActivities = ['projectJoin', 'projectLeave', 'newComment', 'newTodo', 't
 changeLoggables = ['projectJoin', 'projectLeave', 'newComment', 'newTodo', 'todoResolved', 'todoReopened', 'fileUpload']
 
 exports.isReadOnly = (activity) ->
-  for readOnlyActivity in readOnlyActivities
-    return true if activity.type is readOnlyActivity
-  return false
+  activity.type in readOnlyActivities
 
 exports.isChangeLoggable = (type) ->
-  for changeLoggable in changeLoggables
-    return true if type is changeLoggable
-  return false
+  type in changeLoggables

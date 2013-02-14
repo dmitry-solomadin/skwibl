@@ -1,9 +1,7 @@
-ctrls = require '../controllers'
+exports.configure = (app) ->
 
-exports.configure = (app, passport) ->
+  app.get '/tour/:chapter?', @ctrls.support.tour
 
-  app.get '/tour/:chapter?', ctrls.support.tour
+  app.post '/forgotpassword', @ctrls.support.passwordRecovery
 
-  app.post '/forgotpassword', ctrls.support.passwordRecovery
-
-  app.get '/checkmail', ctrls.support.checkMail
+  app.get '/checkmail', @ctrls.support.checkMail

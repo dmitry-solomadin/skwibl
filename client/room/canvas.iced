@@ -365,6 +365,22 @@ $ ->
       $("#smallCanvasPreviews").animate(left: -500, 500)
       $("#canvasFolder").attr("onclick", "App.room.canvas.foldPreviews(this); return false;")
 
+    requestLinkScreenshot: ->
+      link = window.prompt '', 'Enter a link'
+      http = 'http://'
+      link = http + link if link.indexOf http
+      #TODO check if link is correct
+      posX = paper.view.center.x
+      posY = paper.view.center.y
+      $.post "/canvases/linkscreenshot", pid: $("#pid").val(), link: link, width: 1366, height: 768, posX: posX, posY: posY, (data, status, xhr) =>
+        App.room.canvas.handleUpload
+          canvasId: data.canvasId
+          fileId: data.element.id
+          name: data.canvasName
+          posX: data.element.posX
+          posY: data.element.posY
+        , true
+
     requestAddEmpty: ->
       thumbs = @getThumbs()
       initializeFirst = thumbs.length is 1 and not @isFirstInitialized()

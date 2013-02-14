@@ -1,23 +1,15 @@
 
 connect_redis = require 'connect-redis'
 
-cfg = require '../config'
+exports.createStore = (express) =>
+  sessionStore = connect_redis express
+  return new sessionStore {
+    client: @client
+    ttl: @cfg.SESSION_DURATION
+  }
 
-exports.setUp = (client, db) ->
+exports.get = (sessionId, fn) =>
+  return @client.get "sess:#{sessionId}", fn
 
-  mod = {};
-
-  mod.createStore = (express) ->
-    sessionStore = connect_redis express
-    return new sessionStore {
-      client: client
-      ttl: cfg.SESSION_DURATION
-    }
-
-  mod.get = (sessionId, fn) ->
-    return client.get "sess:#{sessionId}", fn
-
-  mod.touch = (sessionId, fn) ->
-    client.expire "sess:#{sessionId}", cfg.SESSION_DURATION, fn
-
-  return mod
+exports.touch = (sessionId, fn) =>
+  @client.expire "sess:#{sessionId}", @cfg.SESSION_DURATION, fn

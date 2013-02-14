@@ -1,11 +1,8 @@
-
-db = require '../db'
-
 #
 # ALL
 # Check authentication
 #
-exports.isAuth = (req, res, next) ->
+exports.isAuth = (req, res, next) =>
   return next() if req.isAuthenticated()
   return res.redirect '/' if req.method is 'GET'
   return res.json
@@ -16,7 +13,7 @@ exports.isAuth = (req, res, next) ->
 # ALL
 # Check that user id in params matches authenticated user id.
 #
-exports.isCurrentUser = (req, res, next) ->
+exports.isCurrentUser = (req, res, next) =>
   return next() if req.user.id is req.params.id
   if req.method is 'GET'
     req.flash 'error', "You can't view this page."
@@ -29,9 +26,9 @@ exports.isCurrentUser = (req, res, next) ->
 # ALL
 # Check if the user is the project member
 #
-exports.isMember = (req, res, next) ->
+exports.isMember = (req, res, next) =>
   pid = req.params.pid or req.body.pid or req.query.pid
-  db.mid.isMember req.user.id, pid, (err, val) ->
+  @db.mid.isMember req.user.id, pid, (err, val) =>
     return next() if val
     if req.method is 'GET'
       return res.redirect 'back'
@@ -43,10 +40,10 @@ exports.isMember = (req, res, next) ->
 # All
 # Check if the file belongs to the project
 #
-exports.isFileInProject = (req, res, next) ->
+exports.isFileInProject = (req, res, next) =>
   pid = req.params.pid or req.body.pid
   fid = req.params.fid or req.body.fid
-  db.mid.isFileInProject fid, pid, (err, val) ->
+  @db.mid.isFileInProject fid, pid, (err, val) =>
     return next() if val
     if req.method is 'GET'
       return res.redirect 'back'
@@ -58,8 +55,8 @@ exports.isFileInProject = (req, res, next) ->
 # POST
 # Check if the user is project owner
 #
-exports.isOwner = (req, res, next) ->
-  db.mid.isOwner req.user.id, req.body.pid, (err, val) ->
+exports.isOwner = (req, res, next) =>
+  @db.mid.isOwner req.user.id, req.body.pid, (err, val) =>
     return next() if val
     return res.json
       success: no
@@ -69,8 +66,8 @@ exports.isOwner = (req, res, next) ->
 # POST
 # Check if the user is invited to a project
 #
-exports.isInvited = (req, res, next) ->
-  db.mid.isInvited req.user.id, req.body.aid, (err, val) ->
+exports.isInvited = (req, res, next) =>
+  @db.mid.isInvited req.user.id, req.body.aid, (err, val) =>
     return next() if val
     return res.json
       success: no
