@@ -291,6 +291,8 @@ $ ->
           commentRect = if @items.created and @items.created.isCommentRect then @items.created
           commentMin = @comments.create(event.point.x, event.point.y, commentRect)
           commentRect.commentMin = commentMin if commentRect
+          $(".instruments > li").removeClass("selected")
+          $(".selectable[data-tooltype='select']").parent().addClass("selected")
 
       switch tooltype
         when 'straightline', 'arrow', 'circle', 'rectangle', 'line', 'highlighter'
