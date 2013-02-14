@@ -44,13 +44,19 @@ $ ->
       commentMin.on "mousedown", => @unfoldComment(commentMin, false)
 
       commentMax.append(commentHeader)
+      cmd = if isMac() then "⌘" else "Ctrl"
       commentContent = $("<div class='comment-content'><div class='comment-content-inner'></div>" +
       "<div class='comment-content-actions'><textarea class='comment-reply' placeholder='Type a comment...'></textarea>" +
-      "<input type='button' class='btn small-btn fr comment-send hide' value='Send'>" +
+      "<div class='comment-send-wrap hide'><span class='exp'>* #{cmd}+Enter to send comment</span><input type='button' class='btn small-btn fr comment-send' value='Send'></div>" +
       "<input type='button' class='btn small-btn fr edit-cancel hide' value='Cancel edit'></div>" +
       "</div>")
       $(commentContent).data("hidden", "false")
       commentMax.append(commentContent)
+
+      if isMac()
+        $(commentContent).find('.comment-reply').bind 'keydown.meta_return', => @sendComment(commentMin)
+      else
+        $(commentContent).find('.comment-reply').bind 'keydown.ctrl_return', => @sendComment(commentMin)
 
       commentHeader[0].commentMin = commentMin
       commentHeader.drags
@@ -70,24 +76,16 @@ $ ->
           room.redrawWithThumb()
 
       $(document).off("click.toggleCommentButtons").on "click.toggleCommentButtons", (evt) =>
-        for commentSendButton in $(".comment-send:visible")
+        for commentSendWrap in $(".comment-send-wrap:visible")
           # do not make send button invisible if comment in editing mode.
-          unless $(commentSendButton).parent().find(".edit-cancel:visible")[0]
-            $(commentSendButton).hide()
+          unless $(commentSendWrap).parent().find(".edit-cancel:visible")[0]
+            $(commentSendWrap).hide()
             @redrawArrow(commentMin)
 
-        $(evt.target).parent(".comment-content-actions").find(".comment-send").show() if evt.target
+        $(evt.target).parent(".comment-content-actions").find(".comment-send-wrap").show() if evt.target
 
       $(commentMax).find(".comment-send").on "click", =>
-        editCancelButton = commentMax.find(".edit-cancel:visible")[0]
-        if editCancelButton
-          commentTextarea = commentMax.find(".comment-reply")
-          @doEditText $(editCancelButton).data("edited-comment-text-id"), commentTextarea.val(), true
-          commentMax.find(".edit-cancel").click()
-        else
-          commentTextarea = commentMax.find(".comment-reply")
-          @addCommentText commentMin, text: commentTextarea.val()
-          commentTextarea.val("")
+        @sendComment(commentMin)
 
       $(commentMax).find(".edit-cancel").on "click", =>
         commentMax.find(".comment-reply").val("")
@@ -135,6 +133,18 @@ $ ->
       commentMin[0].arrow = path
 
       commentMin
+
+    sendComment: (commentMin) ->
+      commentMax = commentMin[0].$maximized
+      editCancelButton = commentMax.find(".edit-cancel:visible")[0]
+      if editCancelButton
+        commentTextarea = commentMax.find(".comment-reply")
+        @doEditText $(editCancelButton).data("edited-comment-text-id"), commentTextarea.val(), true
+        commentMax.find(".edit-cancel").click()
+      else
+        commentTextarea = commentMax.find(".comment-reply")
+        @addCommentText commentMin, text: commentTextarea.val()
+        commentTextarea.val("")
 
     getZone: (commentMin) ->
       bp = @getArrowBindPoint commentMin
@@ -473,7 +483,8 @@ $ ->
       commentText = comment.find(".the-comment-text").html()
 
       # show the buttons
-      comment.parent().parent().find(".comment-send").val("Save").show()
+      comment.parent().parent().find(".comment-send").val("Save")
+      comment.parent().parent().find(".comment-send-wrap").show()
       comment.parent().parent().find(".edit-cancel").data("edited-comment-text-id", elementId).show()
 
       replyBox.val(commentText)

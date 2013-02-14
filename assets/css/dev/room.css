@@ -740,7 +740,9 @@ body.room {
 
 .comment-reply {
     margin-top: 10px;
-    width: 220px;
+    width: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
     height: 40px;
     font-size: 11px;
 }

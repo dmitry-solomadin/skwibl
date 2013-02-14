@@ -1,11 +1,21 @@
 /* GENERAL START */
 
 a {
+    outline: none !important;
     color: rgb(73, 166, 20);
 }
 
 a:hover {
+    outline: none !important;
     color: #3e8c11;
+}
+
+a:focus, a:active {
+    outline: none !important;
+}
+
+textarea {
+    resize: none;
 }
 
 h2 {
@@ -120,6 +130,11 @@ input.input-big {
 
 .navbar-fixed-top-under {
     z-index: 39;
+}
+
+.exp {
+    font-size: 11px;
+    color: #808080;
 }
 
 .btn {
