@@ -152,4 +152,4 @@ exports.sendError = (res, err) ->
     return res.send false
 
 exports.logError = (err, val) ->
-  console.log err, val if err
+  console.trace err if err

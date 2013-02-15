@@ -66,6 +66,14 @@ exports.setUp = ->
     consumerKey: cfg.LINKEDIN_CONSUMER_KEY
     consumerSecret: cfg.LINKEDIN_CONSUMER_SECRET
     callbackURL: "#{cfg.DOMAIN}/auth/linkedin/callback"
+    profileFields: [
+      'id'
+      'first-name'
+      'last-name'
+      'email-address'
+      'picture-url'
+      'headline'
+    ]
   , (token, tokenSecret, profile, done) ->
     db.auth.findOrCreate profile, token, tokenSecret, done
 

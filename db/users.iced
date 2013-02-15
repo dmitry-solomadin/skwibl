@@ -35,6 +35,8 @@ exports.add = (user, name, emails, fn) =>
       if purifiedName
         @client.hmset "users:#{val}:name", purifiedName, @tools.logError
       @client.sadd "users:#{val}:emails", umails
+      console.log emailtypes
+      console.log emailuid
       @client.mset emailtypes, @tools.logError
       return @client.mset emailuid, (err, results) =>
         if not err
@@ -101,6 +103,7 @@ exports.setName = (id, name, fn) =>
 exports.addEmails = (id, emails, fn) =>
   values = _.pluck emails, 'value'
   @client.sadd "users:#{id}:emails" , values
-  for value, index in values
+  for value, index of values
+    console.log value, emails[index]
     @client.mset "emails:#{value}:uid", id, "emails:#{value}:type", emails[index].type, @tools.logError
   return @tools.asyncOpt fn, null, values

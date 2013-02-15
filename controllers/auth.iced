@@ -228,7 +228,11 @@ exports.connectFacebookCb = (req, res) =>
 # LinkedIn authenticate
 #
 exports.linkedin = (passport) =>
-  return passport.authenticate 'linkedin'
+  return passport.authenticate 'linkedin',
+    scope: [
+      'r_basicprofile'
+      'r_emailaddress'
+    ]
 
 #
 # GET
