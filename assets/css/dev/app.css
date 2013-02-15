@@ -249,6 +249,10 @@ input.input-big {
     padding: 9px 22px;
 }
 
+.gecko #createNewProject button{
+    padding: 8px 22px 10px 22px;
+}
+
 .navbar .nav > li > a {
     padding: 18px 10px 11px;
     line-height: 16px;
