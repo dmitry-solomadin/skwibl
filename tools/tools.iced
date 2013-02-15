@@ -20,9 +20,6 @@ exports.isEmail = (value) ->
 
 exports.sanitize = validator.sanitize
 
-exports.emailType = (x) ->
-  return "emails:#{x}:type"
-
 exports.emailUid = (x) ->
   return "emails:#{x}:uid"
 

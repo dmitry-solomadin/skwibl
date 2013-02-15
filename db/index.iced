@@ -6,7 +6,7 @@ tools = require '../tools'
 client = redis.createClient()
 
 client.on "error", (err) ->
-  console.log "Error #{err}"
+  console.trace err
 
 defaults =
   tools: require '../tools'

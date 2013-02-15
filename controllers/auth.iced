@@ -61,10 +61,7 @@ exports.register = (req, res, next) =>
       ,
         givenName: givenName
         familyName: familyName
-      , [
-        value: email
-        type: 'main'
-      ], (err, user) =>
+      , [value: email], (err, user) =>
         return next err if err
         unless user
           @tools.addError req, 'Enter valid email.'
