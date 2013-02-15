@@ -10,7 +10,7 @@ exports.findOrCreate = (profile, token, secret, fn) =>
         displayName: profile.displayName
         providerId: profile.id
         password: password
-        picture: profile._json.picture
+        picture: profile._json.picture or profile._json.pictureUrl
         status: 'registred'
         provider: profile.provider
       , profile.name, emails, (err, user) =>
@@ -22,7 +22,7 @@ exports.findOrCreate = (profile, token, secret, fn) =>
           return @smtp.sendRegMail user, fn
         return @tools.asyncOpt fn, err, user
     unless user.picture
-      user.picture = profile._json.picture;
+      user.picture = profile._json.picture or profile._json.pictureUrl
       @db.users.setProperties user.id, picture: user.picture
     purifiedName = @tools.purify profile.name
     unless _.isEqual user.name, purifiedName

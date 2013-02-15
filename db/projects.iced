@@ -140,7 +140,6 @@ exports.invite = (pid, id, user, fn) =>
     return @tools.asyncOptError fn, 'Cannot invite deleted user'
   # Check if user exists
   return @client.exists "users:#{user.id}", (err, val) =>
-    console.log "here"
     if not err and val
       # check if user is already invited
       return @client.zrangebyscore "projects:#{pid}:unconfirmed", user.id, user.id, (err, array) =>
@@ -165,18 +164,13 @@ exports.inviteEmail = (pid, id, email, fn) =>
     return @tools.asyncOpt fn, err if err
     if not user
       hash = @tools.hash email
-      password = @tools.genPass();
-      return @db.users.add {
+      password = @tools.genPass()
+      return @db.users.add
         hash: hash
         password: password
         status: 'unconfirmed'
         provider: 'local'
-      }, null, [
-        {
-          value: email
-          type: 'main'
-        }
-      ], (err, user) =>
+      , null, [value: email], (err, user) =>
         return @tools.asyncOpt fn err, null if err
         return @tools.asyncOpt fn new Error 'Can not create user.', null if not user
         @db.projects.invite pid, id, user

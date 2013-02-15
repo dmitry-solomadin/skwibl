@@ -61,10 +61,7 @@ exports.register = (req, res, next) =>
       ,
         givenName: givenName
         familyName: familyName
-      , [
-        value: email
-        type: 'main'
-      ], (err, user) =>
+      , [value: email], (err, user) =>
         return next err if err
         unless user
           @tools.addError req, 'Enter valid email.'
@@ -228,7 +225,11 @@ exports.connectFacebookCb = (req, res) =>
 # LinkedIn authenticate
 #
 exports.linkedin = (passport) =>
-  return passport.authenticate 'linkedin'
+  return passport.authenticate 'linkedin',
+    scope: [
+      'r_basicprofile'
+      'r_emailaddress'
+    ]
 
 #
 # GET

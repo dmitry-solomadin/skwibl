@@ -18,14 +18,10 @@ exports.add = (user, name, emails, fn) =>
       if user.provider is 'local'
         user.providerId = val
       umails = []
-      emailtypes = []
       emailuid = []
       for email in emails
         value = email.value
         umails.push value
-        if email.type
-          emailtypes.push "emails:#{value}:type"
-          emailtypes.push email.type
         emailuid.push "emails:#{value}:uid"
         emailuid.push val
       if user.hash
@@ -35,7 +31,6 @@ exports.add = (user, name, emails, fn) =>
       if purifiedName
         @client.hmset "users:#{val}:name", purifiedName, @tools.logError
       @client.sadd "users:#{val}:emails", umails
-      @client.mset emailtypes, @tools.logError
       return @client.mset emailuid, (err, results) =>
         if not err
           user.name = purifiedName
@@ -59,17 +54,14 @@ exports.findById = (id, fn) =>
     @client.smembers "users:#{id}:emails",  (err, emails) =>
       if err
         return @tools.asyncOpt fn, new Error "User #{id} have no emails"
-      @client.mget emails.map(@tools.emailType), (err, array) =>
-        types = array if array and array.length
-        @client.hgetall "users:#{id}:name", (err, name) =>
-          umails = []
-          for email, index in emails
-            umails.push
-              value: email
-              type: types[index]
-          user.emails = umails
-          user.name = name
-          return @tools.asyncOpt fn, null, user
+      @client.hgetall "users:#{id}:name", (err, name) =>
+        umails = []
+        for email, index of emails
+          umails.push
+            value: email
+        user.emails = umails
+        user.name = name
+        return @tools.asyncOpt fn, null, user
 
 exports.findByEmail = (email, fn) =>
   @client.get "emails:#{email}:uid", (err, val) =>
@@ -101,6 +93,6 @@ exports.setName = (id, name, fn) =>
 exports.addEmails = (id, emails, fn) =>
   values = _.pluck emails, 'value'
   @client.sadd "users:#{id}:emails" , values
-  for value, index in values
-    @client.mset "emails:#{value}:uid", id, "emails:#{value}:type", emails[index].type, @tools.logError
+  for value, index of values
+    @client.set "emails:#{value}:uid", id @tools.logError
   return @tools.asyncOpt fn, null, values
