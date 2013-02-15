@@ -92,7 +92,7 @@ exports.setName = (id, name, fn) =>
 
 exports.addEmails = (id, emails, fn) =>
   values = _.pluck emails, 'value'
-  @client.sadd "users:#{id}:emails" , values
+  @client.sadd "users:#{id}:emails", values
   for value, index of values
-    @client.set "emails:#{value}:uid", id @tools.logError
+    @client.set "emails:#{value}:uid", id, @tools.logError
   return @tools.asyncOpt fn, null, values
