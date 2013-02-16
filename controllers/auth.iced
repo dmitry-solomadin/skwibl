@@ -175,7 +175,6 @@ exports.facebook = (passport) =>
       'email'
       'offline_access'
       'user_status'
-      'user_checkins'
       'user_photos'
       'user_videos'
     ]

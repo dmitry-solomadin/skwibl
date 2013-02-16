@@ -1,6 +1,7 @@
 _ = require 'lodash'
 
 exports.findOrCreate = (profile, token, secret, fn) =>
+  console.log profile
   emails = profile.emails
   return @db.users.findByEmails emails, (err, user) =>
     unless user

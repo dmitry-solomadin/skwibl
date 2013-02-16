@@ -59,6 +59,19 @@ exports.setUp = ->
     clientID: cfg.FACEBOOK_APP_ID
     clientSecret: cfg.FACEBOOK_APP_SECRET
     callbackURL: "#{cfg.DOMAIN}/auth/facebook/callback"
+    profileFields: [
+      'id'
+      'picture'
+      'name'
+      'username'
+      'first_name'
+      'last_name'
+      'middle_name'
+      'displayName'
+      'gender'
+      'link'
+      'emails'
+    ]
   , (accessToken, refreshToken, profile, done) ->
     db.auth.findOrCreate profile, accessToken, refreshToken, done
 

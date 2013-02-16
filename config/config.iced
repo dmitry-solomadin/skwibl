@@ -9,8 +9,8 @@ exports.DOMAIN = if @ENVIRONMENT is 'development' then 'http://localhost' else '
 exports.GOOGLE_CLIENT_ID = '435757431999.apps.googleusercontent.com'
 exports.GOOGLE_CLIENT_SECRET = 'IoZpFsfeyBuRvs2Djbut1wSZ'
 
-exports.FACEBOOK_APP_ID = '513105425381842'
-exports.FACEBOOK_APP_SECRET = 'ad4fc590e9e78619bcf076c4cda6bfb3'
+exports.FACEBOOK_APP_ID = if @ENVIRONMENT is 'development' then '604594816233276' else '513105425381842'
+exports.FACEBOOK_APP_SECRET = if @ENVIRONMENT is 'development' then 'ce9a493f9e85d633177ad80041af2ff0' else 'ad4fc590e9e78619bcf076c4cda6bfb3'
 
 exports.LINKEDIN_CONSUMER_KEY = 'two4f1vl4319'
 exports.LINKEDIN_CONSUMER_SECRET = 'CN5FSKF3HYDw74Do'
