@@ -79,7 +79,7 @@ $ ->
       @scrollToTheBottom()
 
     getChatUnfoldCallback: () ->
-      @unfoldCallback.pop()
+      @unfoldCallback.pop() if @unfoldCallback
 
     setChatUnfoldCallback: (callback) ->
       @unfoldCallback = []

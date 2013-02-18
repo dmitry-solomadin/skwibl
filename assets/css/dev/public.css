@@ -37,3 +37,44 @@
 .team_pics div:first-child {
     margin-left: 0;
 }
+
+.tour_item_wrap {
+    margin-top: 35px;
+    margin-bottom: 35px;
+}
+
+.tour_item_wrap_first {
+    margin-top: 0;
+}
+
+.tour_image {
+    width: 350px;
+    float: left;
+    border: 1px solid rgb(138,197,53);
+    padding: 1px;
+    border-radius: 4px;
+}
+
+.tour_text {
+    float: left;
+    margin-left: 35px;
+    width: 500px;
+}
+
+.tour_text h3 {
+    margin-top: -5px;
+    margin-bottom: 12px;
+    font-size: 30px;
+    text-shadow: white 1px 1px 1px;
+}
+
+.tour_text p {
+    font-size: 14px;
+    line-height: 20px;
+    text-shadow: white 1px 1px 1px;
+}
+
+.tour_text_right {
+    margin-left: 0;
+    margin-right: 25px;
+}

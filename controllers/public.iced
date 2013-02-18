@@ -6,3 +6,6 @@ exports.contacts = (req, res, next) =>
 
 exports.team = (req, res, next) =>
   return res.render 'index', template: 'public/team'
+
+exports.tour = (req, res, next) =>
+  return res.render 'index', template: 'public/tour'
