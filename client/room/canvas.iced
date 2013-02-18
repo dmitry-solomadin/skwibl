@@ -8,6 +8,7 @@ $ ->
       @initComments()
       @initThumbnails()
       @initThumbSort()
+      @initCarousel()
 
     #@initBackground()
 
@@ -125,6 +126,13 @@ $ ->
 
       paper.project.activeLayer.insertChild(0, background)
 
+    initCarousel: ->
+      new App.SkwiblCarousel
+        selector: '#canvasSelectDiv'
+        height: 75
+        leftArrowClass: "gallery_l"
+        rightArrowClass: "gallery_r"
+
     # executes function for each cavnvas in context of opts of this canvas
     forEachThumbInContext: (fn) ->
       selectedCid = @getSelectedCanvasId()
@@ -209,6 +217,7 @@ $ ->
     destroy: (cid, emit) ->
       if @getThumbs().length > 1
         @findThumbByCanvasId(cid).parent().remove()
+        $('#canvasSelectDiv')[0].carousel.update()
         @findMiniThumbByCanvasId(cid).remove()
         room.savedOpts.splice room.savedOpts.indexOf(@findOptsById(cid)), 1
         @selectThumb $("#canvasSelectDiv div:first .clink")
@@ -410,6 +419,7 @@ $ ->
     addEmpty: (canvasData) ->
       @addNewThumbAndSelect canvasData, true
       room.hideSplashScreen()
+      App.chat.setChatUnfoldCallback -> $('#canvasSelectDiv')[0].carousel.goToItem($("#canvasSelectDiv .canvasPreviewDiv:last").index())
       room.socket.emit "canvasAdded", canvasData
 
     handleUpload: (canvasData, emit) ->

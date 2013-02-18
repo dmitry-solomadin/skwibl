@@ -35,24 +35,11 @@ $ ->
       @scrollToTheBottom()
 
     initCarousel: ->
-      visibleUserCount = 5
-      userCount = $(".project_participants_slider .chatUser").length
-      $(".project_participants_slider").removeClass("no-carousel") if userCount > visibleUserCount
-
-      $('.project_participants_slider_container').carouFredSel
-        circular: false
+      new App.SkwiblCarousel
+        selector: '.project_participants_slider_container'
         height: 45
-        items:
-          visible: visibleUserCount
-          minimum: 1
-        scroll:
-          items: 2
-        auto:
-          play: false
-        prev:
-          button: ".project_participants_slider_l"
-        next:
-          button: ".project_participants_slider_r"
+        leftArrowClass: "project_participants_slider_l"
+        rightArrowClass: "project_participants_slider_r"
 
     addNewUser: (user) ->
       @users.push user
@@ -73,22 +60,30 @@ $ ->
       $("#canvasFooter").animate(paddingLeft: 0)
       $(".canvasFooterInner").animate {width: $(window).width()}, ->
         $(".canvasFooterInner").css(width: "100%")
-        $('.canvasSelectDiv').trigger("updateSizes")
+        $('#canvasSelectDiv')[0].carousel.update()
 
       $("#chatFolder").attr("onclick", "App.chat.unfold(this); return false;")
-
 
     unfold: ->
       $("#chat").data("visible", "true")
       $("#chat").animate {left: 0}, queue: false
       $("#canvasFooter").animate(paddingLeft: 300)
-      $(".canvasFooterInner").animate {width: $(window).width() - 300}, ->
+      $(".canvasFooterInner").animate {width: $(window).width() - 300}, =>
         $(".canvasFooterInner").css(width: "100%")
-        $('.canvasSelectDiv').trigger("updateSizes")
+        $('#canvasSelectDiv')[0].carousel.update()
+        unfoldCallback = @getChatUnfoldCallback()
+        unfoldCallback() if unfoldCallback
 
       $("#chatFolder").attr("onclick", "App.chat.fold(this); return false;")
       @clearBadgeCount()
       @scrollToTheBottom()
+
+    getChatUnfoldCallback: () ->
+      @unfoldCallback.pop()
+
+    setChatUnfoldCallback: (callback) ->
+      @unfoldCallback = []
+      @unfoldCallback.push(callback)
 
     getUserById: (uid) ->
       for user in @users

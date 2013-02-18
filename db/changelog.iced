@@ -16,7 +16,7 @@ exports.add = (pid, uid, type, additionalInfo, fn) =>
 
 exports.index = (pid, fn) =>
   #TODO remove sort
-  @client.sort "projects:#{pid}:changelog", "by", "changelog:*=>time", "desc", (err, changelogIds) =>
+  @client.sort "projects:#{pid}:changelog", "by", "changelog:*->time", "desc", (err, changelogIds) =>
     if not err and changelogIds and changelogIds.length
       changelog = []
       return @tools.asyncParallel changelogIds, (clid) =>

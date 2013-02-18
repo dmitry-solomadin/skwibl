@@ -28,7 +28,7 @@ exports.get = (cid, fn) =>
   @client.hgetall 'canvases:' + cid, fn
 
 exports.index = (pid, fn) =>
-  @client.sort "projects:#{pid}:canvases", "by", "canvases:*=>position", (err, array) =>
+  @client.sort "projects:#{pid}:canvases", "by", "canvases:*->position", (err, array) =>
     if not err and array and array.length
       canvases = []
       return @tools.asyncParallel array, (cid, index) =>
@@ -47,8 +47,9 @@ exports.index = (pid, fn) =>
     return @tools.asyncOpt fn, err, []
 
 exports.reorder = (pid, cid, toPos, fn) =>
+  toPos = parseInt(toPos) if toPos is not null
   @db.canvases.get cid, (err, moveCanvas) =>
-    fromPos = moveCanvas.position
+    fromPos = parseInt(moveCanvas.position)
     return @tools.asyncOpt fn, err, null if fromPos is toPos
     @client.lrange "projects:#{pid}:canvases", 0, -1, (err, array) =>
       if not err and array and array.length
@@ -58,12 +59,17 @@ exports.reorder = (pid, cid, toPos, fn) =>
               @db.canvases.setProperties canvas.id, position: toPos
               return @tools.asyncDone array, => return @tools.asyncOpt fn, null, null
 
-            if fromPos < toPos
-              if fromPos < canvas.position <= toPos
+            if toPos is null
+              # toPos is null when we reorder after delete canvas
+              if fromPos < parseInt(canvas.position)
                 @db.canvases.setProperties canvas.id, position: parseInt(canvas.position) - 1
             else
-              if toPos <= canvas.position < fromPos
-                @db.canvases.setProperties canvas.id, position: parseInt(canvas.position) + 1
+              if fromPos < toPos
+                if fromPos < parseInt(canvas.position) <= toPos
+                  @db.canvases.setProperties canvas.id, position: parseInt(canvas.position) - 1
+              else
+                if toPos <= parseInt(canvas.position) < fromPos
+                  @db.canvases.setProperties canvas.id, position: parseInt(canvas.position) + 1
 
             return @tools.asyncDone array, => return @tools.asyncOpt fn, null, null
       return @tools.asyncOpt fn, err, null
@@ -73,7 +79,7 @@ exports.clear = (cid) =>
   @db.canvases.deleteComments cid
 
 exports.delete = (cid, fn) =>
-  @db.canvases.get cid, (err, canvas)=>
+  @db.canvases.get cid, (err, canvas) =>
     if not err and canvas
       @client.lrange "projects:#{canvas.project}:canvases", 0, -1, (err, canvases) =>
         if not err and canvases and canvases.length
@@ -83,9 +89,10 @@ exports.delete = (cid, fn) =>
             @client.hset "canvases:#{cid}", "initialized", "false"
             return @tools.asyncOpt fn, null, null
           else
-            @client.lrem "projects:#{canvas.project}:canvases", 0, cid
-            @db.canvases.clear cid
-            return @client.del "canvases:#{cid}", cid
+            return @db.canvases.reorder canvas.project, cid, null, =>
+              @client.lrem "projects:#{canvas.project}:canvases", 0, cid
+              @db.canvases.clear cid
+              return @client.del "canvases:#{cid}", cid
     return @tools.asyncOpt fn, null, null
 
 exports.deleteElements = (cid, fn) =>
