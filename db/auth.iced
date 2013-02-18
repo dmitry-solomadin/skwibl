@@ -1,7 +1,6 @@
 _ = require 'lodash'
 
 exports.findOrCreate = (profile, token, secret, fn) =>
-  console.log profile
   emails = profile.emails
   return @db.users.findByEmails emails, (err, user) =>
     unless user
@@ -11,7 +10,7 @@ exports.findOrCreate = (profile, token, secret, fn) =>
         displayName: profile.displayName
         providerId: profile.id
         password: password
-        picture: profile._json.picture or profile._json.pictureUrl
+        picture: profile._json.picture?.data?.url or profile._json.picture or profile._json.pictureUrl
         status: 'registred'
         provider: profile.provider
       , profile.name, emails, (err, user) =>

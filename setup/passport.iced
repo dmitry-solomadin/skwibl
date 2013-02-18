@@ -61,7 +61,7 @@ exports.setUp = ->
     callbackURL: "#{cfg.DOMAIN}/auth/facebook/callback"
     profileFields: [
       'id'
-      'picture'
+      'photos'
       'name'
       'username'
       'first_name'
@@ -69,7 +69,7 @@ exports.setUp = ->
       'middle_name'
       'displayName'
       'gender'
-      'link'
+      'profileUrl'
       'emails'
     ]
   , (accessToken, refreshToken, profile, done) ->
