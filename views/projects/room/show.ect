@@ -147,10 +147,10 @@
               <% end %>
             </div>
             <div class="clink <%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.id %>"
-               data-name="<%= canvas.name %>"  data-pos="<%= canvas.position %>"
+               data-name="<%= canvas.name %>"
                data-initialized="<%= canvas.initialized %>" data-pos-x="<%= canvas.file.posX if canvas.file %>"
                data-pos-y="<%= canvas.file.posY if canvas.file %>" <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
-            <%= canvas.position %>
+            <!-- <%= canvas.position %> -->
             <canvas width="80" height="60"></canvas>
 
             </div>
