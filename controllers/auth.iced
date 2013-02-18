@@ -221,6 +221,20 @@ exports.connectFacebookCb = (req, res) =>
 
 #
 # GET
+# get Facebook friends
+#
+exports.friendsFacebook = (req, res) =>
+  db.getConnection req.user.id, 'facebook', (err, connection) =>
+    if not err and connection
+      url = 'https://graph.facebook.com/me/friends?fields=id,picture,name'
+      return request.get url, (error, response, body) =>
+        if not error and response.statusCode is 200
+          #TODO send fb friends
+        return error #TODO send some err
+    return err #TODO return some err
+
+#
+# GET
 # LinkedIn authenticate
 #
 exports.linkedin = (passport) =>
