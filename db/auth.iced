@@ -22,7 +22,7 @@ exports.findOrCreate = (profile, token, secret, fn) =>
           return @smtp.sendRegMail user, fn
         return @tools.asyncOpt fn, err, user
     unless user.picture
-      user.picture = profile._json.picture or profile._json.pictureUrl
+      user.picture = profile._json.picture?.data?.url or profile._json.picture or profile._json.pictureUrl
       @db.users.setProperties user.id, picture: user.picture
     purifiedName = @tools.purify profile.name
     unless _.isEqual user.name, purifiedName
