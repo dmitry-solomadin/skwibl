@@ -5,3 +5,5 @@ exports.configure = (app) ->
   app.get '/contact_us', @ctrls.public.contacts
 
   app.get '/team', @ctrls.public.team
+
+  app.get '/tour', @ctrls.public.tour
