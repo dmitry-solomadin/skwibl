@@ -21,8 +21,6 @@
       </div>
       <% end %>
     </div>
-    <a href="#" class="project_participants_slider_l" style="display: block;"></a>
-    <a href="#" class="project_participants_slider_r" style="display: block;"></a>
   </div>
 
   <div class="clearfix"></div>
@@ -134,7 +132,6 @@
       </div>
     </div>
     <div class="canvasFooterBottom">
-      <a href="#" class="gallery_l"></a>
       <div id="canvasSelectDiv" class="canvasSelectDiv">
         <% for canvas, i in @canvases : %>
           <div class="canvasPreviewDiv">
@@ -150,10 +147,12 @@
               <% end %>
             </div>
             <div class="clink <%- 'canvasSelected' if i is 0 %>" data-cid="<%= canvas.id %>"
-               data-name="<%= canvas.name %>"
+               data-name="<%= canvas.name %>"  data-pos="<%= canvas.position %>"
                data-initialized="<%= canvas.initialized %>" data-pos-x="<%= canvas.file.posX if canvas.file %>"
                data-pos-y="<%= canvas.file.posY if canvas.file %>" <%-"data-fid=\"#{canvas.file.id}\"" if canvas.file %>>
+            <%= canvas.position %>
             <canvas width="80" height="60"></canvas>
+
             </div>
             <a href="#" class="gallery_slide_close" onclick="App.room.canvas.onDeleteClick(this, true); return false;"></a>
             <div class="gallery_slide_controls_container">
@@ -165,7 +164,6 @@
           </div>
         <% end %>
       </div>
-      <a href="#" class="gallery_r"></a>
     </div>
   </div>
 </div>

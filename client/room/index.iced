@@ -18,7 +18,6 @@ $ ->
       @initOpts(canvasId)
       @sharedOpts.scale = 1
 
-      @initCarousel()
       $(".toolTypeChanger").on "click", ->
         sharedOpts.tooltype = $(@).data("tooltype")
 
@@ -117,27 +116,6 @@ $ ->
       script.setAttribute('data-app-key', dropboxAPIKey)
       $("body")[0].appendChild(script)
 
-    initCarousel: ->
-      canvasPreviewWidth = 95
-      visible = Math.floor($(".canvasFooterBottom").width() / canvasPreviewWidth)
-      console.log "visible", visible
-
-      $('.canvasSelectDiv').carouFredSel
-        circular: false
-        infinite: false
-        height: 75
-        items:
-          visible: "variable"
-          width: 98
-        scroll:
-          items: 3
-        auto:
-          play: false
-        prev:
-          button: ".gallery_l"
-        next:
-          button: ".gallery_r"
-
     initOpts: (canvasId) ->
       @opts = {}
       window.opts = @opts
@@ -170,8 +148,6 @@ $ ->
       opts.pandx = tempOpts.prevPandx
       opts.pandy = tempOpts.prevPandy
       @sharedOpts.scale = tempOpts.prevGlobalScale
-
-    restoreFromSaved: (opts) ->
 
     # Mouse events handling
 

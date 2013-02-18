@@ -1082,25 +1082,13 @@ body.room {
 }
 
 .project_participants_slider {
-    padding: 0 15px;
+    padding: 0;
     margin-bottom: 2px;
     position: relative;
     margin-left: 3px;
     margin-right: 3px;
     height: 45px;
     overflow: hidden;
-}
-
-.project_participants_slider.no-carousel {
-    padding: 0;
-}
-
-.project_participants_slider.no-carousel .project_participants_slider_l {
-    display: none !important;
-}
-
-.project_participants_slider.no-carousel .project_participants_slider_r {
-    display: none !important;
 }
 
 .chatUser {
@@ -1461,3 +1449,32 @@ span.label-9, span.labelstyle-ffcc00, ffcc00.selected {
 }
 
 /* LABELS END */
+
+/* SKWIBL CAROUSEL START */
+
+.skwibl-carousel {
+    text-align: left;
+    float: none;
+    position: absolute;
+    top: 0;
+    right: auto;
+    bottom: auto;
+    left: 0;
+    margin: 0;
+}
+
+.skwibl-carousel-wrap {
+    display: block;
+    text-align: start;
+    float: none;
+    position: absolute;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    z-index: auto;
+    margin: 0;
+    overflow: hidden;
+}
+
+/* SKWIBL CAROUSEL END */
