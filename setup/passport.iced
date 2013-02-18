@@ -59,6 +59,19 @@ exports.setUp = ->
     clientID: cfg.FACEBOOK_APP_ID
     clientSecret: cfg.FACEBOOK_APP_SECRET
     callbackURL: "#{cfg.DOMAIN}/auth/facebook/callback"
+    profileFields: [
+      'id'
+      'photos'
+      'name'
+      'username'
+      'first_name'
+      'last_name'
+      'middle_name'
+      'displayName'
+      'gender'
+      'profileUrl'
+      'emails'
+    ]
   , (accessToken, refreshToken, profile, done) ->
     db.auth.findOrCreate profile, accessToken, refreshToken, done
 
@@ -66,6 +79,14 @@ exports.setUp = ->
     consumerKey: cfg.LINKEDIN_CONSUMER_KEY
     consumerSecret: cfg.LINKEDIN_CONSUMER_SECRET
     callbackURL: "#{cfg.DOMAIN}/auth/linkedin/callback"
+    profileFields: [
+      'id'
+      'first-name'
+      'last-name'
+      'email-address'
+      'picture-url'
+      'headline'
+    ]
   , (token, tokenSecret, profile, done) ->
     db.auth.findOrCreate profile, token, tokenSecret, done
 

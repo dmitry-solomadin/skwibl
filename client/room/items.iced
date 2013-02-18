@@ -163,7 +163,7 @@ $ ->
       sx = Math.abs(1 + @sel.pzx * event.delta.x / w)
       sy = Math.abs(1 + @sel.pzy * event.delta.y / h)
 
-      return if sx is 0 or sy is 0
+      return if -0.00001 < sx < 0.00001 or -0.00001 < sy < 0.00001
 
       @scaleInternal @sel, sx, sy
 

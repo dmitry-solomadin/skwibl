@@ -5,7 +5,6 @@ exports.update = (pid, owner, data, fn) =>
   msg.owner = owner
   msg.time = Date.now()
   msg.message = data.msg
-  console.log data
   return @client.exists "messages:#{mid}", (err, exists) =>
     @client.hmset "messages:#{mid}", msg, @tools.logError
     unless exists # creating new message

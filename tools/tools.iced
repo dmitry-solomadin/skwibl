@@ -20,9 +20,6 @@ exports.isEmail = (value) ->
 
 exports.sanitize = validator.sanitize
 
-exports.emailType = (x) ->
-  return "emails:#{x}:type"
-
 exports.emailUid = (x) ->
   return "emails:#{x}:uid"
 
@@ -152,4 +149,4 @@ exports.sendError = (res, err) ->
     return res.send false
 
 exports.logError = (err, val) ->
-  console.log err, val if err
+  console.trace err if err
