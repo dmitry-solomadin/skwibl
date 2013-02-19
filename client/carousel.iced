@@ -34,6 +34,8 @@ $ ->
 
       @update()
 
+      $(window).resize => @update()
+
       fastForward = (invisible, forward) =>
         # todo queue up the animations
         return if @carousel.queue("fx").length > 0
@@ -131,7 +133,7 @@ $ ->
       for child in @carousel.children()
         tempAvailableWidth = availableWidth
         tempAvailableWidth += $(child).outerWidth(true)
-        break if tempAvailableWidth > fullWidth
+        break if tempAvailableWidth > (fullWidth + ($(child).outerWidth(true) - $(child).width()))
         availableWidth = tempAvailableWidth
       availableWidth
 
