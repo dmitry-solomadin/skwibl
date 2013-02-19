@@ -16,7 +16,7 @@ exports.configure = (app) ->
 
   app.get '/auth/google/callback', @ctrls.auth.googleCb(passport), @ctrls.auth.logIn
 
-  app.get '/connect/google', @ctrls.auth.connectGoogle
+  app.get '/connect/google', @ctrls.mid.isAuth, @ctrls.auth.connectGoogle
 
   app.get '/connect/google/callback', @ctrls.auth.connectGoogleCb
 
@@ -24,23 +24,25 @@ exports.configure = (app) ->
 
   app.get '/auth/facebook/callback', @ctrls.auth.facebookCb(passport), @ctrls.auth.logIn
 
-  app.get '/connect/facebook', @ctrls.auth.connectFacebook
+  app.get '/connect/facebook', @ctrls.mid.isAuth, @ctrls.auth.connectFacebook
 
   app.get '/connect/facebook/callback', @ctrls.auth.connectFacebookCb
+
+  app.get '/friends/facebook', @ctrls.mid.isAuth, @ctrls.auth.friendsFacebook
 
   app.get '/auth/linkedin', @ctrls.auth.linkedin passport
 
   app.get '/auth/linkedin/callback', @ctrls.auth.linkedinCb(passport), @ctrls.auth.logIn
 
-  app.get '/connect/linkedin', @ctrls.auth.connectLinkedin
+  app.get '/connect/linkedin', @ctrls.mid.isAuth, @ctrls.auth.connectLinkedin
 
   app.get '/connect/linkedin/callback', @ctrls.auth.connectLinkedinCb
 
-  app.get '/connect/dropbox', @ctrls.auth.connectDropbox
+  app.get '/connect/dropbox', @ctrls.mid.isAuth, @ctrls.auth.connectDropbox
 
   app.get '/connect/dropbox/callback', @ctrls.auth.connectDropboxCb
 
-  app.get '/connect/yahoo', @ctrls.auth.connectYahoo
+  app.get '/connect/yahoo', @ctrls.mid.isAuth, @ctrls.auth.connectYahoo
 
   app.get '/connect/yahoo/callback', @ctrls.auth.connectYahooCb
 

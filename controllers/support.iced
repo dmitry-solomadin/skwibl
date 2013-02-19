@@ -21,6 +21,3 @@ exports.checkMail = (req, res) =>
   res.render 'index',
     template: '/users/check_mail'
     message: req.flash 'message'
-
-exports.tour = (req, res) =>
-  res.send 'tour'

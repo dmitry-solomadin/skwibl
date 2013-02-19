@@ -7,3 +7,5 @@ exports.configure = (app) ->
   app.get '/team', @ctrls.public.team
 
   app.get '/tour', @ctrls.public.tour
+
+#   app.get '/tour/:chapter?', @ctrls.public.tourChapter

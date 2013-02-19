@@ -9,3 +9,6 @@ exports.team = (req, res, next) =>
 
 exports.tour = (req, res, next) =>
   return res.render 'index', template: 'public/tour'
+
+exports.tourCapter = (req, res) =>
+  res.send 'tour'
