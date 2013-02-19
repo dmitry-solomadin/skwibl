@@ -1477,4 +1477,12 @@ span.label-9, span.labelstyle-ffcc00, ffcc00.selected {
     overflow: hidden;
 }
 
+.skwibl-carousel-l {
+    cursor: pointer;
+}
+
+.skwibl-carousel-r {
+    cursor: pointer;
+}
+
 /* SKWIBL CAROUSEL END */

@@ -1,8 +1,11 @@
 $ ->
   class App.SkwiblCarousel
 
+    defaults:
+      adjustPaddings: false
+
     constructor: (settings) ->
-      @settings = settings
+      @settings = $.extend(@defaults, settings)
       @carousel = $(@settings.selector)
       @carouselParent = @carousel.parent()
       @initialize()
@@ -19,8 +22,8 @@ $ ->
       @carousel.wrap @carouselWrap
       @carouselWrap = @carousel.parent()
 
-      @carouselLeft = $("<div class='skwibl-carousel-l'></div>")
-      @carouselRight = $("<div class='skwibl-carousel-r'></div>")
+      @carouselLeft = $("<div class='skwibl-carousel-l noselect'></div>")
+      @carouselRight = $("<div class='skwibl-carousel-r noselect'></div>")
       @carouselLeft.addClass(@settings.leftArrowClass) if @settings.leftArrowClass
       @carouselRight.addClass(@settings.rightArrowClass) if @settings.rightArrowClass
       @carouselParent.prepend(@carouselLeft)
@@ -29,8 +32,7 @@ $ ->
       @lArrWidth = @carouselLeft.outerWidth(true)
       @rArrWidth = @carouselRight.outerWidth(true)
 
-      @toggleArrows()
-      @carouselWrap.width @availableWidth()
+      @update()
 
       fastForward = (invisible, forward) =>
         # todo queue up the animations
@@ -47,7 +49,8 @@ $ ->
         currentLength = parseInt(@carousel.css("left"))
         amount = if forward then -20 else 20
         length = currentLength + amount
-        @carousel.animate {left: length}, "fast", => @carousel.animate {left: currentLength}
+        @carousel.animate {left: length}, "fast", =>
+          @carousel.animate {left: currentLength}
 
       @carouselLeft.on "click", =>
         firstVisibleIndex = @firstVisible().index()
@@ -66,21 +69,49 @@ $ ->
           invisible = @carousel.children()[lastVisibleIndex + 1..lastVisibleIndex + 2]
           fastForward(invisible, true)
 
-    goToItem: (number, center) ->
+    goToItem: (number, onFinish) ->
       availableWidth = @availableWidth()
       for i in [number..0]
         availableWidth -= $(@carousel.children()[i]).outerWidth(true)
         break if availableWidth < 0
         prevChild = $(@carousel.children()[i])
       if not prevChild[0] then alert("something wierd happened!")
-      @carousel.animate({left: -prevChild.position().left}, "fast")
+      @carousel.animate {left: -prevChild.position().left}, "fast", ->
+        onFinish() if onFinish
 
     update: ->
-      @toggleArrows()
-      @carouselWrap.width @availableWidth()
-      @carousel.css("left", 0) if not @areArrowsVisible()
-      if @areArrowsVisible() and @visibleChildrenWidth() < @availableWidth()
-        @goToItem(@carousel.children().length - 1)
+      updateInternal = =>
+        @adjustDefaultPaddings() if @settings.adjustPaddings
+        @toggleArrows()
+        @adjustPaddings() if @settings.adjustPaddings
+        @carouselWrap.width @availableWidth()
+        @carousel.css("left", 0) if not @areArrowsVisible()
+
+      # this will be true if updated after user removed last item in carousel we then need shift items to the right
+      moreSpaceAvailable = @areArrowsVisible() and @visibleChildrenWidth() < @availableWidth()
+      if moreSpaceAvailable
+        lastItemIndex = @carousel.children().length - 1
+        @goToItem lastItemIndex, updateInternal
+      else
+        updateInternal()
+
+    adjustDefaultPaddings: ->
+      for child in @carousel.children() when $(child).data("initial-margin")
+        marginRight = parseFloat $(child).data("initial-margin")
+        $(child).css "margin-right", marginRight
+
+    adjustPaddings: ->
+      return unless @areArrowsVisible()
+      adjustWidth = @fullWidth() - @visibleChildrenWidth()
+      paddingAdjust = Math.floor(adjustWidth / @visibleItemsCount())
+      for child in @carousel.children()
+        if $(child).data("initial-margin")
+          marginRight = parseFloat($(child).data("initial-margin"))
+        else
+          marginRight = parseFloat($(child).css("margin-right"))
+          $(child).data("initial-margin", marginRight)
+
+        $(child).css("margin-right", marginRight + paddingAdjust)
 
     toggleArrows: ->
       arrs = @carouselParent.find(".skwibl-carousel-l, .skwibl-carousel-r")
@@ -95,15 +126,18 @@ $ ->
       @carouselParent.find(".skwibl-carousel-l:visible, .skwibl-carousel-r:visible").length is 2
 
     availableWidth: ->
-      arrowsWidth = if @areArrowsVisible() then @lArrWidth + @rArrWidth else 0
+      fullWidth = @fullWidth()
       availableWidth = 0
-      fullWidth = @carouselParent.width() - arrowsWidth
       for child in @carousel.children()
         tempAvailableWidth = availableWidth
         tempAvailableWidth += $(child).outerWidth(true)
         break if tempAvailableWidth > fullWidth
         availableWidth = tempAvailableWidth
       availableWidth
+
+    fullWidth: ->
+      arrowsWidth = if @areArrowsVisible() then @lArrWidth + @rArrWidth else 0
+      @carouselParent.width() - arrowsWidth
 
     childrenWidth: ->
       childrenWidth = 0
@@ -116,6 +150,9 @@ $ ->
       for child in @carousel.children()[@firstVisible().index()..@lastVisible().index()]
         childrenWidth += $(child).outerWidth(true)
       childrenWidth
+
+    visibleItemsCount: ->
+      @lastVisible().index() - @firstVisible().index()
 
     firstVisible: ->
       left = Math.abs(parseInt(@carousel.css("left")))

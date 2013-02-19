@@ -130,6 +130,7 @@ $ ->
       new App.SkwiblCarousel
         selector: '#canvasSelectDiv'
         height: 75
+        adjustPaddings: true
         leftArrowClass: "gallery_l"
         rightArrowClass: "gallery_r"
 
@@ -216,11 +217,13 @@ $ ->
 
     destroy: (cid, emit) ->
       if @getThumbs().length > 1
-        @findThumbByCanvasId(cid).parent().remove()
-        $('#canvasSelectDiv')[0].carousel.update()
-        @findMiniThumbByCanvasId(cid).remove()
-        room.savedOpts.splice room.savedOpts.indexOf(@findOptsById(cid)), 1
-        @selectThumb $("#canvasSelectDiv div:first .clink")
+        canvasToRemove = @findThumbByCanvasId(cid).parent()
+        canvasToRemove.animate {width: 0, opacity:0}, "slow", =>
+          canvasToRemove.remove()
+          $('#canvasSelectDiv')[0].carousel.update()
+          @findMiniThumbByCanvasId(cid).remove()
+          room.savedOpts.splice room.savedOpts.indexOf(@findOptsById(cid)), 1
+          @selectThumb $("#canvasSelectDiv div:first .clink")
       else
         @erase()
         room.savedOpts = []
