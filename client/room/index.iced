@@ -18,6 +18,7 @@ $ ->
       @initOpts(canvasId)
       @sharedOpts.scale = 1
 
+      @initMenuCarousel()
       $(".toolTypeChanger").on "click", ->
         sharedOpts.tooltype = $(@).data("tooltype")
 
@@ -72,6 +73,14 @@ $ ->
       canvas.onmousedown = -> return false
 
       false
+
+    initMenuCarousel: ->
+      new App.SkwiblCarousel
+        selector: '.instruments'
+        height: 55
+        itemPartialVisibility: true
+        leftArrowClass: "ins_slider_l"
+        rightArrowClass: "ins_slider_r"
 
     initDropbox: ->
       $("#dropboxChoose").on "click", ->

@@ -35,167 +35,175 @@
   </ul>
 </div>
 
-<ul class="instruments">
-  <li>
-    <a href="#" class="tooltipize toolTypeChanger selectable" title="Move canvas"
-       data-delay="1000" data-placement="bottom" data-tooltype="pan">
-      <img src="/images/room/new/instrument/pan.png" alt="Move">
-    </a>
-  </li>
-  <li>
-    <a href="#" class="tooltipize toolTypeChanger selectable" title="Select"
-       data-delay="1000" data-placement="bottom" data-tooltype="select">
-      <img src="/images/room/new/instrument/select.png" alt="Select">
-    </a>
-  </li>
-  <li>
-    <a href="#" class="tooltipize toolTypeChanger selectable" title="Note" onclick="App.room.helper.notifyComment()"
-       data-delay="1000" data-placement="bottom" data-tooltype="comment">
-      <img src="/images/room/new/instrument/comment.png" alt="Note">
-    </a>
-  </li>
-  <li>
-    <a href="#" class="tooltipize toolTypeChanger selectable" title="Highlighter"
-       data-delay="1000" data-placement="bottom" data-tooltype="highlighter">
-      <img src="/images/room/new/instrument/highlighter.png" alt="Highlighter">
-    </a>
-  </li>
-  <li class="selected">
-    <a href="#" class="tooltipize toolTypeChanger selectable" title="Pencil"
-       data-delay="1000" data-placement="bottom" data-tooltype="line">
-      <img src="/images/room/new/instrument/pencil.png" alt="Pencil">
-    </a>
-  </li>
-  <li class="dropdown">
-    <a href="#" id="additionalInsDropdown" class="tooltipize toolTypeChanger selectable" title="Arrow"
-       data-delay="1000" data-placement="bottom" data-tooltype="arrow">
-      <img src="/images/room/new/instrument/arrow.png" alt="Arrow">
-    </a>
-    <button class="btn dropdown-toggle" data-toggle="dropdown">
-      <span class="caret"></span>
-    </button>
-    <ul id="additionalInsSelect">
+<div class="header_right">
+  <div class="instruments_wrap">
+    <ul class="instruments">
       <li>
-        <a href="#" class="tooltipize toolTypeChanger" title="Arrow"
+        <a href="#" class="tooltipize toolTypeChanger selectable" title="Move canvas"
+           data-delay="1000" data-placement="bottom" data-tooltype="pan">
+          <img src="/images/room/new/instrument/pan.png" alt="Move">
+        </a>
+      </li>
+      <li>
+        <a href="#" class="tooltipize toolTypeChanger selectable" title="Select"
+           data-delay="1000" data-placement="bottom" data-tooltype="select">
+          <img src="/images/room/new/instrument/select.png" alt="Select">
+        </a>
+      </li>
+      <li>
+        <a href="#" class="tooltipize toolTypeChanger selectable" title="Note" onclick="App.room.helper.notifyComment()"
+           data-delay="1000" data-placement="bottom" data-tooltype="comment">
+          <img src="/images/room/new/instrument/comment.png" alt="Note">
+        </a>
+      </li>
+      <li>
+        <a href="#" class="tooltipize toolTypeChanger selectable" title="Highlighter"
+           data-delay="1000" data-placement="bottom" data-tooltype="highlighter">
+          <img src="/images/room/new/instrument/highlighter.png" alt="Highlighter">
+        </a>
+      </li>
+      <li class="selected">
+        <a href="#" class="tooltipize toolTypeChanger selectable" title="Pencil"
+           data-delay="1000" data-placement="bottom" data-tooltype="line">
+          <img src="/images/room/new/instrument/pencil.png" alt="Pencil">
+        </a>
+      </li>
+      <li class="dropdown">
+        <a href="#" id="additionalInsDropdown" class="tooltipize toolTypeChanger selectable" title="Arrow"
            data-delay="1000" data-placement="bottom" data-tooltype="arrow">
           <img src="/images/room/new/instrument/arrow.png" alt="Arrow">
         </a>
+        <button class="btn dropdown-toggle" data-toggle="dropdown">
+          <span class="caret"></span>
+        </button>
+        <ul id="additionalInsSelect">
+          <li>
+            <a href="#" class="tooltipize toolTypeChanger" title="Arrow"
+               data-delay="1000" data-placement="bottom" data-tooltype="arrow">
+              <img src="/images/room/new/instrument/arrow.png" alt="Arrow">
+            </a>
+          </li>
+          <li>
+            <a href="#" class="tooltipize toolTypeChanger" title="Rectangle"
+               data-delay="1000" data-placement="bottom" data-tooltype="rectangle">
+              <img src="/images/room/new/instrument/rect.png" alt="Rectangle">
+            </a>
+          </li>
+          <li>
+            <a href="#" class="tooltipize toolTypeChanger" title="Circle"
+               data-delay="1000" data-placement="bottom" data-tooltype="circle">
+              <img src="/images/room/new/instrument/circle.png" alt="Circle">
+            </a>
+          </li>
+          <li>
+            <a href="#" class="tooltipize toolTypeChanger" title="Line"
+               data-delay="1000" data-placement="bottom" data-tooltype="straightline">
+              <img src="/images/room/new/instrument/line.png" alt="Line">
+            </a>
+          </li>
+        </ul>
       </li>
-      <li>
-        <a href="#" class="tooltipize toolTypeChanger" title="Rectangle"
-           data-delay="1000" data-placement="bottom" data-tooltype="rectangle">
-          <img src="/images/room/new/instrument/rect.png" alt="Rectangle">
+      <li class="dropdown">
+        <a href="#" class="tooltipize" role="button" data-toggle="dropdown" title="Select color"
+           data-delay="1000" data-placement="bottom">
+          <div class="instrument_color colorSelected" style="background-color:red;" data-color="red"></div>
         </a>
+        <button class="btn dropdown-toggle" data-toggle="dropdown">
+          <span class="caret"></span>
+        </button>
+        <ul id="colorSelect">
+          <li>
+            <a href="#" class="instrument_color_link">
+              <div class="instrument_color" style="background-color:black;" data-color="black"></div>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="instrument_color_link">
+              <div class="instrument_color" style="background-color:red;" data-color="red"></div>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="instrument_color_link">
+              <div class="instrument_color" style="background-color:orange;" data-color="orange"></div>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="instrument_color_link">
+              <div class="instrument_color" style="background-color:yellow;" data-color="yellow"></div>
+            </a>
+          </li>
+          <br>
+          <li>
+            <a href="#" class="instrument_color_link">
+              <div class="instrument_color" style="background-color:green;" data-color="green"></div>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="instrument_color_link">
+              <div class="instrument_color" style="background-color:#986536;" data-color="#986536"></div>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="instrument_color_link">
+              <div class="instrument_color" style="background-color:blue;" data-color="blue"></div>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="instrument_color_link">
+              <div class="instrument_color" style="background-color:#9aff99;" data-color="#9aff99"></div>
+            </a>
+          </li>
+          <br>
+        </ul>
       </li>
-      <li>
-        <a href="#" class="tooltipize toolTypeChanger" title="Circle"
-           data-delay="1000" data-placement="bottom" data-tooltype="circle">
-          <img src="/images/room/new/instrument/circle.png" alt="Circle">
+      <div id="scaleDiv" class="instrument_zoom dropdown">
+        <a href="#" class="plusSign tooltipize" title="Zoom In"
+           data-placement="bottom" data-delay="1000" href="#" onclick="App.room.canvas.addScale(); return false;">
+          <img src="/images/room/new/instrument/plus.png" alt="Zoom in" width="18">
         </a>
-      </li>
-      <li>
-        <a href="#" class="tooltipize toolTypeChanger" title="Line"
-           data-delay="1000" data-placement="bottom" data-tooltype="straightline">
-          <img src="/images/room/new/instrument/line.png" alt="Line">
+        <a href="#" id="scaleAmount" class="dropdown-toggle instrument_zoom_text" role="button"
+           data-toggle="dropdown">100%</a>
+        <a href="#" class="minusSign tooltipize" title="Zoom out"
+           data-placement="bottom" data-delay="1000" href="#" onclick="App.room.canvas.subtractScale(); return false;">
+          <img src="/images/room/new/instrument/minus.png" alt="Zoom out" width="18">
         </a>
-      </li>
-    </ul>
-  </li>
-  <li class="dropdown">
-    <a href="#" class="tooltipize" role="button" data-toggle="dropdown" title="Select color"
-       data-delay="1000" data-placement="bottom">
-      <div class="instrument_color colorSelected" style="background-color:red;" data-color="red"></div>
-    </a>
-    <button class="btn dropdown-toggle" data-toggle="dropdown">
-      <span class="caret"></span>
-    </button>
-    <ul id="colorSelect">
-      <li>
-        <a href="#" class="instrument_color_link">
-          <div class="instrument_color" style="background-color:black;" data-color="black"></div>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="instrument_color_link">
-          <div class="instrument_color" style="background-color:red;" data-color="red"></div>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="instrument_color_link">
-          <div class="instrument_color" style="background-color:orange;" data-color="orange"></div>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="instrument_color_link">
-          <div class="instrument_color" style="background-color:yellow;" data-color="yellow"></div>
-        </a>
-      </li>
-      <br>
-      <li>
-        <a href="#" class="instrument_color_link">
-          <div class="instrument_color" style="background-color:green;" data-color="green"></div>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="instrument_color_link">
-          <div class="instrument_color" style="background-color:#986536;" data-color="#986536"></div>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="instrument_color_link">
-          <div class="instrument_color" style="background-color:blue;" data-color="blue"></div>
-        </a>
-      </li>
-      <li>
-        <a href="#" class="instrument_color_link">
-          <div class="instrument_color" style="background-color:#9aff99;" data-color="#9aff99"></div>
-        </a>
-      </li>
-      <br>
-    </ul>
-  </li>
-  <div id="scaleDiv" class="instrument_zoom dropdown">
-    <a href="#" class="plusSign tooltipize" title="Zoom In"
-       data-placement="bottom" data-delay="1000" href="#" onclick="App.room.canvas.addScale(); return false;">
-      <img src="/images/room/new/instrument/plus.png" alt="Zoom in">
-    </a>
-    <a href="#" id="scaleAmount" class="dropdown-toggle instrument_zoom_text" role="button"
-       data-toggle="dropdown">100%</a>
-    <a href="#" class="minusSign tooltipize" title="Zoom out"
-       data-placement="bottom" data-delay="1000" href="#" onclick="App.room.canvas.subtractScale(); return false;">
-      <img src="/images/room/new/instrument/minus.png" alt="Zoom out">
-    </a>
 
-    <div class="instrument_zoom_drop">
-      <a href="#" data-scale="0.5">50%</a>
-      <a href="#" data-scale="0.75">75%</a>
-      <a href="#" data-scale="1">100%</a>
-      <a href="#" data-scale="1.25">125%</a>
-      <a href="#" data-scale="1.5">150%</a>
-      <a href="#" data-scale="2">200%</a>
-      <a href="#" data-scale="fitToImage">Fit to image</a>
-    </div>
+        <div class="instrument_zoom_drop">
+          <a href="#" data-scale="0.5">50%</a>
+          <a href="#" data-scale="0.75">75%</a>
+          <a href="#" data-scale="1">100%</a>
+          <a href="#" data-scale="1.25">125%</a>
+          <a href="#" data-scale="1.5">150%</a>
+          <a href="#" data-scale="2">200%</a>
+          <a href="#" data-scale="fitToImage">Fit to image</a>
+        </div>
+      </div>
+      <li class="instrument_history">
+        <a href="#" id="undoLink" class="disabled tooltipize" title="Undo"
+           data-placement="bottom" data-delay="1000" onclick="App.room.history.prev();return false;">
+          <img src="/images/room/new/instrument/undo.png" alt="Rotate Anticlockwise">
+        </a>
+        <a href="#" id="redoLink" class="disabled tooltipize" title="Redo"
+           data-placement="bottom" data-delay="1000" onclick="App.room.history.next();return false;">
+          <img src="/images/room/new/instrument/redo.png" alt="Rotate Clockwise">
+        </a>
+      </li>
+      <li>
+        <a id="toggleComments" href="#" class="tooltipize selectable" data-title="Hide all comments"
+           data-placement="bottom" data-delay="1000" onclick="App.room.comments.toggleComments(); return false;">
+          <strong style="font-size:10px;">Hide</strong>
+        </a>
+      </li>
+      <li>
+        <a href="#" class="tooltipize" title="Clear canvas"
+           data-placement="bottom" data-delay="1000" onclick="App.room.canvas.clear(true); return false;">
+          <img src="/images/room/new/instrument/clear.png" alt="Clear canvas">
+        </a>
+      </li>
+    </ul>
   </div>
-  <li class="instrument_history">
-    <a href="#" id="undoLink" class="disabled tooltipize" title="Undo"
-       data-placement="bottom" data-delay="1000" onclick="App.room.history.prev();return false;">
-      <img src="/images/room/new/instrument/undo.png" alt="Rotate Anticlockwise">
-    </a>
-    <a href="#" id="redoLink" class="disabled tooltipize" title="Redo"
-       data-placement="bottom" data-delay="1000" onclick="App.room.history.next();return false;">
-      <img src="/images/room/new/instrument/redo.png" alt="Rotate Clockwise">
-    </a>
-  </li>
-  <li>
-    <a id="toggleComments" href="#" class="tooltipize selectable" data-title="Hide all comments"
-       data-placement="bottom" data-delay="1000" onclick="App.room.comments.toggleComments(); return false;">
-      <strong style="font-size:10px;">Hide</strong>
-    </a>
-  </li>
-  <li>
-    <a href="#" class="tooltipize" title="Clear canvas"
-       data-placement="bottom" data-delay="1000" onclick="App.room.canvas.clear(true); return false;">
-      <img src="/images/room/new/instrument/clear.png" alt="Clear canvas">
-    </a>
-  </li>
-</ul>
+
+  <div style="overflow: hidden;height: 55px">
+    <%- include './header/user_dropdown.ect' %>
+  </div>
+</div>

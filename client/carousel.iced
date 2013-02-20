@@ -3,13 +3,14 @@ $ ->
 
     defaults:
       adjustPaddings: false
+      itemPartialVisibility: false
 
     constructor: (settings) ->
-      @settings = $.extend(@defaults, settings)
+      @settings = $.extend {}, @defaults, settings
       @carousel = $(@settings.selector)
       @carouselParent = @carousel.parent()
-      @initialize()
       @carousel[0].carousel = @
+      @initialize()
 
     initialize: ->
       @carousel.addClass("skwibl-carousel")
@@ -34,17 +35,24 @@ $ ->
 
       @update()
 
-      $(window).resize => @update()
+      $(window).resize =>
+        @update()
 
       fastForward = (invisible, forward) =>
         # todo queue up the animations
         return if @carousel.queue("fx").length > 0
+        console.log @startPartialVisible()
+        console.log @endPartialVisible()
+
         length = 0
         length += $(child).outerWidth(true) for child in invisible
+        if forward then length -= @endPartialVisible() else length -= @startPartialVisible()
         length = -length if forward
+
         currentLength = parseInt(@carousel.css("left"))
-        length = currentLength + length
-        @carousel.animate {left: length}, "fast"
+        resultingLength = currentLength + length
+        if not forward and resultingLength > 0 then resultingLength = 0
+        @carousel.animate {left: resultingLength}, "fast"
 
       fakeFastForward = (forward) =>
         return if @carousel.queue("fx").length > 0
@@ -68,7 +76,7 @@ $ ->
         if lastVisibleIndex is (@carousel.children().length - 1)
           fakeFastForward(true)
         else
-          invisible = @carousel.children()[lastVisibleIndex + 1..lastVisibleIndex + 2]
+          invisible = @carousel.children()[lastVisibleIndex+1..lastVisibleIndex + 2]
           fastForward(invisible, true)
 
     goToItem: (number, onFinish) ->
@@ -91,7 +99,9 @@ $ ->
 
       # this will be true if updated after user removed last item in carousel we then need shift items to the right
       moreSpaceAvailable = @areArrowsVisible() and @visibleChildrenWidth() < @availableWidth()
-      if moreSpaceAvailable
+      # todo implement itemCountDiminished currently deletion of list item in carousel won't work
+      itemCountDiminished = false
+      if moreSpaceAvailable and itemCountDiminished
         lastItemIndex = @carousel.children().length - 1
         @goToItem lastItemIndex, updateInternal
       else
@@ -128,6 +138,8 @@ $ ->
       @carouselParent.find(".skwibl-carousel-l:visible, .skwibl-carousel-r:visible").length is 2
 
     availableWidth: ->
+      return @fullWidth() if @settings.itemPartialVisibility
+
       fullWidth = @fullWidth()
       availableWidth = 0
       for child in @carousel.children()
@@ -157,20 +169,35 @@ $ ->
       @lastVisible().index() - @firstVisible().index()
 
     firstVisible: ->
-      left = Math.abs(parseInt(@carousel.css("left")))
+      leftEdge = @leftEdge()
+      return $(child) for child in @carousel.children() when $(child).position().left >= leftEdge
+
+    startPartialVisible: ->
+      leftEdge = @leftEdge()
       for child in @carousel.children()
-        left -= $(child).outerWidth(true)
-        return $(child) if left < 0
-      return null
+        childLeft = $(child).position().left
+        break if childLeft >= leftEdge
+        return (childLeft + $(child).width() - leftEdge) if childLeft < leftEdge and childLeft + $(child).width() > leftEdge
+      return 0
 
     lastVisible: ->
-      width = @availableWidth()
-      firstVisibleIndex = if @firstVisible() then @firstVisible().index() else 0
-      children = @carousel.children()
-      for child, i in children when i >= firstVisibleIndex
-        width -= $(child).outerWidth(true)
-        return prevChild if width < 0
-        prevChild = $(child)
-      $(children[children.length - 1])
+      rightEdge = @rightEdge()
+      for child in @carousel.children().get().reverse()
+        return $(child) if $(child).position().left + $(child).outerWidth(true) <= rightEdge
+
+    endPartialVisible: ->
+      rightEdge = @rightEdge()
+      for child in @carousel.children().get().reverse()
+        childLeft = $(child).position().left
+        break if childLeft + $(child).width() < rightEdge
+        return (rightEdge - childLeft) if childLeft < rightEdge and childLeft + $(child).outerWidth(true) > rightEdge
+      return 0
+
+    leftEdge: ->
+      Math.abs(parseInt(@carousel.css("left")))
+
+    rightEdge: ->
+      @leftEdge() + @availableWidth()
+
 
 

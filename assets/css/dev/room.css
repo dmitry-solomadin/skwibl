@@ -45,9 +45,55 @@ body.room {
 
 /* ROOM HEADER START */
 
+.navbar-fixed-top {
+    position: fixed !important;
+    margin-bottom: 0 !important;
+}
+
+.navbar-fixed-top .navbar-inner {
+    padding: 0 !important;
+}
+
+.header_right {
+    overflow: hidden;
+    height: 55px
+}
+
+.instruments_wrap {
+    position: relative;
+    float: left;
+    width: 75%;
+}
+
+@media screen and (max-width: 1260px) {
+    .instruments_wrap {
+        width: 88%;
+    }
+}
+
+.ins_slider_l {
+    position: absolute;
+    height: 40px;
+    top: 8px;
+    bottom: 0;
+    left: 0;
+    width: 30px;
+    background: url(/images/room/new/project_participants_slider_l.png) 50% no-repeat;
+}
+
+.ins_slider_r {
+    position: absolute;
+    height: 40px;
+    top: 8px;
+    bottom: 0;
+    right: 0;
+    width: 30px;
+    background: url(/images/room/new/project_participants_slider_r.png) 50% no-repeat;
+}
+
 .instruments {
     float: left;
-    margin: 0 0 0 25px;
+    margin: 0 0 0 5px;
     list-style: none;
     font-size: 0;
     padding: 8px 0 3px;
@@ -556,7 +602,7 @@ body.room {
 
 .canvasSelectDiv {
     height: 75px !important;
-    padding: 5px 1px;
+    padding: 5px 0;
 }
 
 .gallery_l {

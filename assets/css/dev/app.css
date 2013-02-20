@@ -56,7 +56,7 @@ html {
 }
 
 body {
-    min-width: 1000px;
+    width: 100%;
     font-family: Verdana, Geneva, sans-serif;
     height: 100%;
     padding-top: 55px;
@@ -579,6 +579,12 @@ input.input-big {
     line-height: 16px;
     height: 17px;
     padding-bottom: 11px;
+}
+
+@media screen and (max-width: 1260px) {
+    .userDropdown .username {
+        display: none !important;
+    }
 }
 
 .notification {
