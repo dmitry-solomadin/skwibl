@@ -76,46 +76,44 @@ $ ->
         if lastVisibleIndex is (@carousel.children().length - 1)
           fakeFastForward(true)
         else
-          invisible = @carousel.children()[lastVisibleIndex+1..lastVisibleIndex + 2]
+          invisible = @carousel.children()[lastVisibleIndex + 1..lastVisibleIndex + 2]
           fastForward(invisible, true)
 
-    goToItem: (number, onFinish) ->
-      availableWidth = @availableWidth()
-      for i in [number..0]
-        availableWidth -= $(@carousel.children()[i]).outerWidth(true)
-        break if availableWidth < 0
-        prevChild = $(@carousel.children()[i])
-      if not prevChild[0] then alert("something wierd happened!")
-      @carousel.animate {left: -prevChild.position().left}, "fast", ->
+    # align left edge of carousel to item
+    goToItem: (number, onFinish, animate = true) ->
+      # взять последний лефт алайнебельный айтем, если у текущего айтема left > чем у него, то алайнить к нему.
+      maxLeftAlign = @childrenWidth() - @availableWidth()
+      item = $(@carousel.children()[number])
+      left = item.position().left
+      if left > maxLeftAlign then left = maxLeftAlign
+      left =-left
+      if animate
+        @carousel.animate {left: left}, "fast", ->
+          onFinish() if onFinish
+      else
+        @carousel.css {left: left}
         onFinish() if onFinish
 
     update: ->
-      updateInternal = =>
-        @adjustDefaultPaddings() if @settings.adjustPaddings
-        @toggleArrows()
-        @adjustPaddings() if @settings.adjustPaddings
-        @carouselWrap.width @availableWidth()
-        @carousel.css("left", 0) if not @areArrowsVisible()
-
-      # this will be true if updated after user removed last item in carousel we then need shift items to the right
-      moreSpaceAvailable = @areArrowsVisible() and @visibleChildrenWidth() < @availableWidth()
-      # todo implement itemCountDiminished currently deletion of list item in carousel won't work
-      itemCountDiminished = false
-      if moreSpaceAvailable and itemCountDiminished
-        lastItemIndex = @carousel.children().length - 1
-        @goToItem lastItemIndex, updateInternal
-      else
-        updateInternal()
+      @adjustDefaultPaddings() if @settings.adjustPaddings
+      @toggleArrows()
+      @adjustPaddings() if @settings.adjustPaddings
+      @carouselWrap.width @availableWidth()
+      @carousel.css("left", 0) if not @areArrowsVisible()
 
     adjustDefaultPaddings: ->
+      firstVisible = @firstVisible().index()
       for child in @carousel.children() when $(child).data("initial-margin")
         marginRight = parseFloat $(child).data("initial-margin")
         $(child).css "margin-right", marginRight
+
+      @goToItem firstVisible, null, false
 
     adjustPaddings: ->
       return unless @areArrowsVisible()
       adjustWidth = @fullWidth() - @visibleChildrenWidth()
       paddingAdjust = Math.floor(adjustWidth / @visibleItemsCount())
+      firstVisible = @firstVisible().index()
       for child in @carousel.children()
         if $(child).data("initial-margin")
           marginRight = parseFloat($(child).data("initial-margin"))
@@ -124,6 +122,8 @@ $ ->
           $(child).data("initial-margin", marginRight)
 
         $(child).css("margin-right", marginRight + paddingAdjust)
+
+      @goToItem firstVisible, null, false
 
     toggleArrows: ->
       arrs = @carouselParent.find(".skwibl-carousel-l, .skwibl-carousel-r")
