@@ -20,6 +20,10 @@ $ ->
       $(document).bind 'keydown.shift_right', => room.items.translate(new Point(1, 0))
       $(document).bind 'keydown.shift_down', => room.items.translate(new Point(0, 1))
 
+    initMousewheel: ->
+      $('#mainCanvas').on 'mousewheel', (event, delta, deltaX, deltaY) ->
+        if delta > 0 then room.canvas.addScale(true) else room.canvas.subtractScale(true)
+
     initUploader: ->
       percents = {}
       firstFile = true

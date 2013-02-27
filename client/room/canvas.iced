@@ -267,12 +267,13 @@ $ ->
       return r
 
     setScale: (scale, skipUpdateAmount = false) ->
-      scale = 0.01 if scale <= 0.01
-      scale = 4 if scale >= 4
-
       # if first time scale
       scale = 1 if not scale and not opts.currentScale
       return unless scale
+
+      scale = 0.01 if scale <= 0.01
+      scale = 4 if scale >= 4
+
       firstTimeScale = opts.currentScale is null
       $("#scaleAmount").html "#{parseInt(scale * 100)}%" unless skipUpdateAmount
 
@@ -310,13 +311,13 @@ $ ->
       $.post '/projects/prepareDownload', {pid: $("#pid").val(), canvasData: dataURL}, (data, status, xhr) =>
         window.location = "/projects/download?pid=#{$("#pid").val()}&img=#{data}"
 
-    addScale: ->
+    addScale: (slow = false) ->
       opts.scaleChanged = true
-      @setScale(room.sharedOpts.scale + 0.1)
+      @setScale(room.sharedOpts.scale + if slow then 0.02 else 0.1)
 
-    subtractScale: ->
+    subtractScale: (slow = false)->
       opts.scaleChanged = true
-      @setScale(room.sharedOpts.scale - 0.1)
+      @setScale(room.sharedOpts.scale - if slow then 0.02 else 0.1)
 
     getViewportAdjustX: -> if App.chat.isVisible() then 300 else 0
 

@@ -64,6 +64,7 @@ $ ->
 
       @helper.initUploader()
       @helper.initHotkeys()
+      @helper.initMousewheel()
       @canvas.init()
       @comments.assignBringToFront()
 
