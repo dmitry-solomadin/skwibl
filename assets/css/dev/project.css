@@ -73,14 +73,13 @@
     border: 1px solid #70ad18;
     text-shadow: -1px -1px rgba(0, 0, 0, 0.38);
     box-shadow: 1px 1px rgba(255, 255, 255, 0.84), inset 0 0 0 1px rgba(255, 255, 190, 0.75);
-    background: #cbed9c;
+    background: #88c433;
     background: -moz-linear-gradient(top, #cbed9c 0%, #88c433 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #cbed9c), color-stop(100%, #88c433));
     background: -webkit-linear-gradient(top, #cbed9c 0%, #88c433 100%);
     background: -o-linear-gradient(top, #cbed9c 0%, #88c433 100%);
     background: -ms-linear-gradient(top, #cbed9c 0%, #88c433 100%);
     background: linear-gradient(to bottom, #cbed9c 0%, #88c433 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#cbed9c', endColorstr = '#88c433', GradientType = 0);
 }
 
 .project_r {

@@ -2,6 +2,8 @@ $ ->
   class Home
 
     constructor: ->
+      Placeholders.init()
+
       $(".tooltipize").tooltip()
 
       $("#forgotpasswordlink").click => @showForgotPassword()

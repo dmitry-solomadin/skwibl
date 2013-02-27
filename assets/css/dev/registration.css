@@ -37,6 +37,10 @@
     font-family: 'MyriadPro-Regular';
 }
 
+.ie .social_join .btn {
+    border-radius: 0 4px 4px 0  !important;
+}
+
 .gecko .social_join .btn {
     padding: 3px 20px 5px 20px;
 }
