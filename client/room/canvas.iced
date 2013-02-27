@@ -294,11 +294,14 @@ $ ->
       return r
 
     setScale: (scale, skipUpdateAmount = false) ->
+      scale = 0.01 if scale <= 0.01
+      scale = 4 if scale >= 4
+
       # if first time scale
       scale = 1 if not scale and not opts.currentScale
       return unless scale
       firstTimeScale = opts.currentScale is null
-      $("#scaleAmount").html "#{parseInt(scale * 100)}%" unless  skipUpdateAmount
+      $("#scaleAmount").html "#{parseInt(scale * 100)}%" unless skipUpdateAmount
 
       previousScale = opts.currentScale
       finalScale = scale / room.sharedOpts.scale
