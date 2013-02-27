@@ -10,8 +10,6 @@ $ ->
       @initThumbSort()
       @initCarousel()
 
-    #@initBackground()
-
     initElements: ->
       selectedCid = @getSelectedCanvasId()
       @forEachThumbInContext (cid) ->
@@ -96,35 +94,6 @@ $ ->
           cid = $(ui.item[0]).find(".clink").data("cid")
           pos = $(".canvasPreviewDiv").index(ui.item)
           room.socket.emit "canvasReorder", canvasId: cid, position: pos
-
-    initBackground: ->
-      wFreq = 25
-      wCount = Math.ceil($("#mainCanvas").width() / wFreq)
-      hFreq = 25
-      hCount = Math.ceil($("#mainCanvas").height() / hFreq)
-      each = 3
-
-      background = new Group()
-
-      createItem = (index, vertical) ->
-        path = new Path()
-        path.strokeColor = "#c7c7c7"
-        path.opacity = if index % each is 0 then "0.26" else "0.12"
-        path.strokeWidth = "1"
-        if vertical
-          startX = wFreq * index
-          path.add new Point(startX, 0)
-          path.add new Point(startX, $("#mainCanvas").height())
-        else
-          startY = hFreq * index
-          path.add new Point(0, startY)
-          path.add new Point($("#mainCanvas").width(), startY)
-        background.addChild(path)
-
-      createItem index, true for index in [1..wCount]
-      createItem index, false for index in [1..hCount]
-
-      paper.project.activeLayer.insertChild(0, background)
 
     initCarousel: ->
       new App.SkwiblCarousel

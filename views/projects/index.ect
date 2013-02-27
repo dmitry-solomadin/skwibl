@@ -14,7 +14,7 @@
             <% break if index > 2 %>
             <% continue unless canvas.file %>
             <% size = if index is 0 then "lsmall" else "rsmall"%>
-            <a href="#"><img src="/files/<%= project.id %>/<%= canvas.file.id %>?size=<%= size %>" alt="test"></a>
+            <a href="/projects/<%= project.id %>#cid=<%= canvas.id %>"><img src="/files/<%= project.id %>/<%= canvas.file.id %>?size=<%= size %>" alt="test"></a>
             <% index++ %>
           <% end %>
           <% if index is 0 : %>
