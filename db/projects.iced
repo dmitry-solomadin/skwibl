@@ -18,8 +18,8 @@ exports.getData = (pid, fn) =>
         project.users = users
         return @db.projects.getUnconfirmedUsers pid, (err, unconfirmedUsers) =>
           project.unconfirmedUsers = unconfirmedUsers
-          return @db.projects.getFiles pid, (err, files) =>
-            project.files = files
+          return @db.canvases.index pid, (err, canvases) =>
+            project.canvases = canvases
             return @db.texts.getProjectTodos pid, 3, (err, todos) =>
               project.todos = todos
               return @db.texts.getProjectTodosCount pid, (err, todos) =>

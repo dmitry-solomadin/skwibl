@@ -9,19 +9,18 @@
     <div class="project_body" id="project<%= project.id %>">
       <div class="project clearfix">
         <div class="project_pics">
-          <% if project.files.length : %>
-            <% for file, index in project.files : %>
-              <% break if index > 2 %>
-              <% size = if index is 0 then "lsmall" else "rsmall"%>
-              <a href="#"><img src="/files/<%= project.id %>/<%= file.id %>?size=<%= size %>" alt="test"></a>
-            <% end %>
-          <% else : %>
+          <% index = 0 %>
+          <% for canvas in project.canvases : %>
+            <% break if index > 2 %>
+            <% continue unless canvas.file %>
+            <% size = if index is 0 then "lsmall" else "rsmall"%>
+            <a href="#"><img src="/files/<%= project.id %>/<%= canvas.file.id %>?size=<%= size %>" alt="test"></a>
+            <% index++ %>
+          <% end %>
+          <% if index is 0 : %>
             <div class="no_images">No images</div>
           <% end %>
-          <!--
-            PROJECT UNREAD ACTIVITIES
-            <div class="project_notice">0</div>
-          -->
+          <div class="project_notice"><%= project.canvases.length %></div>
         </div>
         <div class="project_r">
           <h2 class="project_name"><a href="/projects/<%= project.id %>"><%= project.name %></a></h2>
