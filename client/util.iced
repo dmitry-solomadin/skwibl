@@ -40,22 +40,30 @@ $ ->
   $.fn.drags = (opt) ->
     opt = $.extend({cursor:"move"}, opt)
 
-    $(document).on "mousemove", (e) =>
+    $(document).on "mousemove touchmove", (e) =>
       return unless @hasClass "draggable"
 
-      unless @data("pdx")
-        @data("pdx", e.clientX)
-        @data("pdy", e.clientY)
+      if e.type is "touchmove"
+        touches = event.changedTouches
+        first = touches[0]
+        point = {x: first.clientX, y:first.clientY}
       else
-        dx = e.clientX - parseInt(@data("pdx"))
-        dy = e.clientY - parseInt(@data("pdy"))
+        point = {x: e.clientX, y:e.clientY}
 
-        @data("pdx", e.clientX)
-        @data("pdy", e.clientY)
+      unless @data("pdx")
+        @data("pdx", point.x)
+        @data("pdy", point.y)
+      else
+        dx = point.x - parseInt(@data("pdx"))
+        dy = point.y - parseInt(@data("pdy"))
+
+        @data("pdx", point.x)
+        @data("pdy", point.y)
 
         opt.onDrag(dx, dy)
 
-    $(document).on "mouseup", (e) =>
+    $(document).on "mouseup touchend", (e) =>
+      console.log "touchend"
       return unless @hasClass "draggable"
 
       draggedObject = $('.draggable')
@@ -64,7 +72,8 @@ $ ->
 
       draggedObject.removeClass('draggable')
 
-    @css('cursor', opt.cursor).on "mousedown", (e) =>
+    @css('cursor', opt.cursor).on "mousedown touchstart", (e) =>
+      console.log "touchstart"
       @addClass('draggable')
       @data("pdx", "")
       @data("pdy", "")
