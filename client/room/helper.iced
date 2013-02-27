@@ -32,6 +32,7 @@ $ ->
         done: (e, data) ->
           results.push data.result[0]
           if results.length is data.originalFiles.length
+            #TODO make this function the class instance
             showButtons = ->
               $("#canvasInitButtons").show()
               $("#loadingProgressWrap").hide()

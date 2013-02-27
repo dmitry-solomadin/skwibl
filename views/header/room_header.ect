@@ -35,8 +35,8 @@
   </ul>
 </div>
 
-<div class="header_right">
-  <div class="instruments_wrap">
+<!--<div class="header_right">
+  <div class="instruments_wrap">-->
     <ul class="instruments">
       <li>
         <a href="#" class="tooltipize toolTypeChanger selectable" title="Move canvas"
@@ -189,21 +189,21 @@
         </a>
       </li>
       <li>
-        <a id="toggleComments" href="#" class="tooltipize selectable" data-title="Hide all comments"
+        <a id="toggleComments" href="#" class="tooltipize selectable" data-title="Hide all comments" data-tooltype="hideshow"
            data-placement="bottom" data-delay="1000" onclick="App.room.comments.toggleComments(); return false;">
           <strong style="font-size:10px;">Hide</strong>
         </a>
       </li>
       <li>
-        <a href="#" class="tooltipize" title="Clear canvas"
+        <a href="#" class="tooltipize" title="Clear canvas" data-tooltype="clear"
            data-placement="bottom" data-delay="1000" onclick="App.room.canvas.onClearClick(); return false;">
           <img src="/images/room/new/instrument/clear.png" alt="Clear canvas">
         </a>
       </li>
     </ul>
-  </div>
+<!--   </div> -->
 
   <div style="overflow: hidden;height: 55px">
     <%- include './header/user_dropdown.ect' %>
   </div>
-</div>
+<!-- </div> -->

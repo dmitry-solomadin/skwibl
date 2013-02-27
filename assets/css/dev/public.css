@@ -25,7 +25,7 @@
 
 .team_pics h4 {
     margin-top: 5px;
-    font-size: 18px;
+    font-size: 20px;
 }
 
 .team_pics div {
@@ -34,12 +34,12 @@
 
 .team_pics div img {
     border-radius: 50%;
-    width: 150px;
-    height: 150px;
+    width: 175px;
+    height: 175px;
 }
 
 .team_pics div {
-    margin-left: 20px;
+    margin-left: 46px;
 }
 
 .team_pics div:first-child {

@@ -18,7 +18,8 @@ $ ->
       @initOpts(canvasId)
       @sharedOpts.scale = 1
 
-      @initMenuCarousel()
+#       @initMenuCarousel()
+#       $(".instruments").toolbar()
       $(".toolTypeChanger").on "click", ->
         sharedOpts.tooltype = $(@).data("tooltype")
 
@@ -68,19 +69,19 @@ $ ->
       @comments.assignBringToFront()
 
       # disable canvas text selection for cursor change
-      canvas = $("#myCanvas")[0]
+      canvas = $("#mainCanvas")[0]
       canvas.onselectstart = -> return false
       canvas.onmousedown = -> return false
 
       false
 
-    initMenuCarousel: ->
-      new App.SkwiblCarousel
-        selector: '.instruments'
-        height: 55
-        itemPartialVisibility: true
-        leftArrowClass: "ins_slider_l"
-        rightArrowClass: "ins_slider_r"
+#     initMenuCarousel: ->
+#       new App.SkwiblCarousel
+#         selector: '.instruments'
+#         height: 55
+#         itemPartialVisibility: true
+#         leftArrowClass: "ins_slider_l"
+#         rightArrowClass: "ins_slider_r"
 
     initDropbox: ->
       $("#dropboxChoose").on "click", ->
@@ -320,7 +321,7 @@ $ ->
       return if $("#canvasInitDivWrapper:visible")[0]
 
       $("#canvasInitDivWrapper").show()
-      $("#myCanvas").hide()
+      $("#mainCanvas").hide()
       $("#commentsDiv").hide()
       $("#cancelInitLink").show() if showCancelLink
 
@@ -331,7 +332,7 @@ $ ->
       return unless $("#canvasInitDivWrapper:visible")[0]
 
       $("#canvasInitDivWrapper").hide()
-      $("#myCanvas").show()
+      $("#mainCanvas").show()
       $("#commentsDiv").show()
 
       App.chat.unfold()
@@ -366,14 +367,14 @@ $ ->
     window[key] = paper[key] if not /^(version|_id|load)/.test(key) and not window[key]?
 
   paper.setup($('#copyCanvas')[0]);
-  paper.setup($('#myCanvas')[0]);
+  paper.setup($('#mainCanvas')[0]);
 
   # initilazing events
   tool = new paper.Tool()
-  tool.onMouseDown = (event) -> App.room.onMouseDown($("#myCanvas"), event)
-  tool.onMouseDrag = (event) -> App.room.onMouseDrag($("#myCanvas"), event)
-  tool.onMouseUp = (event) -> App.room.onMouseUp($("#myCanvas"), event)
-  tool.onMouseMove = (event) -> App.room.onMouseMove($("#myCanvas"), event)
+  tool.onMouseDown = (event) -> App.room.onMouseDown($("#mainCanvas"), event)
+  tool.onMouseDrag = (event) -> App.room.onMouseDrag($("#mainCanvas"), event)
+  tool.onMouseUp = (event) -> App.room.onMouseUp($("#mainCanvas"), event)
+  tool.onMouseMove = (event) -> App.room.onMouseMove($("#mainCanvas"), event)
 
   window.room = App.room
   window.opts = App.room.opts
