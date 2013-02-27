@@ -99,9 +99,9 @@ $ ->
 
     initBackground: ->
       wFreq = 25
-      wCount = Math.ceil($("#myCanvas").width() / wFreq)
+      wCount = Math.ceil($("#mainCanvas").width() / wFreq)
       hFreq = 25
-      hCount = Math.ceil($("#myCanvas").height() / hFreq)
+      hCount = Math.ceil($("#mainCanvas").height() / hFreq)
       each = 3
 
       background = new Group()
@@ -114,11 +114,11 @@ $ ->
         if vertical
           startX = wFreq * index
           path.add new Point(startX, 0)
-          path.add new Point(startX, $("#myCanvas").height())
+          path.add new Point(startX, $("#mainCanvas").height())
         else
           startY = hFreq * index
           path.add new Point(0, startY)
-          path.add new Point($("#myCanvas").width(), startY)
+          path.add new Point($("#mainCanvas").width(), startY)
         background.addChild(path)
 
       createItem index, true for index in [1..wCount]
@@ -174,10 +174,12 @@ $ ->
       @changeCanvasBg()
 
     changeCanvasBg: ->
-      bg = if opts.image then "url(/images/room/new/site_bg.jpg)" else "none"
-      if bg isnt $("#myCanvas").data('background-image')
-        $("#myCanvas").css background: bg
-        $("#myCanvas").data('background-image', bg)
+      canvas = $("#mainCanvas")
+      if opts.image
+        unless canvas.hasClass "canvasWrapper"
+          canvas.addClass "canvasWrapper"
+      else if canvas.hasClass "canvasWrapper"
+        canvas.removeClass "canvasWrapper"
 
     initNameChanger: ->
       $("#canvasName").on "click", ->
@@ -345,8 +347,8 @@ $ ->
     getViewportAdjustY: -> $("#canvasFooter").height()
 
     getViewportSize: ->
-      w: $("#myCanvas").width() - @getViewportAdjustX()
-      h: $("#myCanvas").height() - @getViewportAdjustY()
+      w: $("#mainCanvas").width() - @getViewportAdjustX()
+      h: $("#mainCanvas").height() - @getViewportAdjustY()
 
     # CANVAS THUMBNAILS & IMAGE UPLOAD
 
@@ -378,6 +380,9 @@ $ ->
       $("#canvasFolder").attr("onclick", "App.room.canvas.foldPreviews(this); return false;")
 
     requestLinkScreenshot: ->
+      #TODO add function to helpers
+      $("#canvasInitButtons").hide()
+      $("#loadingProgressWrap").show()
       link = window.prompt '', 'Enter a link'
       http = 'http://'
       link = http + link if link.indexOf http
@@ -392,6 +397,9 @@ $ ->
           posX: data.element.posX
           posY: data.element.posY
         , true
+        #TODO change to function call
+        $("#canvasInitButtons").show()
+        $("#loadingProgressWrap").hide()
 
     requestAddEmpty: ->
       thumbs = @getThumbs()

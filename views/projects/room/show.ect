@@ -57,8 +57,7 @@
   </div>
 </div>
 
-<canvas id="myCanvas" resize="true"
-        style="<%= 'display:none' unless canvasInitialized %>;background: url('/images/room/new/site_bg.jpg');"></canvas>
+<canvas id="mainCanvas" resize="true" class="canvasWrapper" style="<%= 'display:none' unless canvasInitialized %>"></canvas>
 <div id="commentsDiv" style="<%= 'display:none' unless canvasInitialized %>"></div>
 <canvas id="copyCanvas" resize="true" style="display: none;"></canvas>
 <div id="canvasInitDivWrapper" class="canvasInitDivWrapper" style="<%= 'display:none' if canvasInitialized %>">
@@ -73,10 +72,11 @@
       <a href="#" id="dropboxChoose" class="btn font-normal">Dropbox</a><br>
       <a class="btn font-normal disabled tooltipize" data-placement="bottom" title="This feature is coming soon">Google
         Drive</a><br>
-      <a href="#" id="linkChoose" class="btn font-normal  disabled tooltipize" onclick="App.room.canvas.requestLinkScreenshot(); return false;">Link</a><br>
+      <div class="canvasInitHeader">take screenshot by a</div>
+      <a href="#" id="linkChoose" class="btn font-normal tooltipize" onclick="App.room.canvas.requestLinkScreenshot(); return false;">Link</a><br>
 
-      <div class="canvasInitHeader">or</div>
-      <a href="#" class="btn font-normal" onclick="App.room.canvas.requestAddEmpty(); return false;">Create empty
+      <div class="canvasInitHeader">or create</div>
+      <a href="#" class="btn font-normal" onclick="App.room.canvas.requestAddEmpty(); return false;">Empty
         canvas</a>
 
       <a id="cancelInitLink" class="cancelInit hide" href="#"
@@ -126,7 +126,7 @@
       <div class="gallery_bar_right">
         <a class="createNewCanvasLink" href="#" onclick="App.room.showSplashScreen()">
           <img src="/images/room/new/create_icon.png" alt="Create" width="19" height="20">
-          <span>Create</span></a>
+          <span>New canvas</span></a>
         <img src="<%= foldImg %>" alt="Hide" width="10" height="11"
              id="canvasFolder" onclick="<%= foldFunc %>" class="canvasFolder">
       </div>

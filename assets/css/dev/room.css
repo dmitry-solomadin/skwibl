@@ -56,10 +56,10 @@ body.room {
 
 .header_right {
     overflow: hidden;
-    height: 55px
+    height: 100px
 }
 
-.instruments_wrap {
+/*.instruments_wrap {
     position: relative;
     float: left;
     width: 75%;
@@ -69,7 +69,7 @@ body.room {
     .instruments_wrap {
         width: 88%;
     }
-}
+}*/
 
 .ins_slider_l {
     position: absolute;
@@ -383,6 +383,14 @@ body.room {
     font-size: 0;
 }
 
+.canvasWrapper {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  background: radial-gradient(ellipse at center center , rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 98%), url('/images/room/new/site_bg.jpg');
+}
+
 .canvasInitDivWrapper {
     font-family: 'MyriadPro-Regular';
     width: 100%;
@@ -390,11 +398,11 @@ body.room {
     padding: 50px 0 210px 0;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
-    background: url('/images/room/new/site_bg.jpg');
+    background: radial-gradient(ellipse at center center , rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 98%), url('/images/room/new/site_bg.jpg');
 }
 
 .canvasInitDiv {
-    height: 360px;
+    height: 385px;
     border-radius: 10px;
     box-shadow: black 0 0 15px;
     width: 400px;
