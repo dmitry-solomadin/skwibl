@@ -231,6 +231,10 @@ $ ->
 
       room.socket.emit "removeCanvas", canvasId: cid if emit
 
+    onClearClick: ->
+      if confirm "Are you sure? This will delete all canvas content."
+        @clear true
+
     #hides elements and emits canvas cleared event
     clear: (emit) ->
       items = []
