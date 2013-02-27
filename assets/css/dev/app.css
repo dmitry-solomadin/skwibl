@@ -66,6 +66,7 @@ body {
 }
 
 body.app {
+    background-attachment: fixed !important;
     background: url(/images/room/new/site_bg.jpg);
     background: -moz-radial-gradient(center, circle cover,  rgba(152, 157, 169, 0.7) 0%, rgba(255, 255, 255, 0) 98%), url(/images/room/new/site_bg.jpg); /* FF3.6+ */
     background: -webkit-radial-gradient(center, circle cover,  rgba(152, 157, 169, 1) 0%, rgba(255, 255, 255, 0) 98%), url(/images/room/new/site_bg.jpg); /* Chrome10+,Safari5.1+ */
