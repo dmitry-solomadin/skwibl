@@ -63,7 +63,6 @@ $ ->
         opt.onDrag(dx, dy)
 
     $(document).on "mouseup touchend", (e) =>
-      console.log "touchend"
       return unless @hasClass "draggable"
 
       draggedObject = $('.draggable')
@@ -73,7 +72,6 @@ $ ->
       draggedObject.removeClass('draggable')
 
     @css('cursor', opt.cursor).on "mousedown touchstart", (e) =>
-      console.log "touchstart"
       @addClass('draggable')
       @data("pdx", "")
       @data("pdy", "")

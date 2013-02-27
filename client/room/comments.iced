@@ -283,6 +283,7 @@ $ ->
         $(@).css("z-index", parseInt(maxZIndex) + 1)
 
     translate: (commentMin, delta) ->
+      commentMin[0].rect?.selectionRect?.translate(delta)
       unscaledD = room.applyReverseCurrentScale delta
       commentMin.css
         top: commentMin.position().top + unscaledD.y
