@@ -49,8 +49,6 @@ $ ->
 
           for text in texts
             room.comments.addCommentText createdComment, text
-            if text.todo
-              room.comments.addTodo $("#commentText#{text.elementId}")
 
     initThumbnails: ->
       selectedCid = @getSelectedCanvasId()

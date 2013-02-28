@@ -27,8 +27,8 @@
 
   <div id="chatFilters" class="btn-group chatFilters">
     <button data-tab="chat-tab" class="btn btn-large active">Chat</button>
-    <button data-tab="todo-tab" class="btn btn-large">Todo</button>
-    <button data-tab="changelog-tab" class="btn btn-large">Change Log</button>
+    <button data-tab="todo-tab" class="btn btn-large">Comments</button>
+    <button data-tab="changelog-tab" class="btn btn-large">Log</button>
   </div>
   <div class="chatInner">
     <div class="tab-content" id="chat-tab">
@@ -46,7 +46,20 @@
     </div>
     <div class="tab-content filter-box" id="todo-tab" style="display: none;">
       <div id="todo-tab-inner" class="filter-box-inner">
-        Mark comment as todo to add tasks
+        <div id="commentsSection">
+          <div class='commentsTabGeneric commentsTab selected' onclick='App.room.comments.viewComments(this);'>0 comments</div>
+          <div class='commentsTabGeneric openTab' onclick='App.room.comments.viewOpen(this);'>0 open</div>
+          <div class='commentsTabGeneric resolvedTab' onclick='App.room.comments.viewResolved(this);'>0 resolved</div>
+          <div class='commentsList list' style="display: block;">
+            <span class="noText">Nothing here yet, add some comments to see them here.</span>
+          </div>
+          <div class='openList list'>
+            <span class="noText">Nothing here yet, mark comments as todo to see them here.</span>
+          </div>
+          <div class='resolvedList list'>
+            <span class="noText">Nothing here yet, resolve todo to see them here.</span>
+          </div>
+        </div>
       </div>
     </div>
     <div class="tab-content filter-box" id="changelog-tab" style="display: none;">

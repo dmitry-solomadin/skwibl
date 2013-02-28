@@ -824,35 +824,69 @@ body.room {
     margin-bottom: 10px;
 }
 
-.openTab {
+.commentsTabGeneric {
     float: left;
-    padding: 9px 14px;
-    width: 105px;
-    font: bold 14px Sans-Serif;
+    padding: 7px 2px;
+    width: 84px;
+    font: 14px 'MyriadPro-Regular';
     text-align: center;
     color: white;
     cursor: pointer;
     border-radius: 2px;
+}
+
+.commentsTab {
+    padding: 6px 2px;
+    color: black;
+    background-color: whiteSmoke;
+    background-image: -ms-linear-gradient(top, white, #E6E6E6);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#E6E6E6));
+    background-image: -webkit-linear-gradient(top, white, #E6E6E6);
+    background-image: -o-linear-gradient(top, white, #E6E6E6);
+    background-image: linear-gradient(top, white, #E6E6E6);
+    background-image: -moz-linear-gradient(top, white, #E6E6E6);
+    background-repeat: repeat-x;
+    border: 1px solid #CCC;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    border-color: #E6E6E6 #E6E6E6 #BFBFBF;
+    border-bottom-color: #B3B3B3;
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)
+}
+
+.commentsTab.selected {
+    background-image: -ms-linear-gradient(top, #E6E6E6, white);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(white));
+    background-image: -webkit-linear-gradient(top, #E6E6E6, white);
+    background-image: -o-linear-gradient(top, #E6E6E6, white);
+    background-image: linear-gradient(top, #E6E6E6, white);
+    background-image: -moz-linear-gradient(top, #E6E6E6, white);
+}
+
+.openTab {
+    margin-left: 5px;
+    text-shadow: rgba(0, 0, 0, 0.5) 0px 1px 0px;
     background-color: #08C;
     background-image: -webkit-gradient(linear, left top, left bottom, from(#08C), to(#05C));
     background-image: -webkit-linear-gradient(top, #08C, #05C);
     background-image: -moz-linear-gradient(top, #08C, #05C);
     background-image: -ms-linear-gradient(top, #08C, #05C);
     background-image: -o-linear-gradient(top, #08C, #05C);
-    text-shadow: rgba(0, 0, 0, 0.5) 0px 1px 0px;
+}
+
+.openTab.selected {
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#05C), to(#08C));
+    background-image: -webkit-linear-gradient(top, #05C, #08C);
+    background-image: -moz-linear-gradient(top, #05C, #08C);
+    background-image: -ms-linear-gradient(top, #05C, #08C);
+    background-image: -o-linear-gradient(top, #05C, #08C);
 }
 
 .resolvedTab {
-    margin-left: 12px;
-    float: left;
-    padding: 9px 14px;
-    width: 105px;
-    text-align: center;
+    margin-left: 5px;
     color: #6a6340;
-    font: bold 14px Sans-Serif;
     text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;
-    border-radius: 2px;
-    cursor: pointer;
     background: #BFDC7A;
     background-image: -webkit-gradient(linear, left top, left bottom, from(#BFDC7A), to(#8EBF45));
     background-image: -webkit-linear-gradient(top, #BFDC7A, #8EBF45);
@@ -861,8 +895,23 @@ body.room {
     background-image: -o-linear-gradient(top, #BFDC7A, #8EBF45);
 }
 
+.resolvedTab.selected {
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#8EBF45), to(#BFDC7A));
+    background-image: -webkit-linear-gradient(top, #8EBF45, #BFDC7A);
+    background-image: -moz-linear-gradient(top, #8EBF45, #BFDC7A);
+    background-image: -ms-linear-gradient(top, #8EBF45, #BFDC7A);
+    background-image: -o-linear-gradient(top, #8EBF45, #BFDC7A);
+}
+
+.commentsList {
+    padding-top: 10px;
+    display: none;
+    clear: both;
+}
+
 .openList {
     padding-top: 10px;
+    display: none;
     clear: both;
 }
 

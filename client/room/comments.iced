@@ -90,6 +90,7 @@ $ ->
       $(commentMax).find(".edit-cancel").on "click", =>
         commentMax.find(".comment-reply").val("")
         $(commentMax).find(".edit-cancel").hide()
+        $(commentMax).find(".exp").show()
 
       commentMax[0].coords = ->
         left = $(this).position().left
@@ -459,6 +460,8 @@ $ ->
       for comment, index in commentContent.children()
         $(comment).hide() if commentsCount - index > 2
 
+      @addToCommentsSection $("#commentText#{elementId}")
+
       if emit
         room.socket.emit "commentText",
           elementId: elementId
@@ -486,6 +489,7 @@ $ ->
       # show the buttons
       comment.parent().parent().find(".comment-send").val("Save")
       comment.parent().parent().find(".comment-send-wrap").show()
+      comment.parent().parent().find(".exp").hide()
       comment.parent().parent().find(".edit-cancel").data("edited-comment-text-id", elementId).show()
 
       replyBox.val(commentText)
@@ -503,7 +507,7 @@ $ ->
       comment.slideUp "fast", =>
         $(comment).remove()
 
-        $("#todo-tab-inner").find("#commentText#{elementId}").remove()
+        $("#todo-tab-inner").find("#commentText#{elementId}cloned").remove()
         @recalcTasksCount()
 
         @initHideCommentsBlock commentContent if $(commentContent).parent().data("hidden") is "true"
@@ -515,7 +519,7 @@ $ ->
       comment.find(".markAsTodoLink").replaceWith("<a href='#' class='resolve-link'
         onclick='App.room.comments.resolveTodo(#{elementId}, true); return false;'>resolve</a>")
 
-      @addTodo $("#commentText#{elementId}")
+      @addToCommentsSection $("#commentText#{elementId}")
 
       room.socket.emit "markAsTodo", elementId if emit
 
@@ -526,7 +530,7 @@ $ ->
       comment.find(".resolve-link").replaceWith("<a href='#' class='resolve-link'
         onclick='App.room.comments.reopenTodo(#{elementId}, true); return false;'>reopen</a>")
 
-      @addTodo $("#commentText#{elementId}")
+      @addToCommentsSection $("#commentText#{elementId}")
 
       room.socket.emit "resolveTodo", elementId if emit
 
@@ -537,18 +541,14 @@ $ ->
       comment.find(".resolve-link").replaceWith("<a href='#' class='resolve-link'
        onclick='App.room.comments.resolveTodo(#{elementId}, true); return false;'>resolve</a>")
 
-      @addTodo $("#commentText#{elementId}")
+      @addToCommentsSection $("#commentText#{elementId}")
 
       room.socket.emit "reopenTodo", elementId if emit
 
-    addTodo: (commentText) ->
-      if $("#todo-tab-inner").children().length is 0
-        # if it's the first comment added let's prepare todolist structure
-        $("#todo-tab-inner").html("")
-        $("#todo-tab-inner").append(
-          "<div class='openTab' onclick='App.room.comments.viewOpen()'>0 open</div>
-           <div class='resolvedTab' onclick='App.room.comments.viewResolved()'>0 resolved</div>")
-        $("#todo-tab-inner").append("<div class='openList'></div><div class='resolvedList'></div>")
+    addToCommentsSection: (commentText) ->
+      unless $("#commentsSection").data("initialized")
+        $("#noCommentsSection").hide()
+        $("#commentsSection").data("initialized", "true")
 
       commentText = commentText.clone()
       commentText[0].id = commentText[0].id + "cloned"
@@ -559,24 +559,40 @@ $ ->
 
       $("#todo-tab-inner").find("#" + commentText[0].id).remove()
       if commentText.hasClass("resolved")
+        $("#todo-tab-inner").find(".resolvedList").find(".noText").hide()
         $("#todo-tab-inner").find(".resolvedList").append(commentText)
-      else
+      else if commentText.hasClass("todo")
+        $("#todo-tab-inner").find(".openList").find(".noText").hide()
         $("#todo-tab-inner").find(".openList").append(commentText)
-      commentText.show()
+      else
+        $("#todo-tab-inner").find(".commentsList").find(".noText").hide()
+        $("#todo-tab-inner").find(".commentsList").append(commentText)
       #it may be hidden in the main view.
+      commentText.show()
 
       @recalcTasksCount()
 
     recalcTasksCount: ->
-      $(".resolvedTab").html($(".resolvedList").children().length + " resolved")
-      $(".openTab").html($(".openList").children().length + " open")
+      $(".commentsTab").html($(".commentsList").children(".comment-text").length + " comments")
+      $(".resolvedTab").html($(".resolvedList").children(".comment-text").length + " resolved")
+      $(".openTab").html($(".openList").children(".comment-text").length + " open")
 
-    viewResolved: ->
-      $(".openList").hide()
+    viewResolved: (button) ->
+      $("#commentsSection > .list").hide()
+      $(".commentsTabGeneric").removeClass("selected")
+      $(button).addClass("selected")
       $(".resolvedList").show()
 
-    viewOpen: ->
-      $(".resolvedList").hide()
+    viewComments: (button) ->
+      $("#commentsSection > .list").hide()
+      $(".commentsTabGeneric").removeClass("selected")
+      $(button).addClass("selected")
+      $(".commentsList").show()
+
+    viewOpen: (button) ->
+      $("#commentsSection > .list").hide()
+      $(".commentsTabGeneric").removeClass("selected")
+      $(button).addClass("selected")
       $(".openList").show()
 
     highlightComment: (commentTextId, twice) ->
