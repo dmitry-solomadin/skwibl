@@ -19,6 +19,13 @@ exports.regPage = (req, res) =>
   return res.render 'index', template:'users/new'
 
 #
+# GET
+# login page
+#
+exports.loginPage = (req, res) =>
+  return res.render 'index', template:'users/sign_in'
+
+#
 # POST
 # Local registration
 #

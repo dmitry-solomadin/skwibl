@@ -107,6 +107,10 @@ a.verify_code_reset {
 .join_btn .btn {
     font-size: 24px;
     font-family: 'MyriadPro-Semibold';
+    padding: 13px 30px 15px 30px;
+}
+
+.ie .join_btn .btn, .gecko .join_btn .btn {
     padding: 14px 30px;
 }
 

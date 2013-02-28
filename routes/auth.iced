@@ -6,6 +6,8 @@ exports.configure = (app) ->
 
   app.get '/registration', @ctrls.auth.regPage
 
+  app.get '/sign_in', @ctrls.auth.loginPage
+
   app.post '/register', @ctrls.auth.register
 
   app.post '/login', @ctrls.auth.local(passport)

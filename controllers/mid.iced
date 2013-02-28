@@ -4,7 +4,9 @@
 #
 exports.isAuth = (req, res, next) =>
   return next() if req.isAuthenticated()
-  return res.redirect '/' if req.method is 'GET'
+  if req.method is 'GET'
+    req.flash 'message', "This section requires login to view."
+    return res.redirect '/sign_in'
   return res.json
     success: no
     message: 'not authenticated'

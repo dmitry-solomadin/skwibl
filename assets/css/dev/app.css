@@ -80,6 +80,11 @@ b {
     font-weight: 600;
 }
 
+#main-content .alert {
+    margin-bottom: 0;
+    margin-top: 20px;
+}
+
 /* GENERAL END */
 
 /* COMMON STYLES START */
@@ -126,7 +131,7 @@ input.input-big {
 }
 
 .container {
-    width: 940px;
+    width: 960px;
     min-height: 100%;
 }
 
@@ -197,7 +202,15 @@ input.input-big {
 .btn.btn-primary {
     color: #fff;
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-    border-color: transparent;
+    border-color: #0A3C59;
+    background: #315BAD;
+    background: -webkit-gradient(linear, left top, left bottom, from(#71A0EE), to(#315BAD));
+    background: -webkit-linear-gradient(top, #71A0EE, #315BAD);
+    background: -moz-linear-gradient(top, #71A0EE, #315BAD);
+    background: -ms-linear-gradient(top, #71A0EE, #315BAD);
+    background: -o-linear-gradient(top, #71A0EE, #315BAD);
+    background-image: -ms-linear-gradient(top, #71A0EE 0%, #315BAD 100%);
+    box-shadow: rgba(255, 255, 255, 0.4) 0 1px 0, inset rgba(255, 255, 255, 0.4) 0 1px 0;
 }
 
 .btn.btn-danger {
@@ -216,7 +229,7 @@ input.input-big {
 }
 
 .btn {
-    filter:none;
+    filter: none;
 }
 
 .btn.btn-success {
@@ -344,6 +357,43 @@ input.input-big {
     visibility: hidden;
 }
 
+.singin_standalone {
+    position: relative;
+}
+
+.signin_wrapper {
+    float: left;
+    width: 960px;
+    position: relative;
+    left: 0;
+}
+
+.forgotpass_wrapper {
+    position: absolute;
+    width: 960px;
+    left: 960px;
+    top: 0;
+    display: none;
+}
+
+.forgotPasswordHeader {
+    font-size: 22px;
+    line-height: 28px;
+}
+
+.loginFields.standalone input {
+    margin-bottom: 10px !important;
+}
+
+.loginBottom {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.loginBottom label {
+    font-size: 16px;
+}
+
 .loginFields {
     margin-top: 5px;
 }
@@ -379,6 +429,11 @@ input.input-big {
 #loginError {
     height: 20px;
     margin-top: 5px;
+}
+
+#loginError.standalone {
+    font-size: 22px;
+    height: 24px;
 }
 
 .login_social_join {
@@ -433,6 +488,12 @@ input.input-big {
     background: #f6f1ed;
     font-size: 16px;
     padding: 5px 30px;
+}
+
+.login_or.standalone {
+    font-size: 22px;
+    top: -52px;
+    left: 240px;
 }
 
 /* LOGIN END */
