@@ -84,11 +84,11 @@ body.mainpage {
 
 .banner_radial_bg {
     height: 532px;
-    background: -moz-radial-gradient(center, circle cover,  rgba(152, 157, 169, 0.7) 0%, rgba(255, 255, 255, 0) 98%); /* FF3.6+ */
-    background: -webkit-radial-gradient(50% 35%, ellipse cover,  rgba(152, 157, 169, 0.90) 0%, rgba(152, 157, 169, 0) 80%); /* Chrome10+,Safari5.1+ */
-    background: -o-radial-gradient(center, circle cover, rgba(152, 157, 169, 0.7) 0%, rgba(255, 255, 255, 0) 98%); /* Opera 12+ */
-    background: -ms-radial-gradient(center, circle cover, rgba(152, 157, 169, 0.7) 0%, rgba(255, 255, 255, 0) 98%); /* IE10+ */
-    background: radial-gradient(circle at center, rgba(152, 157, 169, 0.7) 0%, rgba(255, 255, 255, 0) 98%); /* W3C */
+    background: -moz-radial-gradient(center, circle cover,  rgba(152, 157, 169, 0.9) 0%, rgba(152, 157, 169, 0) 98%); /* FF3.6+ */
+    background: -webkit-radial-gradient(50% 35%, ellipse cover,  rgba(152, 157, 169, 0.9) 0%, rgba(152, 157, 169, 0) 80%); /* Chrome10+,Safari5.1+ */
+    background: -o-radial-gradient(center, circle cover, rgba(152, 157, 169, 0.9) 0%, rgba(152, 157, 169, 0) 98%); /* Opera 12+ */
+    background: -ms-radial-gradient(center, circle cover, rgba(152, 157, 169, 0.9) 0%, rgba(152, 157, 169, 0) 98%); /* IE10+ */
+    background: radial-gradient(circle at center, rgba(152, 157, 169, 0.9) 0%, rgba(152, 157, 169, 0) 98%); /* W3C */
 }
 
 .ie .banner_radial_bg {
