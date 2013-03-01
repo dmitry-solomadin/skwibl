@@ -73,7 +73,11 @@ $ ->
       errors.html("")
       errors.removeClass("textError")
       if data is "OK"
-        window.location = "/"
+        redirectTo = $(loginForm).find("#redirectTo").val()
+        if $.trim(redirectTo).length
+          window.location = redirectTo
+        else
+          window.location = "/"
       else
         errors.addClass("textError")
         errors.html(data.message)

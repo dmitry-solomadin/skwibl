@@ -23,7 +23,7 @@ exports.regPage = (req, res) =>
 # login page
 #
 exports.loginPage = (req, res) =>
-  return res.render 'index', template:'users/sign_in'
+  return res.render 'index', template:'users/sign_in', redirectTo: req.query.r
 
 #
 # POST
@@ -357,12 +357,21 @@ exports.confirm = (req, res, next) =>
       return res.redirect '/'
     return @db.users.persist user, next
 
+exports.rememberRedirect = (req, res, next) =>
+  req.flash 'redirectTo', req.query.r if req.query.r and req.query.r.trim().length
+  next()
+
 #
 # GET
 # Redirect to main page
 #
 exports.logIn = (req, res) =>
-  res.redirect '/'
+  # flash returns value in array
+  redirectTo = req.flash 'redirectTo'
+  if redirectTo and redirectTo.length and redirectTo[0].trim().length
+    res.redirect redirectTo[0]
+  else
+    res.redirect '/'
 
 #
 # GET

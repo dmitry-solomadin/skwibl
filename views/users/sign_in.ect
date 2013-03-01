@@ -8,17 +8,18 @@
         <div class="join_div">
           <div>Sign in with your social account:</div>
           <ul class="social_join">
+            <% redirectString = if @redirectTo and @redirectTo.trim().length then "?r=#{@redirectTo}" else "" %>
             <li class="input-append">
               <img class="add-on" src="/images/registration/join_soc1.png" alt="Google+"><a
-                class="btn" href="/auth/google" title="Connect with Google+">Connect</a>
+                class="btn" href="/auth/google<%= redirectString %>" title="Connect with Google+">Connect</a>
             </li>
             <li class="input-append">
               <img class="add-on" src="/images/registration/join_soc2.png" alt="Facebook"><a
-                class="btn" href="/auth/facebook" title="Connect with Facebook">Connect</a>
+                class="btn" href="/auth/facebook<%= redirectString %>" title="Connect with Facebook">Connect</a>
             </li>
             <li class="input-append">
               <img class="add-on" src="/images/registration/join_soc3.png" alt="Linkedin"><a
-                class="btn" href="/auth/linkedin" title="Connect with Linkedin">Connect</a>
+                class="btn" href="/auth/linkedin<%= redirectString %>" title="Connect with Linkedin">Connect</a>
             </li>
           </ul>
           <hr>
@@ -28,6 +29,7 @@
         </div>
 
         <form id="loginForm" action="/login" method="post" class="form-horizontal loginForm" data-remote="true">
+          <input id="redirectTo" type="hidden" name="redirectTo" value="<%= @redirectTo %>">
           <div id="loginError" class="standalone"></div>
 
           <div class="loginFields standalone">
