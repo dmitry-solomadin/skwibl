@@ -22,7 +22,7 @@ exports.configure = (app) ->
 
   app.get '/connect/google/callback', @ctrls.auth.connectGoogleCb
 
-  app.get '/auth/facebook', @ctrls.auth.rememberRedirect, @ctrls.auth.facebook passport, @ctrls.aux.empty
+  app.get '/auth/facebook', @ctrls.auth.rememberRedirect, @ctrls.auth.facebook(passport), @ctrls.aux.empty
 
   app.get '/auth/facebook/callback', @ctrls.auth.facebookCb(passport), @ctrls.auth.logIn
 
@@ -32,7 +32,7 @@ exports.configure = (app) ->
 
   app.get '/friends/facebook', @ctrls.mid.isAuth, @ctrls.auth.friendsFacebook
 
-  app.get '/auth/linkedin', @ctrls.auth.rememberRedirect, @ctrls.auth.linkedin passport
+  app.get '/auth/linkedin', @ctrls.auth.rememberRedirect, @ctrls.auth.linkedin(passport)
 
   app.get '/auth/linkedin/callback', @ctrls.auth.linkedinCb(passport), @ctrls.auth.logIn
 
