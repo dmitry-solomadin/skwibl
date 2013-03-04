@@ -433,7 +433,11 @@ body.room {
     -moz-box-sizing: border-box;
     background: white;
     text-align: center;
-    position: relative;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -200px;
+    margin-left: -200px;
 }
 
 .canvasInitDiv .progressWrap {

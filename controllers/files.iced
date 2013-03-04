@@ -69,7 +69,7 @@ exports.upload = (req, res, next) =>
       savedFiles = []
       data = req.body
       @tools.asyncParallel files, (file) =>
-        @db.files.add req.user.id, data.cid, data.pid, file.name, file.mime, data.posX, data.posY, (err, savedFile) =>
+        @db.files.add req.user.id, data.cid, data.pid, file.name, file.type, data.posX, data.posY, (err, savedFile) =>
           element = savedFile.element
           @tools.makeProjectThumbs data.pid, element
           savedFiles.push savedFile
@@ -96,7 +96,7 @@ exports.upload = (req, res, next) =>
       if @cfg.MAX_FILE_SIZE and size > @cfg.MAX_FILE_SIZE
         fs.unlink file.path
         return
-      mime = file.mime
+      mime = file.type
       type = @tools.getFileType mime
       unless @tools.isMimeSupported mime
         fs.unlink file.path

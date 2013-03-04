@@ -355,10 +355,11 @@ $ ->
       $("#canvasFolder").attr("onclick", "App.room.canvas.foldPreviews(this); return false;")
 
     requestLinkScreenshot: ->
+      link = window.prompt '', 'Enter a link'
+      return unless link
       #TODO add function to helpers
       $("#canvasInitButtons").hide()
       $("#loadingProgressWrap").show()
-      link = window.prompt '', 'Enter a link'
       http = 'http://'
       link = http + link if link.indexOf http
       #TODO check if link is correct
