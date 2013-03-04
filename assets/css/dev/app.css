@@ -68,11 +68,11 @@ body {
 body.app {
     background-attachment: fixed !important;
     background: url(/images/room/new/site_bg.jpg);
-    background: -moz-radial-gradient(center, ellipse cover, rgba(166, 171, 183, 0.9) 0%, rgba(166, 171, 183, 0.3) 98%), url(/images/room/new/site_bg.jpg); /* FF3.6+ */
-    background: -webkit-radial-gradient(center, ellipse cover, rgba(166, 171, 183, 0.9) 0%, rgba(166, 171, 183, 0.3) 98%), url(/images/room/new/site_bg.jpg); /* Chrome10+,Safari5.1+ */
-    background: -o-radial-gradient(center, ellipse cover, rgba(166, 171, 183, 0.9) 0%, rgba(166, 171, 183, 0.3) 98%), url(/images/room/new/site_bg.jpg); /* Opera 12+ */
-    background: -ms-radial-gradient(center, ellipse cover, rgba(166, 171, 183, 0.9) 0%, rgba(166, 171, 183, 0.3) 98%), url(/images/room/new/site_bg.jpg); /* IE10+ */
-    background: radial-gradient(ellipse at center, rgba(166, 171, 183, 0.9) 0%, rgba(166, 171, 183, 0.3) 98%), url(/images/room/new/site_bg.jpg); /* W3C */
+    background: -moz-radial-gradient(50% 60%, ellipse cover, rgba(166, 171, 183, 0.9) 20%, rgba(238, 243, 255, 0) 98%), url(/images/room/new/site_bg.jpg); /* FF3.6+ */
+    background: -webkit-radial-gradient(50% 60%, ellipse cover, rgba(166, 171, 183, 0.9) 20%, rgba(238, 243, 255, 0) 98%), url(/images/room/new/site_bg.jpg); /* Chrome10+,Safari5.1+ */
+    background: -o-radial-gradient(50% 60%, ellipse cover, rgba(166, 171, 183, 0.9) 20%, rgba(238, 243, 255, 0) 98%), url(/images/room/new/site_bg.jpg); /* Opera 12+ */
+    background: -ms-radial-gradient(50% 60%, ellipse cover, rgba(166, 171, 183, 0.9) 20%, rgba(238, 243, 255, 0) 98%), url(/images/room/new/site_bg.jpg); /* IE10+ */
+    background: radial-gradient(ellipse at 50% 60% , rgba(166, 171, 183, 0.9) 20%, rgba(238, 243, 255, 0) 98%), url(/images/room/new/site_bg.jpg); /* W3C */
 }
 
 b {
