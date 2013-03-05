@@ -88,6 +88,16 @@ $ ->
         firstFile = false
         data.formData = params
 
+    showLoadingDiv: ->
+      left = ($(window).width() + room.canvas.getViewportAdjustX()) / 2
+      top = ($(window).height() - room.canvas.getViewportAdjustY()) / 2
+      $("#loading-div").css
+        top: top
+        left: left
+        display: "block"
+
+    hideLoadingDiv: -> $("#loading-div").hide()
+
     reverseOpacity: (elem) -> elem.opacity = 1 - elem.opacity
 
     notifyComment: -> App.notificator.notify("Select an area to comment.")

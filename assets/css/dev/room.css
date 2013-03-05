@@ -413,8 +413,8 @@ body.room {
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     background: url(/images/room/new/site_bg.jpg);
-    background: -moz-radial-gradient(center, circle cover,  rgba(152, 157, 169, 0.9) 0%, rgba(238, 243, 255, 0) 98%), url(/images/room/new/site_bg.jpg); /* FF3.6+ */
-    background: -webkit-radial-gradient(center, circle cover,  rgba(152, 157, 169, 0.9) 0%, rgba(238, 243, 255, 0) 98%), url(/images/room/new/site_bg.jpg); /* Chrome10+,Safari5.1+ */
+    background: -moz-radial-gradient(center, circle cover, rgba(152, 157, 169, 0.9) 0%, rgba(238, 243, 255, 0) 98%), url(/images/room/new/site_bg.jpg); /* FF3.6+ */
+    background: -webkit-radial-gradient(center, circle cover, rgba(152, 157, 169, 0.9) 0%, rgba(238, 243, 255, 0) 98%), url(/images/room/new/site_bg.jpg); /* Chrome10+,Safari5.1+ */
     background: -o-radial-gradient(center, circle cover, rgba(152, 157, 169, 0.9) 0%, rgba(238, 243, 255, 0) 98%), url(/images/room/new/site_bg.jpg); /* Opera 12+ */
     background: -ms-radial-gradient(center, circle cover, rgba(152, 157, 169, 0.9) 0%, rgba(238, 243, 255, 0) 98%), url(/images/room/new/site_bg.jpg); /* IE10+ */
     background: radial-gradient(circle at center, rgba(152, 157, 169, 0.9) 0%, rgba(238, 243, 255, 0) 98%), url(/images/room/new/site_bg.jpg); /* W3C */
@@ -1495,6 +1495,18 @@ body.room {
 }
 
 /* COMMENT RIBBONS END */
+
+.loading-div {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    background: white;
+    padding: 5px;
+    height: 25px;
+    width: 25px;
+    border-radius: 8px;
+    box-shadow: black 0 0 3px;
+}
 
 /* LABELS */
 

@@ -259,7 +259,7 @@ $ ->
     getFitToImage: (dontEnlarge = true)->
       w = paper.project.view.viewSize.width / opts.image.width
       # +20 to let the user see that whole image is fit into canvas
-      h = paper.project.view.viewSize.height / (opts.image.height + 20)
+      h = (paper.project.view.viewSize.height - @getViewportAdjustY())/ (opts.image.height + 20)
       r = if h < w then h else w
       return null if r > 1 and dontEnlarge
       return r
@@ -416,6 +416,7 @@ $ ->
       else
         @initializeFirst false
 
+      room.helper.showLoadingDiv()
       @addImage canvasData.fileId, canvasData.posX, canvasData.posY, (raster, executeLoadImage) =>
         executeLoadImage()
         if @getSelectedCanvasId() is canvasData.canvasId
@@ -436,20 +437,27 @@ $ ->
 
       img = new Raster(fakeImage)
       img.isImage = true
+      img.cid = opts.canvasId
+      img.imageLoaded = false
       room.items.insertFirst(img)
       img.fileId = fileId
       opts.image = img
       room.history.add(img)
+      self = @
 
       onload = ->
         img.size.width = image.width()
         img.size.height = image.height()
         img.position = new Point parseInt(posX), parseInt(posY)
         img.setImage(image[0])
+        img.imageLoaded = true
+        self.onImageLoaded(img.cid)
 
       $(image).on "load", -> if loadWrap then loadWrap(img, -> onload()) else onload()
 
       img
+
+    onImageLoaded: (canvasId) -> room.helper.hideLoadingDiv() if opts.canvasId is canvasId
 
     centerOnImage: (force = false) ->
       # do not center user if the moved the canvas by himself
@@ -460,9 +468,12 @@ $ ->
         imageX = opts.image.position.x
         imageY = opts.image.position.y
 
-        if App.chat.isVisible()
-          viewportAdjustX = @getViewportAdjustX() / 2
-          centerX += room.applyCurrentScale(new Point(viewportAdjustX, 0)).x
+        viewportAdjustX = @getViewportAdjustX() / 2
+        viewportAdjustY = @getViewportAdjustY() / 2
+        adjust = room.applyCurrentScale(new Point(viewportAdjustX, viewportAdjustY))
+
+        centerX += adjust.x
+        centerY -= adjust.y
 
         if centerX isnt imageX or centerY isnt imageY
           room.items.pan new Point(centerX - imageX, centerY - imageY)

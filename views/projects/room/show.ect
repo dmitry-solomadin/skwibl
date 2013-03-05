@@ -3,6 +3,18 @@
 
 <% canvasInitialized = "#{@canvases[0].initialized}" == "true" %>
 
+<div id="loading-div" class="loading-div hide"></div>
+<script>
+  var cl = new CanvasLoader('loading-div');
+  cl.setShape('oval'); // default is 'oval'
+  cl.setDiameter(25); // default is 40
+  cl.setDensity(45); // default is 40
+  cl.setRange(0.4); // default is 1.3
+  cl.setSpeed(2); // default is 2
+  cl.setFPS(40); // default is 24
+  cl.show(); // Hidden by default
+</script>
+
 <div id="chat" class="chat <%= 'chatFolded' unless canvasInitialized %>">
   <div class="projectHeader">
     <span><img src="/images/room/new/room_chat_head_icon.png" alt="Web site mockups review" width="16" height="17"></span>
