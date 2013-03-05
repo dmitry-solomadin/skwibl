@@ -4,7 +4,7 @@ $ ->
       @opts = {}
       @savedOpts = []
       @sharedOpts =
-        tooltype: 'line'
+        tooltype: 'pan'
         color: 'red'
 
       @defaultOpts =
