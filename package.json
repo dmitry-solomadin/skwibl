@@ -51,7 +51,8 @@
   "devDependencies": {
     "iced-coffee-script": "*",
     "uglify-js": "2.x.x",
-    "clean-css": "*"
+    "clean-css": "*",
+    "sleep": "*"
   },
   "engine": {
     "node": "0.8.x"

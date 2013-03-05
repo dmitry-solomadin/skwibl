@@ -30,16 +30,16 @@ $ ->
       id = 1
       results = []
 
+      showButtons = ->
+        $("#canvasInitButtons").show()
+        $("#loadingProgressWrap").hide()
+
       $('#fileupload').fileupload
         dataType: 'json'
         url: '/file/upload'
-        done: (e, data) ->
+        done: (e, data) =>
           results.push data.result[0]
           if results.length is data.originalFiles.length
-            #TODO make this function the class instance
-            showButtons = ->
-              $("#canvasInitButtons").show()
-              $("#loadingProgressWrap").hide()
             showButtons()
             # on local machine files sometimes uploaded before fadeOut is finished so we ensure that buttons will be displayed
             setTimeout showButtons, 500
@@ -87,7 +87,6 @@ $ ->
         params.cid = App.room.canvas.getSelectedCanvasId() if not room.canvas.isFirstInitialized() and firstFile
         firstFile = false
         data.formData = params
-
 
     reverseOpacity: (elem) -> elem.opacity = 1 - elem.opacity
 

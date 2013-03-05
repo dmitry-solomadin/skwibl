@@ -195,6 +195,8 @@ $ ->
         when "select"
           @items.testSelect(event.point)
           @items.drawSelRect(event.point)
+        when "pan"
+          opts.canvasPanned = true
 
       switch @sharedOpts.tooltype
         when 'line', 'highlighter', 'arrow', 'circle', 'rectangle', 'comment', 'straightline'

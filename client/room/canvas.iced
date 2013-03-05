@@ -120,7 +120,6 @@ $ ->
     onFirstCavasLoaded: ->
       @setScale @getFitToImage()
       @centerOnImage()
-      room.redraw()
 
     onLoadingFinished: ->
       # highlight to-do if id is provided
@@ -259,7 +258,8 @@ $ ->
 
     getFitToImage: (dontEnlarge = true)->
       w = paper.project.view.viewSize.width / opts.image.width
-      h = paper.project.view.viewSize.height / opts.image.height
+      # +20 to let the user see that whole image is fit into canvas
+      h = paper.project.view.viewSize.height / (opts.image.height + 20)
       r = if h < w then h else w
       return null if r > 1 and dontEnlarge
       return r
@@ -453,15 +453,20 @@ $ ->
 
     centerOnImage: (force = false) ->
       # do not center user if the moved the canvas by himself
-      userMovedCanvas = true if opts.pandx or opts.pandy
+      userMovedCanvas = true if opts.canvasPanned
       if opts.image and (not userMovedCanvas or force)
         centerX = opts.scaledCenter.x
         centerY = opts.scaledCenter.y
         imageX = opts.image.position.x
         imageY = opts.image.position.y
 
+        if App.chat.isVisible()
+          viewportAdjustX = @getViewportAdjustX() / 2
+          centerX += room.applyCurrentScale(new Point(viewportAdjustX, 0)).x
+
         if centerX isnt imageX or centerY isnt imageY
           room.items.pan new Point(centerX - imageX, centerY - imageY)
+      room.redraw()
 
     cancelPan: -> room.items.pan new Point(-opts.pandx, -opts.pandy)
 
