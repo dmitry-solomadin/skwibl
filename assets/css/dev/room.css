@@ -947,13 +947,14 @@ body.room {
 
 .projectHeader {
     height: 30px;
-    line-height: 30px;
+    line-height: 28px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 13px;
+    font-size: 18px;
     background: #ece2d9;
     padding: 0 10px;
+    text-shadow: white 1px 1px 1px;
 }
 
 .projectHeader span {
