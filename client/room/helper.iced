@@ -11,14 +11,30 @@ $ ->
 
       $(document).bind 'keydown.del', => room.items.remove()
       $(document).bind 'keydown.backspace', => room.items.remove()
-      $(document).bind 'keydown.left', => room.items.translate(new Point(-5, 0))
-      $(document).bind 'keydown.up', => room.items.translate(new Point(0, -5))
-      $(document).bind 'keydown.right', => room.items.translate(new Point(5, 0))
-      $(document).bind 'keydown.down', => room.items.translate(new Point(0, 5))
-      $(document).bind 'keydown.shift_left', => room.items.translate(new Point(-1, 0))
-      $(document).bind 'keydown.shift_up', => room.items.translate(new Point(0, -1))
-      $(document).bind 'keydown.shift_right', => room.items.translate(new Point(1, 0))
-      $(document).bind 'keydown.shift_down', => room.items.translate(new Point(0, 1))
+      $(document).bind 'keydown.left', =>
+        room.items.translate(new Point(-5, 0))
+        room.redrawWithThumb()
+      $(document).bind 'keydown.up', =>
+        room.items.translate(new Point(0, -5))
+        room.redrawWithThumb()
+      $(document).bind 'keydown.right', =>
+        room.items.translate(new Point(5, 0))
+        room.redrawWithThumb()
+      $(document).bind 'keydown.down', =>
+        room.items.translate(new Point(0, 5))
+        room.redrawWithThumb()
+      $(document).bind 'keydown.shift_left', =>
+        room.items.translate(new Point(-1, 0))
+        room.redrawWithThumb()
+      $(document).bind 'keydown.shift_up', =>
+        room.items.translate(new Point(0, -1))
+        room.redrawWithThumb()
+      $(document).bind 'keydown.shift_right', =>
+        room.items.translate(new Point(1, 0))
+        room.redrawWithThumb()
+      $(document).bind 'keydown.shift_down', =>
+        room.items.translate(new Point(0, 1))
+        room.redrawWithThumb()
 
     initMousewheel: ->
       $('#mainCanvas').on 'mousewheel', (event, delta, deltaX, deltaY) ->

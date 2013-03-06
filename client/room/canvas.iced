@@ -148,7 +148,18 @@ $ ->
         canvas.removeClass "canvasWrapper"
 
     initNameChanger: ->
-      $("#canvasName").on "click", ->
+      changeName = =>
+        $("#canvasName").show()
+        $("#canvasNameInputDiv").hide()
+        name = $("#canvasNameInput").val()
+        @changeName @getSelectedCanvasId(), name
+        room.socket.emit "changeCanvasName", canvasId: @getSelectedCanvasId(), name: name
+
+      cancelChangeName = =>
+        $("#canvasName").show()
+        $("#canvasNameInputDiv").hide()
+
+      $("#canvasName").on "click", =>
         $("#canvasName").hide()
         $("#canvasNameInputDiv").show()
 
@@ -159,18 +170,22 @@ $ ->
 
         $("#canvasNameInput").val(name).focus()
 
-      $("#canvasNameSave").on "click", =>
-        $("#canvasName").show()
-        $("#canvasNameInputDiv").hide()
+        $(document).on "click.changeName", (e) =>
+          return if $(e.target).parents("#nameChanger")[0]
+          changeName()
+          $(document).off "click.changeName"
 
-        name = $("#canvasNameInput").val()
-        @changeName name
+      $("#canvasNameInput").bind 'keydown.esc', => cancelChangeName()
+      $("#canvasNameInput").bind 'keydown.return', => changeName()
 
-        room.socket.emit "changeCanvasName", canvasId: @getSelectedCanvasId(), name: name
 
     # INITIALIZATION END
 
-    changeName: (name) ->
+    changeName: (cid, name) ->
+      @findThumbByCanvasId(cid).data("name", name)
+      @changeNameHtml name
+
+    changeNameHtml: (name) ->
       if $.trim(name).length > 0
         $("#canvasName").removeClass("noname")
         $("#canvasName").html(name)
@@ -605,7 +620,7 @@ $ ->
       $(".smallCanvasPreview").removeClass("previewSelected")
       $(@findMiniThumbByCanvasId(cid)).addClass("previewSelected")
 
-      $("#canvasName").html($(anchor).data("name"))
+      @changeNameHtml $(anchor).data("name")
 
       room.socket.emit("switchCanvas", cid) if emit
       room.redraw()

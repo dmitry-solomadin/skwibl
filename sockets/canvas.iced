@@ -147,6 +147,7 @@ exports.configure = (sio) ->
             socket.broadcast.to(socket.project).emit 'changeCanvasName',
               id: id
               name: data.name
+              canvasId: data.canvasId
             db.canvases.setProperties data.canvasId, name: data.name
 
       socket.on 'removeCanvas', (data) ->

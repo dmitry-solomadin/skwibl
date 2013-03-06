@@ -21,7 +21,7 @@ $ ->
       socket.on 'resolveTodo', (data) => room.comments.resolveTodo(data.elementId, false)
       socket.on 'reopenTodo', (data) => room.comments.reopenTodo(data.elementId, false)
       socket.on 'commentNumberUpdate', (data) => room.comments.updateCommentNumber data
-      socket.on 'changeCanvasName', (data) => room.canvas.changeName(data.name)
+      socket.on 'changeCanvasName', (data) => room.canvas.changeName(data.canvasId, data.name)
       socket.on 'switchCanvas', (data) =>
         room.canvas.selectThumb(room.canvas.findThumbByCanvasId(data.canvasId), false)
       socket.on 'canvasReorder', (data) => room.canvas.setCanvasPosition data.canvasId, data.position
