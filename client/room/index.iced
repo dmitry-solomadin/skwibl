@@ -289,7 +289,8 @@ $ ->
             @items.created.eligible = true
             @history.add()
 
-            @socket.emit("elementUpdate", @socketHelper.prepareElementToSend(@items.created, "create"))
+            gaTrack "Instrument", "Created"
+            @socket.emit "elementUpdate", @socketHelper.prepareElementToSend(@items.created, "create")
         when "comment"
           if commentRect
             @items.created.eligible = true
@@ -298,7 +299,9 @@ $ ->
             @history.add actionType: "comment", commentMin: commentMin, eligible: true
 
           commentMin.elementId = @generateId()
-          @socket.emit("commentUpdate", @socketHelper.prepareCommentToSend(commentMin, "create"))
+
+          gaTrack "Comment", "Created"
+          @socket.emit "commentUpdate", @socketHelper.prepareCommentToSend(commentMin, "create")
         when 'select'
           selectedItem = @items.sel
           if selectedItem

@@ -27,7 +27,7 @@ $ ->
       additionalTriggers.on('mouseenter', -> addHoverCount())
         .on('mouseleave', -> removeHoverCount())
 
-    trigger.on('mouseenter', ->
+    trigger.on('mouseenter',->
       addHoverCount()
       settings.onTrigger()
     ).on('mouseleave', -> removeHoverCount())
@@ -38,7 +38,7 @@ $ ->
     value
 
   $.fn.drags = (opt) ->
-    opt = $.extend({cursor:"move"}, opt)
+    opt = $.extend({cursor: "move"}, opt)
 
     $(document).on "mousemove touchmove", (e) =>
       return unless @hasClass "draggable"
@@ -46,9 +46,9 @@ $ ->
       if e.type is "touchmove"
         touches = event.changedTouches
         first = touches[0]
-        point = {x: first.clientX, y:first.clientY}
+        point = {x: first.clientX, y: first.clientY}
       else
-        point = {x: e.clientX, y:e.clientY}
+        point = {x: e.clientX, y: e.clientY}
 
       unless @data("pdx")
         @data("pdx", point.x)
@@ -81,7 +81,7 @@ $ ->
 
   $(document).bind 'ajaxSend', (e, request, options) ->
     $('[data-loading]').each ->
-      $(@).attr("disabled","disabled")
+      $(@).attr("disabled", "disabled")
       $(@).data("prevText", $(@).html())
       $(@).html($(@).data("loading"))
 
@@ -101,6 +101,7 @@ window.hasAjaxError = ->
     return true if $(ajaxError).css("visibility") is "visible"
   return false
 
+window.gaTrack = (event, action) -> _gaq.push(['_trackEvent', "Skwibl | Events", action, event])
 
 
 

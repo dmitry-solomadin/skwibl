@@ -521,7 +521,9 @@ $ ->
 
       @addToCommentsSection $("#commentText#{elementId}")
 
-      room.socket.emit "markAsTodo", elementId if emit
+      if emit
+        gaTrack "Todo", "Created"
+        room.socket.emit "markAsTodo", elementId
 
     resolveTodo: (elementId, emit) ->
       comment = $("#commentText#{elementId}")
@@ -532,7 +534,9 @@ $ ->
 
       @addToCommentsSection $("#commentText#{elementId}")
 
-      room.socket.emit "resolveTodo", elementId if emit
+      if emit
+        gaTrack "Todo", "Resolved"
+        room.socket.emit "resolveTodo", elementId
 
     reopenTodo: (elementId, emit) ->
       comment = $("#commentText#{elementId}")
@@ -543,7 +547,9 @@ $ ->
 
       @addToCommentsSection $("#commentText#{elementId}")
 
-      room.socket.emit "reopenTodo", elementId if emit
+      if emit
+        gaTrack "Todo", "Reopened"
+        room.socket.emit "reopenTodo", elementId
 
     addToCommentsSection: (commentText) ->
       unless $("#commentsSection").data("initialized")

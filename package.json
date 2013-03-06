@@ -46,7 +46,8 @@
     "winston": "*",
     "gm": "*",
     "phantomjs": "*",
-    "validator": "*"
+    "validator": "*",
+    "ga": "*"
   },
   "devDependencies": {
     "iced-coffee-script": "*",

@@ -407,6 +407,8 @@ $ ->
       @addNewThumbAndSelect canvasData, true
       room.hideSplashScreen()
       App.chat.setChatUnfoldCallback -> $('#canvasSelectDiv')[0].carousel.goToItem($("#canvasSelectDiv .canvasPreviewDiv:last").index())
+
+      gaTrack "Empty canvas", "Created"
       room.socket.emit "canvasAdded", canvasData
 
     handleUpload: (canvasData, emit) ->
@@ -425,6 +427,7 @@ $ ->
         @updateThumb parseInt(canvasData.canvasId)
         @onEachCanvasLoaded()
 
+      gaTrack "File", "Created"
       room.socket.emit("fileAdded", canvasData) if emit
 
     addImage: (fileId, posX, posY, loadWrap) ->

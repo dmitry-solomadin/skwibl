@@ -73,6 +73,11 @@ exports.add = (req, res) =>
     return res.redirect '/projects/new'
   @db.projects.add req.user.id, req.body.name, (err, project) =>
     unless err
+      @ga.trackEvent
+        category: "Skwibl | Events",
+        action: "Created",
+        label: "Project"
+
       dir = "#{@cfg.UPLOADS}/#{project.id}"
       fs.mkdir dir, @cfg.DIRECTORY_PERMISSION, (err) =>
         fs.mkdir "#{dir}/video", @cfg.DIRECTORY_PERMISSION
