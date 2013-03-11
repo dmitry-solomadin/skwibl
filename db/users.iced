@@ -56,7 +56,7 @@ exports.findById = (id, fn) =>
         return @tools.asyncOpt fn, new Error "User #{id} have no emails"
       @client.hgetall "users:#{id}:name", (err, name) =>
         umails = []
-        for email, index of emails
+        for email in emails
           umails.push
             value: email
         user.emails = umails
@@ -93,6 +93,6 @@ exports.setName = (id, name, fn) =>
 exports.addEmails = (id, emails, fn) =>
   values = _.pluck emails, 'value'
   @client.sadd "users:#{id}:emails", values
-  for value, index of values
+  for value in values
     @client.set "emails:#{value}:uid", id, @tools.logError
   return @tools.asyncOpt fn, null, values
