@@ -29,9 +29,6 @@ exports.findOrCreate = (profile, token, secret, fn) =>
       user.name = _.extend purifiedName, user.name
       @db.users.setName user.id, user.name
     diff = _.difference _.pluck(profile.emails, 'value'), _.pluck(user.emails, 'value')
-    console.log user.emails
-    console.log profile.emails
-    console.log diff
     if diff.length
       user.emails.concat diff.map (email) -> value: email
       @db.users.addEmails user.id, user.emails
