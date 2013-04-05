@@ -24,6 +24,7 @@ exports.BEHANCE_API_KEY = 's7cImnmGx7l1Qa4gIFrm91CDph7PvMhP'
 
 exports.SITE_SECRET = 'gohph5aer8Edee&V'
 exports.SESSION_KEY = 'sid'
+exports.SESSION_DURATION = 7200 # two hours
 
 exports.SMTP_USER = 'noreply@skwibl.com'
 exports.SMTP_PASSWORD = 'soo8aeyaXa3U'
@@ -51,8 +52,6 @@ exports.MIME = [
 exports.PASSWORD_LENGTH = 12
 exports.PASSWORD_MIN_LENGTH = 6
 exports.PASSWORD_EASYTOREMEMBER = no
-
-exports.SESSION_DURATION = 7200 # two hours
 
 # exports.CONFIRM_EXPIRE = 604800 # one week
 
