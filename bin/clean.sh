@@ -14,6 +14,9 @@ find ./setup -name "*.js" -delete
 find ./smtp -name "*.js" -delete
 find ./sockets -name "*.js" -delete
 find ./tools -name "*.js" -delete
-rm -f ./assets/js/skwibl.js ./assets/js/skwibl.min.js ./assets/js/skwibl.min.js.gz
+
+STAMP=$1
+
+rm -f ./assets/js/skwibl.js ./assets/js/skwibl$STAMP.min.js ./assets/js/skwibl$STAMP.min.js.gz
 rm -f ./assets/js/Jplayer.swf
-rm -f ./assets/css/skwibl.css ./assets/css/skwibl-min.css ./assets/css/skwibl-min.css.gz
+rm -f ./assets/css/skwibl.css ./assets/css/skwibl$STAMP-min.css ./assets/css/skwibl$STAMP-min.css.gz

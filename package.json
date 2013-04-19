@@ -1,6 +1,6 @@
 {
   "name": "skwibl",
-  "version": "0.5.1",
+  "version": "0.6.1",
   "private": true,
   "author": "skwibl <info@skwibl.com>",
   "description": "Realtime collaboration engine for WEB",
@@ -47,7 +47,8 @@
     "gm": "*",
     "phantomjs": "*",
     "validator": "*",
-    "ga": "*"
+    "ga": "*",
+    "i18n-2": "*"
   },
   "devDependencies": {
     "iced-coffee-script": "*",
@@ -56,6 +57,6 @@
     "sleep": "*"
   },
   "engine": {
-    "node": "0.8.x"
+    "node": ">=0.8.x"
   }
 }

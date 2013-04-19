@@ -60,10 +60,10 @@ COFFEE_OPT='--nodejs "--nouse-idle-notification" --nodejs "--expose-gc"'
 FLUSH_REDIS_CMD='redis-cli flushall'
 
 ## tools file (to uncomment gc)
-TOOLS_FILE='./tools/tools.iced'
+TOOLS_FILE='tools/tools.iced'
 
-## socket.io script location
-SOCKETIO_SCRIPT='./node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js'
+## application script file (for timeshtamp)
+APPSCRIPT_FILE='views/shared/application_scripts.ect'
 
 ## usage string
 USAGE="Usage: $0 -a -b -c -d -i -p -r -s -u -h \n\n

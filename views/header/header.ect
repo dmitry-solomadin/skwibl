@@ -18,9 +18,9 @@
 
       <% unless @helpers.users.currentUser() : %>
       <span class="pull-right header_btns">
-        <a class="btn btn-success" href="/registration">Join Skwibl</a>
+        <a class="btn btn-success" href="/registration"><%= @__ 'Join Skwibl' %></a>
         <a id="signInButton" class="btn" href="#" data-dropdown-toggler="loginBlock" data-duration="300">
-          Sign In
+          <%= @__ 'Sign In' %>
         </a>
       </span>
       <% end %>
@@ -33,14 +33,14 @@
             <li class="<%= 'selected' if isActivities %>">
               <a href="/activities">
                 <div class="top_nav_icon top_nav_activities"><img src="/images/top_nav1.png" alt="Activities" width="33"></div>
-                <div class="top_nav_name">Activities</div>
+                <div class="top_nav_name"><%= @__ 'Activities' %></div>
                 <div id="activityBadge" class="top_nav_notice hide">0</div>
               </a>
             </li>
             <li class="projectsLi <%= 'selected' if isProjects %>">
               <a href="/projects">
                 <div class="top_nav_icon"><img src="/images/top_nav2.png" alt="Projects" width="36"></div>
-                <div class="top_nav_name">Projects</div>
+                <div class="top_nav_name"><%= @__ 'Projects' %></div>
               </a>
             </li>
           </ul>
@@ -48,7 +48,7 @@
           <%- include './header/user_dropdown.ect' %>
 
           <a class="fr mr25" id="createNewProject" href="/projects/new">
-            <button class="btn btn-success">New project</button>
+            <button class="btn btn-success"><%= @__ 'New project' %></button>
           </a>
         </div>
       <% end %>
@@ -71,9 +71,9 @@
 <div id="userDropdownMenu" class="skwibl-dropdown" style="display: none;">
   <hr>
   <ul class="dropdownMenu">
-    <li><a href="/users/<%= @helpers.users.currentUser().id %>/edit">Edit Profile</a></li>
+    <li><a href="/users/<%= @helpers.users.currentUser().id %>/edit"><%= @__ 'Edit Profile' %></a></li>
     <li class="divider"></li>
-    <li><a href="/logout">Sign Out</a></li>
+    <li><a href="/logout"><%= @__ 'Sign Out' %></a></li>
   </ul>
 </div>
 <% end %>

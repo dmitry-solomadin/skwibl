@@ -22,7 +22,6 @@ case "$1" in
     bin/init.sh
     bin/build.sh -b
     bin/deploy.sh
-    bin/clean.sh
     exit 0;;
   -i|--init)
     bin/init.sh

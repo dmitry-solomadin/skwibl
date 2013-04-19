@@ -287,6 +287,7 @@ $ ->
               @items.created.arrowGroup.elementId = @items.created.elementId
               @items.created = @items.created.arrowGroup
             @items.created.eligible = true
+            console.log @item
             @history.add()
 
             gaTrack "Instrument", "Created"

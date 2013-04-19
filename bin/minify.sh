@@ -15,10 +15,12 @@ for SCRIPT in $JS_LIST; do
   fi
 done
 
-$UGLIFYJS $JS_NAME.js -c -o $JS_NAME.min.js
-gzip -9 $JS_NAME.min.js -c > $JS_NAME.min.js.gz
+STAMP=$1
 
-rm -f $JS_NAME.js $JS_NAME.min.js
+$UGLIFYJS $JS_NAME.js -c -o $JS_NAME$STAMP.min.js
+gzip -9 $JS_NAME$STAMP.min.js -c > $JS_NAME$STAMP.min.js.gz
+
+rm -f $JS_NAME.js $JS_NAME$STAMP.min.js
 
 cp ./assets/js/vendor/Jplayer.swf ./assets/js/Jplayer.swf
 
@@ -28,7 +30,7 @@ for CSS in $CSS_LIST; do
   fi
 done
 
-$CLEANCSS -e --s0 -o $CSS_NAME-min.css $CSS_NAME.css
-gzip -9 $CSS_NAME-min.css -c > $CSS_NAME-min.css.gz
+$CLEANCSS -e --s0 -o $CSS_NAME$STAMP-min.css $CSS_NAME.css
+gzip -9 $CSS_NAME$STAMP-min.css -c > $CSS_NAME$STAMP-min.css.gz
 
-rm -f $CSS_NAME.css $CSS_NAME-min.css
+rm -f $CSS_NAME.css $CSS_NAME$STAMP-min.css

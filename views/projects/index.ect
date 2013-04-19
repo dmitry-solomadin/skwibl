@@ -1,7 +1,7 @@
 <input type="hidden" id="id" value="<%= @id %>"/>
 <input type="hidden" id="name" value="<%= @name %>"/>
 
-<h1 class="page_header">Projects<%- "<span id='projectCountSemicolon'>: <span id='projectCount'>#{@projects.length}</span></span>" if @projects.length %></h1>
+<h1 class="page_header"><%= @__ 'Projects' %><%- "<span id='projectCountSemicolon'>: <span id='projectCount'>#{@projects.length}</span></span>" if @projects.length %></h1>
 
 <div class="content" id="projects">
   <% hasProjects = @projects.length %>
@@ -18,7 +18,7 @@
             <% index++ %>
           <% end %>
           <% if index is 0 : %>
-            <div class="no_images">No images</div>
+            <div class="no_images"><%= @__ 'No images' %></div>
           <% end %>
           <div class="project_notice"><%= project.canvases.length %></div>
         </div>
@@ -31,9 +31,9 @@
             <li><a href="/projects/<%= project.id %>#tsl=<%= todo.elementId %>" onclick=""><%= todo.text %></a></li>
             <% end %>
           </ul>
-          <a class="projects_more_btn" href="/projects/<%= project.id %>">View project &rarr;</a>
+          <a class="projects_more_btn" href="/projects/<%= project.id %>"><%= @__ 'View project' %> &rarr;</a>
         </div>
-        <div class="participants_number"><span style="color:#6b7078;">Projects participants: </span><%= project.users.length %></div>
+        <div class="participants_number"><span style="color:#6b7078;"><%= @__ 'Projects participants:' %> </span><%= project.users.length %></div>
         <ul class="participants_list">
           <% for user in project.users : %>
             <li>
@@ -53,15 +53,15 @@
             </li>-->
             <li>
               <a onclick="App.projects.showInviteModal('<%= project.id %>'); return false;" class="tooltipize"
-                 href="#" title="Invite participant"><img src="/images/projects/projects_menu2.png" alt="Invite"></a>
+                 href="#" title="<%= @__ 'Invite participants' %>"><img src="/images/projects/projects_menu2.png" alt="Invite"></a>
             </li>
             <li>
               <% if project.owner == @helpers.users.currentUser().id : %>
                 <a onclick="App.projects.deleteProject('<%= project.id %>'); return false;" class="tooltipize"
-                   href="#" title="Delete project"><img src="/images/projects/projects_menu3.png" alt="Delete"></a>
+                   href="#" title="<%= @__ 'Delete project' %>"><img src="/images/projects/projects_menu3.png" alt="Delete"></a>
               <% else : %>
                 <a onclick="App.projects.leaveProject('<%= project.id %>'); return false;" class="tooltipize"
-                   href="#" title="Leave project"><img src="/images/projects/projects_menu3.png" alt="Leave"></a>
+                   href="#" title="<%= @__ 'Leave project' %>"><img src="/images/projects/projects_menu3.png" alt="Leave"></a>
               <% end %>
             </li>
           </ul>

@@ -3,6 +3,7 @@ express = require 'express'
 flash = require 'connect-flash'
 ect = require 'ect'
 path = require 'path'
+i18n = require 'i18n-2'
 
 moment = require 'moment'
 
@@ -28,15 +29,19 @@ exports.setUp = (logger) ->
       logger.info message
 
   app.configure 'development', ->
-    app.use express.errorHandler {
+    app.use express.errorHandler
       dumpExceptions: yes
       showStack: yes
-    }
+    app.set 'cookie', maxAge: cfg.SESSION_DURATION * 1000
 
   app.configure 'production', ->
     app.use express.errorHandler()
+    app.set 'cookie',
+      maxAge: cfg.SESSION_DURATION * 1000
+      domain: ".skwibl.com"
 
   app.configure ->
+    i18n.expressBind app, locales: ['ru', 'en']
     app.set 'views', viewsDir
     app.engine 'ect', ect(
       cache: on
@@ -55,9 +60,7 @@ exports.setUp = (logger) ->
     app.use express.session
       key: cfg.SESSION_KEY
       secret: cfg.SITE_SECRET
-      cookie:
-        maxAge: cfg.SESSION_DURATION * 1000
-        domain: ".skwibl.com"
+      cookie: app.get 'cookie'
       store: db.sessions.createStore express
     app.use passport.initialize()
     app.use passport.session()

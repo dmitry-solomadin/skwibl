@@ -13,7 +13,8 @@ exports.persist = (user, fn) =>
 exports.add = (user, name, emails, fn) =>
   @client.incr 'users:next', (err, val) =>
     if not err
-      user.id = val + ''
+      @db.projects.createDemo val+''
+      user.id = val+''
       user.email = emails[0].value
       if user.provider is 'local'
         user.providerId = val
