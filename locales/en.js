@@ -9,6 +9,8 @@
   "Password": "Password",
   "Remember me": "Remember me",
   "Forgot password?": "Forgot password?",
+  "Recover passport": "Recover passport",
+  "Forgot your password? Enter your email below, we will generate you a new one and send it to this email.": "Forgot your password? Enter your email below, we will generate you a new one and send it to this email.",
   "FIND": "FIND",
   "New clients, if you are a designer": "New clients, if you are a designer",
   "The right designers": "The right designers",

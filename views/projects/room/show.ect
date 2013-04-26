@@ -20,7 +20,7 @@
     <span><img src="/images/room/new/room_chat_head_icon.png" alt="Web site mockups review" width="16" height="17"></span>
     <%= @project.name %>
   </div>
-  <div class="project_participants_head">Project participants: <%= @users.length %></div>
+  <div class="project_participants_head"><%= @__ 'Project participants:' %> <%= @users.length %></div>
   <div class="project_participants_slider no-carousel">
     <div id="participants" class="project_participants_slider_container">
       <% for user in @users : %>
@@ -38,9 +38,9 @@
   <div class="clearfix"></div>
 
   <div id="chatFilters" class="btn-group chatFilters">
-    <button data-tab="chat-tab" class="btn btn-large active">Chat</button>
-    <button data-tab="todo-tab" class="btn btn-large">Comments</button>
-    <button data-tab="changelog-tab" class="btn btn-large">Log</button>
+    <button data-tab="chat-tab" class="btn btn-large active"><%= @__ 'Chat' %></button>
+    <button data-tab="todo-tab" class="btn btn-large"><%= @__ 'Comments' %></button>
+    <button data-tab="changelog-tab" class="btn btn-large"><%= @__ 'Log' %></button>
   </div>
   <div class="chatInner">
     <div class="tab-content" id="chat-tab">
@@ -51,9 +51,9 @@
       </div>
       <div class="conversation-controls" id="conversation-controls">
         <div>
-          <textarea class="chattext" id="chattext" placeholder="Type your message..."></textarea>
+          <textarea class="chattext" id="chattext" placeholder="<%= @__ 'Type your message...' %>"></textarea>
         </div>
-        <input class="btn btn-large btn-primary fr" type="button" id="chatsend" value="Send"/>
+        <input class="btn btn-large btn-primary fr" type="button" id="chatsend" value="<%= @__ 'Send' %>"/>
       </div>
     </div>
     <div class="tab-content filter-box" id="todo-tab" style="display: none;">
@@ -88,24 +88,22 @@
 <div id="canvasInitDivWrapper" class="canvasInitDivWrapper" style="<%= 'display:none' if canvasInitialized %>">
   <div class="canvasInitDiv ">
     <div id="canvasInitButtons">
-      <div class="canvasInitHeader">Upload images from</div>
+      <div class="canvasInitHeader"><%= @__ 'Upload images from' %></div>
 
       <span class="btn font-normal fileinput-button">
-        My computer
+        <%= @__ 'My computer' %>
         <input id="fileupload" type="file" name="files[]" multiple>
       </span><br>
       <a href="#" id="dropboxChoose" class="btn font-normal">Dropbox</a><br>
-      <a class="btn font-normal disabled tooltipize" data-placement="bottom" title="This feature is coming soon">Google
-        Drive</a><br>
-      <div class="canvasInitHeader">take screenshot by a</div>
-      <a href="#" id="linkChoose" class="btn font-normal tooltipize" onclick="App.room.canvas.requestLinkScreenshot(); return false;">Link</a><br>
+      <a class="btn font-normal disabled tooltipize" data-placement="bottom" title="This feature is coming soon"><%= @__ 'Google Drive' %></a><br>
+      <div class="canvasInitHeader"><%= @__ 'take screenshot by a' %></div>
+      <a href="#" id="linkChoose" class="btn font-normal tooltipize" onclick="App.room.canvas.requestLinkScreenshot(); return false;"><%= @__ 'Link' %></a><br>
 
-      <div class="canvasInitHeader">or create</div>
-      <a href="#" class="btn font-normal" onclick="App.room.canvas.requestAddEmpty(); return false;">Empty
-        canvas</a>
+      <div class="canvasInitHeader"><%= @__ 'or create' %></div>
+      <a href="#" class="btn font-normal" onclick="App.room.canvas.requestAddEmpty(); return false;"><%= @__ 'Empty canvas' %></a>
 
       <a id="cancelInitLink" class="cancelInit hide" href="#"
-         onclick="App.room.hideSplashScreen(); return false;">Cancel</a>
+         onclick="App.room.hideSplashScreen(); return false;"><%= @__ 'Cancel' %></a>
     </div>
 
     <div class="progressWrap" id="loadingProgressWrap" style="display: none">
@@ -150,7 +148,7 @@
       <div class="gallery_bar_right">
         <a class="createNewCanvasLink" href="#" onclick="App.room.showSplashScreen()">
           <img src="/images/room/new/create_icon.png" alt="Create" width="19" height="20">
-          <span>New canvas</span></a>
+          <span><%= @__ 'New canvas' %></span></a>
         <img src="<%= foldImg %>" alt="Hide" width="10" height="11"
              id="canvasFolder" onclick="<%= foldFunc %>" class="canvasFolder">
       </div>

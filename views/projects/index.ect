@@ -25,7 +25,7 @@
         <div class="project_r">
           <h2 class="project_name"><a href="/projects/<%= project.id %>"><%= project.name %></a></h2>
 
-          <div style="margin:3px 0;">To-Do: <span style="font-family: 'MyriadPro-SemiBold'"><%= project.todosCount %></span></div>
+          <div style="margin:3px 0;"><%= @__ 'To-Do' %>: <span style="font-family: 'MyriadPro-SemiBold'"><%= project.todosCount %></span></div>
           <ul class="skwibl_list project_list short">
             <% for todo in project.todos : %>
             <li><a href="/projects/<%= project.id %>#tsl=<%= todo.elementId %>" onclick=""><%= todo.text %></a></li>
@@ -33,7 +33,7 @@
           </ul>
           <a class="projects_more_btn" href="/projects/<%= project.id %>"><%= @__ 'View project' %> &rarr;</a>
         </div>
-        <div class="participants_number"><span style="color:#6b7078;"><%= @__ 'Projects participants:' %> </span><%= project.users.length %></div>
+        <div class="participants_number"><span style="color:#6b7078;"><%= @__ 'Project participants:' %> </span><%= project.users.length %></div>
         <ul class="participants_list">
           <% for user in project.users : %>
             <li>

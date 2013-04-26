@@ -1,8 +1,8 @@
 <form id="loginForm" action="/login" method="post" class="form-horizontal loginForm" data-remote="true">
   <div>
     <span class="login_header"><%= @__ 'Sign in with your social account:' %></span>
-    <ul class="login_social_join">
-      <li class="input-append">
+    <center><ul class="login_social_join">
+      <li class="input-append" style="float: left;">
         <img class="add-on" src="/images/google-27.png" alt="Google+"><a
           class="btn" href="/auth/google" title="Connect with Google+"><%= @__ 'Connect' %></a>
       </li>
@@ -10,11 +10,11 @@
         <img class="add-on" src="/images/facebook-27.png" alt="Facebook"><a
           class="btn" href="/auth/facebook" title="Connect with Facebook"><%= @__ 'Connect' %></a>
       </li>
-      <li class="input-append">
+      <li class="input-append" style="float: right;">
         <img class="add-on" src="/images/linkedin-27.png" alt="Linkedin"><a
           class="btn" href="/auth/linkedin" title="Connect with Linkedin"><%= @__ 'Connect' %></a>
       </li>
-    </ul>
+    </ul></center>
 
     <div style="clear: both;"></div>
 

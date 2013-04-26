@@ -1,30 +1,30 @@
 <div class="page_container singin_standalone">
   <div class="signin_wrapper">
-    <h1 style="text-align:center;" class="page_header">Sign In</h1>
+    <h1 style="text-align:center;" class="page_header"><%= @__ 'Sign In' %></h1>
 
     <div class="content">
       <%- include './shared/errors.ect' %>
       <div class="join_form">
         <div class="join_div">
-          <div>Sign in with your social account:</div>
+          <div><%= @__ 'Sign in with your social account:' %></div>
           <ul class="social_join">
             <% redirectString = if @redirectTo and @redirectTo.trim().length then "?r=#{@redirectTo}" else "" %>
             <li class="input-append">
               <img class="add-on" src="/images/registration/join_soc1.png" alt="Google+"><a
-                class="btn" href="/auth/google<%= redirectString %>" title="Connect with Google+">Connect</a>
+                class="btn" href="/auth/google<%= redirectString %>" title="<%= @__ 'Connect with' %> Google+"><%= @__ 'Connect' %></a>
             </li>
             <li class="input-append">
               <img class="add-on" src="/images/registration/join_soc2.png" alt="Facebook"><a
-                class="btn" href="/auth/facebook<%= redirectString %>" title="Connect with Facebook">Connect</a>
+                class="btn" href="/auth/facebook<%= redirectString %>" title="<%= @__ 'Connect with' %> Facebook"><%= @__ 'Connect' %></a>
             </li>
             <li class="input-append">
               <img class="add-on" src="/images/registration/join_soc3.png" alt="Linkedin"><a
-                class="btn" href="/auth/linkedin<%= redirectString %>" title="Connect with Linkedin">Connect</a>
+                class="btn" href="/auth/linkedin<%= redirectString %>" title="<%= @__ 'Connect with' %> Linkedin"><%= @__ 'Connect' %></a>
             </li>
           </ul>
           <hr>
           <div class="login_or_wrap">
-            <div class="login_or standalone">or</div>
+            <div class="login_or standalone"><%= @__ 'or' %></div>
           </div>
         </div>
 
@@ -33,20 +33,20 @@
           <div id="loginError" class="standalone"></div>
 
           <div class="loginFields standalone">
-            <input type="text" class="input-big" name="email" placeholder="Email"><br/>
-            <input type="password" class="input-big" name="password" id="password" placeholder="Password">
+            <input type="text" class="input-big" name="email" placeholder="<%= @__ 'Email' %>"><br/>
+            <input type="password" class="input-big" name="password" id="password" placeholder="<%= @__ 'Password' %>">
           </div>
 
           <div class="fr loginBottom" style="width:100%;">
-            <label class="checkbox fl" style="width: 110px;">
-              <input type="checkbox"> Remember me
+            <label class="checkbox fl" style="width: 120px;">
+              <input type="checkbox"><%= @__ 'Remember me' %>
             </label>
-            <a id="forgotpasswordlink_standalone" class="fr" href="#">Forgot password?</a>
+            <a id="forgotpasswordlink_standalone" class="fr" href="#"><%= @__ 'Forgot password?' %></a>
           </div>
 
           <div class="clear_medium"></div>
           <div class="join_btn">
-            <button class="btn" type="submit">Login</button>
+            <button class="btn" type="submit"><%= @__ 'Login' %></button>
           </div>
         </form>
       </div>
@@ -54,27 +54,27 @@
   </div>
 
   <div class="forgotpass_wrapper">
-    <h1 style="text-align:center;" class="page_header">Forgot password</h1>
+    <h1 style="text-align:center;" class="page_header"><%= @__ 'Recover password' %></h1>
 
     <div class="content">
       <div class="join_form">
         <form id="forgotpassword_form_standalone" method="post">
           <fieldset>
             <label class="control-label login_header forgotPasswordHeader" for="forgotPasswordEmail">
-              Forgot your password? Enter your email below, we will generate you a new one and send it to this email.
+              <%= @__ 'Forgot your password? Enter your email below, we will generate you a new one and send it to this email.' %>
             </label>
 
             <div class="forgotPasswordError" id="forgotPasswordError"></div>
             <div class="loginFields">
               <input type="text" class="input-big" name="email" id="forgotPasswordEmail"
-                     placeholder="Enter your email">
+                     placeholder="<%= @__ 'Type your Email' %>">
             </div>
 
             <div class="join_btn fl">
-              <a id="backToLogin_standalone" class="btn">Back to Login</a>
+              <a id="backToLogin_standalone" class="btn"><%= @__ 'Back to Login' %></a>
             </div>
             <div class="join_btn fr">
-              <a id="submitForgotPassword_standalone" class="btn btn-primary" type="submit">Reset & Send</a>
+              <a id="submitForgotPassword_standalone" class="btn btn-primary" type="submit"><%= @__ 'Reset & Send' %></a>
             </div>
           </fieldset>
         </form>
