@@ -41,7 +41,18 @@ $ ->
 
       commentHeader.find(".comment-minimize").on "click", => @foldComment(commentMin)
       commentHeader.find(".comment-remove").on "click", => @removeComment(commentMin)
-      commentMin.on "mousedown", => @unfoldComment(commentMin, false)
+      commentMin.on "mousedown", =>
+        commentMin[0].dragPossible = true
+      commentMin.on "mousemove", =>
+        commentMin[0].dragPerformed = true if commentMin[0].dragPossible
+      commentMin.on "mouseup", =>
+        if not commentMin[0].dragPerformed and commentMin[0].$maximized.css("visibility") is "visible"
+          @foldComment commentMin
+        else
+          @unfoldComment commentMin
+        commentMin[0].dragPossible = false
+        commentMin[0].dragPerformed = false
+        return true
 
       commentMax.append(commentHeader)
       cmd = if isMac() then "⌘" else "Ctrl"
@@ -609,7 +620,7 @@ $ ->
       room.canvas.findThumbByCanvasId(result.canvasId).click()
 
       comment = result.element
-      @unfoldComment comment.commentMin, false
+      @unfoldComment comment.commentMin
 
       commentText.effect("highlight", {}, 800)
       commentText.effect("highlight", {}, 800) if twice
