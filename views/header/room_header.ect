@@ -8,12 +8,12 @@
 
   <ul class="site_nav">
     <li>
-      <a href="/" class="tooltipize" title="Return to projects" data-delay="1000" data-placement="bottom">
+      <a href="/" class="tooltipize" title="<%= @__ 'Return to projects' %>" data-delay="1000" data-placement="bottom">
         <img src="/images/room/new/site_nav1.png" alt="test">
       </a>
     </li>
     <li>
-      <a href="#inviteModal" class="tooltipize" title="Invite new participant" data-delay="1000"
+      <a href="#inviteModal" class="tooltipize" title="<%= @__ 'Invite new participants' %>" data-delay="1000"
          data-placement="bottom" data-toggle="modal">
         <img src="/images/room/new/site_nav2.png" alt="test">
       </a>
@@ -25,7 +25,7 @@
       <% foldFunc = "App.chat.unfold(); return false;" %>
       <% end %>
 
-      <a id="chatFolder" href="#" class="tooltipize" title="Toggle chat"
+      <a id="chatFolder" href="#" class="tooltipize" title="<%= @__ 'Toggle chat' %>"
          data-delay="1000" data-placement="bottom" onclick="<%= foldFunc %>">
         <img src="/images/room/new/site_nav3.png" alt="test">
       </a>
@@ -37,37 +37,37 @@
 
 <ul id="skwiblMenu" class="instruments">
   <li class="selected">
-    <a href="#" class="tooltipize toolTypeChanger selectable" title="Move canvas"
+    <a href="#" class="tooltipize toolTypeChanger selectable" title="<%= @__ 'Move canvas' %>"
        data-delay="1000" data-placement="bottom" data-tooltype="pan">
       <img src="/images/room/new/instrument/pan.png" alt="Move">
     </a>
   </li>
   <li>
-    <a href="#" class="tooltipize toolTypeChanger selectable" title="Select"
+    <a href="#" class="tooltipize toolTypeChanger selectable" title="<%= @__ 'Select' %>"
        data-delay="1000" data-placement="bottom" data-tooltype="select">
       <img src="/images/room/new/instrument/select.png" alt="Select">
     </a>
   </li>
   <li>
-    <a href="#" class="tooltipize toolTypeChanger selectable" title="Note" onclick="App.room.helper.notifyComment()"
+    <a href="#" class="tooltipize toolTypeChanger selectable" title="<%= @__ 'Note' %>" onclick="App.room.helper.notifyComment()"
        data-delay="1000" data-placement="bottom" data-tooltype="comment">
       <img src="/images/room/new/instrument/comment.png" alt="Note">
     </a>
   </li>
   <li>
-    <a href="#" class="tooltipize toolTypeChanger selectable" title="Highlighter"
+    <a href="#" class="tooltipize toolTypeChanger selectable" title="<%= @__ 'Highlighter' %>"
        data-delay="1000" data-placement="bottom" data-tooltype="highlighter">
       <img src="/images/room/new/instrument/highlighter.png" alt="Highlighter">
     </a>
   </li>
   <li>
-    <a href="#" class="tooltipize toolTypeChanger selectable" title="Pencil"
+    <a href="#" class="tooltipize toolTypeChanger selectable" title="<%= @__ 'Pencil' %>"
        data-delay="1000" data-placement="bottom" data-tooltype="line">
       <img src="/images/room/new/instrument/pencil.png" alt="Pencil">
     </a>
   </li>
   <li class="dropdown">
-    <a href="#" id="additionalInsDropdown" class="tooltipize toolTypeChanger selectable" title="Arrow"
+    <a href="#" id="additionalInsDropdown" class="tooltipize toolTypeChanger selectable" title="<%= @__ 'Arrow' %>"
        data-delay="1000" data-placement="bottom" data-tooltype="arrow">
       <img src="/images/room/new/instrument/arrow.png" alt="Arrow">
     </a>
@@ -76,25 +76,25 @@
     </button>
     <ul id="additionalInsSelect">
       <li>
-        <a href="#" class="tooltipize toolTypeChanger" title="Arrow"
+        <a href="#" class="tooltipize toolTypeChanger" title="<%= @__ 'Arrow' %>"
            data-delay="1000" data-placement="bottom" data-tooltype="arrow">
           <img src="/images/room/new/instrument/arrow.png" alt="Arrow">
         </a>
       </li>
       <li>
-        <a href="#" class="tooltipize toolTypeChanger" title="Rectangle"
+        <a href="#" class="tooltipize toolTypeChanger" title="<%= @__ 'Rectangle' %>"
            data-delay="1000" data-placement="bottom" data-tooltype="rectangle">
           <img src="/images/room/new/instrument/rect.png" alt="Rectangle">
         </a>
       </li>
       <li>
-        <a href="#" class="tooltipize toolTypeChanger" title="Circle"
+        <a href="#" class="tooltipize toolTypeChanger" title="<%= @__ 'Circle' %>"
            data-delay="1000" data-placement="bottom" data-tooltype="circle">
           <img src="/images/room/new/instrument/circle.png" alt="Circle">
         </a>
       </li>
       <li>
-        <a href="#" class="tooltipize toolTypeChanger" title="Line"
+        <a href="#" class="tooltipize toolTypeChanger" title="<%= @__ 'Line' %>"
            data-delay="1000" data-placement="bottom" data-tooltype="straightline">
           <img src="/images/room/new/instrument/line.png" alt="Line">
         </a>
@@ -102,7 +102,7 @@
     </ul>
   </li>
   <li class="dropdown">
-    <a href="#" class="tooltipize" role="button" data-toggle="dropdown" title="Select color"
+    <a href="#" class="tooltipize" role="button" data-toggle="dropdown" title="<%= @__ 'Select color' %>"
        data-delay="1000" data-placement="bottom">
       <div class="instrument_color colorSelected" style="background-color:red;" data-color="red"></div>
     </a>
@@ -155,13 +155,13 @@
     </ul>
   </li>
   <div id="scaleDiv" class="instrument_zoom dropdown">
-    <a href="#" class="plusSign tooltipize" title="Zoom In"
+    <a href="#" class="plusSign tooltipize" title="<%= @__ 'Zoom In' %>"
        data-placement="bottom" data-delay="1000" href="#" onclick="App.room.canvas.addScale(); return false;">
       <img src="/images/room/new/instrument/plus.png" alt="Zoom in" width="18">
     </a>
     <a href="#" id="scaleAmount" class="dropdown-toggle instrument_zoom_text" role="button"
        data-toggle="dropdown">100%</a>
-    <a href="#" class="minusSign tooltipize" title="Zoom out"
+    <a href="#" class="minusSign tooltipize" title="<%= @__ 'Zoom Out' %>"
        data-placement="bottom" data-delay="1000" href="#" onclick="App.room.canvas.subtractScale(); return false;">
       <img src="/images/room/new/instrument/minus.png" alt="Zoom out" width="18">
     </a>
@@ -173,27 +173,27 @@
       <a href="#" data-scale="1.25">125%</a>
       <a href="#" data-scale="1.5">150%</a>
       <a href="#" data-scale="2">200%</a>
-      <a href="#" data-scale="fitToImage">Fit to image</a>
+      <a href="#" data-scale="fitToImage"><%= @__ 'Fit to image' %></a>
     </div>
   </div>
   <li class="instrument_history" data-overflow-hideable="true">
-    <a href="#" id="undoLink" class="disabled tooltipize" title="Undo"
+    <a href="#" id="undoLink" class="disabled tooltipize" title="<%= @__ 'Undo' %>"
        data-placement="bottom" data-delay="1000" onclick="App.room.history.prev();return false;">
       <img src="/images/room/new/instrument/undo.png" alt="Rotate Anticlockwise">
     </a>
-    <a href="#" id="redoLink" class="disabled tooltipize" title="Redo"
+    <a href="#" id="redoLink" class="disabled tooltipize" title="<%= @__ 'Redo' %>"
        data-placement="bottom" data-delay="1000" onclick="App.room.history.next();return false;">
       <img src="/images/room/new/instrument/redo.png" alt="Rotate Clockwise">
     </a>
   </li>
   <li data-overflow-hideable="true">
-    <a id="toggleComments" href="#" class="tooltipize selectable" data-title="Hide all comments"
+    <a id="toggleComments" href="#" class="tooltipize selectable" data-title="<%= @__ 'Hide all comments' %>"
        data-placement="bottom" data-delay="1000" onclick="App.room.comments.toggleComments(); return false;">
       <strong style="font-size:10px;">Hide</strong>
     </a>
   </li>
   <li data-overflow-hideable="true">
-    <a href="#" class="tooltipize" title="Clear canvas"
+    <a href="#" class="tooltipize" title="<%= @__ 'Clear canvas' %>"
        data-placement="bottom" data-delay="1000" onclick="App.room.canvas.onClearClick(); return false;">
       <img src="/images/room/new/instrument/clear.png" alt="Clear canvas">
     </a>

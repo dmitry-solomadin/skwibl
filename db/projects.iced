@@ -1,4 +1,5 @@
-# get all the projects that are available for the user
+fs = require 'fs'
+
 exports.index = (uid, fn) =>
   @client.zrevrange "users:#{uid}:projects", 0, -1, (err, array) =>
     projects = []
@@ -75,7 +76,6 @@ exports.add = (uid, name, fn) =>
       project.name = name
       project.owner = uid
       project.createdAt = Date.now()
-      project.start = Date()
       project.status = 'new'
       @client.hmset "projects:#{val}", project, @tools.logError
       @client.sadd "projects:#{val}:users", uid
@@ -226,7 +226,30 @@ exports.confirm = (aid, uid, answer, fn) =>
     return @tools.asyncOpt fn, err, val
 
 exports.set = (id, pid, fn) =>
+  @client.hset "projects:#{pid}", 'updatedAt', Date.now()
   @client.set "users:#{id}:current", pid, fn
 
 exports.current = (id, fn) =>
   @client.get "users:#{id}:current", fn
+
+exports.createDemo = (uid, fn) ->
+  @db.projects.add uid, 'Demo Project', (err, project) =>
+    dir = "#{@cfg.UPLOADS}/#{project.id}"
+    fs.mkdir dir, @cfg.DIRECTORY_PERMISSION, (err) =>
+      fs.mkdir "#{dir}/video", @cfg.DIRECTORY_PERMISSION
+      fs.mkdir "#{dir}/image", @cfg.DIRECTORY_PERMISSION, (err) =>
+        #TODO use symlink with realpath instead
+        fs.createReadStream('./uploads/demo/image/Skibwl_room_9.png').pipe(fs.createWriteStream("./uploads/#{project.id}/image/Skibwl_room_9.png"))
+        fs.createReadStream('./uploads/demo/image/Skibwl_room_7_2.png').pipe(fs.createWriteStream("./uploads/#{project.id}/image/Skibwl_room_7_2.png"))
+        @client.lrange "projects:#{project.id}:canvases", 0 ,-1, (err, canvases) =>
+          @db.files.add uid, canvases[0], project.id, 'Skibwl_room_9.png', 'image/png', 680, 300
+        @db.canvases.add project.id, null, null, (err, canvas) =>
+          @db.files.add uid, canvas.id, project.id, 'Skibwl_room_7_2.png', 'image/png', 680, 300
+        for size of @cfg.PROJECT_THUMB_SIZE
+          fs.mkdir "#{dir}/image/#{size}", @cfg.DIRECTORY_PERMISSION
+          fs.createReadStream('./uploads/demo/image/lsmall/Skibwl_room_7_2.png').pipe(fs.createWriteStream("./uploads/#{project.id}/image/lsmall/Skibwl_room_7_2.png"))
+          fs.createReadStream('./uploads/demo/image/rsmall/Skibwl_room_7_2.png').pipe(fs.createWriteStream("./uploads/#{project.id}/image/rsmall/Skibwl_room_7_2.png"))
+          fs.createReadStream('./uploads/demo/image/tiny/Skibwl_room_7_2.png').pipe(fs.createWriteStream("./uploads/#{project.id}/image/tiny/Skibwl_room_7_2.png"))
+          fs.createReadStream('./uploads/demo/image/lsmall/Skibwl_room_9.png').pipe(fs.createWriteStream("./uploads/#{project.id}/image/lsmall/Skibwl_room_9.png"))
+          fs.createReadStream('./uploads/demo/image/rsmall/Skibwl_room_9.png').pipe(fs.createWriteStream("./uploads/#{project.id}/image/rsmall/Skibwl_room_9.png"))
+          fs.createReadStream('./uploads/demo/image/tiny/Skibwl_room_9.png').pipe(fs.createWriteStream("./uploads/#{project.id}/image/tiny/Skibwl_room_9.png"))

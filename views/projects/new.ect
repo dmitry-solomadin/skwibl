@@ -1,19 +1,19 @@
-<h1 class="page_header">Create a Project</h1>
+<h1 class="page_header"><%= @__ 'Create a Project' %></h1>
 <div class="content">
   <%- include './shared/errors.ect' %>
 
   <form action="/projects/add" method="POST" class="project_create_form">
-    <input class="input-big" style="width:870px;" type="text" placeholder="Type Project Name" name="name">
+    <input class="input-big" style="width:888px;" type="text" placeholder="<%= @__ 'Type Project Name' %>" name="name">
 
     <div class="invite_head">
-      Invite Participants
+      <%= @__ 'Invite participants' %>
       <a class="btn noselect" id="inviteParticipantsToggle"><span class="caret-image"></span></a>
     </div>
 
     <div id="inviteParticipants" style="display: none;">
-      <label style="font-family: 'MyriadPro-Regular';font-size:20px;line-height:26px;">By email:</label>
+      <label style="font-family: 'MyriadPro-Regular';font-size:20px;line-height:26px;"><%= @__ 'By email:' %></label>
 
-      <input class="input-big" style="width:870px;" type="text" placeholder="Type email (comma separated)"
+      <input class="input-big" style="width:888px;" type="text" placeholder="<%= @__ 'Type email (comma separated)' %>"
              name="inviteeEmails">
 
       <!-- NICE EMAIL INPUT
@@ -152,7 +152,7 @@
       -->
     </div>
     <div class="project_create_btn">
-      <input type="submit" class="btn btn-success" value="Create"/>
+      <input type="submit" class="btn btn-success" value="<%= @__ 'Create' %>"/>
     </div>
   </form>
 </div>

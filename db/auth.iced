@@ -28,9 +28,9 @@ exports.findOrCreate = (profile, token, secret, fn) =>
     unless _.isEqual user.name, purifiedName
       user.name = _.extend purifiedName, user.name
       @db.users.setName user.id, user.name
-    diff = _.difference profile.emails, user.emails
+    diff = _.difference _.pluck(profile.emails, 'value'), _.pluck(user.emails, 'value')
     if diff.length
-      user.emails.concat diff
+      user.emails.concat diff.map (email) -> value: email
       @db.users.addEmails user.id, user.emails
     @db.auth.connect user.id, profile.provider,
       token: token

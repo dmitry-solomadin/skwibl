@@ -1,4 +1,4 @@
-<h1 class="page_header">Activities</h1>
+<h1 class="page_header"><%= @__ 'Activities' %></h1>
 <div class="content activities">
   <% if @activities.length : %>
     <% for @activity in @activities.reverse() : %>
@@ -13,6 +13,6 @@
     </div>
     -->
   <% else : %>
-    <h3>There are no activities to display</h3>
+    <h3><%= @__ 'There are no activities to display' %></h3>
   <% end %>
 </div>

@@ -3,6 +3,7 @@ express = require 'express'
 flash = require 'connect-flash'
 ect = require 'ect'
 path = require 'path'
+i18n = require 'i18n-2'
 
 moment = require 'moment'
 
@@ -28,43 +29,45 @@ exports.setUp = (logger) ->
       logger.info message
 
   app.configure 'development', ->
-    app.use express.errorHandler {
-      dumpExceptions: true
-      showStack: true
-    }
+    app.use express.errorHandler
+      dumpExceptions: yes
+      showStack: yes
+    app.set 'cookie', maxAge: cfg.SESSION_DURATION * 1000
 
   app.configure 'production', ->
     app.use express.errorHandler()
+    app.set 'cookie',
+      maxAge: cfg.SESSION_DURATION * 1000
+      domain: ".skwibl.com"
 
   app.configure ->
+    i18n.expressBind app, locales: ['ru', 'en']
     app.set 'views', viewsDir
-    app.engine 'ect', ect({
-      cache: true
-      watch: true
+    app.engine 'ect', ect(
+      cache: on
+      watch: yes
       root: viewsDir
-    }).render
+    ).render
     app.set 'view engine', 'ect'
     app.use express.logger stream: logStream, format: 'dev'
     app.enable 'trust proxy'
     app.use express.favicon "#{assetsDir}/images/butterfly-tiny.png"
-    app.set 'view options', {layout: false}
+    app.set 'view options', layout: off
     app.use express.json()
     app.use express.urlencoded()
     app.use express.methodOverride()
     app.use express.cookieParser()
-    app.use express.session {
+    app.use express.session
       key: cfg.SESSION_KEY
       secret: cfg.SITE_SECRET
+      cookie: app.get 'cookie'
       store: db.sessions.createStore express
-    }
     app.use passport.initialize()
     app.use passport.session()
     app.use '/file/upload', ctrls.mid.isAuth
     app.use '/file/upload', ctrls.files.upload
     app.use flash()
     app.use (req, res, next) ->
-      #TODO change to req.user, req.flash
-      #TODO temporary fix, find a nicer way
       res.locals helpers: helpers
       res.locals.helpers.users.user = req.user
       res.locals.helpers.flash.req = {}

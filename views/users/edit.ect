@@ -1,4 +1,4 @@
-<h1 class="page_header">Edit Your Profile</h1>
+<h1 class="page_header"><%= @__ 'Edit Your Profile' %></h1>
 
 <div class="content">
 <%- include './shared/errors.ect' %>
@@ -13,29 +13,29 @@
         <% end %>
       </div>
 
-      <label class="control-label" for="name">Name</label>
+      <label class="control-label" for="name"><%= @__ 'Name' %></label>
 
       <div class="controls">
         <input type="text" class="input-xlarge" name="user[displayName]" id="name" value="<%= user.displayName %>">
       </div>
 
-      <label class="control-label" for="email">Email</label>
+      <label class="control-label" for="email"><%= @__ 'Email' %></label>
 
       <div class="controls">
         <input type="text" class="input-xlarge" name="user[email]" id="email" value="<%= user.email %>"
                autocomplete="off">
       </div>
 
-      <label class="control-label" for="registerpassword">Password</label>
+      <label class="control-label" for="registerpassword"><%= @__ 'Password' %></label>
 
       <div class="controls">
         <input type="password" class="input-xlarge" name="user[password]" id="registerpassword"
-               placeholder="Change password" autocomplete="off">
+               placeholder="<%= @__ 'Change password' %>" autocomplete="off">
       </div>
     </div>
     <div class="control-group">
       <div class="controls">
-        <button class="btn btn-success btn-large" type="submit">Update</button>
+        <button class="btn btn-success btn-large" type="submit"><%= @__ 'Update' %></button>
       </div>
     </div>
   </fieldset>

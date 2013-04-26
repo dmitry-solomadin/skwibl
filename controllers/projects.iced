@@ -64,8 +64,6 @@ exports.add = (req, res) =>
     if err
       req.flash 'warning', 'Project was created but there was some problems with sending invites.'
       return res.redirect '/projects'
-#     else
-#       req.flash 'message', 'Project was created invites were sent.'
     return res.redirect "/projects/#{pid}"
 
   if not req.body.name or req.body.name is ''

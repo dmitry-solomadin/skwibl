@@ -1,44 +1,44 @@
 <form id="loginForm" action="/login" method="post" class="form-horizontal loginForm" data-remote="true">
   <div>
-    <span class="login_header">Sign in with your social account:</span>
-    <ul class="login_social_join">
-      <li class="input-append">
+    <span class="login_header"><%= @__ 'Sign in with your social account:' %></span>
+    <center><ul class="login_social_join">
+      <li class="input-append" style="float: left;">
         <img class="add-on" src="/images/google-27.png" alt="Google+"><a
-          class="btn" href="/auth/google" title="Connect with Google+">Connect</a>
+          class="btn" href="/auth/google" title="Connect with Google+"><%= @__ 'Connect' %></a>
       </li>
       <li class="input-append">
         <img class="add-on" src="/images/facebook-27.png" alt="Facebook"><a
-          class="btn" href="/auth/facebook" title="Connect with Facebook">Connect</a>
+          class="btn" href="/auth/facebook" title="Connect with Facebook"><%= @__ 'Connect' %></a>
       </li>
-      <li class="input-append">
+      <li class="input-append" style="float: right;">
         <img class="add-on" src="/images/linkedin-27.png" alt="Linkedin"><a
-          class="btn" href="/auth/linkedin" title="Connect with Linkedin">Connect</a>
+          class="btn" href="/auth/linkedin" title="Connect with Linkedin"><%= @__ 'Connect' %></a>
       </li>
-    </ul>
+    </ul></center>
 
     <div style="clear: both;"></div>
 
     <hr>
-    <div class="login_or_wrap"><div class="login_or">or</div></div>
+    <div class="login_or_wrap"><div class="login_or"><%= @__ 'or' %></div></div>
   </div>
 
   <div id="loginError"></div>
 
   <div class="loginFields">
-    <input type="text" class="input-xlarge" name="email" placeholder="Email"><br/>
-    <input type="password" class="input-xlarge" name="password" id="password" placeholder="Password">
+    <input type="text" class="input-xlarge" name="email" placeholder="<%= @__ 'Email' %>"><br/>
+    <input type="password" class="input-xlarge" name="password" id="password" placeholder="<%= @__ 'Password' %>">
   </div>
 
   <div class="fr" style="width:100%;">
     <label class="checkbox fl" style="width: 110px;">
-      <input type="checkbox"> Remember me
+      <input type="checkbox"> <%= @__ 'Remember me' %>
     </label>
 
-    <a id="forgotpasswordlink" class="fr" href="#">Forgot password?</a>
+    <a id="forgotpasswordlink" class="fr" href="#"><%= @__ 'Forgot password?' %></a>
   </div>
 
   <div class="clear_medium"></div>
   <div class="fr">
-    <button class="btn" type="submit">Login</button>
+    <button class="btn" type="submit"><%= @__ 'Login' %></button>
   </div>
 </form>

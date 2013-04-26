@@ -6,4 +6,4 @@ echo "updating"
 
 npm install -d
 npm update
-bin/patch.sh
+# bin/patch.sh

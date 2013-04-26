@@ -164,8 +164,8 @@ input.input-big {
 }
 
 .gecko .btn {
-    padding-top: 6px;
-    padding-bottom: 8px;
+    padding-top: 8px;
+    padding-bottom: 6px;
 }
 
 .font-normal {
@@ -273,7 +273,7 @@ input.input-big {
 }
 
 .gecko #createNewProject button, .ie #createNewProject button {
-    padding: 8px 22px 10px 22px;
+    padding: 10px 22px 8px 22px;
 }
 
 .navbar .nav > li > a {
@@ -474,7 +474,7 @@ input.input-big {
 }
 
 .gecko .login_social_join .btn {
-    padding: 3px 10px 5px 10px;
+    padding: 5px 10px 3px 10px;
 }
 
 .login_or_wrap {
@@ -592,7 +592,7 @@ input.input-big {
 
 .dropdownMenu li a {
     display: block;
-    padding: 12px 0 12px 15px;
+    padding: 12px 8px 12px 15px;
     min-width: 150px;
     font-family: "MyriadPro-Regular";
     font-size: 16px;

@@ -42,7 +42,7 @@
 }
 
 .gecko .social_join .btn {
-    padding: 3px 20px 5px 20px;
+    padding: 5px 20px 3px 20px;
 }
 
 hr {
@@ -111,7 +111,7 @@ a.verify_code_reset {
 }
 
 .ie .join_btn .btn, .gecko .join_btn .btn {
-    padding: 14px 30px;
+    padding: 16px 30px 13px;
 }
 
 .join_div {

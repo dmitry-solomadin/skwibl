@@ -1,4 +1,5 @@
 exports.update = (pid, owner, data, fn) =>
+  console.log data
   data = data.element
   canvas = data.canvasId
   eid = data.elementId

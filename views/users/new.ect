@@ -1,38 +1,38 @@
 <div class="page_container">
-  <h1 style="text-align:center;" class="page_header">Join Skwibl</h1>
+  <h1 style="text-align:center;" class="page_header"><%= @__ 'Join Skwibl' %></h1>
 
   <div class="content">
     <%- include './shared/errors.ect' %>
     <div class="join_form">
       <div class="join_div">
-        <div>Join through your Social Networks:</div>
+        <div><%= @__ 'Join through your Social Networks:' %></div>
         <ul class="social_join">
           <li class="input-append">
             <img class="add-on" src="/images/registration/join_soc1.png" alt="Google+"><a
-              class="btn" href="/auth/google" title="Connect with Google+">Connect</a>
+              class="btn" href="/auth/google" title="<%= @__ 'Connect with' %> Google+"><%= @__ 'Connect' %></a>
           </li>
           <li class="input-append">
             <img class="add-on" src="/images/registration/join_soc2.png" alt="Facebook"><a
-              class="btn" href="/auth/facebook" title="Connect with Facebook">Connect</a>
+              class="btn" href="/auth/facebook" title="<%= @__ 'Connect with' %> Facebook"><%= @__ 'Connect' %></a>
           </li>
           <li class="input-append">
             <img class="add-on" src="/images/registration/join_soc3.png" alt="Linkedin"><a
-              class="btn" href="/auth/linkedin" title="Connect with Linkedin">Connect</a>
+              class="btn" href="/auth/linkedin" title="<%= @__ 'Connect with' %> Linkedin"><%= @__ 'Connect' %></a>
           </li>
         </ul>
         <hr>
-        <div style="color:#acabab">or</div>
-        <div>Create an Account</div>
+        <div style="color:#acabab"><%= @__ 'or' %></div>
+        <div><%= @__ 'Create an Account' %></div>
       </div>
       <form action="/register" method="post" onsubmit="return App.Home.submitJoinForm();">
-        <input id="joinGivenName" class="input-big input_half fl" type="text" placeholder="Type your First Name" name="givenName">
-        <input id="joinFamilyName" class="input-big input_half fl ml25" type="text" placeholder="Type your Last Name" name="familyName">
+        <input id="joinGivenName" class="input-big input_half fl" type="text" placeholder="<%= @__ 'Type your First Name' %>" name="givenName">
+        <input id="joinFamilyName" class="input-big input_half fl ml25" type="text" placeholder="<%= @__ 'Type your Last Name' %>" name="familyName">
         <div id="joinGivenNameError" class="error_ajax error_half fl just_hidden"></div>
         <div id="joinFamilyNameError" class="error_ajax error_half fl ml25 just_hidden"></div>
         <div class="clearfix"></div>
-        <input id="joinEmail" class="input-big" type="text" placeholder="Type your Email" name="email">
+        <input id="joinEmail" class="input-big" type="text" placeholder="<%= @__ 'Type your Email' %>" name="email">
         <div id="joinEmailError" class="error_ajax just_hidden"></div>
-        <input id="joinPassword" class="input-big" type="password" placeholder="Type your Password" name="password">
+        <input id="joinPassword" class="input-big" type="password" placeholder="<%= @__ 'Type your Password' %>" name="password">
         <div id="joinPasswordError" class="error_ajax just_hidden"></div>
 
         <!--
@@ -47,7 +47,7 @@
         -->
 
         <div class="join_btn">
-          <button type="submit" class="btn btn-success">Join Skwibl</button>
+          <button type="submit" class="btn btn-success"><%= @__ 'Join Skwibl Reg' %></button>
         </div>
       </form>
     </div>
