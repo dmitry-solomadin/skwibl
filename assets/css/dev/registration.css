@@ -33,16 +33,12 @@
     height: 23px;
     line-height: 23px;
     font-size: 15px;
-    padding: 4px 20px;
+    padding: 5px 20px 3px 20px;
     font-family: 'MyriadPro-Regular';
 }
 
 .ie .social_join .btn {
     border-radius: 0 4px 4px 0  !important;
-}
-
-.gecko .social_join .btn {
-    padding: 5px 20px 3px 20px;
 }
 
 hr {
@@ -107,10 +103,6 @@ a.verify_code_reset {
 .join_btn .btn {
     font-size: 24px;
     font-family: 'MyriadPro-Semibold';
-    padding: 13px 30px 15px 30px;
-}
-
-.ie .join_btn .btn, .gecko .join_btn .btn {
     padding: 16px 30px 13px;
 }
 
