@@ -121,16 +121,15 @@ body.mainpage {
 }
 
 .tour_item {
-    padding-top: 265px;
-    padding-left: 50px;
     font-size: 18px;
 }
 
 .tour_item.left {
-    float: left;
-    position: relative;
+    position: absolute;
     left: 25px;
-    background: url(/images/mainpage/tour1.png) 0 90px no-repeat;
+    top: 80px;
+    padding: 185px 0 0 42px;
+    background: url(/images/mainpage/tour1.png) 0 10px no-repeat;
 }
 
 .tour_item span {
@@ -168,9 +167,6 @@ body.mainpage {
 }
 
 .tour_item.center {
-    position: absolute;
-    top: 0;
-    left: 330px;
     padding: 110px 0 0;
     background: url(/images/mainpage/tour2.png) 50% 10px no-repeat;
     text-align: center;
@@ -181,8 +177,11 @@ body.mainpage {
 }
 
 .tour_item.right {
-    float: right;
-    background: url(/images/mainpage/tour3.png) 0 115px no-repeat;
+    position: absolute;
+    left: 709px;
+    top: 105px;
+    padding: 160px 0 0;
+    background: url(/images/mainpage/tour3.png)  0 10px no-repeat;
 }
 
 .banner_nav {
