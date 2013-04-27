@@ -43,12 +43,8 @@ $ ->
           texts = []
           texts.push(JSON.parse($(rawText).val())) for rawText in $(".commentTexts#{comment.elementId}")
 
-          createdComment = room.socketHelper.createCommentFromData(comment)
-          unless cid is selectedCid
-            room.comments.hideComment(createdComment)
-
-          for text in texts
-            room.comments.addCommentText createdComment, text
+          createdComment = room.socketHelper.createCommentFromDataWithTexts comment, texts
+          room.comments.hideComment createdComment unless cid is selectedCid
 
     initThumbnails: ->
       selectedCid = @getSelectedCanvasId()

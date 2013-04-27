@@ -87,12 +87,18 @@ $ ->
 
       $(document).off("click.toggleCommentButtons").on "click.toggleCommentButtons", (evt) =>
         for commentSendWrap in $(".comment-send-wrap:visible")
+          commentContent = $(commentSendWrap).closest(".comment-content")
           # do not make send button invisible if comment in editing mode.
-          unless $(commentSendWrap).parent().find(".edit-cancel:visible")[0]
+          unless commentContent.find(".edit-cancel:visible")[0]
             $(commentSendWrap).hide()
+            if commentContent.find(".comment-content-inner > div").length > 0
+              commentContent.find(".comment-content-actions").hide()
             @redrawArrow(commentMin)
 
-        $(evt.target).parent(".comment-content-actions").find(".comment-send-wrap").show() if evt.target
+        if evt.target
+          commentContent = $(evt.target).closest(".comment-content")
+          commentContent.find(".comment-send-wrap, .comment-content-actions").show()
+          commentContent.find(".comment-content-actions textarea")[0].focus()
 
       $(commentMax).find(".comment-send").on "click", =>
         @sendComment(commentMin)

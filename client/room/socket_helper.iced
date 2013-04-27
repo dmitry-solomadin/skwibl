@@ -67,10 +67,7 @@ $ ->
       if foundComment
         updateComment(foundComment, data)
       else
-        commentMin = @createCommentFromData(data)
-
-        for text in data.texts
-          room.comments.addCommentText commentMin, text
+        room.socketHelper.createCommentFromDataWithTexts data, data.texts
 
       room.redrawWithThumb()
 
@@ -83,6 +80,7 @@ $ ->
 
       commentMin = room.comments.create(comment.min.x, comment.min.y, rect, comment.min, comment.max, comment.color, comment.number)
       commentMin.elementId = comment.elementId
+      commentMin.find("").hide()
 
       if rect
         rect.commentMin = commentMin
@@ -91,6 +89,13 @@ $ ->
       else
         room.history.add({actionType: "comment", commentMin: commentMin, eligible: false})
 
+      commentMin
+
+    createCommentFromDataWithTexts: (comment, texts) ->
+      commentMin = @createCommentFromData comment
+      for text in texts
+        room.comments.addCommentText commentMin, text
+      commentMin[0].$maximized.find(".comment-content-actions").hide() if texts.length > 0
       commentMin
 
     socketRemoveElement: (elementId) ->
