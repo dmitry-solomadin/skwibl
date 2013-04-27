@@ -68,10 +68,6 @@ body.mainpage {
 
 .header_btns .btn {
     width: 113px;
-    padding: 10px 0 !important;
-}
-
-.gecko .header_btns .btn {
     padding: 11px 0 9px 0 !important;
 }
 

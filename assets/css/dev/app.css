@@ -155,17 +155,12 @@ input.input-big {
     font: 17px 'MyriadPro-Bold';
     line-height: 18px;
     vertical-align: bottom;
-    padding-top: 7px;
-    padding-bottom: 7px;
+    padding-top: 8px;
+    padding-bottom: 6px;
     border-color: #c5c6c6 #838484 #777777 #bababa;
     box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.3), inset -1px -1px 0 rgba(0, 0, 0, 0.1);
     box-sizing: content-box;
     -moz-box-sizing: content-box;
-}
-
-.gecko .btn {
-    padding-top: 8px;
-    padding-bottom: 6px;
 }
 
 .font-normal {
@@ -173,25 +168,16 @@ input.input-big {
 }
 
 .navbar .btn {
-    padding-top: 7px;
-    padding-bottom: 7px;
-}
-
-.gecko .navbar .btn {
     padding-top: 6px;
     padding-bottom: 8px;
 }
 
 .small-btn {
-    padding: 4px !important;
+    padding: 3px 4px 5px 4px !important;
     font: 14px 'MyriadPro-SemiBold';
     -webkit-font-smoothing: antialiased;
     line-height: 19px !important;
     height: 18px;
-}
-
-.gecko .small-btn {
-    padding: 3px 4px 5px 4px !important;
 }
 
 .btn:active {
@@ -247,10 +233,6 @@ input.input-big {
 }
 
 .btn .icon-plus-sign {
-    margin-top: 2px;
-}
-
-.gecko .btn .icon-plus-sign {
     margin-top: 3px;
 }
 
@@ -269,10 +251,6 @@ input.input-big {
 
 #createNewProject button {
     margin-top: 8px;
-    padding: 9px 22px;
-}
-
-.gecko #createNewProject button, .ie #createNewProject button {
     padding: 10px 22px 8px 22px;
 }
 
@@ -465,16 +443,12 @@ input.input-big {
     height: 17px;
     line-height: 16px;
     font-size: 14px;
-    padding: 4px 10px;
+    padding: 5px 10px 3px 10px;
     font-family: 'MyriadPro-Regular';
 }
 
 .ie .login_social_join .btn {
     border-radius: 0 4px 4px 0 !important;
-}
-
-.gecko .login_social_join .btn {
-    padding: 5px 10px 3px 10px;
 }
 
 .login_or_wrap {
