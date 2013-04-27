@@ -597,7 +597,7 @@ body.room {
 }
 
 .canvasFooterFolded {
-    height: 37px;
+    height: 35px;
 }
 
 .canvasFooterFolded #smallCanvasPreviews {
@@ -1378,12 +1378,12 @@ body.room {
     cursor: pointer;
     margin-top: 6px;
     margin-left: 15px;
-}
-
-.canvasFolderTrans {
     -webkit-transition: all 0.35s;
     -moz-transition: all 0.35s;
     transition: all 0.35s;
+}
+
+.canvasFolderTrans {
     -webkit-transform: rotate(180deg);
     -moz-transform: rotate(180deg);
     transform: rotate(180deg);

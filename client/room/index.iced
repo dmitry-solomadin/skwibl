@@ -62,6 +62,10 @@ $ ->
         App.room.canvas.selectMiniThumb(@, true)
         false
 
+      $(".canvasFooterTop").on "click", (e) ->
+        if $(e.target).hasClass("canvasFooterTop") and not App.room.canvas.isNameChangeInProgress()
+          App.room.canvas.togglePreviews()
+
       @helper.initUploader()
       @helper.initHotkeys()
       @helper.initMousewheel()

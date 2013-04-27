@@ -150,7 +150,7 @@
           <img src="/images/room/new/create_icon.png" alt="Create" width="19" height="20">
           <span><%= @__ 'New canvas' %></span></a>
         <img src="<%= foldImg %>" alt="Hide" width="10" height="11"
-             id="canvasFolder" onclick="<%= foldFunc %>" class="canvasFolder">
+             id="canvasFolder" onclick="<%= foldFunc %>" class="canvasFolder <%= 'folded' unless canvasInitialized %>">
       </div>
     </div>
     <div class="canvasFooterBottom">

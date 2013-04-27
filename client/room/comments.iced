@@ -97,8 +97,9 @@ $ ->
 
         if evt.target
           commentContent = $(evt.target).closest(".comment-content")
-          commentContent.find(".comment-send-wrap, .comment-content-actions").show()
-          commentContent.find(".comment-content-actions textarea")[0].focus()
+          if commentContent[0]
+            commentContent.find(".comment-send-wrap, .comment-content-actions").show()
+            commentContent.find(".comment-content-actions textarea")[0].focus()
 
       $(commentMax).find(".comment-send").on "click", =>
         @sendComment(commentMin)

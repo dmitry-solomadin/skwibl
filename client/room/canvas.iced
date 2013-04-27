@@ -143,6 +143,8 @@ $ ->
       else if canvas.hasClass "canvasWrapper"
         canvas.removeClass "canvasWrapper"
 
+    isNameChangeInProgress: -> !$("#canvasNameInput").is(":hidden")
+
     initNameChanger: ->
       changeName = =>
         $("#canvasName").show()
@@ -339,9 +341,12 @@ $ ->
     # CANVAS THUMBNAILS & IMAGE UPLOAD
 
     foldPreviews: ->
-      $("#canvasFolder").addClass("canvasFolderTrans")
-      $("#canvasFooter").animate {height: 35}, queue: false, complete: ->
-        $("#canvasFolder").removeClass("canvasFolderTrans").attr("src", "/images/room/new/hide_icon_up.png")
+      if $("#canvasFolder").attr("src") == "/images/room/new/hide_icon_up.png"
+        $("#canvasFolder").removeClass("canvasFolderTrans")
+      else
+        $("#canvasFolder").addClass("canvasFolderTrans")
+      $("#canvasFolder").attr("src", "/images/room/new/hide_icon_up.png") if isIE()
+      $("#canvasFooter").animate {height: 35}, queue: false
 
       if $("#smallCanvasPreviewsWrap").css('position') is "relative"
         $("#nameChanger").animate(left: 0, 500)
@@ -350,20 +355,31 @@ $ ->
 
       $("#smallCanvasPreviews").animate(left: 0, 500, 'linear')
       $("#canvasFolder").attr("onclick", "App.room.canvas.unfoldPreviews(this); return false;")
+      $("#canvasFolder").addClass("folded")
 
     unfoldPreviews: ->
-      $("#canvasFolder").addClass("canvasFolderTrans")
+      if $("#canvasFolder").attr("src") == "/images/room/new/hide_icon_up.png"
+        $("#canvasFolder").addClass("canvasFolderTrans")
+      else
+        $("#canvasFolder").removeClass("canvasFolderTrans")
+      $("#canvasFolder").attr("src", "/images/room/new/hide_icon.png") if isIE()
 
       if $("#smallCanvasPreviewsWrap").css('position') is "relative"
         $("#nameChanger").animate(left: -$("#nameChanger").position().left, 500)
       else
         $("#nameChanger").animate(left: 0, 500)
 
-      $("#canvasFooter").animate {height: 108}, duration: 500, easing: 'easeOutBack', queue: false, complete: ->
-        $("#canvasFolder").removeClass("canvasFolderTrans").attr("src", "/images/room/new/hide_icon.png")
+      $("#canvasFooter").animate {height: 108}, duration: 500, easing: 'easeOutBack', queue: false
 
       $("#smallCanvasPreviews").animate(left: -500, 500)
       $("#canvasFolder").attr("onclick", "App.room.canvas.foldPreviews(this); return false;")
+      $("#canvasFolder").removeClass("folded")
+
+    togglePreviews: ->
+      if $("#canvasFolder").hasClass("folded")
+        @unfoldPreviews()
+      else
+        @foldPreviews()
 
     requestLinkScreenshot: ->
       link = window.prompt '', 'Enter a link'

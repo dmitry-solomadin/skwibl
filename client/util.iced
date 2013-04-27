@@ -94,6 +94,8 @@ $ ->
 
 window.isMac = -> return /Mac/.test(navigator.userAgent)
 
+window.isIE = -> return /msie/.test(navigator.userAgent)
+
 window.currentPage = (template) -> return $("#currentTemplate").val() is template
 
 window.hasAjaxError = ->
