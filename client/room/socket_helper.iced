@@ -80,7 +80,6 @@ $ ->
 
       commentMin = room.comments.create(comment.min.x, comment.min.y, rect, comment.min, comment.max, comment.color, comment.number)
       commentMin.elementId = comment.elementId
-      commentMin.find("").hide()
 
       if rect
         rect.commentMin = commentMin
