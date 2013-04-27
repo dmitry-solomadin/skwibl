@@ -9,7 +9,6 @@ moment = require 'moment'
 
 routes = require '../routes'
 ctrls = require '../controllers'
-helpers = require '../helpers'
 db = require '../db'
 cfg = require '../config'
 
@@ -41,7 +40,7 @@ exports.setUp = (logger) ->
       domain: ".skwibl.com"
 
   app.configure ->
-    i18n.expressBind app, locales: ['ru', 'en']
+    i18n.expressBind app, locales: ['en', 'ru']
     app.set 'views', viewsDir
     app.engine 'ect', ect(
       cache: on
@@ -67,18 +66,12 @@ exports.setUp = (logger) ->
     app.use '/file/upload', ctrls.mid.isAuth
     app.use '/file/upload', ctrls.files.upload
     app.use flash()
-    app.use (req, res, next) ->
-      res.locals helpers: helpers
-      res.locals.helpers.users.user = req.user
-      res.locals.helpers.flash.req = {}
-      res.locals.helpers.flash.req.session = req.session
-      res.locals.helpers.flash.req.flash = req.flash
-      res.locals.originalUrl = req.originalUrl
-      next()
+    app.use ctrls.aux.helpers
+    app.use ctrls.aux.locale
     app.use app.router
     app.use express.static assetsDir
     app.use ctrls.aux.notFound
-#     app.use(ctrls.aux.error);
+#     app.use ctrls.aux.error
 
   app.locals.moment = moment
   app.locals.passport = passport

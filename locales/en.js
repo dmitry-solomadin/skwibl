@@ -133,5 +133,6 @@
 	"Invite": "Invite",
 	"Log": "Log",
 	"New canvas": "New canvas",
-	"There are no activities to display": "There are no activities to display"
+	"There are no activities to display": "There are no activities to display",
+	"through pictures together, point out and negotiate corrections": "through pictures together, point out and negotiate corrections"
 }

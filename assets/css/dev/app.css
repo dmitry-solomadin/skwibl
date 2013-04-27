@@ -115,6 +115,18 @@ b {
     font-weight: normal;
 }
 
+.lang_chooser {
+    position: relative;
+    float: right;
+    font-size: 18px;
+    margin: 15px 0 0 10px;
+}
+
+.lang_chooser_drop {
+    min-width: 15px;
+    margin: 15px 0 0 -15px;
+}
+
 .content {
     padding: 30px 20px;
     background: #f6f1ed;
