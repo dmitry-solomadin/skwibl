@@ -25,7 +25,6 @@ $ ->
       min_y = if min then min.y else reversedCoord.y
 
       commentMin = $("<div class='comment-minimized'></div>")
-      commentMin.addClass("vis-hidden") if rect
       commentMin.css(left: min_x, top: min_y, borderColor: color).data("color", color)
 
       @setNumber commentMin, number
@@ -143,6 +142,7 @@ $ ->
       paper.project.activeLayer.addChild(path)
 
       commentMin[0].arrow = path
+      @rebindArrowBindPoint commentMin
 
       commentMin
 
@@ -265,12 +265,7 @@ $ ->
     redrawArrow: ($commentMin) ->
       arrow = $commentMin[0].arrow
 
-      # reposition comment-minimized when user translates comment rectangle or moves comment
-      if $commentMin[0].rect
-        bp = @getArrowBindPoint $commentMin
-        $commentMin.css
-          left: (bp.x * room.getScale()) - ($commentMin.width() / 2)
-          top: (bp.y * room.getScale()) - ($commentMin.height() / 2)
+      @rebindArrowBindPoint $commentMin
 
       return if arrow.isHidden
 
@@ -284,6 +279,14 @@ $ ->
       arrow.segments[2].point.y = coords.y2
 
       room.redraw()
+
+    rebindArrowBindPoint: ($commentMin) ->
+      # reposition comment-minimized when user translates comment rectangle or moves comment
+      if $commentMin[0].rect
+        bp = @getArrowBindPoint $commentMin
+        $commentMin.css
+          left: (bp.x * room.getScale()) - ($commentMin.width() / 2)
+          top: (bp.y * room.getScale()) - ($commentMin.height() / 2)
 
     assignBringToFront: ->
       $(document).on "mousedown", "#commentsDiv .comment-maximized", ->
@@ -395,8 +398,6 @@ $ ->
 
       # the comment position might have been changed.
       @redrawArrow($commentmin)
-
-      $commentmin.css("visibility", "hidden") if $commentmin[0].rect
 
       room.redrawWithThumb()
 
